@@ -28,4 +28,20 @@
 "Choose from the Local" = "Choisir depuis le Finder";
 "Api" = "Api";
 "Query Host: " = "Hôte de requête : ";
+"API Key: " = "Clé API : ";
 "Finish" = "Terminer";
+
+"You need to obtain an API key from macosicons.com" = "Vous devez obtenir une clé API depuis macosicons.com";
+"Test API Connection" = "Tester la connexion API";
+"Testing..." = "Test en cours...";
+"API connection established but no results returned." = "Connexion API établie mais aucun résultat retourné.";
+"API connection successful! Found %@ icons." = "Connexion API réussie ! %@ icônes trouvées.";
+"API test failed: %@" = "Test API échoué : %@";
+"Language" = "Langue";
+"System Default" = "Défaut du système";
+"English" = "Anglais";
+"French" = "Français";
+"Chinese" = "Chinois";
+"Changes will take full effect after restarting the app" = "Les changements prendront pleinement effet après le redémarrage de l'application";
+"Language Changed" = "Langue modifiée";
+"The language has been changed. For the best experience, please restart the application." = "La langue a été modifiée. Pour une meilleure expérience, veuillez redémarrer l'application.";

@@ -19,19 +19,18 @@ IconChanger vous permet de changer les icônes de vos applications. Elle simplif
 3. Définissez un nom d'alias (genre Adobe Illustrator -> Illustrator)
 
 
-## Comment obtenir une API de requête (facultatif)
+## Comment obtenir une clé API (obligatoire)
 
 ![](./Github/Api.png)
 
-1. Ouvrez l'app Safari
-2. Ouvrez le site https://macosicons.com/#/
-3. Cherchez ce que vous voulez
-4. Ouvrez l'outil de développeur
-5. Choisissez l'onglet réseau
-6. Cherchez `algolianet`
-7. Copiez l'hôte, du genre `p1txh7zfb3-3.algolianet.com`
-8. Ouvrez les reglages d'IconChanger
-9. Collez l'hôte !
+1. Ouvrez votre navigateur
+2. Allez sur https://macosicons.com/
+3. Créez un compte ou connectez-vous
+4. Accédez aux paramètres de votre profil
+5. Demandez une clé API pour utiliser avec IconChanger
+6. Copiez la clé API
+7. Ouvrez les réglages d'IconChanger
+8. Collez la clé API
 
 ## À propos des Apps Système
 

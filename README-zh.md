@@ -19,19 +19,18 @@ IconChanger是一个可以更换App图标的应用程序。它简化了你更换
 3. 为这个App设置一个合适的别名 (例如 Adobe Illustrator -> Illustrator)
 
 
-## 如何获得 query api (可选择)
+## 如何获得 API 密钥 (必需)
 
 ![](./Github/Api.png)
 
-1. 打开Safari
-2. 打开https://macosicons.com/#/
-3. 搜索任意图标
-4. 打开开发者工具
-5. 选择网络标签栏
-6. 搜索 `algolianet`
-7. 复制链接类似于 `p1txh7zfb3-3.algolianet.com`
-8. 打开IconChanger的设置
-9. 输入链接
+1. 打开浏览器
+2. 访问 https://macosicons.com/
+3. 创建账户或登录
+4. 进入个人设置页面
+5. 请求用于 IconChanger 的 API 密钥
+6. 复制 API 密钥
+7. 打开 IconChanger 设置
+8. 输入 API 密钥
 
 ## 关于系统App
 

@@ -28,4 +28,20 @@
 "Choose from the Local" = "Choose from the Local";
 "Api" = "Api";
 "Query Host: " = "Query Host: ";
+"API Key: " = "API Key: ";
 "Finish" = "Finish";
+
+"You need to obtain an API key from macosicons.com" = "You need to obtain an API key from macosicons.com";
+"Test API Connection" = "Test API Connection";
+"Testing..." = "Testing...";
+"API connection established but no results returned." = "API connection established but no results returned.";
+"API connection successful! Found %@ icons." = "API connection successful! Found %@ icons.";
+"API test failed: %@" = "API test failed: %@";
+"Language" = "Language";
+"System Default" = "System Default";
+"English" = "English";
+"French" = "French";
+"Chinese" = "Chinese";
+"Changes will take full effect after restarting the app" = "Changes will take full effect after restarting the app";
+"Language Changed" = "Language Changed";
+"The language has been changed. For the best experience, please restart the application." = "The language has been changed. For the best experience, please restart the application.";

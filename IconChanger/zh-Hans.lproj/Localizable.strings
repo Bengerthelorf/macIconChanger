@@ -1,0 +1,48 @@
+/* 
+  Localizable.strings
+  IconChanger
+
+  Created by 朱浩宇 on 2022/12/23.
+  Localization for Chinese (Simplified) added on 2024/03/20
+  
+*/
+
+"Unknown" = "未知";
+"We Need Full Disk Access" = "我们需要完全磁盘访问权限";
+"1. Open the System Setting App" = "1. 打开系统设置应用";
+"2. Go to the security" = "2. 前往安全性与隐私";
+"3. Choose the Full Disk Access" = "3. 选择完全磁盘访问权限";
+"4. Unlock it" = "4. 解锁它";
+"5. Choose or add the IconChanger" = "5. 选择或添加IconChanger";
+"6. Check the check box" = "6. 勾选复选框";
+"Check the Access Permition" = "检查访问权限";
+"Copy the Name" = "复制名称";
+"Path" = "路径";
+"Copy" = "复制";
+"Copy the Path Name" = "复制路径名称";
+"Show in the Finder" = "在访达中显示";
+"Set the Alias" = "设置别名";
+"Remove the Icon from the Launchpad" = "从启动台中移除图标";
+"macOSIcon" = "macOSIcon"; // This is the name of the website. Maybe you can keep it.
+"Local" = "本地";
+"Cancel" = "取消";
+"Choose from the Local" = "从本地选择";
+"Api" = "Api";
+"Query Host: " = "查询主机: ";
+"API Key: " = "API密钥: ";
+"Finish" = "完成";
+
+"You need to obtain an API key from macosicons.com" = "您需要从 macosicons.com 获取API密钥";
+"Test API Connection" = "测试API连接";
+"Testing..." = "测试中...";
+"API connection established but no results returned." = "API连接已建立但未返回结果。";
+"API connection successful! Found %@ icons." = "API连接成功！找到 %@ 个图标。";
+"API test failed: %@" = "API测试失败: %@";
+"Language" = "语言";
+"System Default" = "系统默认";
+"English" = "英文";
+"French" = "法文";
+"Chinese" = "中文";
+"Changes will take full effect after restarting the app" = "更改将在重新启动应用后完全生效";
+"Language Changed" = "语言已更改";
+"The language has been changed. For the best experience, please restart the application." = "语言已更改。为了获得最佳体验，请重新启动应用程序。"; 

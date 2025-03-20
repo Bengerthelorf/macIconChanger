@@ -19,19 +19,18 @@ IconChanger is an app that can change you app's icon. It simplifies your icon ch
 3. Set a alias name for it (Like Adobe Illustrator -> Illustrator)
 
 
-## How to get query api (optional)
+## How to get API key (required)
 
 ![](./Github/Api.png)
 
-1. Open the Safari
-2. Open the https://macosicons.com/#/
-3. Search anything
-4. Open the Devloper Tool
-5. Choose the Network tab
-6. Search the `algolianet`
-7. Copy the host like `p1txh7zfb3-3.algolianet.com`
-8. Open the IconChanger Setting
-9. Input the host.
+1. Open your browser
+2. Go to https://macosicons.com/
+3. Create an account or log in
+4. Go to your profile settings
+5. Request an API key for use with IconChanger
+6. Copy the API key
+7. Open the IconChanger Settings
+8. Input the API key
 
 ## About System App
 
