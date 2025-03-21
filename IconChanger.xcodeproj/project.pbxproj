@@ -65,7 +65,7 @@
 		68431E71D50DCD6E570EC101 /* ApplicationSettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplicationSettingsView.swift; sourceTree = "<group>"; };
 		68431EB0D4F0448EC3F269CE /* ApplicationFolderSettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplicationFolderSettingsView.swift; sourceTree = "<group>"; };
 		68431F457332C81179583E38 /* APISettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APISettingsView.swift; sourceTree = "<group>"; };
-		900D1CE5281934C7007ABB12 /* IconChanger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IconChanger.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		900D1CE5281934C7007ABB12 /* IconChanger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = IconChanger.app; path = /Users/zane/Documents/macIconChanger/build/Debug/IconChanger.app; sourceTree = "<absolute>"; };
 		900D1CE8281934C7007ABB12 /* IconChangerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconChangerApp.swift; sourceTree = "<group>"; };
 		900D1CEA281934C7007ABB12 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		900D1CEC281934C8007ABB12 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -155,18 +155,9 @@
 				907AC4F82954038600F9F0F9 /* README-zh.md */,
 				907AC5002955363800F9F0F9 /* README-fr.md */,
 				900D1CE7281934C7007ABB12 /* IconChanger */,
-				900D1CE6281934C7007ABB12 /* Products */,
 				9017B60B2951B22F005709C6 /* Frameworks */,
 				684310CF2CFC89861988FEC0 /* .gitignore */,
 			);
-			sourceTree = "<group>";
-		};
-		900D1CE6281934C7007ABB12 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				900D1CE5281934C7007ABB12 /* IconChanger.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		900D1CE7281934C7007ABB12 /* IconChanger */ = {
@@ -283,7 +274,7 @@
 				9083CCEA2867FDDD0093A1B2 /* XCRemoteSwiftPackageReference "LaunchPadManagerDBHelper" */,
 				9017B5F6294DBBA9005709C6 /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
-			productRefGroup = 900D1CE6281934C7007ABB12 /* Products */;
+			productRefGroup = 900D1CDC281934C7007ABB12;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (

@@ -1,7 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Updated by Bengerthelorf on 2025/03/21 -->
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
         <title>IconChanger</title>
+        <item>
+            <title>Version 1.0.0</title>
+            <link>https://github.com/Bengerthelorf/macIconChanger</link>
+            <sparkle:version>100</sparkle:version>
+            <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>
+            <pubDate>Tue, 21 Mar 2025 12:00:00 +0800</pubDate>
+            <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.0.0/IconChanger.2025-03-21.12-00-00.zip" 
+            sparkle:edSignature="Bengerthelorf2025SignatureWillBeGeneratedLater" 
+            length="7500000"
+            type="application/octet-stream"/>
+            <description>
+                <![CDATA[
+                <h2>macIconChanger 1.0.0</h2>
+                <ul>
+                    <li>迁移到新的 Meilisearch API</li>
+                    <li>添加了多语言支持 (英文、法文、中文)</li>
+                    <li>改进用户界面设计</li>
+                    <li>修复了图标下载问题</li>
+                    <li>增强错误处理和日志记录</li>
+                </ul>
+                ]]>
+            </description>
+        </item>
         <item>
             <title>Version 1.2.2</title>
             <link>https://github.com/underthestars-zhy/IconChanger</link>
