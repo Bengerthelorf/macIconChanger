@@ -20,6 +20,7 @@ struct ChangeView: View {
     @State var isLoadingIcons = true
     @State var totalIconsCount: Int = 0
     @State var successIconsCount: Int = 0
+    @State var validIcons: [IconRes] = []  // 新增：保存成功加载的图标
     let setPath: LaunchPadManagerDBHelper.AppInfo
 
     @Environment(\.presentationMode) var presentationMode
@@ -94,7 +95,7 @@ struct ChangeView: View {
                                 .progressViewStyle(AppStoreProgressViewStyle())
                             Spacer()
                         }
-                    } else if icons.isEmpty {
+                    } else if validIcons.isEmpty {
                         VStack {
                             Spacer()
                             Text("No Icons Found")
@@ -113,7 +114,7 @@ struct ChangeView: View {
                     } else {
                         ZStack {
                             LazyVGrid(columns: columns, alignment: .leading) {
-                                ForEach(icons) { icon in
+                                ForEach(validIcons) { icon in
                                     ImageView(icon: icon, setPath: setPath, onStatusUpdate: { isValid in
                                         updateIconStatus(icon: icon, isValid: isValid)
                                     })
@@ -153,6 +154,7 @@ struct ChangeView: View {
                         icons = try await iconManager.getIcons(setPath)
                         totalIconsCount = icons.count
                         successIconsCount = icons.count  // 初始时假设所有图标都可加载
+                        validIcons = icons  // 初始时将所有图标视为有效
                         isLoadingIcons = false
                     } catch {
                         print(error)
@@ -173,11 +175,19 @@ struct ChangeView: View {
             if successIconsCount > 0 {
                 successIconsCount -= 1
             }
+            
+            // 从validIcons数组中移除无效图标
+            validIcons.removeAll { $0.id == icon.id }
         }
-        // 如果状态变为有效，且之前是无效的
+        // 如果状态变为有效，且之前是无效的 (理论上不会发生，但保留以防万一)
         else if isValid && !icon.isValidIcon {
             icon.isValidIcon = true
             successIconsCount += 1
+            
+            // 确保图标在validIcons数组中
+            if !validIcons.contains(where: { $0.id == icon.id }) {
+                validIcons.append(icon)
+            }
         }
     }
 }
