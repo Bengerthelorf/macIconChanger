@@ -44,4 +44,10 @@
 "Chinese" = "中文";
 "Changes will take full effect after restarting the app" = "更改将在重新启动应用后完全生效";
 "Language Changed" = "语言已更改";
-"The language has been changed. For the best experience, please restart the application." = "语言已更改。为了获得最佳体验，请重新启动应用程序。"; 
+"The language has been changed. For the best experience, please restart the application." = "语言已更改。为了获得最佳体验，请重新启动应用程序。";
+
+"No Icons Found" = "没有找到匹配的图标";
+"Try different search keywords" = "请尝试使用其他关键词搜索";
+"No Icon" = "没有图标";
+"You can modify the alias name for better results" = "您可以修改别名以获得更好的搜索结果";
+"Set Alias Name" = "设置别名"; 

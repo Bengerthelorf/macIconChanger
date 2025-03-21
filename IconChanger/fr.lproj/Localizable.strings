@@ -46,3 +46,10 @@
 "Changes will take full effect after restarting the app" = "Les changements prendront pleinement effet après le redémarrage de l'application";
 "Language Changed" = "Langue modifiée";
 "The language has been changed. For the best experience, please restart the application." = "La langue a été modifiée. Pour une meilleure expérience, veuillez redémarrer l'application.";
+
+// New translation keys
+"No Icons Found" = "Aucune icône trouvée";
+"Try different search keywords" = "Essayez différents mots-clés de recherche";
+"No Icon" = "Pas d'icône";
+"You can modify the alias name for better results" = "Vous pouvez modifier l'alias pour de meilleurs résultats";
+"Set Alias Name" = "Définir un alias";

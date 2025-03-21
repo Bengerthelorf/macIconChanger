@@ -3,6 +3,7 @@
 //  IconChanger
 //
 //  Created by seril on 7/25/23.
+//  Modified by Bengerthelorf on 2025/3/21.
 //
 
 import SwiftUI
@@ -14,11 +15,19 @@ struct ImageViewCore: View {
     let setPath: LaunchPadManagerDBHelper.AppInfo
     @State private var isTaskRunning = false
     @State private var task: Task<Void, Never>? = nil
+    @Binding var isLoading: Bool
 
     // Add a new State variable for showing an alert
     @State var showSnackbar = false
     @State var isSuccessful = true
     @State var failureMessage = "Failed to load data."
+
+    // 添加一个初始化方法，使之向后兼容
+    init(nsimage: Binding<NSImage?>, setPath: LaunchPadManagerDBHelper.AppInfo, isLoading: Binding<Bool> = .constant(true)) {
+        self._nsimage = nsimage
+        self.setPath = setPath
+        self._isLoading = isLoading
+    }
 
     var body: some View {
         Group {
@@ -29,13 +38,33 @@ struct ImageViewCore: View {
                             .onTapGesture {
                                 changeIcon(image: nsimage)
                             }
-                } else {
+                            .onAppear {
+                                isLoading = false
+                            }
+                } else if isLoading {
                     Image("Unknown")
                             .resizable()
                             .scaledToFit()
                             .overlay {
                                 ProgressView()
                             }
+                            .onAppear {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                                    if nsimage == nil {
+                                        isLoading = false
+                                    }
+                                }
+                            }
+                } else {
+                    VStack {
+                        Text("No Icon")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .padding()
+                    }
+                    .frame(minWidth: 80, minHeight: 80)
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(10)
                 }
 
             }        .overlay(

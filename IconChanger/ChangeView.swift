@@ -4,6 +4,7 @@
 //
 //  Created by 朱浩宇 on 2022/4/27.
 //  Modified by seril on 2023/7/25.
+//  Modified by Bengerthelorf on 2025/3/21.
 //
 
 import SwiftUI
@@ -16,6 +17,9 @@ struct ChangeView: View {
     @State var icons: [IconRes] = []
     @State var inIcons: [URL] = []
     @State var showProgress = false
+    @State var isLoadingIcons = true
+    @State var totalIconsCount: Int = 0
+    @State var successIconsCount: Int = 0
     let setPath: LaunchPadManagerDBHelper.AppInfo
 
     @Environment(\.presentationMode) var presentationMode
@@ -25,6 +29,8 @@ struct ChangeView: View {
     @State var isExpanded: Bool = false
 
     @State var importImage = false
+
+    @State var setAlias: String? = nil
 
     var body: some View {
         GeometryReader { geometry in
@@ -67,23 +73,51 @@ struct ChangeView: View {
                     Divider().padding(.top, 10)
                             .padding(.bottom, 10)
 
-                    Text("macOSicons.com")
+                    HStack {
+                        Text("macOSicons.com")
                             .font(.headline)
                             .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        if !isLoadingIcons && successIconsCount > 0 {
+                            HStack(spacing: 4) {
+                                Text("\(successIconsCount)/\(totalIconsCount)")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    }
 
-                    if icons.isEmpty {
+                    if isLoadingIcons {
                         VStack {
                             Spacer()
                             ProgressView()
-                                    .progressViewStyle(AppStoreProgressViewStyle())
+                                .progressViewStyle(AppStoreProgressViewStyle())
+                            Spacer()
+                        }
+                    } else if icons.isEmpty {
+                        VStack {
+                            Spacer()
+                            Text("No Icons Found")
+                                .font(.title3)
+                                .foregroundColor(.secondary)
+                                .padding()
+                            Text("You can modify the alias name for better results")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            Button("Set Alias Name") {
+                                setAlias = setPath.url.deletingPathExtension().lastPathComponent
+                            }
+                            .padding(.top, 8)
                             Spacer()
                         }
                     } else {
                         ZStack {
                             LazyVGrid(columns: columns, alignment: .leading) {
-                                ForEach(icons, id: \.self) { icon in
-                                    ImageView(icon: icon, setPath: setPath)
-                                            .frame(width: imageSize, height: imageSize) // Make sure the image view fits in the grid
+                                ForEach(icons) { icon in
+                                    ImageView(icon: icon, setPath: setPath, onStatusUpdate: { isValid in
+                                        updateIconStatus(icon: icon, isValid: isValid)
+                                    })
+                                    .frame(width: imageSize, height: imageSize)
                                 }
                             }
                         }
@@ -115,12 +149,36 @@ struct ChangeView: View {
                 }
                 .task {
                     do {
+                        isLoadingIcons = true
                         icons = try await iconManager.getIcons(setPath)
+                        totalIconsCount = icons.count
+                        successIconsCount = icons.count  // 初始时假设所有图标都可加载
+                        isLoadingIcons = false
                     } catch {
                         print(error)
+                        isLoadingIcons = false
                     }
                 }
+                .sheet(item: $setAlias) {
+                    SetAliasNameView(raw: $0, lastText: AliasName.getName(for: $0) ?? "")
+                }
 //                .navigationTitle(setPath.name)
+    }
+    
+    // 更新图标状态和计数的函数
+    private func updateIconStatus(icon: IconRes, isValid: Bool) {
+        // 如果状态变为无效，且之前是有效的
+        if !isValid && icon.isValidIcon {
+            icon.isValidIcon = false
+            if successIconsCount > 0 {
+                successIconsCount -= 1
+            }
+        }
+        // 如果状态变为有效，且之前是无效的
+        else if isValid && !icon.isValidIcon {
+            icon.isValidIcon = true
+            successIconsCount += 1
+        }
     }
 }
 
