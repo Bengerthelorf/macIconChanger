@@ -4,6 +4,7 @@
 //
 //  Created by 朱浩宇 on 2022/4/27.
 //  Modified by seril on 2023/7/24.
+//  Modified by Bengerthelorf on 2025/3/21.
 //
 
 import SwiftUI
@@ -123,7 +124,7 @@ struct IconView: View {
 }
 
 
-extension String: Identifiable {
+extension String: @retroactive Identifiable {
     public var id: String {
         self
     }
@@ -145,7 +146,7 @@ struct MyDropDelegate: DropDelegate {
 
                         if let nsimage = NSImage(contentsOf: url) {
                             do {
-                                try IconManager.shared.setImage(nsimage, app: app)
+                                try await IconManager.shared.setImage(nsimage, app: app)
                             } catch {
                                 fatalError(error.localizedDescription)
                             }

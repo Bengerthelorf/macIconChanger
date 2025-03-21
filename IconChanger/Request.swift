@@ -12,6 +12,7 @@ import AppKit
 import SwiftyJSON
 
 class MyRequestController {
+    @Sendable
     func sendRequest(_ URL: URL) async throws -> NSImage? {
         /* Configure session, choose between:
          * defaultSessionConfiguration
@@ -24,13 +25,16 @@ class MyRequestController {
         
         if URL.isFileURL {
             print("📁 Loading icon from local file")
-            let image = NSImage(byReferencing: URL)
-            if image.isValid {
-                print("✅ Successfully loaded local icon")
-                return image
-            } else {
-                print("❌ Failed to load local icon from \(URL.path)")
-                return nil
+            // 在主线程上创建和返回 NSImage
+            return await MainActor.run {
+                let image = NSImage(byReferencing: URL)
+                if image.isValid {
+                    print("✅ Successfully loaded local icon")
+                    return image
+                } else {
+                    print("❌ Failed to load local icon from \(URL.path)")
+                    return nil
+                }
             }
         }
 
@@ -90,31 +94,34 @@ class MyRequestController {
                 return nil
             }
             
-            if let image = NSImage(data: data) {
-                print("✅ Successfully created NSImage from data (size: \(image.size.width) x \(image.size.height))")
-                return image
-            } else {
-                print("❌ Failed to create NSImage from data")
-                
-                // Try to figure out what type of data we received
-                let firstBytes = data.prefix(min(4, data.count))
-                let hexString = firstBytes.map { String(format: "%02x", $0) }.joined()
-                print("⚠️ First bytes of received data: \(hexString)")
-                
-                // Check common image file signatures
-                if hexString.hasPrefix("89504e47") {
-                    print("📄 Data appears to be a PNG file")
-                } else if hexString.hasPrefix("ffd8ff") {
-                    print("📄 Data appears to be a JPEG file")
-                } else if hexString.hasPrefix("47494638") {
-                    print("📄 Data appears to be a GIF file")
-                } else if hexString.hasPrefix("4949") || hexString.hasPrefix("4d4d") {
-                    print("📄 Data appears to be a TIFF file")
+            // 在主线程上创建和返回 NSImage
+            return await MainActor.run {
+                if let image = NSImage(data: data) {
+                    print("✅ Successfully created NSImage from data (size: \(image.size.width) x \(image.size.height))")
+                    return image
                 } else {
-                    print("❓ Unable to determine data format from signature")
+                    print("❌ Failed to create NSImage from data")
+                    
+                    // Try to figure out what type of data we received
+                    let firstBytes = data.prefix(min(4, data.count))
+                    let hexString = firstBytes.map { String(format: "%02x", $0) }.joined()
+                    print("⚠️ First bytes of received data: \(hexString)")
+                    
+                    // Check common image file signatures
+                    if hexString.hasPrefix("89504e47") {
+                        print("📄 Data appears to be a PNG file")
+                    } else if hexString.hasPrefix("ffd8ff") {
+                        print("📄 Data appears to be a JPEG file")
+                    } else if hexString.hasPrefix("47494638") {
+                        print("📄 Data appears to be a GIF file")
+                    } else if hexString.hasPrefix("4949") || hexString.hasPrefix("4d4d") {
+                        print("📄 Data appears to be a TIFF file")
+                    } else {
+                        print("❓ Unable to determine data format from signature")
+                    }
+                    
+                    return nil
                 }
-                
-                return nil
             }
         } catch {
             print("❌ Error downloading icon: \(error.localizedDescription)")

@@ -3,6 +3,7 @@
 //  IconChanger
 //
 //  Created by 朱浩宇 on 2022/4/27.
+//  Modified by Bengerthelorf on 2025/3/21.
 //
 
 import SwiftUI
@@ -217,7 +218,7 @@ class IconManager: ObservableObject {
     }
 }
 
-extension LaunchPadManagerDBHelper.AppInfo: Identifiable {
+extension LaunchPadManagerDBHelper.AppInfo: @retroactive Identifiable {
     public var id: URL {
         url
     }

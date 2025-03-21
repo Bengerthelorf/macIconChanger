@@ -22,13 +22,18 @@ struct LocalImageView: View {
                 .task {
                     do {
                         isLoading = true
-                        nsimage = try await MyRequestController().sendRequest(url)
-                        if nsimage == nil {
-                            isLoading = false
+                        let image = try await MyRequestController().sendRequest(url)
+                        await MainActor.run {
+                            nsimage = image
+                            if nsimage == nil {
+                                isLoading = false
+                            }
                         }
                     } catch {
-                        print(error)
-                        isLoading = false
+                        await MainActor.run {
+                            print(error)
+                            isLoading = false
+                        }
                     }
                 }
     }
