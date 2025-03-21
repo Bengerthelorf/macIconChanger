@@ -51,6 +51,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2FF217A62D8CEAFF00AE478C /* IconChanger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IconChanger.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6843102ECDF4DE9417AD9634 /* LocalImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalImageView.swift; sourceTree = "<group>"; };
 		684310CF2CFC89861988FEC0 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = file.gitignore; path = .gitignore; sourceTree = "<group>"; };
 		684311E6ADA4C380BC5296B0 /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -65,7 +66,6 @@
 		68431E71D50DCD6E570EC101 /* ApplicationSettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplicationSettingsView.swift; sourceTree = "<group>"; };
 		68431EB0D4F0448EC3F269CE /* ApplicationFolderSettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplicationFolderSettingsView.swift; sourceTree = "<group>"; };
 		68431F457332C81179583E38 /* APISettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APISettingsView.swift; sourceTree = "<group>"; };
-		900D1CE5281934C7007ABB12 /* IconChanger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = IconChanger.app; path = /Users/zane/Documents/macIconChanger/build/Debug/IconChanger.app; sourceTree = "<absolute>"; };
 		900D1CE8281934C7007ABB12 /* IconChangerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconChangerApp.swift; sourceTree = "<group>"; };
 		900D1CEA281934C7007ABB12 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		900D1CEC281934C8007ABB12 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -157,6 +157,7 @@
 				900D1CE7281934C7007ABB12 /* IconChanger */,
 				9017B60B2951B22F005709C6 /* Frameworks */,
 				684310CF2CFC89861988FEC0 /* .gitignore */,
+				2FF217A62D8CEAFF00AE478C /* IconChanger.app */,
 			);
 			sourceTree = "<group>";
 		};
@@ -241,7 +242,7 @@
 				9017B5F7294DBBA9005709C6 /* Sparkle */,
 			);
 			productName = IconChanger;
-			productReference = 900D1CE5281934C7007ABB12 /* IconChanger.app */;
+			productReference = 2FF217A62D8CEAFF00AE478C /* IconChanger.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -494,7 +495,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zhuhaoyu.IconChanger;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -528,7 +529,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zhuhaoyu.IconChanger;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
