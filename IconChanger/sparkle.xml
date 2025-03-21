@@ -9,7 +9,7 @@
             <sparkle:version>101</sparkle:version>
             <sparkle:shortVersionString>1.0.1</sparkle:shortVersionString>
             <pubDate>Fri, 21 Mar 2025 12:40:00 +0800</pubDate>
-            <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.0.1/IconChanger.2025-03-21.12-40-00.zip" 
+            <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.0.1/IconChanger.dmg" 
             sparkle:edSignature="Bengerthelorf2025SignatureWillBeGeneratedLater" 
             length="7500000"
             type="application/octet-stream"/>
@@ -17,11 +17,11 @@
                 <![CDATA[
                 <h2>macIconChanger 1.0.1</h2>
                 <ul>
-                    <li>改进图标加载过程</li>
-                    <li>添加图标加载状态指示器</li>
-                    <li>移除无效图标的显示，保持界面整洁</li>
-                    <li>添加了图标计数器显示（已加载/总数）</li>
-                    <li>修复了部分图标加载失败的问题</li>
+                    <li>Improved icon loading process</li>
+                    <li>Added icon loading status indicator</li>
+                    <li>Removed invalid icons display for a cleaner interface</li>
+                    <li>Added icon counter display (loaded/total)</li>
+                    <li>Fixed issues with some icons failing to load</li>
                 </ul>
                 ]]>
             </description>
@@ -32,7 +32,7 @@
             <sparkle:version>100</sparkle:version>
             <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>
             <pubDate>Tue, 21 Mar 2025 12:00:00 +0800</pubDate>
-            <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.0.0/IconChanger.2025-03-21.12-00-00.zip" 
+            <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.0.0/IconChanger.dmg" 
             sparkle:edSignature="Bengerthelorf2025SignatureWillBeGeneratedLater" 
             length="7500000"
             type="application/octet-stream"/>
