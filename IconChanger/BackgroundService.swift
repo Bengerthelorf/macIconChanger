@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 import LaunchPadManagerDBHelper
+import UserNotifications // Add modern notification framework
 
 class BackgroundService: ObservableObject {
     static let shared = BackgroundService()
@@ -61,6 +62,9 @@ class BackgroundService: ObservableObject {
             setupStatusBar()
         }
         
+        // Request notification permission
+        requestNotificationPermission()
+        
         setupTimers()
         
         // Update dock visibility
@@ -68,6 +72,15 @@ class BackgroundService: ObservableObject {
         
         // Save state
         runInBackground = true
+    }
+    
+    // Request permission to show notifications
+    private func requestNotificationPermission() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
+            if let error = error {
+                print("Error requesting notification permission: \(error.localizedDescription)")
+            }
+        }
     }
     
     // Stop background service
@@ -380,12 +393,14 @@ class BackgroundService: ObservableObject {
                 print("Manual restore failed: \(error.localizedDescription)")
                 
                 // Show error alert
-                let alert = NSAlert()
-                alert.messageText = "Icon Restoration Failed"
-                alert.informativeText = error.localizedDescription
-                alert.alertStyle = .warning
-                alert.addButton(withTitle: "OK")
-                alert.runModal()
+                let alert = await NSAlert()
+                await MainActor.run {
+                    alert.messageText = "Icon Restoration Failed"
+                    alert.informativeText = error.localizedDescription
+                    alert.alertStyle = .warning
+                    alert.addButton(withTitle: "OK")
+                    alert.runModal()
+                }
             }
         }
     }
@@ -420,10 +435,11 @@ class BackgroundService: ObservableObject {
     }
     
     // Restore icons for updated apps
+    @MainActor
     private func restoreUpdatedApps(_ apps: [LaunchPadManagerDBHelper.AppInfo]) async throws {
         for app in apps {
             // Get cached icon
-            if let cache = IconCacheManager.shared.getIconCache(for: app.url.universalPath()),
+            if let _ = IconCacheManager.shared.getIconCache(for: app.url.universalPath()),
                let iconURL = IconCacheManager.shared.getCachedIconURL(for: app.url.universalPath()),
                let image = NSImage(contentsOf: iconURL) {
                 // Restore icon
@@ -432,24 +448,48 @@ class BackgroundService: ObservableObject {
         }
     }
     
-    // Show restoration notification
+    // Show restoration notification using the modern UserNotifications framework
     private func showRestoreNotification() {
-        let notification = NSUserNotification()
-        notification.title = "Icons Restored"
-        notification.informativeText = "All cached app icons have been successfully restored."
-        notification.soundName = NSUserNotificationDefaultSoundName
+        let content = UNMutableNotificationContent()
+        content.title = "Icons Restored"
+        content.body = "All cached app icons have been successfully restored."
+        content.sound = UNNotificationSound.default
         
-        NSUserNotificationCenter.default.deliver(notification)
+        // Create a request with a unique identifier
+        let request = UNNotificationRequest(
+            identifier: UUID().uuidString,
+            content: content,
+            trigger: nil  // Deliver immediately
+        )
+        
+        // Schedule the notification
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Error showing notification: \(error.localizedDescription)")
+            }
+        }
     }
     
     // Show update notification
     private func showUpdateNotification(appCount: Int) {
-        let notification = NSUserNotification()
-        notification.title = "App Icons Restored"
-        notification.informativeText = "\(appCount) updated app(s) had their custom icons restored."
-        notification.soundName = NSUserNotificationDefaultSoundName
+        let content = UNMutableNotificationContent()
+        content.title = "App Icons Restored"
+        content.body = "\(appCount) updated app(s) had their custom icons restored."
+        content.sound = UNNotificationSound.default
         
-        NSUserNotificationCenter.default.deliver(notification)
+        // Create a request with a unique identifier
+        let request = UNNotificationRequest(
+            identifier: UUID().uuidString,
+            content: content,
+            trigger: nil  // Deliver immediately
+        )
+        
+        // Schedule the notification
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Error showing notification: \(error.localizedDescription)")
+            }
+        }
     }
     
     // Helper to format time interval

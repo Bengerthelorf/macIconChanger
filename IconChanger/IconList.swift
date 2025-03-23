@@ -22,138 +22,136 @@ struct IconList: View {
     @State var setAlias: String?
 
     var body: some View {
-        NavigationView {
+        NavigationSplitView {
             List(selection: $selectedApp) {
                 ForEach(iconManager.apps.filter { app in
                     searchText.isEmpty || app.name.localizedStandardContains(searchText)
                 }, id: \.url) { app in
-                    NavigationLink(destination: ChangeView(setPath: app),
-                            tag: app,
-                            selection: $selectedApp) {
+                    NavigationLink(value: app) {
                         IconView(app: app)
                     }
-                            .contextMenu {
-                                Button("Copy the Name") {
-                                    NSPasteboard.general.clearContents()
-                                    NSPasteboard.general.setString(app.name, forType: .string)
-                                }
+                    .contextMenu {
+                        Button("Copy the Name") {
+                            NSPasteboard.general.clearContents()
+                            NSPasteboard.general.setString(app.name, forType: .string)
+                        }
 
-                                Menu("Path") {
-                                    Button("Copy") {
-                                        NSPasteboard.general.clearContents()
-                                        NSPasteboard.general.setString(app.url.universalPath(), forType: .string)
-                                    }
-
-                                    Button("Copy the Path Name") {
-                                        NSPasteboard.general.clearContents()
-                                        NSPasteboard.general.setString(app.url.deletingPathExtension().lastPathComponent, forType: .string)
-                                    }
-
-                                    Button("Show in the Finder") {
-                                        NSWorkspace.shared.activateFileViewerSelecting([app.url])
-                                    }
-                                }
-
-                                Button("Set the Alias") {
-                                    setAlias = app.url.deletingPathExtension().lastPathComponent
-                                }
-
-                                Button("Remove the Icon from the Launchpad") {
-                                    do {
-                                        try LaunchPadManagerDBHelper().removeApp(app)
-                                    } catch {
-                                        print(error)
-                                    }
-                                }
+                        Menu("Path") {
+                            Button("Copy") {
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(app.url.universalPath(), forType: .string)
                             }
+
+                            Button("Copy the Path Name") {
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(app.url.deletingPathExtension().lastPathComponent, forType: .string)
+                            }
+
+                            Button("Show in the Finder") {
+                                NSWorkspace.shared.activateFileViewerSelecting([app.url])
+                            }
+                        }
+
+                        Button("Set the Alias") {
+                            setAlias = app.url.deletingPathExtension().lastPathComponent
+                        }
+
+                        Button("Remove the Icon from the Launchpad") {
+                            do {
+                                try LaunchPadManagerDBHelper().removeApp(app)
+                            } catch {
+                                print(error)
+                            }
+                        }
+                    }
                 }
             }
-                    .listStyle(SidebarListStyle())  // Use SidebarListStyle to create a sidebar look
-                    .frame(minWidth: 200, idealWidth: 300) // Adjust the width to your liking
-
-            // Display detail view when an app is selected, otherwise display placeholder
+            .listStyle(SidebarListStyle())
+            .frame(minWidth: 200, idealWidth: 300)
+            .searchable(text: $searchText)
+            .navigationTitle("Apps")
+        } detail: {
+            // 详情视图
             if let app = selectedApp {
                 ChangeView(setPath: app)
             } else {
                 Text("Select an app to see its details")
-                        .foregroundColor(.secondary)
+                    .foregroundColor(.secondary)
             }
         }
-
-                .sheet(item: $setAlias) {
-                    SetAliasNameView(raw: $0, lastText: AliasName.getName(for: $0) ?? "")
-                }
-                .searchable(text: $searchText)
-                .toolbar {
-                    ToolbarItem {
-                        Menu {
-                            Button("Install Helper Again") {
-                                try? iconManager.installHelperTool()
+        .navigationDestination(for: LaunchPadManagerDBHelper.AppInfo.self) { app in
+            ChangeView(setPath: app)
+        }
+        .sheet(item: $setAlias) {
+            SetAliasNameView(raw: $0, lastText: AliasName.getName(for: $0) ?? "")
+        }
+        .toolbar {
+            ToolbarItem {
+                Menu {
+                    Button("Install Helper Again") {
+                        try? iconManager.installHelperTool()
+                    }
+                    
+                    Divider()
+                    
+                    Button {
+                        Task {
+                            do {
+                                try await iconManager.restoreAllCachedIcons()
+                                // Show success notification using a simple alert
+                                let alert = NSAlert()
+                                alert.messageText = "Icons Restored"
+                                alert.informativeText = "All cached custom icons have been successfully restored."
+                                alert.alertStyle = .informational
+                                alert.addButton(withTitle: "OK")
+                                alert.runModal()
+                            } catch let error as RestoreError {
+                                // Show error notification
+                                let alert = NSAlert()
+                                alert.messageText = "Error Restoring Icons"
+                                alert.informativeText = error.localizedDescription
+                                alert.alertStyle = .critical
+                                alert.addButton(withTitle: "OK")
+                                alert.runModal()
+                            } catch {
+                                // Generic error
+                                let alert = NSAlert()
+                                alert.messageText = "Error Restoring Icons"
+                                alert.informativeText = error.localizedDescription
+                                alert.alertStyle = .critical
+                                alert.addButton(withTitle: "OK")
+                                alert.runModal()
                             }
-                            
-                            Divider()
-                            
-                            // Add new option to restore cached icons
-                            Button {
-                                Task {
-                                    do {
-                                        try await iconManager.restoreAllCachedIcons()
-                                        // Show success notification using a simple alert
-                                        let alert = NSAlert()
-                                        alert.messageText = "Icons Restored"
-                                        alert.informativeText = "All cached custom icons have been successfully restored."
-                                        alert.alertStyle = .informational
-                                        alert.addButton(withTitle: "OK")
-                                        alert.runModal()
-                                    } catch let error as RestoreError {
-                                        // Show error notification
-                                        let alert = NSAlert()
-                                        alert.messageText = "Error Restoring Icons"
-                                        alert.informativeText = error.localizedDescription
-                                        alert.alertStyle = .critical
-                                        alert.addButton(withTitle: "OK")
-                                        alert.runModal()
-                                    } catch {
-                                        // Generic error
-                                        let alert = NSAlert()
-                                        alert.messageText = "Error Restoring Icons"
-                                        alert.informativeText = error.localizedDescription
-                                        alert.alertStyle = .critical
-                                        alert.addButton(withTitle: "OK")
-                                        alert.runModal()
-                                    }
-                                }
-                            } label: {
-                                Label("Restore Cached Icons", systemImage: "arrow.clockwise")
-                            }
-
-                        } label: {
-                            Image(systemName: "ellipsis.circle")
                         }
+                    } label: {
+                        Label("Restore Cached Icons", systemImage: "arrow.clockwise")
                     }
-
-                    ToolbarItem(placement: .automatic) {
-                        Button {
-                            iconManager.refresh()
-                        } label: {
-                            Image(systemName: "goforward")
-                        }
-                    }
-//                     Add a new toolbar item to show cache count (optional)
-                    ToolbarItem(placement: .automatic) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "archivebox")
-                                .font(.system(size: 12))
-                            Text("\(IconCacheManager.shared.getCachedIconsCount())")
-                                .font(.caption)
-                        }
-                        .padding(5)
-                        .background(Color.secondary.opacity(0.2))
-                        .cornerRadius(5)
-                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
                 }
+            }
+
+            ToolbarItem(placement: .automatic) {
+                Button {
+                    iconManager.refresh()
+                } label: {
+                    Image(systemName: "goforward")
+                }
+            }
+            
+            ToolbarItem(placement: .automatic) {
+                HStack(spacing: 4) {
+                    Image(systemName: "archivebox")
+                        .font(.system(size: 12))
+                    Text("\(IconCacheManager.shared.getCachedIconsCount())")
+                        .font(.caption)
+                }
+                .padding(5)
+                .background(Color.secondary.opacity(0.2))
+                .cornerRadius(5)
+            }
+        }
     }
-
 }
 
 struct IconView: View {
@@ -192,7 +190,7 @@ struct MyDropDelegate: DropDelegate {
                     if let urlData = urlData as? Data {
                         let url = NSURL(absoluteURLWithDataRepresentation: urlData, relativeTo: nil) as URL
 
-                        if let nsimage = NSImage(contentsOf: url) {
+                        if let nsimage =  NSImage(contentsOf: url) {
                             do {
                                 try await IconManager.shared.setImage(nsimage, app: app)
                             } catch {

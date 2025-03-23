@@ -62,10 +62,9 @@ struct ApplicationAliasSettingsView: View {
                     ))
                 }
             }
-                    .onChange(of: sortOrder) {
-                        aliasNames.sort(using: $0)
-                    }
-
+            .onChange(of: sortOrder) { oldValue, newValue in
+                aliasNames.sort(using: newValue)
+            }
         }
     }
 }

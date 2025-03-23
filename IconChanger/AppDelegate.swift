@@ -6,14 +6,21 @@
 //
 
 import SwiftUI
+import UserNotifications // Add modern notification framework
 
-class AppDelegate: NSObject, NSApplicationDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
     private let backgroundService = BackgroundService.shared
     
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // Register user notification delegate
-        let center = NSUserNotificationCenter.default
-        center.delegate = self
+        // Set up notification delegate
+        UNUserNotificationCenter.current().delegate = self
+        
+        // Request notification permission
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
+            if let error = error {
+                print("Error requesting notification permission: \(error.localizedDescription)")
+            }
+        }
         
         // Setup background service if enabled
         if backgroundService.runInBackground {
@@ -34,12 +41,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         return false
     }
-}
-
-// Extension to handle notifications
-extension AppDelegate: NSUserNotificationCenterDelegate {
-    func userNotificationCenter(_ center: NSUserNotificationCenter, shouldPresent notification: NSUserNotification) -> Bool {
-        // Always show notifications, even when app is in foreground
-        return true
+    
+    // MARK: - UNUserNotificationCenterDelegate Methods
+    
+    // Handle notifications when app is in foreground
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                               willPresent notification: UNNotification,
+                               withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        // Show notification even when app is in foreground
+        if #available(macOS 11.0, *) {
+            completionHandler([.banner, .sound])
+        } else {
+            completionHandler([.alert, .sound])
+        }
+    }
+    
+    // Handle notification response (if user clicks on notification)
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                               didReceive response: UNNotificationResponse,
+                               withCompletionHandler completionHandler: @escaping () -> Void) {
+        // Optionally handle different actions based on notification identifier
+        
+        // Bring app to foreground
+        NSApp.activate(ignoringOtherApps: true)
+        
+        completionHandler()
     }
 }

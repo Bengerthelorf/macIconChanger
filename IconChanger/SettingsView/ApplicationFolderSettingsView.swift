@@ -36,7 +36,7 @@ struct ApplicationFolderSettingsView: View {
                 TableColumn("Folder", value: \.path)
 
             }
-                    .onChange(of: selectedId) { newValue in
+                    .onChange(of: selectedId) {oldValue, newValue in
                         // Handle selection change if needed
                     }
                     .onAppear {

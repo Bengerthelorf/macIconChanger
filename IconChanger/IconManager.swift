@@ -13,32 +13,31 @@ import LaunchPadManagerDBHelper
 class IconManager: ObservableObject {
     static let shared = IconManager()
 
-    @Published var icons = [(String, String)]()
-    @Published var apps: [LaunchPadManagerDBHelper.AppInfo] = []
-
+    // 使用private(set)来防止外部修改这些属性
+    @Published private(set) var icons = [(String, String)]()
+    @Published private(set) var apps: [LaunchPadManagerDBHelper.AppInfo] = []
     init() {
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(refresh), name: NSWindow.didBecomeKeyNotification, object: nil)
 
-        do {
-            let helper = try LaunchPadManagerDBHelper()
-
-            apps = try helper.getAllAppInfos().sorted(by: { info1, info2 in
-                info1.name.compare(info2.name) == .orderedAscending
-            })
-
-        } catch {
-            print(error)
-        }
-    }
+        DispatchQueue.main.async {
+                    self.refresh()
+                }
+            }
 
     @objc func refresh() {
         do {
             let helper = try LaunchPadManagerDBHelper()
 
-            apps = try helper.getAllAppInfos().sorted(by: { info1, info2 in
+            // 获取排序后的列表
+            let sortedApps = try helper.getAllAppInfos().sorted(by: { info1, info2 in
                 info1.name.compare(info2.name) == .orderedAscending
             })
+            
+            // 在主线程上更新@Published属性
+            DispatchQueue.main.async {
+                self.apps = sortedApps
+            }
         } catch {
             print(error)
         }
@@ -111,10 +110,13 @@ class IconManager: ObservableObject {
 
         try copy.write(to: path, atomically: true, encoding: .utf8)
     }
-
+    
+    @MainActor
     func setImage(_ image: NSImage, app: LaunchPadManagerDBHelper.AppInfo) throws {
         // First, cache the icon
-        try IconCacheManager.shared.cacheIcon(image: image, for: app.url.universalPath(), appName: app.name)
+//        try IconCacheManager.shared.cacheIcon(image: image, for: app.url.universalPath(), appName: app.name)
+        let _ = try IconCacheManager.shared.cacheIcon(image: image, for: app.url.universalPath(), appName: app.name)
+
         
         // Then follow the original process to set the icon
         let imageURL = URL.documents.universalappending(path: "icon.png")
@@ -139,6 +141,7 @@ class IconManager: ObservableObject {
     }
 
     // Set an icon without caching it (used during restoration)
+    @MainActor
     func setIconWithoutCaching(_ image: NSImage, app: LaunchPadManagerDBHelper.AppInfo) async throws {
         let imageURL = URL.documents.universalappending(path: "icon.png")
         

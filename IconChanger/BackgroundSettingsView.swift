@@ -38,7 +38,7 @@ struct BackgroundSettingsView: View {
             // Background mode section
             VStack(alignment: .leading, spacing: 16) {
                 Toggle("Run in Background", isOn: $backgroundService.runInBackground)
-                    .onChange(of: backgroundService.runInBackground) { newValue in
+                    .onChange(of: backgroundService.runInBackground) {oldValue, newValue in
                         if newValue {
                             backgroundService.startBackgroundService()
                         } else {
@@ -57,13 +57,13 @@ struct BackgroundSettingsView: View {
                     
                     Toggle("Show in Menu Bar", isOn: $backgroundService.showInMenuBar)
                         .padding(.leading, 10)
-                        .onChange(of: backgroundService.showInMenuBar) { newValue in
+                        .onChange(of: backgroundService.showInMenuBar) {oldValue, newValue in
                             handleVisibilityChange()
                         }
                     
                     Toggle("Show in Dock", isOn: $backgroundService.showInDock)
                         .padding(.leading, 10)
-                        .onChange(of: backgroundService.showInDock) { newValue in
+                        .onChange(of: backgroundService.showInDock) {oldValue, newValue in
                             handleVisibilityChange()
                         }
                     
