@@ -113,6 +113,10 @@ class IconManager: ObservableObject {
     }
 
     func setImage(_ image: NSImage, app: LaunchPadManagerDBHelper.AppInfo) throws {
+        // First, cache the icon
+        try IconCacheManager.shared.cacheIcon(image: image, for: app.url.universalPath(), appName: app.name)
+        
+        // Then follow the original process to set the icon
         let imageURL = URL.documents.universalappending(path: "icon.png")
         #if DEBUG
         print(imageURL)
@@ -125,13 +129,74 @@ class IconManager: ObservableObject {
         Self.saveImage(image, atUrl: imageURL)
 
         let helperPath = URL.documents.universalappending(path: "helper.sh")
-
         let fileiconPath = URL.documents.universalappending(path: "fileicon")
 
         try setContent(helperPath, replacement: ["fileicon": fileiconPath.universalPath(),
-                                                 "app": app.url.universalPath(),
-                                                 "image": imageURL.universalPath()]) {
+                                                "app": app.url.universalPath(),
+                                                "image": imageURL.universalPath()]) {
             try runHelperTool()
+        }
+    }
+
+    // Set an icon without caching it (used during restoration)
+    func setIconWithoutCaching(_ image: NSImage, app: LaunchPadManagerDBHelper.AppInfo) async throws {
+        let imageURL = URL.documents.universalappending(path: "icon.png")
+        
+        if FileManager.default.fileExists(atPath: imageURL.universalPath()) {
+            try FileManager.default.removeItem(at: imageURL)
+        }
+        
+        Self.saveImage(image, atUrl: imageURL)
+
+        let helperPath = URL.documents.universalappending(path: "helper.sh")
+        let fileiconPath = URL.documents.universalappending(path: "fileicon")
+
+        try setContent(helperPath, replacement: ["fileicon": fileiconPath.universalPath(),
+                                                "app": app.url.universalPath(),
+                                                "image": imageURL.universalPath()]) {
+            try runHelperTool()
+        }
+    }
+
+    // Restore all cached icons
+    func restoreAllCachedIcons() async throws {
+        let cachedIcons = IconCacheManager.shared.getAllCachedIcons()
+        var failedApps: [(String, Error)] = []
+        
+        for cache in cachedIcons {
+            do {
+                let appPath = cache.appPath
+                let iconURL = IconCacheManager.cacheDirectory.appendingPathComponent(cache.iconFileName)
+                
+                // Check if the app and icon still exist
+                if FileManager.default.fileExists(atPath: appPath) &&
+                FileManager.default.fileExists(atPath: iconURL.path) {
+                    
+                    // Load the icon image
+                    if let image = NSImage(contentsOf: iconURL) {
+                        if let appInfo = apps.first(where: { $0.url.universalPath() == appPath }) {
+                            // Set the icon (without re-caching to avoid duplication)
+                            try await setIconWithoutCaching(image, app: appInfo)
+                        } else {
+                            throw RestoreError.appNotFound(cache.appName)
+                        }
+                    } else {
+                        throw RestoreError.iconFileNotFound(cache.appName)
+                    }
+                } else if !FileManager.default.fileExists(atPath: appPath) {
+                    // App no longer exists, remove from cache
+                    IconCacheManager.shared.removeCachedIcon(for: appPath)
+                } else if !FileManager.default.fileExists(atPath: iconURL.path) {
+                    // Icon file missing, remove from cache
+                    IconCacheManager.shared.removeCachedIcon(for: appPath)
+                }
+            } catch {
+                failedApps.append((cache.appName, error))
+            }
+        }
+        
+        if !failedApps.isEmpty {
+            throw RestoreError.someFailed(failed: failedApps)
         }
     }
 

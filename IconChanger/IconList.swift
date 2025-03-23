@@ -90,8 +90,45 @@ struct IconList: View {
                             Button("Install Helper Again") {
                                 try? iconManager.installHelperTool()
                             }
+                            
+                            Divider()
+                            
+                            // Add new option to restore cached icons
+                            Button {
+                                Task {
+                                    do {
+                                        try await iconManager.restoreAllCachedIcons()
+                                        // Show success notification using a simple alert
+                                        let alert = NSAlert()
+                                        alert.messageText = "Icons Restored"
+                                        alert.informativeText = "All cached custom icons have been successfully restored."
+                                        alert.alertStyle = .informational
+                                        alert.addButton(withTitle: "OK")
+                                        alert.runModal()
+                                    } catch let error as RestoreError {
+                                        // Show error notification
+                                        let alert = NSAlert()
+                                        alert.messageText = "Error Restoring Icons"
+                                        alert.informativeText = error.localizedDescription
+                                        alert.alertStyle = .critical
+                                        alert.addButton(withTitle: "OK")
+                                        alert.runModal()
+                                    } catch {
+                                        // Generic error
+                                        let alert = NSAlert()
+                                        alert.messageText = "Error Restoring Icons"
+                                        alert.informativeText = error.localizedDescription
+                                        alert.alertStyle = .critical
+                                        alert.addButton(withTitle: "OK")
+                                        alert.runModal()
+                                    }
+                                }
+                            } label: {
+                                Label("Restore Cached Icons", systemImage: "arrow.clockwise")
+                            }
+
                         } label: {
-                            Image(systemName: "hammer.fill")
+                            Image(systemName: "ellipsis.circle")
                         }
                     }
 
@@ -102,7 +139,18 @@ struct IconList: View {
                             Image(systemName: "goforward")
                         }
                     }
-
+//                     Add a new toolbar item to show cache count (optional)
+                    ToolbarItem(placement: .automatic) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "archivebox")
+                                .font(.system(size: 12))
+                            Text("\(IconCacheManager.shared.getCachedIconsCount())")
+                                .font(.caption)
+                        }
+                        .padding(5)
+                        .background(Color.secondary.opacity(0.2))
+                        .cornerRadius(5)
+                    }
                 }
     }
 

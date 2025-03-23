@@ -4,6 +4,28 @@
     <channel>
         <title>IconChanger</title>
         <item>
+            <title>Version 1.0.2</title>
+            <link>https://github.com/Bengerthelorf/macIconChanger</link>
+            <sparkle:version>102</sparkle:version>
+            <sparkle:shortVersionString>1.0.2</sparkle:shortVersionString>
+            <pubDate>Sun, 23 Mar 2025 9:30:00 +0800</pubDate>
+            <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.0.2/IconChanger.dmg"
+            sparkle:edSignature="wAxlhGqsqJ2PhzidcL0iQno56Bs43/wZ4AyAxGXo9HN21VzVv2kJvMOQgO4C6Vbv3meGafjJdBi5Se4TnpngBg==" length="10700080"
+            type="application/octet-stream"/>
+            <description>
+                <![CDATA[
+                <h2>macIconChanger 1.0.2</h2>
+                <ul>
+                    <li><strong>NEW:</strong> Icon caching system - automatically remember all applied custom icons</li>
+                    <li><strong>NEW:</strong> Restore all cached icons after app updates with one click</li>
+                    <li><strong>NEW:</strong> Icon Cache management in settings allows selective icon restoration</li>
+                    <li>Improved loading performance for large icon sets</li>
+                    <li>Various UI improvements and bug fixes</li>
+                </ul>
+                ]]>
+            </description>
+        </item>
+        <item>
             <title>Version 1.0.1</title>
             <link>https://github.com/Bengerthelorf/macIconChanger</link>
             <sparkle:version>101</sparkle:version>

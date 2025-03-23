@@ -1,0 +1,74 @@
+/* 
+  Localizable.strings
+  IconChanger
+
+  Created by 朱浩宇 on 2022/12/23.
+  Modified by Bengerthelorf on 2025/03/21.
+  
+*/
+
+"Unknown" = "Unknown";
+"We Need Full Disk Access" = "We Need Full Disk Access";
+"1. Open the System Setting App" = "1. Open the System Setting App";
+"2. Go to the security" = "2. Go to the security";
+"3. Choose the Full Disk Access" = "3. Choose the Full Disk Access";
+"4. Unlock it" = "4. Unlock it";
+"5. Choose or add the IconChanger" = "5. Choose or add the IconChanger";
+"6. Check the check box" = "6. Check the check box";
+"Check the Access Permition" = "Check the Access Permition";
+"Copy the Name" = "Copy the Name";
+"Path" = "Path";
+"Copy" = "Copy";
+"Copy the Path Name" = "Copy the Path Name";
+"Show in the Finder" = "Show in the Finder";
+"Set the Alias" = "Set the Alias";
+"Remove the Icon from the Launchpad" = "Remove the Icon from the Launchpad";
+"macOSIcon" = "macOSIcon"; // This is the name of the website. Maybe you can keep it.
+"Local" = "Local";
+"Cancel" = "Cancel";
+"Choose from the Local" = "Choose from the Local";
+"Api" = "Api";
+"Query Host: " = "Query Host: ";
+"API Key: " = "API Key: ";
+"Finish" = "Finish";
+
+"You need to obtain an API key from macosicons.com" = "You need to obtain an API key from macosicons.com";
+"Test API Connection" = "Test API Connection";
+"Testing..." = "Testing...";
+"API connection established but no results returned." = "API connection established but no results returned.";
+"API connection successful! Found %@ icons." = "API connection successful! Found %@ icons.";
+"API test failed: %@" = "API test failed: %@";
+"Language" = "Language";
+"System Default" = "System Default";
+"English" = "English";
+"French" = "French";
+"Chinese" = "Chinese";
+"Changes will take full effect after restarting the app" = "Changes will take full effect after restarting the app";
+"Language Changed" = "Language Changed";
+"The language has been changed. For the best experience, please restart the application." = "The language has been changed. For the best experience, please restart the application.";
+
+// New translation keys
+"No Icons Found" = "No Icons Found";
+"Try different search keywords" = "Try different search keywords";
+"No Icon" = "No Icon";
+"You can modify the alias name for better results" = "You can modify the alias name for better results";
+"Set Alias Name" = "Set Alias Name";
+
+"Icon Cache" = "Icon Cache";
+"Restore Cached Icons" = "Restore Cached Icons";
+"Icons Restored" = "Icons Restored";
+"All cached custom icons have been successfully restored." = "All cached custom icons have been successfully restored.";
+"Error Restoring Icons" = "Error Restoring Icons";
+"No cached icons found" = "No cached icons found";
+"Icons will be cached automatically when you apply them to apps" = "Icons will be cached automatically when you apply them to apps";
+"Restore This Icon" = "Restore This Icon";
+"Remove from Cache" = "Remove from Cache";
+"Restore All" = "Restore All";
+"Restore Selected" = "Restore Selected";
+"Clear Cache" = "Clear Cache";
+"Restoring icons..." = "Restoring icons...";
+"Custom icons have been successfully restored." = "Custom icons have been successfully restored.";
+"Could not load icon or app no longer exists" = "Could not load icon or app no longer exists";
+"App or cached icon file no longer exists" = "App or cached icon file no longer exists";
+"Search apps..." = "Search apps...";
+"Refresh App List" = "Refr

@@ -1,0 +1,75 @@
+/* 
+  Localizable.strings
+  IconChanger
+
+  Created by 朱浩宇 on 2022/12/23.
+  Modified by Bengerthelorf on 2025/03/21.
+  
+*/
+
+"Unknown" = "Inconnu";
+"We Need Full Disk Access" = "IconChanger a besoin d'un accès complet au disque";
+"1. Open the System Setting App" = "1. Ouvrez les Réglages Système";
+"2. Go to the security" = "2. Allez à Confidentialité et Sécurité";
+"3. Choose the Full Disk Access" = "3. Cliquez sur Accès complet au disque";
+"4. Unlock it" = "4. Déverouillez-le si besoin";
+"5. Choose or add the IconChanger" = "5. Choisissez ou ajoutez IconChanger";
+"6. Check the check box" = "6. Cochez le truc vert";
+"Check the Access Permition" = "Verifier si l'accès complet est activé";
+"Copy the Name" = "Copier le nom";
+"Path" = "App";
+"Copy" = "Copier";
+"Copy the Path Name" = "Copier le Chemin d'accès";
+"Show in the Finder" = "Afficher dans le Finder";
+"Set the Alias" = "Définir un autre nom";
+"Remove the Icon from the Launchpad" = "Supprimer du Launchpad";
+"macOSIcon" = "macOSIcon"; // This is the name of the website. Maybe you can keep it.
+"Local" = "Local";
+"Cancel" = "Annuler";
+"Choose from the Local" = "Choisir depuis le Finder";
+"Api" = "Api";
+"Query Host: " = "Hôte de requête : ";
+"API Key: " = "Clé API : ";
+"Finish" = "Terminer";
+
+"You need to obtain an API key from macosicons.com" = "Vous devez obtenir une clé API depuis macosicons.com";
+"Test API Connection" = "Tester la connexion API";
+"Testing..." = "Test en cours...";
+"API connection established but no results returned." = "Connexion API établie mais aucun résultat retourné.";
+"API connection successful! Found %@ icons." = "Connexion API réussie ! %@ icônes trouvées.";
+"API test failed: %@" = "Test API échoué : %@";
+"Language" = "Langue";
+"System Default" = "Défaut du système";
+"English" = "Anglais";
+"French" = "Français";
+"Chinese" = "Chinois";
+"Changes will take full effect after restarting the app" = "Les changements prendront pleinement effet après le redémarrage de l'application";
+"Language Changed" = "Langue modifiée";
+"The language has been changed. For the best experience, please restart the application." = "La langue a été modifiée. Pour une meilleure expérience, veuillez redémarrer l'application.";
+
+// New translation keys
+"No Icons Found" = "Aucune icône trouvée";
+"Try different search keywords" = "Essayez différents mots-clés de recherche";
+"No Icon" = "Pas d'icône";
+"You can modify the alias name for better results" = "Vous pouvez modifier l'alias pour de meilleurs résultats";
+"Set Alias Name" = "Définir un alias";
+
+"Icon Cache" = "Cache d'icônes";
+"Restore Cached Icons" = "Restaurer les icônes en cache";
+"Icons Restored" = "Icônes restaurées";
+"All cached custom icons have been successfully restored." = "Toutes les icônes personnalisées en cache ont été restaurées avec succès.";
+"Error Restoring Icons" = "Erreur lors de la restauration des icônes";
+"No cached icons found" = "Aucune icône en cache trouvée";
+"Icons will be cached automatically when you apply them to apps" = "Les icônes seront automatiquement mises en cache lorsque vous les appliquerez aux applications";
+"Restore This Icon" = "Restaurer cette icône";
+"Remove from Cache" = "Supprimer du cache";
+"Restore All" = "Tout restaurer";
+"Restore Selected" = "Restaurer la sélection";
+"Clear Cache" = "Vider le cache";
+"Restoring icons..." = "Restauration des icônes...";
+"Custom icons have been successfully restored." = "Les icônes personnalisées ont été restaurées avec succès.";
+"Could not load icon or app no longer exists" = "Impossible de charger l'icône ou l'application n'existe plus";
+"App or cached icon file no longer exists" = "L'application ou le fichier d'icône en cache n'existe plus";
+"Search apps..." = "Rechercher des applications...";
+"Refresh App List" = "Actualiser la liste des applications";
+"Settings" = "Paramètres";

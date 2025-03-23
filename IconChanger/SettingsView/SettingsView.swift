@@ -104,7 +104,7 @@ struct LanguageSettingsView: View {
             // 现代化的Picker选择器
             Picker("", selection: Binding(
                 get: { self.languageManager.currentLanguage },
-                set: { newValue in 
+                set: { newValue in
                     self.languageManager.currentLanguage = newValue
                     self.showRestartAlert = true
                 }
@@ -180,22 +180,26 @@ struct LanguageSettingsView: View {
 struct SettingsView: View {
     var body: some View {
         TabView {
-//            GeneralSettingsView()
-//                    .tabItem {
-//                        Label("General", systemImage: "gearshape")
-//                    }
             ApplicationSettingsView()
                 .tabItem {
                     Label("Application", systemImage: "app")
                 }
+            
+            // Add our new CachedIconsView tab
+            CachedIconsView()
+                .tabItem {
+                    Label("Icon Cache", systemImage: "arrow.triangle.2.circlepath")
+                }
+            
             APISettingsView()
                 .tabItem {
                     Label(NSLocalizedString("Api", comment: "Settings tab"), systemImage: "bolt")
                 }
-            LanguageSettingsView()
-                .tabItem {
-                    Label(NSLocalizedString("Language", comment: "Settings tab"), systemImage: "globe")
-                }
+            
+//            LanguageSettingsView()
+//                .tabItem {
+//                    Label(NSLocalizedString("Language", comment: "Settings tab"), systemImage: "globe")
+//                }
         }
         .padding()
         .frame(width: 550, height: 450)
