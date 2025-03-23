@@ -173,6 +173,7 @@
 		68431606A6C8EB7BCAA21DD2 /* SettingsView */ = {
 			isa = PBXGroup;
 			children = (
+				2FC131882D8FB34F00F60B19 /* BackgroundSettingsView.swift */,
 				684311E6ADA4C380BC5296B0 /* SettingsView.swift */,
 				684314884C7FE8AEB85353E6 /* GeneralSettingsView.swift */,
 				68431257D7AB81F1EC9AC811 /* ApplicationAliasSettingsView.swift */,
@@ -213,7 +214,6 @@
 				900D1CF9281938D6007ABB12 /* IconList.swift */,
 				908A78FA2819640800951B15 /* IconManager.swift */,
 				908A79082819840D00951B15 /* ChangeView.swift */,
-				2FC131882D8FB34F00F60B19 /* BackgroundSettingsView.swift */,
 				2FC1318C2D8FB5CA00F60B19 /* BackgroundService.swift */,
 				2FC1318A2D8FB37B00F60B19 /* AppDelegate.swift */,
 				908A790A281A128700951B15 /* Request.swift */,
