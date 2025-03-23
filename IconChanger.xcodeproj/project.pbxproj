@@ -12,6 +12,9 @@
 		2FC131832D8F916D00F60B19 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2FC1317E2D8F916D00F60B19 /* Localizable.strings */; };
 		2FC131842D8F916D00F60B19 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2FC1317B2D8F916D00F60B19 /* Localizable.strings */; };
 		2FC131852D8F916D00F60B19 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2FC131812D8F916D00F60B19 /* Localizable.strings */; };
+		2FC131892D8FB34F00F60B19 /* BackgroundSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FC131882D8FB34F00F60B19 /* BackgroundSettingsView.swift */; };
+		2FC1318B2D8FB37B00F60B19 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FC1318A2D8FB37B00F60B19 /* AppDelegate.swift */; };
+		2FC1318D2D8FB5CB00F60B19 /* BackgroundService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FC1318C2D8FB5CA00F60B19 /* BackgroundService.swift */; };
 		684311E1DAA0EE528A75D6B4 /* SetAliasNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684312DDF57DD3F7FD140291 /* SetAliasNameView.swift */; };
 		684312FB180B32D3350C6687 /* ImageViewCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68431B5BF95B69F7A3E9C314 /* ImageViewCore.swift */; };
 		684313DDC8758B6A23980300 /* PermissionRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6843168B503282547D31EC35 /* PermissionRequest.swift */; };
@@ -60,6 +63,9 @@
 		2FC1317A2D8F916D00F60B19 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Localizable.strings; sourceTree = "<group>"; };
 		2FC1317D2D8F916D00F60B19 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = Localizable.strings; sourceTree = "<group>"; };
 		2FC131802D8F916D00F60B19 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = Localizable.strings; sourceTree = "<group>"; };
+		2FC131882D8FB34F00F60B19 /* BackgroundSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundSettingsView.swift; sourceTree = "<group>"; };
+		2FC1318A2D8FB37B00F60B19 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		2FC1318C2D8FB5CA00F60B19 /* BackgroundService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundService.swift; sourceTree = "<group>"; };
 		2FF217A62D8CEAFF00AE478C /* IconChanger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IconChanger.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6843102ECDF4DE9417AD9634 /* LocalImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalImageView.swift; sourceTree = "<group>"; };
 		684310CF2CFC89861988FEC0 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = file.gitignore; path = .gitignore; sourceTree = "<group>"; };
@@ -207,6 +213,9 @@
 				900D1CF9281938D6007ABB12 /* IconList.swift */,
 				908A78FA2819640800951B15 /* IconManager.swift */,
 				908A79082819840D00951B15 /* ChangeView.swift */,
+				2FC131882D8FB34F00F60B19 /* BackgroundSettingsView.swift */,
+				2FC1318C2D8FB5CA00F60B19 /* BackgroundService.swift */,
+				2FC1318A2D8FB37B00F60B19 /* AppDelegate.swift */,
 				908A790A281A128700951B15 /* Request.swift */,
 				9083CCED28680BE20093A1B2 /* URL+Universal.swift */,
 				90B57C1A286AA2B400EE52D3 /* URL+Document.swift */,
@@ -356,6 +365,7 @@
 				908A790B281A128700951B15 /* Request.swift in Sources */,
 				9017B5FA294ED626005709C6 /* IconRes.swift in Sources */,
 				908A78FB2819640800951B15 /* IconManager.swift in Sources */,
+				2FC131892D8FB34F00F60B19 /* BackgroundSettingsView.swift in Sources */,
 				900D1CE9281934C7007ABB12 /* IconChangerApp.swift in Sources */,
 				900D1CFA281938D6007ABB12 /* IconList.swift in Sources */,
 				2FC131602D8F7D7E00F60B19 /* CachedIconsView.swift in Sources */,
@@ -369,10 +379,12 @@
 				684312FB180B32D3350C6687 /* ImageViewCore.swift in Sources */,
 				68431CD74AE43807FEA2060C /* AliasName.swift in Sources */,
 				684311E1DAA0EE528A75D6B4 /* SetAliasNameView.swift in Sources */,
+				2FC1318B2D8FB37B00F60B19 /* AppDelegate.swift in Sources */,
 				68431F5F90EFAE60C30EF968 /* AliasNameCore.swift in Sources */,
 				684313DDC8758B6A23980300 /* PermissionRequest.swift in Sources */,
 				684319A985908FD7F396A2B9 /* SettingsView.swift in Sources */,
 				68431C42D3D73EB33CD18CD3 /* GeneralSettingsView.swift in Sources */,
+				2FC1318D2D8FB5CB00F60B19 /* BackgroundService.swift in Sources */,
 				68431D85DB8E44D55E7421B7 /* ApplicationAliasSettingsView.swift in Sources */,
 				684319BAF8AE3F8E503A8FCD /* ApplicationSettingsView.swift in Sources */,
 				68431AECAF55382A0674F142 /* APISettingsView.swift in Sources */,
@@ -463,7 +475,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -521,7 +533,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
@@ -541,7 +553,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 102;
+				CURRENT_PROJECT_VERSION = 103;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"IconChanger/Preview Content\"";
 				DEVELOPMENT_TEAM = 2T53C3HYGK;
@@ -555,8 +567,8 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 1.0.2;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zhuhaoyu.IconChanger;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -575,7 +587,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 102;
+				CURRENT_PROJECT_VERSION = 103;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"IconChanger/Preview Content\"";
 				DEVELOPMENT_TEAM = 2T53C3HYGK;
@@ -589,8 +601,8 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 1.0.2;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zhuhaoyu.IconChanger;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

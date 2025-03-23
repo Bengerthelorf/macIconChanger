@@ -4,6 +4,30 @@
     <channel>
         <title>IconChanger</title>
         <item>
+            <title>Version 1.0.3</title>
+            <link>https://github.com/Bengerthelorf/macIconChanger</link>
+            <sparkle:version>103</sparkle:version>
+            <sparkle:shortVersionString>1.0.3</sparkle:shortVersionString>
+            <pubDate>Sun, 23 Mar 2025 18:30:00 +0800</pubDate>
+            <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.0.3/IconChanger.dmg"
+            sparkle:edSignature="82g2zSKHD8FET118nHLPWjrw3AuESoRouMS51ezl3qA7caIu0i5SwAMP7/U1c6czxuslUyRJjZ5TG/cd6q5IAA==" length="10781197"
+            type="application/octet-stream"/>
+            <description>
+                <![CDATA[
+                <h2>macIconChanger 1.0.3</h2>
+                <ul>
+                    <li><strong>NEW:</strong> Background service mode - run app in menu bar or dock</li>
+                    <li><strong>NEW:</strong> Automatic icon restoration on scheduled intervals</li>
+                    <li><strong>NEW:</strong> App update detection with automatic icon restoration</li>
+                    <li><strong>NEW:</strong> Quick access to common functions via menu bar</li>
+                    <li>Enhanced icon caching system with improved reliability</li>
+                    <li>UI refinements and performance optimizations</li>
+                    <li>Fixed issues with certain icon types not loading properly</li>
+                </ul>
+                ]]>
+            </description>
+        </item>
+        <item>
             <title>Version 1.0.2</title>
             <link>https://github.com/Bengerthelorf/macIconChanger</link>
             <sparkle:version>102</sparkle:version>

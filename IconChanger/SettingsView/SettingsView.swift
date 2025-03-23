@@ -4,6 +4,7 @@
 //
 //  Created by 朱浩宇 on 2022/4/28.
 //  Modified by Bengerthelorf on 2025/3/21.
+//  Modified to add background service on 2025/3/23.
 //
 
 import SwiftUI
@@ -191,6 +192,12 @@ struct SettingsView: View {
                     Label("Icon Cache", systemImage: "arrow.triangle.2.circlepath")
                 }
             
+            // Add our new BackgroundSettingsView tab
+            BackgroundSettingsView()
+                .tabItem {
+                    Label("Background", systemImage: "clock.arrow.circlepath")
+                }
+            
             APISettingsView()
                 .tabItem {
                     Label(NSLocalizedString("Api", comment: "Settings tab"), systemImage: "bolt")
@@ -202,8 +209,6 @@ struct SettingsView: View {
 //                }
         }
         .padding()
-        .frame(width: 550, height: 450)
+        .frame(width: 600, height: 500)
     }
 }
-
-
