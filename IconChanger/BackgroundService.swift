@@ -2,7 +2,7 @@
 //  BackgroundService.swift
 //  IconChanger
 //
-//  Created on 2025/03/23.
+//  Created by Bengerthelorf on 2025/03/23.
 //
 
 import SwiftUI
@@ -25,9 +25,12 @@ class BackgroundService: ObservableObject {
     // Auto-restore settings
     @AppStorage("enableScheduledRestore") var enableScheduledRestore: Bool = false
     @AppStorage("scheduledRestoreInterval") var scheduledRestoreInterval: Int = 24 // Hours
+    @AppStorage("customScheduledRestoreInterval") var customScheduledRestoreInterval: Int = 36 // Hours
+    @AppStorage("useCustomScheduledRestoreInterval") var useCustomScheduledRestoreInterval: Bool = false
     @AppStorage("lastScheduledRestore") var lastScheduledRestore: Date = Date.distantPast
     
     @AppStorage("enableAutoRestoreOnUpdate") var enableAutoRestoreOnUpdate: Bool = false
+    @AppStorage("autoRestoreCheckInterval") var autoRestoreCheckInterval: Int = 15 // Minutes
     @AppStorage("lastUpdateCheck") var lastUpdateCheck: Date = Date.distantPast
     
     // Reference to the app manager
@@ -201,13 +204,26 @@ class BackgroundService: ObservableObject {
         if enableScheduledRestore {
             let intervalSubmenu = NSMenu()
             
+            // Regular intervals
+            let regularIntervalsItem = NSMenuItem(title: "Preset Intervals", action: nil, keyEquivalent: "")
+            regularIntervalsItem.isEnabled = false
+            intervalSubmenu.addItem(regularIntervalsItem)
+            
             for interval in [1, 3, 6, 12, 24, 48, 72] {
                 let intervalItem = NSMenuItem(title: formatInterval(interval), action: #selector(setRestoreInterval(_:)), keyEquivalent: "")
                 intervalItem.target = self
-                intervalItem.state = scheduledRestoreInterval == interval ? .on : .off
+                intervalItem.state = (scheduledRestoreInterval == interval && !useCustomScheduledRestoreInterval) ? .on : .off
                 intervalItem.representedObject = interval
                 intervalSubmenu.addItem(intervalItem)
             }
+            
+            // Custom interval
+            intervalSubmenu.addItem(NSMenuItem.separator())
+            
+            let customIntervalItem = NSMenuItem(title: "Custom: \(formatInterval(customScheduledRestoreInterval))", action: #selector(toggleCustomRestoreInterval), keyEquivalent: "")
+            customIntervalItem.target = self
+            customIntervalItem.state = useCustomScheduledRestoreInterval ? .on : .off
+            intervalSubmenu.addItem(customIntervalItem)
             
             let intervalMenuItem = NSMenuItem(title: "Restore Interval", action: nil, keyEquivalent: "")
             intervalMenuItem.submenu = intervalSubmenu
@@ -221,6 +237,23 @@ class BackgroundService: ObservableObject {
         autoUpdateItem.target = self
         autoUpdateItem.state = enableAutoRestoreOnUpdate ? .on : .off
         settingsSubmenu.addItem(autoUpdateItem)
+        
+        // Check interval submenu if auto-restore on update is enabled
+        if enableAutoRestoreOnUpdate {
+            let checkIntervalSubmenu = NSMenu()
+            
+            for minutes in [5, 15, 30, 60, 120] {
+                let intervalItem = NSMenuItem(title: formatMinuteInterval(minutes), action: #selector(setCheckInterval(_:)), keyEquivalent: "")
+                intervalItem.target = self
+                intervalItem.state = autoRestoreCheckInterval == minutes ? .on : .off
+                intervalItem.representedObject = minutes
+                checkIntervalSubmenu.addItem(intervalItem)
+            }
+            
+            let checkIntervalMenuItem = NSMenuItem(title: "Check Interval", action: nil, keyEquivalent: "")
+            checkIntervalMenuItem.submenu = checkIntervalSubmenu
+            settingsSubmenu.addItem(checkIntervalMenuItem)
+        }
         
         // Settings menu item
         let settingsItem = NSMenuItem(title: "Settings", action: nil, keyEquivalent: ",")
@@ -298,16 +331,33 @@ class BackgroundService: ObservableObject {
         updateStatusMenu()
     }
     
+    // Toggle custom restore interval
+    @objc func toggleCustomRestoreInterval() {
+        useCustomScheduledRestoreInterval.toggle()
+        setupTimers()
+        updateStatusMenu()
+    }
+    
     // Set restore interval
     @objc func setRestoreInterval(_ sender: NSMenuItem) {
         guard let interval = sender.representedObject as? Int else { return }
         scheduledRestoreInterval = interval
+        useCustomScheduledRestoreInterval = false
+        setupTimers()
+        updateStatusMenu()
+    }
+    
+    // Set check interval for app updates
+    @objc func setCheckInterval(_ sender: NSMenuItem) {
+        guard let interval = sender.representedObject as? Int else { return }
+        autoRestoreCheckInterval = interval
         setupTimers()
         updateStatusMenu()
     }
     
     // Setup timers for scheduled tasks
-    private func setupTimers() {
+    // Changed from private to internal so it can be accessed from BackgroundSettingsView
+    func setupTimers() {
         // Invalidate existing timers
         timer?.invalidate()
         timer = nil
@@ -323,16 +373,23 @@ class BackgroundService: ObservableObject {
         
         // Setup app update check timer if enabled
         if enableAutoRestoreOnUpdate {
-            // Check for updates every 15 minutes
-            updateCheckTimer = Timer.scheduledTimer(timeInterval: 900, target: self, selector: #selector(checkForAppUpdates), userInfo: nil, repeats: true)
+            // Convert minutes to seconds
+            let timeInterval = Double(autoRestoreCheckInterval * 60)
+            updateCheckTimer = Timer.scheduledTimer(timeInterval: timeInterval, target: self, selector: #selector(checkForAppUpdates), userInfo: nil, repeats: true)
         }
+    }
+    
+    // Get the current active restore interval in hours
+    func getActiveRestoreInterval() -> Int {
+        return useCustomScheduledRestoreInterval ? customScheduledRestoreInterval : scheduledRestoreInterval
     }
     
     // Check if it's time for scheduled restore
     @objc func checkScheduledRestore() {
         guard enableScheduledRestore else { return }
         
-        let timeInterval = TimeInterval(scheduledRestoreInterval * 3600) // Convert hours to seconds
+        let interval = getActiveRestoreInterval()
+        let timeInterval = TimeInterval(interval * 3600) // Convert hours to seconds
         let nextRestoreTime = lastScheduledRestore.addingTimeInterval(timeInterval)
         
         if Date() >= nextRestoreTime {
@@ -492,14 +549,24 @@ class BackgroundService: ObservableObject {
         }
     }
     
-    // Helper to format time interval
-    private func formatInterval(_ hours: Int) -> String {
+    // Helper to format time interval (hours)
+    func formatInterval(_ hours: Int) -> String {
         switch hours {
         case 1: return "Every Hour"
         case 24: return "Every Day"
         case 48: return "Every 2 Days"
         case 72: return "Every 3 Days"
         default: return "Every \(hours) Hours"
+        }
+    }
+    
+    // Helper to format minute interval
+    func formatMinuteInterval(_ minutes: Int) -> String {
+        switch minutes {
+        case 1: return "Every Minute"
+        case 60: return "Every Hour"
+        case 120: return "Every 2 Hours"
+        default: return "Every \(minutes) Minutes"
         }
     }
 }
