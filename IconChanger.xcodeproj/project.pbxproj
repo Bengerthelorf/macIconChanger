@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2F53ECDE2D91CC8500A91DD9 /* Github-Iconchanger.png in Resources */ = {isa = PBXBuildFile; fileRef = 2F53ECDD2D91CC8500A91DD9 /* Github-Iconchanger.png */; };
 		2FC131602D8F7D7E00F60B19 /* CachedIconsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FC1315F2D8F7D7D00F60B19 /* CachedIconsView.swift */; };
 		2FC131622D8F7DB000F60B19 /* IconCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FC131612D8F7DB000F60B19 /* IconCache.swift */; };
 		2FC131832D8F916D00F60B19 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2FC1317E2D8F916D00F60B19 /* Localizable.strings */; };
@@ -50,7 +51,7 @@
 		908A79092819840D00951B15 /* ChangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 908A79082819840D00951B15 /* ChangeView.swift */; };
 		908A790B281A128700951B15 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 908A790A281A128700951B15 /* Request.swift */; };
 		908A7927281A5A4A00951B15 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 908A7926281A5A4A00951B15 /* README.md */; };
-		908A792A281A5AE800951B15 /* Github-Iconchanger.png in Resources */ = {isa = PBXBuildFile; fileRef = 908A7929281A5AE800951B15 /* Github-Iconchanger.png */; };
+		908A792A281A5AE800951B15 /* Github-Iconchanger_bak.png in Resources */ = {isa = PBXBuildFile; fileRef = 908A7929281A5AE800951B15 /* Github-Iconchanger_bak.png */; };
 		908A792E281A771800951B15 /* Api.png in Resources */ = {isa = PBXBuildFile; fileRef = 908A792D281A771800951B15 /* Api.png */; };
 		90B57C1B286AA2B400EE52D3 /* URL+Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90B57C1A286AA2B400EE52D3 /* URL+Document.swift */; };
 		90B57C1D286AA2F800EE52D3 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90B57C1C286AA2F800EE52D3 /* Config.swift */; };
@@ -58,6 +59,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2F53ECDD2D91CC8500A91DD9 /* Github-Iconchanger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Github-Iconchanger.png"; sourceTree = "<group>"; };
 		2FC1315F2D8F7D7D00F60B19 /* CachedIconsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedIconsView.swift; sourceTree = "<group>"; };
 		2FC131612D8F7DB000F60B19 /* IconCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconCache.swift; sourceTree = "<group>"; };
 		2FC1317A2D8F916D00F60B19 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Localizable.strings; sourceTree = "<group>"; };
@@ -103,7 +105,7 @@
 		908A79082819840D00951B15 /* ChangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeView.swift; sourceTree = "<group>"; };
 		908A790A281A128700951B15 /* Request.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
 		908A7926281A5A4A00951B15 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		908A7929281A5AE800951B15 /* Github-Iconchanger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Github-Iconchanger.png"; sourceTree = "<group>"; };
+		908A7929281A5AE800951B15 /* Github-Iconchanger_bak.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Github-Iconchanger_bak.png"; sourceTree = "<group>"; };
 		908A792D281A771800951B15 /* Api.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Api.png; sourceTree = "<group>"; };
 		90B57C1A286AA2B400EE52D3 /* URL+Document.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Document.swift"; sourceTree = "<group>"; };
 		90B57C1C286AA2F800EE52D3 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
@@ -259,7 +261,8 @@
 			isa = PBXGroup;
 			children = (
 				908A792D281A771800951B15 /* Api.png */,
-				908A7929281A5AE800951B15 /* Github-Iconchanger.png */,
+				2F53ECDD2D91CC8500A91DD9 /* Github-Iconchanger.png */,
+				908A7929281A5AE800951B15 /* Github-Iconchanger_bak.png */,
 			);
 			path = Github;
 			sourceTree = "<group>";
@@ -334,12 +337,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				908A792A281A5AE800951B15 /* Github-Iconchanger.png in Resources */,
+				908A792A281A5AE800951B15 /* Github-Iconchanger_bak.png in Resources */,
 				90534352286C8BDA00237F98 /* fileicon in Resources */,
 				9053438B287550C200237F98 /* helper.sh in Resources */,
 				2FC131832D8F916D00F60B19 /* Localizable.strings in Resources */,
 				2FC131842D8F916D00F60B19 /* Localizable.strings in Resources */,
 				2FC131852D8F916D00F60B19 /* Localizable.strings in Resources */,
+				2F53ECDE2D91CC8500A91DD9 /* Github-Iconchanger.png in Resources */,
 				907AC4F92954038600F9F0F9 /* README-zh.md in Resources */,
 				90B57C20286AB90700EE52D3 /* installHelper.sh in Resources */,
 				900D1CF0281934C8007ABB12 /* Preview Assets.xcassets in Resources */,
