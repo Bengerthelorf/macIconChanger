@@ -4,6 +4,25 @@
     <channel>
         <title>IconChanger</title>
         <item>
+            <title>Version 1.0.4</title>
+            <link>https://github.com/Bengerthelorf/macIconChanger</link>
+            <sparkle:version>104</sparkle:version>
+            <sparkle:shortVersionString>1.0.4</sparkle:shortVersionString>
+            <pubDate>Tue, 25 Mar 2025 05:54:16 +0800</pubDate>
+            <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.0.4/IconChanger.dmg"
+            sparkle:edSignature="Ujb4dW+zXayprn+wDbbOMLq5pZoMktRgvLicGbD3OCJFuCCgi3bpNZVJT9IB2D/1R737JelWO0Yfrurd6QaCDw==" length="12624734"
+            type="application/octet-stream"/>
+            <description>
+                <![CDATA[
+                <h2>IconChanger 1.0.4 🥳</h2>
+                <ul>
+                    <li><strong>NEW:</strong> Customizable time selection for scheduled icon restoration</li>
+                    <li>Bug fixes and stability improvements</li>
+                </ul>
+                ]]>
+            </description>
+        </item>
+        <item>
             <title>Version 1.0.3</title>
             <link>https://github.com/Bengerthelorf/macIconChanger</link>
             <sparkle:version>103</sparkle:version>
@@ -14,7 +33,7 @@
             type="application/octet-stream"/>
             <description>
                 <![CDATA[
-                <h2>macIconChanger 1.0.3</h2>
+                <h2>IconChanger 1.0.3</h2>
                 <ul>
                     <li><strong>NEW:</strong> Background service mode - run app in menu bar or dock</li>
                     <li><strong>NEW:</strong> Automatic icon restoration on scheduled intervals</li>
@@ -38,7 +57,7 @@
             type="application/octet-stream"/>
             <description>
                 <![CDATA[
-                <h2>macIconChanger 1.0.2</h2>
+                <h2>IconChanger 1.0.2</h2>
                 <ul>
                     <li><strong>NEW:</strong> Icon caching system - automatically remember all applied custom icons</li>
                     <li><strong>NEW:</strong> Restore all cached icons after app updates with one click</li>
@@ -60,7 +79,7 @@
             type="application/octet-stream"/>
             <description>
                 <![CDATA[
-                <h2>macIconChanger 1.0.1</h2>
+                <h2>IconChanger 1.0.1</h2>
                 <ul>
                     <li>Improved icon loading process</li>
                     <li>Added icon loading status indicator</li>
@@ -81,7 +100,7 @@
             type="application/octet-stream"/>
             <description>
                 <![CDATA[
-                <h2>macIconChanger 1.0.0</h2>
+                <h2>IconChanger 1.0.0</h2>
                 <ul>
                     <li>迁移到新的 Meilisearch API</li>
                     <li>添加了多语言支持 (英文、法文、中文)</li>
