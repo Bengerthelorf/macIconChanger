@@ -22,7 +22,7 @@ struct ImageViewCore: View {
     @State var isSuccessful = true
     @State var failureMessage = "Failed to load data."
 
-    // 添加一个初始化方法，使之向后兼容
+    // Add an initializer method to ensure backward compatibility
     init(nsimage: Binding<NSImage?>, setPath: LaunchPadManagerDBHelper.AppInfo, isLoading: Binding<Bool> = .constant(true)) {
         self._nsimage = nsimage
         self.setPath = setPath

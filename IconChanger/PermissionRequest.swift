@@ -3,6 +3,7 @@
 //  IconChanger
 //
 //  Created by seril on 7/25/23.
+//  Modified by Bengerthelorf on 3/21/25.
 //
 
 import SwiftUI
@@ -88,7 +89,7 @@ class FolderPermission: ObservableObject {
         return fileManager.isReadableFile(atPath: safariAppURL.path)
     }
 
-    // 创建一个安全标签
+    // Create a security bookmark
     func createBookmark(from url: URL) throws -> Data {
         let bookmarkData = try url.bookmarkData(options: .withSecurityScope,
                 includingResourceValuesForKeys: nil,
@@ -96,7 +97,7 @@ class FolderPermission: ObservableObject {
         return bookmarkData
     }
 
-    // 使用一个安全标签
+    // Use a security bookmark
     func accessBookmark(_ bookmarkData: Data) throws -> URL {
         var isStale = false
         let bookmarkedURL = try URL(resolvingBookmarkData: bookmarkData,
@@ -105,12 +106,12 @@ class FolderPermission: ObservableObject {
                 bookmarkDataIsStale: &isStale)
 
         if isStale {
-            // 书签数据已经过时，需要重新创建
+            // The bookmark data is outdated and needs to be recreated
             // ...
         }
 
         if !bookmarkedURL.startAccessingSecurityScopedResource() {
-            // 没有权限访问资源
+            // No permission to access the resource
             // ...
         }
 

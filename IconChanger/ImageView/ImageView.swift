@@ -14,30 +14,30 @@ struct ImageView: View {
     let icon: IconRes
     let setPath: LaunchPadManagerDBHelper.AppInfo
     @State var preview: NSImage?
-    @State var isLoading: Bool = true  // 添加加载状态标志
+    @State var isLoading: Bool = true  // Add loading state flag
     
-    // 添加一个回调，通知父视图图标加载状态变化
+    // Add a callback to notify the parent view of icon loading status changes
     var onStatusUpdate: ((Bool) -> Void)? = nil
 
     var body: some View {
         ImageViewCore(nsimage: $preview, setPath: setPath, isLoading: $isLoading)
                 .task {
                     do {
-                        isLoading = true  // 开始加载
+                        isLoading = true  // Start loading
                         preview = try await MyRequestController().sendRequest(icon.lowResPngUrl)
                         if preview == nil {
-                            // 图标加载失败
+                            // Icon loading failed
                             isLoading = false
-                            // 通知父视图更新状态
+                            // Notify the parent view to update the status
                             onStatusUpdate?(false)
                         } else {
-                            // 图标加载成功
+                            // Icon loading succeeded
                             onStatusUpdate?(true)
                         }
                     } catch {
                         print(error)
-                        isLoading = false  // 加载失败
-                        // 通知父视图更新状态
+                        isLoading = false  // Loading failed
+                        // Notify the parent view to update the status
                         onStatusUpdate?(false)
                     }
                 }

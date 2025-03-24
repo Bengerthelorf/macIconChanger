@@ -20,7 +20,7 @@ struct ChangeView: View {
     @State var isLoadingIcons = true
     @State var totalIconsCount: Int = 0
     @State var successIconsCount: Int = 0
-    @State var validIcons: [IconRes] = []  // 新增：保存成功加载的图标
+    @State var validIcons: [IconRes] = []
     let setPath: LaunchPadManagerDBHelper.AppInfo
 
     @Environment(\.presentationMode) var presentationMode
@@ -153,8 +153,8 @@ struct ChangeView: View {
                         isLoadingIcons = true
                         icons = try await iconManager.getIcons(setPath)
                         totalIconsCount = icons.count
-                        successIconsCount = icons.count  // 初始时假设所有图标都可加载
-                        validIcons = icons  // 初始时将所有图标视为有效
+                        successIconsCount = icons.count  // Initially assume all icons can be loaded
+                        validIcons = icons  // Initially consider all icons as valid
                         isLoadingIcons = false
                     } catch {
                         print(error)
@@ -167,24 +167,24 @@ struct ChangeView: View {
 //                .navigationTitle(setPath.name)
     }
     
-    // 更新图标状态和计数的函数
+    // Function to update the icon status and count
     private func updateIconStatus(icon: IconRes, isValid: Bool) {
-        // 如果状态变为无效，且之前是有效的
+        // If the status becomes invalid and was previously valid
         if !isValid && icon.isValidIcon {
             icon.isValidIcon = false
             if successIconsCount > 0 {
                 successIconsCount -= 1
             }
             
-            // 从validIcons数组中移除无效图标
+            // Remove invalid icons from the validIcons array
             validIcons.removeAll { $0.id == icon.id }
         }
-        // 如果状态变为有效，且之前是无效的 (理论上不会发生，但保留以防万一)
+        // If the status becomes valid and was previously invalid (theoretically won't happen, but kept just in case)
         else if isValid && !icon.isValidIcon {
             icon.isValidIcon = true
             successIconsCount += 1
             
-            // 确保图标在validIcons数组中
+            // Ensure the icon is in the validIcons array
             if !validIcons.contains(where: { $0.id == icon.id }) {
                 validIcons.append(icon)
             }

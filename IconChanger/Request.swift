@@ -25,7 +25,7 @@ class MyRequestController {
         
         if URL.isFileURL {
             print("📁 Loading icon from local file")
-            // 在主线程上创建和返回 NSImage
+            // Create and return NSImage on the main thread
             return await MainActor.run {
                 let image = NSImage(byReferencing: URL)
                 if image.isValid {
@@ -94,7 +94,7 @@ class MyRequestController {
                 return nil
             }
             
-            // 在主线程上创建和返回 NSImage
+            // Create and return NSImage on the main thread
             return await MainActor.run {
                 if let image = NSImage(data: data) {
                     print("✅ Successfully created NSImage from data (size: \(image.size.width) x \(image.size.height))")
@@ -315,7 +315,7 @@ class MyQueryRequestController {
         
         let session = URLSession(configuration: sessionConfig)
         
-        // 修改为尝试直接访问API的其他端点
+        // Modified to attempt direct access to other endpoints of the API
         let urlString = "https://api.macosicons.com/api/icons?q=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query)&limit=100"
         print("🌐 Backup API Endpoint: \(urlString)")
         
@@ -327,11 +327,11 @@ class MyQueryRequestController {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         
-        // 添加API密钥头
+        // Add API key header
         let apiKey = UserDefaults.standard.string(forKey: "apiKey") ?? ""
         if !apiKey.isEmpty {
             request.addValue(apiKey, forHTTPHeaderField: "x-api-key")
-            print("🔑 添加API密钥到备份请求")
+            print("🔑 Added API key to backup request")
         }
         
         request.addValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.5 Safari/605.1.15", forHTTPHeaderField: "User-Agent")
@@ -360,36 +360,36 @@ class MyQueryRequestController {
                 print("📄 Backup response preview: \(preview)...\(responseStr.count > previewLength ? " (truncated)" : "")")
             }
             
-            // 尝试解析响应数据
+            // Try to parse the response data
             do {
                 let json = try JSON(data: data)
                 
-                // 检查不同的响应结构
+                // Check different response structures
                 var icons: [IconRes] = []
                 
                 if let results = extractIconsFromJSON(json) {
                     icons = results
-                    print("✅ 成功从备份API提取图标数据")
+                    print("✅ Successfully extracted icon data from backup API")
                 } else {
-                    print("⚠️ 无法从备份API响应中提取图标数据")
-                    // 尝试创建一些简单的图标数据，以便应用程序可以继续
-                    // 这只是作为最后的手段
+                    print("⚠️ Unable to extract icon data from backup API response")
+                    // Try to create some simple icon data so the application can continue
+                    // This is only as a last resort
                     if let directData = json.array?.first {
-                        print("⚠️ 尝试作为直接数据解析")
-                        // 打印所有可用的键，以便更好地了解响应格式
+                        print("⚠️ Attempting to parse as direct data")
+                        // Print all available keys for better understanding of the response format
                         if let jsonObj = directData.dictionary {
-                            print("📑 可用键: \(jsonObj.keys.joined(separator: ", "))")
+                            print("📑 Available keys: \(jsonObj.keys.joined(separator: ", "))")
                         }
                     }
                 }
                 
-                print("🔢 从备份方法找到 \(icons.count) 个图标")
+                print("🔢 Found \(icons.count) icons from backup method")
                 return icons.sorted { $0.downloads > $1.downloads }
             } catch {
-                print("❌ JSON解析错误: \(error.localizedDescription)")
+                print("❌ JSON parsing error: \(error.localizedDescription)")
                 
-                // 尝试另一种方法 - 创建一个硬编码的图标作为后备
-                print("⚠️ 创建硬编码的Chrome图标作为最后的后备选项")
+                // Try another method - create a hardcoded icon as a fallback
+                print("⚠️ Creating hardcoded Chrome icon as a last resort")
                 if query.lowercased().contains("chrome") {
                     if let icnsUrl = URL(string: "https://macosicons.com/api/icons/chrome/download"),
                        let lowResPngUrl = URL(string: "https://parsefiles.back4app.com/JPaQcFfEEQ1ePBxbf6wvzkPMEqKYHhPYv8boI1Rc/476887413a132607e24df29a93a4cb3f_low_res_Chrome.png") {

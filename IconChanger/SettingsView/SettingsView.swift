@@ -59,16 +59,16 @@ class LanguageManager: ObservableObject {
     }
     
     private init() {
-        // 先初始化存储属性
+        // Initialize stored properties
         let language = AppLanguage(rawValue: UserDefaults.standard.string(forKey: "appLanguage") ?? AppLanguage.system.rawValue) ?? .system
         self.currentLanguage = language
         
-        // 然后才能安全地调用方法
+        // Safe call
         applyLanguage()
     }
     
     private func applyLanguage() {
-        // 更新存储的语言值
+        // Update the stored language value
         storedLanguage = currentLanguage.rawValue
         
         // Set the app's preferred languages based on the selected language
@@ -102,7 +102,6 @@ struct LanguageSettingsView: View {
             .padding(.top, 10)
             .padding(.bottom, 5)
             
-            // 现代化的Picker选择器
             Picker("", selection: Binding(
                 get: { self.languageManager.currentLanguage },
                 set: { newValue in
@@ -127,7 +126,7 @@ struct LanguageSettingsView: View {
             Divider()
                 .padding(.vertical, 5)
             
-            // 信息说明
+            // Information description
             HStack(spacing: 10) {
                 Image(systemName: "info.circle")
                     .foregroundColor(.blue)
@@ -154,7 +153,7 @@ struct LanguageSettingsView: View {
         }
     }
     
-    // 为每种语言生成对应的图标
+    // Generate corresponding icons for each language
     @ViewBuilder
     private func languageFlag(for language: AppLanguage) -> some View {
         switch language {
@@ -200,7 +199,7 @@ struct SettingsView: View {
             
             APISettingsView()
                 .tabItem {
-                    Label(NSLocalizedString("Api", comment: "Settings tab"), systemImage: "bolt")
+                    Label(NSLocalizedString("API", comment: "Settings tab"), systemImage: "bolt")
                 }
             
 //            LanguageSettingsView()

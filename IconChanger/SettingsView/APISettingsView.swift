@@ -21,7 +21,7 @@ struct APISettingsView: View {
                 Image(systemName: "bolt")
                     .font(.title2)
                     .foregroundColor(.blue)
-                Text(NSLocalizedString("Api", comment: "Settings tab"))
+                Text(NSLocalizedString("API", comment: "Settings tab"))
                     .font(.title2)
                     .fontWeight(.medium)
             }

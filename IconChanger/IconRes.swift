@@ -14,10 +14,10 @@ class IconRes: Identifiable, Hashable {
     let lowResPngUrl: URL
     let downloads: Int
     
-    // 图标是否有效（可以正常加载）
+    // Whether the icon is valid (can be loaded normally)
     var isValidIcon: Bool = true
     
-    // 添加一个唯一标识符
+    // Add a unique identifier
     var id: String {
         return lowResPngUrl.absoluteString
     }
@@ -29,7 +29,6 @@ class IconRes: Identifiable, Hashable {
         self.downloads = downloads
     }
     
-    // 由于转为类，需要实现Hashable协议的方法
     static func == (lhs: IconRes, rhs: IconRes) -> Bool {
         return lhs.lowResPngUrl == rhs.lowResPngUrl
     }
