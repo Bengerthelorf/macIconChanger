@@ -3,6 +3,8 @@
 //  IconChanger
 //
 //  Created by Bengerthelorf on 2025/03/23.
+//  Modified on 2025/03/24 to add configuration import support
+//  Modified on 2025/03/25 to add funtion for Importing and Exporting configuration
 //
 
 import Foundation
@@ -118,6 +120,12 @@ class IconCacheManager {
         
         // Clear cache
         cachedIcons.removeAll()
+        saveCache()
+    }
+    
+    func addImportedCache(_ cache: IconCache) {
+        // Create a new cache entry
+        cachedIcons[cache.appPath] = cache
         saveCache()
     }
 }
