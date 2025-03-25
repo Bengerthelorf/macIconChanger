@@ -4,6 +4,30 @@
     <channel>
         <title>IconChanger</title>
         <item>
+            <title>Version 1.1.0</title>
+            <link>https://github.com/Bengerthelorf/macIconChanger</link>
+            <sparkle:version>110</sparkle:version>
+            <sparkle:shortVersionString>1.1.0</sparkle:shortVersionString>
+            <pubDate>Wed, 26 Mar 2025 4:30:00 +0800</pubDate>
+            <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.1.0/IconChanger.dmg"
+            sparkle:edSignature="gK6hnsjxpcj3JuZjkQ0wyDCO/jV0JOdAo3AGiLwa+kFgAsDoyAC5Czc4GhgX9RmrP1cC9k3MWKZJ5TAnGEvLBg==" length="13377497"
+            type="application/octet-stream"/>
+            <description>
+                <![CDATA[
+                <h2>IconChanger 1.1.0 ⌘</h2>
+                <ul>
+                    <li><strong>NEW:</strong> Command line interface for icon management</li>
+                    <li><strong>NEW:</strong> Import/export configurations via CLI</li>
+                    <li><strong>NEW:</strong> Install CLI tool directly from Settings</li>
+                    <li><strong>NEW:</strong> Integration with dotfiles for automation</li>
+                    <br/>
+                    <li>Improved configuration handling system</li>
+                    <li>Enhanced error handling and feedback</li>
+                </ul>
+                ]]>
+            </description>
+        </item>
+        <item>
             <title>Version 1.0.6</title>
             <link>https://github.com/Bengerthelorf/macIconChanger</link>
             <sparkle:version>106</sparkle:version>
@@ -17,6 +41,7 @@
                 <h2>IconChanger 1.0.6 📜</h2>
                 <ul>
                     FIX: Resolving macOS 13 Compatibility
+                </ul>
                 ]]>
             </description>
         </item>

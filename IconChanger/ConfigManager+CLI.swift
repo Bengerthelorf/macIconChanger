@@ -8,11 +8,11 @@
 import Foundation
 
 extension ConfigManager {
-    // 导出配置并保存最新版本以供CLI使用
+    // Export configuration and save the latest version for CLI use
     func exportConfigurationForCLI() -> URL? {
-        // 导出配置
+        // Export configuration
         if let exportUrl = exportConfiguration() {
-            // 将副本保存到共享目录供CLI使用
+            // Save a copy to the shared directory for CLI use
             let sharedConfigDir = getSharedConfigDirectory()
             let latestExportFile = sharedConfigDir.appendingPathComponent("latest_export.json")
             
@@ -27,22 +27,22 @@ extension ConfigManager {
         return nil
     }
     
-    // 检查并应用通过CLI导入的配置
+    // Check and apply configurations imported via CLI
     func checkForCLIImports() {
         let sharedConfigDir = getSharedConfigDirectory()
         let flagFile = sharedConfigDir.appendingPathComponent("pending_import")
         let importedFile = sharedConfigDir.appendingPathComponent("imported_config.json")
         
-        // 如果存在导入标志，处理导入的配置
+        // If the import flag exists, process the imported configuration
         if FileManager.default.fileExists(atPath: flagFile.path) &&
            FileManager.default.fileExists(atPath: importedFile.path) {
             
             do {
-                // 导入配置
+                // Import configuration
                 let result = importConfiguration(from: importedFile)
                 print("CLI Import completed: \(result.aliases) aliases and \(result.icons) icons imported")
                 
-                // 删除标志文件
+                // Delete the flag file
                 try FileManager.default.removeItem(at: flagFile)
             } catch {
                 print("Error processing CLI import: \(error.localizedDescription)")
@@ -50,7 +50,7 @@ extension ConfigManager {
         }
     }
     
-    // 获取共享配置目录
+    // Get the shared configuration directory
     private func getSharedConfigDirectory() -> URL {
         let path = "\(NSHomeDirectory())/.iconchanger/config"
         let url = URL(fileURLWithPath: path)

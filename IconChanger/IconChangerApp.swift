@@ -21,10 +21,21 @@ struct IconChangerApp: App {
     // Add state object for background service
     @StateObject private var backgroundService = BackgroundService.shared
     
-    // 添加CLI管理器
+    // Add CLI manager
     @StateObject private var cliManager = CLIManager.shared
 
     init() {
+        // Check command-line arguments
+        let arguments = ProcessInfo.processInfo.arguments
+        if arguments.contains("--install-cli") {
+            Task {
+                // Delay execution to ensure the app is fully launched
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                CLIManager.shared.installCLI()
+                
+            }
+        }
+        
         // If you want to start the updater manually, pass false to startingUpdater and call .startUpdater() later
         // This is where you can also pass an updater delegate if you need one
         updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
@@ -42,10 +53,10 @@ struct IconChangerApp: App {
                         backgroundService.startBackgroundService()
                     }
                     
-                    // 检查CLI工具状态
+                    // Check CLI tool status
                     cliManager.checkInstallation()
                     
-                    // 检查是否有通过CLI导入的配置
+                    // Check if there are configurations imported via CLI
                     ConfigManager.shared.checkForCLIImports()
                 }
         }
@@ -86,7 +97,7 @@ struct IconChangerApp: App {
                 }
             }
             
-            // 添加CLI工具菜单
+            // Add CLI tool menu
             CommandGroup(after: .appSettings) {
                 Menu("Command Line Tool") {
                     if cliManager.isInstalled {

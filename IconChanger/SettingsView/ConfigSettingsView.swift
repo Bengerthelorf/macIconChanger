@@ -69,7 +69,7 @@ struct ConfigSettingsView: View {
             // Action buttons
             HStack(spacing: 20) {
                 Button(action: {
-                    // 同时为GUI和CLI导出
+                    // Export for both GUI and CLI
                     if let _ = ConfigManager.shared.exportConfigurationForCLI() {
                         ConfigManager.shared.showExportDialog()
                     }
@@ -89,6 +89,7 @@ struct ConfigSettingsView: View {
                 .disabled(aliasCount == 0 && cachedIconsCount == 0)
                 
                 Button(action: {
+                    // Show import dialog
                     ConfigManager.shared.showImportDialog()
                 }) {
                     HStack {
@@ -145,7 +146,7 @@ struct ConfigSettingsView: View {
             )
         }
         .onAppear {
-            // 检查是否有通过CLI导入的配置需要处理
+            // Check if there are configurations imported via CLI that need to be processed
             ConfigManager.shared.checkForCLIImports()
         }
     }

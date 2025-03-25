@@ -16,7 +16,7 @@ struct APISettingsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            // 标题区域
+            // Title Section
             HStack {
                 Image(systemName: "bolt")
                     .font(.title2)
@@ -28,7 +28,7 @@ struct APISettingsView: View {
             .padding(.top, 10)
             .padding(.bottom, 5)
             
-            // API密钥输入区域
+            // API Key Input Section
             VStack(alignment: .leading, spacing: 8) {
                 Text(NSLocalizedString("API Key: ", comment: "API settings"))
                     .font(.headline)
@@ -48,10 +48,10 @@ struct APISettingsView: View {
             Divider()
                 .padding(.vertical, 5)
             
-            // 测试按钮区域
+            // Test Button Section
             VStack(alignment: .leading, spacing: 12) {
                 Button {
-                    if !isTestingAPI && !apiKey.isEmpty {
+                    if (!isTestingAPI && !apiKey.isEmpty) {
                         isTestingAPI = true
                         testResult = nil
                         

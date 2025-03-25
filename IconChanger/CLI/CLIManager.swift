@@ -32,12 +32,12 @@ class CLIManager: ObservableObject {
         
         Task {
             do {
-                // 获取应用Bundle中的CLI工具
+                // Get the CLI tool from the application's bundle
                 guard let bundlePath = Bundle.main.path(forResource: bundledCLIName, ofType: nil) else {
                     throw NSError(domain: "CLIManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "CLI executable not found in application bundle"])
                 }
                 
-                // 使用osascript执行sudo命令进行安装
+                // Use osascript to execute the sudo command for installation
                 let script = """
                 do shell script "cp '\(bundlePath)' '\(installLocation)' && chmod +x '\(installLocation)'" with administrator privileges
                 """
@@ -69,7 +69,7 @@ class CLIManager: ObservableObject {
         
         Task {
             do {
-                // 使用osascript执行sudo命令进行卸载
+                // Use osascript to execute the sudo command for uninstallation
                 let script = """
                 do shell script "rm '\(installLocation)'" with administrator privileges
                 """

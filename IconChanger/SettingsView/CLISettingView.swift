@@ -13,7 +13,7 @@ struct CLISettingsView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            // 标题区域
+            // Title section
             HStack {
                 Image(systemName: "terminal")
                     .font(.title2)
@@ -25,7 +25,7 @@ struct CLISettingsView: View {
             .padding(.top, 10)
             .padding(.bottom, 5)
             
-            // 状态区域
+            // Status section
             HStack {
                 Image(systemName: cliManager.isInstalled ? "checkmark.circle.fill" : "xmark.circle.fill")
                     .foregroundColor(cliManager.isInstalled ? .green : .red)
@@ -34,7 +34,7 @@ struct CLISettingsView: View {
             }
             .padding(.bottom, 5)
             
-            // 安装路径
+            // Installation path
             HStack {
                 Text("Installation Path:")
                 Text(cliManager.installLocation)
@@ -43,7 +43,7 @@ struct CLISettingsView: View {
             }
             .padding(.bottom, 10)
             
-            // 安装/卸载按钮
+            // Install/Uninstall button
             HStack(spacing: 15) {
                 Button(action: {
                     if cliManager.isInstalled {
@@ -70,7 +70,7 @@ struct CLISettingsView: View {
                 }
             }
             
-            // 错误信息
+            // Error message
             if let error = cliManager.lastError {
                 Text("Error: \(error)")
                     .font(.callout)
@@ -83,7 +83,7 @@ struct CLISettingsView: View {
             Divider()
                 .padding(.vertical, 10)
             
-            // 使用说明
+            // Usage instructions
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
                     Text("Usage Information")
