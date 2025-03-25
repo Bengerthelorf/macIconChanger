@@ -206,6 +206,11 @@ struct SettingsView: View {
                     Label("Configuration", systemImage: "square.and.arrow.up.on.square")
                 }
             
+            CLISettingsView()
+                .tabItem {
+                    Label("Command Line", systemImage: "terminal")
+                }
+            
 //            LanguageSettingsView()
 //                .tabItem {
 //                    Label(NSLocalizedString("Language", comment: "Settings tab"), systemImage: "globe")

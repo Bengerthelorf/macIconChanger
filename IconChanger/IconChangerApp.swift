@@ -20,6 +20,9 @@ struct IconChangerApp: App {
     
     // Add state object for background service
     @StateObject private var backgroundService = BackgroundService.shared
+    
+    // 添加CLI管理器
+    @StateObject private var cliManager = CLIManager.shared
 
     init() {
         // If you want to start the updater manually, pass false to startingUpdater and call .startUpdater() later
@@ -38,6 +41,12 @@ struct IconChangerApp: App {
                     if backgroundService.runInBackground {
                         backgroundService.startBackgroundService()
                     }
+                    
+                    // 检查CLI工具状态
+                    cliManager.checkInstallation()
+                    
+                    // 检查是否有通过CLI导入的配置
+                    ConfigManager.shared.checkForCLIImports()
                 }
         }
         .commands {
@@ -73,6 +82,21 @@ struct IconChangerApp: App {
                         
                         Toggle("Show in Dock", isOn: $backgroundService.showInDock)
                             .disabled(!backgroundService.runInBackground)
+                    }
+                }
+            }
+            
+            // 添加CLI工具菜单
+            CommandGroup(after: .appSettings) {
+                Menu("Command Line Tool") {
+                    if cliManager.isInstalled {
+                        Button("Uninstall CLI Tool") {
+                            cliManager.uninstallCLI()
+                        }
+                    } else {
+                        Button("Install CLI Tool") {
+                            cliManager.installCLI()
+                        }
                     }
                 }
             }

@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2F13C0752D93266500C645E9 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 2F13C0742D93266500C645E9 /* ArgumentParser */; };
+		2F13C0772D93267B00C645E9 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F13C0762D93267A00C645E9 /* AppKit.framework */; };
+		2F13C07E2D932CB800C645E9 /* CLISettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F13C07D2D932CB800C645E9 /* CLISettingView.swift */; };
+		2F13C0802D932CFC00C645E9 /* ConfigManager+CLI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F13C07F2D932CFC00C645E9 /* ConfigManager+CLI.swift */; };
+		2F13C0832D932EDD00C645E9 /* IconChangerCLI in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2F13C06C2D9325B100C645E9 /* IconChangerCLI */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		2F4A9A1D2D92543A00F4FA81 /* ConfigSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F4A9A1C2D92543A00F4FA81 /* ConfigSettingsView.swift */; };
 		2F53ECDE2D91CC8500A91DD9 /* Github-Iconchanger.png in Resources */ = {isa = PBXBuildFile; fileRef = 2F53ECDD2D91CC8500A91DD9 /* Github-Iconchanger.png */; };
 		2FC131602D8F7D7E00F60B19 /* CachedIconsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FC1315F2D8F7D7D00F60B19 /* CachedIconsView.swift */; };
@@ -59,7 +64,33 @@
 		90B57C20286AB90700EE52D3 /* installHelper.sh in Resources */ = {isa = PBXBuildFile; fileRef = 90B57C1F286AB90700EE52D3 /* installHelper.sh */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		2F13C06A2D9325B100C645E9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		2F13C0812D932EAC00C645E9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+				2F13C0832D932EDD00C645E9 /* IconChangerCLI in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		2F13C06C2D9325B100C645E9 /* IconChangerCLI */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = IconChangerCLI; sourceTree = BUILT_PRODUCTS_DIR; };
+		2F13C0762D93267A00C645E9 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		2F13C07D2D932CB800C645E9 /* CLISettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLISettingView.swift; sourceTree = "<group>"; };
+		2F13C07F2D932CFC00C645E9 /* ConfigManager+CLI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfigManager+CLI.swift"; sourceTree = "<group>"; };
 		2F4A9A1C2D92543A00F4FA81 /* ConfigSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigSettingsView.swift; sourceTree = "<group>"; };
 		2F53ECDD2D91CC8500A91DD9 /* Github-Iconchanger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Github-Iconchanger.png"; sourceTree = "<group>"; };
 		2FC1315F2D8F7D7D00F60B19 /* CachedIconsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedIconsView.swift; sourceTree = "<group>"; };
@@ -117,11 +148,21 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		2F13C06D2D9325B200C645E9 /* IconChangerCLI */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = IconChangerCLI; sourceTree = "<group>"; };
+		2F13C0782D932A8100C645E9 /* CLI */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = CLI; sourceTree = "<group>"; };
 		2F4A9A192D9253CF00F4FA81 /* Config */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Config; sourceTree = "<group>"; };
-		2F53ECE82D92492D00A91DD9 /* CLI */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = CLI; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		2F13C0692D9325B100C645E9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2F13C0752D93266500C645E9 /* ArgumentParser in Frameworks */,
+				2F13C0772D93267B00C645E9 /* AppKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		900D1CE2281934C7007ABB12 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -191,6 +232,7 @@
 				68431F457332C81179583E38 /* APISettingsView.swift */,
 				68431EB0D4F0448EC3F269CE /* ApplicationFolderSettingsView.swift */,
 				2F4A9A1C2D92543A00F4FA81 /* ConfigSettingsView.swift */,
+				2F13C07D2D932CB800C645E9 /* CLISettingView.swift */,
 			);
 			path = SettingsView;
 			sourceTree = "<group>";
@@ -204,17 +246,19 @@
 				907AC4F82954038600F9F0F9 /* README-zh.md */,
 				907AC5002955363800F9F0F9 /* README-fr.md */,
 				900D1CE7281934C7007ABB12 /* IconChanger */,
+				2F13C06D2D9325B200C645E9 /* IconChangerCLI */,
 				9017B60B2951B22F005709C6 /* Frameworks */,
 				684310CF2CFC89861988FEC0 /* .gitignore */,
 				2FF217A62D8CEAFF00AE478C /* IconChanger.app */,
+				2F13C06C2D9325B100C645E9 /* IconChangerCLI */,
 			);
 			sourceTree = "<group>";
 		};
 		900D1CE7281934C7007ABB12 /* IconChanger */ = {
 			isa = PBXGroup;
 			children = (
+				2F13C0782D932A8100C645E9 /* CLI */,
 				2F4A9A192D9253CF00F4FA81 /* Config */,
-				2F53ECE82D92492D00A91DD9 /* CLI */,
 				9053434E286B2A6800237F98 /* AutoUpdater.swift */,
 				9053434D286B2A2900237F98 /* Info.plist */,
 				90B57C1E286AA62300EE52D3 /* IconChanger.entitlements */,
@@ -247,6 +291,7 @@
 				6843168B503282547D31EC35 /* PermissionRequest.swift */,
 				68431606A6C8EB7BCAA21DD2 /* SettingsView */,
 				2FC131612D8F7DB000F60B19 /* IconCache.swift */,
+				2F13C07F2D932CFC00C645E9 /* ConfigManager+CLI.swift */,
 			);
 			path = IconChanger;
 			sourceTree = "<group>";
@@ -262,6 +307,7 @@
 		9017B60B2951B22F005709C6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2F13C0762D93267A00C645E9 /* AppKit.framework */,
 				9017B6192951F090005709C6 /* Cocoa.framework */,
 			);
 			name = Frameworks;
@@ -280,6 +326,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		2F13C06B2D9325B100C645E9 /* IconChangerCLI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2F13C0702D9325B200C645E9 /* Build configuration list for PBXNativeTarget "IconChangerCLI" */;
+			buildPhases = (
+				2F13C0682D9325B100C645E9 /* Sources */,
+				2F13C0692D9325B100C645E9 /* Frameworks */,
+				2F13C06A2D9325B100C645E9 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				2F13C06D2D9325B200C645E9 /* IconChangerCLI */,
+			);
+			name = IconChangerCLI;
+			packageProductDependencies = (
+				2F13C0742D93266500C645E9 /* ArgumentParser */,
+			);
+			productName = IconChangerCLI;
+			productReference = 2F13C06C2D9325B100C645E9 /* IconChangerCLI */;
+			productType = "com.apple.product-type.tool";
+		};
 		900D1CE4281934C7007ABB12 /* IconChanger */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 900D1CF4281934C8007ABB12 /* Build configuration list for PBXNativeTarget "IconChanger" */;
@@ -287,14 +356,15 @@
 				900D1CE1281934C7007ABB12 /* Sources */,
 				900D1CE2281934C7007ABB12 /* Frameworks */,
 				900D1CE3281934C7007ABB12 /* Resources */,
+				2F13C0812D932EAC00C645E9 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				2F13C0782D932A8100C645E9 /* CLI */,
 				2F4A9A192D9253CF00F4FA81 /* Config */,
-				2F53ECE82D92492D00A91DD9 /* CLI */,
 			);
 			name = IconChanger;
 			packageProductDependencies = (
@@ -313,9 +383,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1400;
+				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
+					2F13C06B2D9325B100C645E9 = {
+						CreatedOnToolsVersion = 16.2;
+					};
 					900D1CE4281934C7007ABB12 = {
 						CreatedOnToolsVersion = 13.3.1;
 					};
@@ -336,12 +409,14 @@
 				9083CCE72867FDBD0093A1B2 /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
 				9083CCEA2867FDDD0093A1B2 /* XCRemoteSwiftPackageReference "LaunchPadManagerDBHelper" */,
 				9017B5F6294DBBA9005709C6 /* XCRemoteSwiftPackageReference "Sparkle" */,
+				2F13C0732D93266500C645E9 /* XCRemoteSwiftPackageReference "swift-argument-parser" */,
 			);
 			productRefGroup = 900D1CDC281934C7007ABB12;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				900D1CE4281934C7007ABB12 /* IconChanger */,
+				2F13C06B2D9325B100C645E9 /* IconChangerCLI */,
 			);
 		};
 /* End PBXProject section */
@@ -372,6 +447,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		2F13C0682D9325B100C645E9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		900D1CE1281934C7007ABB12 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -397,10 +479,12 @@
 				68431D584237DD997A7513DA /* ImageView.swift in Sources */,
 				684312FB180B32D3350C6687 /* ImageViewCore.swift in Sources */,
 				68431CD74AE43807FEA2060C /* AliasName.swift in Sources */,
+				2F13C0802D932CFC00C645E9 /* ConfigManager+CLI.swift in Sources */,
 				684311E1DAA0EE528A75D6B4 /* SetAliasNameView.swift in Sources */,
 				2FC1318B2D8FB37B00F60B19 /* AppDelegate.swift in Sources */,
 				68431F5F90EFAE60C30EF968 /* AliasNameCore.swift in Sources */,
 				684313DDC8758B6A23980300 /* PermissionRequest.swift in Sources */,
+				2F13C07E2D932CB800C645E9 /* CLISettingView.swift in Sources */,
 				684319A985908FD7F396A2B9 /* SettingsView.swift in Sources */,
 				68431C42D3D73EB33CD18CD3 /* GeneralSettingsView.swift in Sources */,
 				2FC1318D2D8FB5CB00F60B19 /* BackgroundService.swift in Sources */,
@@ -441,6 +525,35 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		2F13C0712D9325B200C645E9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.5;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		2F13C0722D9325B200C645E9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.5;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		900D1CF2281934C8007ABB12 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -633,6 +746,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		2F13C0702D9325B200C645E9 /* Build configuration list for PBXNativeTarget "IconChangerCLI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2F13C0712D9325B200C645E9 /* Debug */,
+				2F13C0722D9325B200C645E9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		900D1CE0281934C7007ABB12 /* Build configuration list for PBXProject "IconChanger" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -654,6 +776,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		2F13C0732D93266500C645E9 /* XCRemoteSwiftPackageReference "swift-argument-parser" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-argument-parser.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.5.0;
+			};
+		};
 		9017B5F6294DBBA9005709C6 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sparkle-project/Sparkle";
@@ -681,6 +811,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		2F13C0742D93266500C645E9 /* ArgumentParser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2F13C0732D93266500C645E9 /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
+			productName = ArgumentParser;
+		};
 		9017B5F7294DBBA9005709C6 /* Sparkle */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9017B5F6294DBBA9005709C6 /* XCRemoteSwiftPackageReference "Sparkle" */;

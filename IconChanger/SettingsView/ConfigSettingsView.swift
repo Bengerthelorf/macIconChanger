@@ -69,7 +69,10 @@ struct ConfigSettingsView: View {
             // Action buttons
             HStack(spacing: 20) {
                 Button(action: {
-                    ConfigManager.shared.showExportDialog()
+                    // 同时为GUI和CLI导出
+                    if let _ = ConfigManager.shared.exportConfigurationForCLI() {
+                        ConfigManager.shared.showExportDialog()
+                    }
                 }) {
                     HStack {
                         Image(systemName: "square.and.arrow.up")
@@ -123,8 +126,8 @@ struct ConfigSettingsView: View {
                 )
                 
                 InfoRow(
-                    icon: "exclamationmark.triangle",
-                    text: "Icon paths are absolute, so imported icons will only work if apps are in the same location"
+                    icon: "info.circle",
+                    text: "Command line configuration is available with 'iconchanger' tool"
                 )
             }
             .padding(.horizontal, 5)
@@ -140,6 +143,10 @@ struct ConfigSettingsView: View {
                 message: Text(confirmationMessage),
                 dismissButton: .default(Text("OK"))
             )
+        }
+        .onAppear {
+            // 检查是否有通过CLI导入的配置需要处理
+            ConfigManager.shared.checkForCLIImports()
         }
     }
 }
