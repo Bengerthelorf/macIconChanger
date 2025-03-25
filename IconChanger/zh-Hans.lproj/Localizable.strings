@@ -3,6 +3,7 @@
   IconChanger
 
   Created by Bengerthelorf on 2025/03/21.
+  Modified by Bengerthelorf on 2025/03/21.
   
 */
 
@@ -22,7 +23,7 @@
 "Show in the Finder" = "在访达中显示";
 "Set the Alias" = "设置别名";
 "Remove the Icon from the Launchpad" = "从启动台中移除图标";
-"macOSIcon" = "macOSIcon"; // This is the name of the website. Maybe you can keep it.
+"macOSIcon" = "macOSIcon";
 "Local" = "本地";
 "Cancel" = "取消";
 "Choose from the Local" = "从本地选择";
@@ -30,7 +31,6 @@
 "Query Host: " = "查询主机: ";
 "API Key: " = "API密钥: ";
 "Finish" = "完成";
-
 "You need to obtain an API key from macosicons.com" = "您需要从 macosicons.com 获取API密钥";
 "Test API Connection" = "测试API连接";
 "Testing..." = "测试中...";
@@ -45,7 +45,6 @@
 "Changes will take full effect after restarting the app" = "更改将在重新启动应用后完全生效";
 "Language Changed" = "语言已更改";
 "The language has been changed. For the best experience, please restart the application." = "语言已更改。为了获得最佳体验，请重新启动应用程序。";
-
 "No Icons Found" = "没有找到匹配的图标";
 "Try different search keywords" = "请尝试使用其他关键词搜索";
 "No Icon" = "没有图标";

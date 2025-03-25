@@ -23,7 +23,7 @@
 "Show in the Finder" = "Afficher dans le Finder";
 "Set the Alias" = "Définir un autre nom";
 "Remove the Icon from the Launchpad" = "Supprimer du Launchpad";
-"macOSIcon" = "macOSIcon"; // This is the name of the website. Maybe you can keep it.
+"macOSIcon" = "macOSIcon";
 "Local" = "Local";
 "Cancel" = "Annuler";
 "Choose from the Local" = "Choisir depuis le Finder";
@@ -31,7 +31,6 @@
 "Query Host: " = "Hôte de requête : ";
 "API Key: " = "Clé API : ";
 "Finish" = "Terminer";
-
 "You need to obtain an API key from macosicons.com" = "Vous devez obtenir une clé API depuis macosicons.com";
 "Test API Connection" = "Tester la connexion API";
 "Testing..." = "Test en cours...";
@@ -46,8 +45,6 @@
 "Changes will take full effect after restarting the app" = "Les changements prendront pleinement effet après le redémarrage de l'application";
 "Language Changed" = "Langue modifiée";
 "The language has been changed. For the best experience, please restart the application." = "La langue a été modifiée. Pour une meilleure expérience, veuillez redémarrer l'application.";
-
-// New translation keys
 "No Icons Found" = "Aucune icône trouvée";
 "Try different search keywords" = "Essayez différents mots-clés de recherche";
 "No Icon" = "Pas d'icône";
