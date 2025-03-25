@@ -18,20 +18,72 @@ class BackgroundService: ObservableObject {
     private var statusMenu: NSMenu?
     
     // Background mode settings
-    @AppStorage("runInBackground") var runInBackground: Bool = false
-    @AppStorage("showInDock") var showInDock: Bool = true
-    @AppStorage("showInMenuBar") var showInMenuBar: Bool = true
+    @Published var runInBackground: Bool {
+        didSet {
+            UserDefaults.standard.set(runInBackground, forKey: "runInBackground")
+        }
+    }
+    
+    @Published var showInDock: Bool {
+        didSet {
+            UserDefaults.standard.set(showInDock, forKey: "showInDock")
+        }
+    }
+    
+    @Published var showInMenuBar: Bool {
+        didSet {
+            UserDefaults.standard.set(showInMenuBar, forKey: "showInMenuBar")
+        }
+    }
     
     // Auto-restore settings
-    @AppStorage("enableScheduledRestore") var enableScheduledRestore: Bool = false
-    @AppStorage("scheduledRestoreInterval") var scheduledRestoreInterval: Int = 24 // Hours
-    @AppStorage("customScheduledRestoreInterval") var customScheduledRestoreInterval: Int = 36 // Hours
-    @AppStorage("useCustomScheduledRestoreInterval") var useCustomScheduledRestoreInterval: Bool = false
-    @AppStorage("lastScheduledRestore") var lastScheduledRestore: Date = Date.distantPast
+    @Published var enableScheduledRestore: Bool {
+        didSet {
+            UserDefaults.standard.set(enableScheduledRestore, forKey: "enableScheduledRestore")
+        }
+    }
     
-    @AppStorage("enableAutoRestoreOnUpdate") var enableAutoRestoreOnUpdate: Bool = false
-    @AppStorage("autoRestoreCheckInterval") var autoRestoreCheckInterval: Int = 15 // Minutes
-    @AppStorage("lastUpdateCheck") var lastUpdateCheck: Date = Date.distantPast
+    @Published var scheduledRestoreInterval: Int {
+        didSet {
+            UserDefaults.standard.set(scheduledRestoreInterval, forKey: "scheduledRestoreInterval")
+        }
+    }
+    
+    @Published var customScheduledRestoreInterval: Int {
+        didSet {
+            UserDefaults.standard.set(customScheduledRestoreInterval, forKey: "customScheduledRestoreInterval")
+        }
+    }
+    
+    @Published var useCustomScheduledRestoreInterval: Bool {
+        didSet {
+            UserDefaults.standard.set(useCustomScheduledRestoreInterval, forKey: "useCustomScheduledRestoreInterval")
+        }
+    }
+    
+    @Published var lastScheduledRestore: Date {
+        didSet {
+            UserDefaults.standard.set(lastScheduledRestore, forKey: "lastScheduledRestore")
+        }
+    }
+    
+    @Published var enableAutoRestoreOnUpdate: Bool {
+        didSet {
+            UserDefaults.standard.set(enableAutoRestoreOnUpdate, forKey: "enableAutoRestoreOnUpdate")
+        }
+    }
+    
+    @Published var autoRestoreCheckInterval: Int {
+        didSet {
+            UserDefaults.standard.set(autoRestoreCheckInterval, forKey: "autoRestoreCheckInterval")
+        }
+    }
+    
+    @Published var lastUpdateCheck: Date {
+        didSet {
+            UserDefaults.standard.set(lastUpdateCheck, forKey: "lastUpdateCheck")
+        }
+    }
     
     // Reference to the app manager
     private let iconManager = IconManager.shared
@@ -42,6 +94,65 @@ class BackgroundService: ObservableObject {
     
     // Initialize
     private init() {
+        // First, initialize all properties with default values
+        self.runInBackground = false
+        self.showInDock = true
+        self.showInMenuBar = true
+        self.enableScheduledRestore = false
+        self.scheduledRestoreInterval = 24
+        self.customScheduledRestoreInterval = 36
+        self.useCustomScheduledRestoreInterval = false
+        self.lastScheduledRestore = Date.distantPast
+        self.enableAutoRestoreOnUpdate = false
+        self.autoRestoreCheckInterval = 15
+        self.lastUpdateCheck = Date.distantPast
+        
+        // Then, after all properties are initialized, we can load values from UserDefaults
+        self.runInBackground = UserDefaults.standard.bool(forKey: "runInBackground")
+        
+        if UserDefaults.standard.object(forKey: "showInDock") != nil {
+            self.showInDock = UserDefaults.standard.bool(forKey: "showInDock")
+        }
+        
+        if UserDefaults.standard.object(forKey: "showInMenuBar") != nil {
+            self.showInMenuBar = UserDefaults.standard.bool(forKey: "showInMenuBar")
+        }
+        
+        self.enableScheduledRestore = UserDefaults.standard.bool(forKey: "enableScheduledRestore")
+        
+        if UserDefaults.standard.object(forKey: "scheduledRestoreInterval") != nil {
+            let interval = UserDefaults.standard.integer(forKey: "scheduledRestoreInterval")
+            if interval > 0 {
+                self.scheduledRestoreInterval = interval
+            }
+        }
+        
+        if UserDefaults.standard.object(forKey: "customScheduledRestoreInterval") != nil {
+            let interval = UserDefaults.standard.integer(forKey: "customScheduledRestoreInterval")
+            if interval > 0 {
+                self.customScheduledRestoreInterval = interval
+            }
+        }
+        
+        self.useCustomScheduledRestoreInterval = UserDefaults.standard.bool(forKey: "useCustomScheduledRestoreInterval")
+        
+        if let date = UserDefaults.standard.object(forKey: "lastScheduledRestore") as? Date {
+            self.lastScheduledRestore = date
+        }
+        
+        self.enableAutoRestoreOnUpdate = UserDefaults.standard.bool(forKey: "enableAutoRestoreOnUpdate")
+        
+        if UserDefaults.standard.object(forKey: "autoRestoreCheckInterval") != nil {
+            let interval = UserDefaults.standard.integer(forKey: "autoRestoreCheckInterval")
+            if interval > 0 {
+                self.autoRestoreCheckInterval = interval
+            }
+        }
+        
+        if let date = UserDefaults.standard.object(forKey: "lastUpdateCheck") as? Date {
+            self.lastUpdateCheck = date
+        }
+        
         // Setup only when app is fully launched
         NotificationCenter.default.addObserver(
             self,

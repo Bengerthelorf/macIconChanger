@@ -49,7 +49,7 @@ struct IconChangerApp: App {
             CommandGroup(after: .windowSize) {
                 Menu("Background Service") {
                     Toggle("Run in Background", isOn: $backgroundService.runInBackground)
-                        .onChange(of: backgroundService.runInBackground) {oldValue, newValue in
+                        .onChange(of: backgroundService.runInBackground) { newValue in
                             if newValue {
                                 backgroundService.startBackgroundService()
                             } else {
