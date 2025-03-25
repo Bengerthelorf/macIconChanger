@@ -48,3 +48,7 @@ Vraiment désolé de le dire, mais actuellement, nous ne pouvons pas modifier le
 * [macOSIcon](https://macosicons.com/#/)
 * [fileiocn](https://github.com/mklement0/fileicon)
 * [Atom](https://github.com/atomtoto)
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Bengerthelorf/macIconChanger&type=Timeline)](https://www.star-history.com/#Bengerthelorf/macIconChanger&Timeline)

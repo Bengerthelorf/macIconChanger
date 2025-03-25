@@ -48,3 +48,7 @@ Very sorry to say, but currently, we cannot change the icon of System Apps. Beca
 * [macOSIcon](https://macosicons.com/#/)
 * [fileiocn](https://github.com/mklement0/fileicon)
 * [Atom](https://github.com/atomtoto)
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Bengerthelorf/macIconChanger&type=Timeline)](https://www.star-history.com/#Bengerthelorf/macIconChanger&Timeline)
