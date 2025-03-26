@@ -174,7 +174,7 @@ echo "IconChanger setup complete!"
 
 ## 🖥️ System Requirements
 
-- macOS 11.0 or later.
+- macOS 12.0 or later.
 - Administrator privileges (for icon changes and CLI installation).
 
 ## 🚫 About System Apps

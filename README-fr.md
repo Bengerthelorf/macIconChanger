@@ -174,7 +174,7 @@ echo "Configuration d'IconChanger terminée !"
 
 ## 🖥️ Configuration système requise
 
-- macOS 11.0 ou version ultérieure.
+- macOS 12.0 ou version ultérieure.
 - Privilèges d'administrateur (pour les modifications d'icônes et l'installation de CLI).
 
 ## 🚫 À propos des applications système
