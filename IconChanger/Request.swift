@@ -304,6 +304,86 @@ class MyQueryRequestController {
         }
     }
     
+    func testAPIConnection() async throws -> (success: Bool, iconCount: Int) {
+        // Use a common query that won't trigger the hardcoded fallback
+        let testQuery = "test_api_connection"
+        print("🔍 Testing API connection with query: \(testQuery)")
+
+        let sessionConfig = URLSessionConfiguration.default
+        sessionConfig.timeoutIntervalForRequest = 15.0
+        
+        let session = URLSession(configuration: sessionConfig)
+        
+        // Use the primary Meilisearch endpoint
+        let urlString = "https://api.macosicons.com/api/search"
+        guard let URL = URL(string: urlString) else {
+            throw NSError(domain: "IconChanger", code: 1001, userInfo: [NSLocalizedDescriptionKey: "Invalid API endpoint URL"])
+        }
+        
+        var request = URLRequest(url: URL)
+        request.httpMethod = "POST"
+        
+        // Get API key from UserDefaults - this is what we're actually testing
+        let apiKey = UserDefaults.standard.string(forKey: "apiKey") ?? ""
+        if apiKey.isEmpty {
+            throw NSError(domain: "IconChanger", code: 1002, userInfo: [NSLocalizedDescriptionKey: "API key not provided"])
+        }
+        
+        // Add the API key to the request headers
+        request.addValue(apiKey, forHTTPHeaderField: "x-api-key")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue("application/json", forHTTPHeaderField: "Accept")
+        
+        // Create a minimal query body
+        let bodyObject: [String: Any] = [
+            "query": testQuery,
+            "searchOptions": [
+                "hitsPerPage": 10,
+                "page": 1,
+                "sort": ["timeStamp:desc"]
+            ]
+        ]
+        
+        // Convert body to JSON data
+        let jsonData = try JSONSerialization.data(withJSONObject: bodyObject, options: [])
+        request.httpBody = jsonData
+        
+        // Make the request
+        let (data, response) = try await session.data(for: request)
+        
+        // Check response status code
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NSError(domain: "IconChanger", code: 1003, userInfo: [NSLocalizedDescriptionKey: "Invalid response type"])
+        }
+        
+        // Check if the status code indicates success
+        if httpResponse.statusCode != 200 {
+            // Try to extract error message from response
+            if let errorStr = String(data: data, encoding: .utf8) {
+                throw NSError(domain: "IconChanger", code: httpResponse.statusCode,
+                              userInfo: [NSLocalizedDescriptionKey: "API error: \(errorStr)"])
+            } else {
+                throw NSError(domain: "IconChanger", code: httpResponse.statusCode,
+                              userInfo: [NSLocalizedDescriptionKey: "API returned status code \(httpResponse.statusCode)"])
+            }
+        }
+        
+        // Parse the response
+        let json = try JSON(data: data)
+        
+        // Check if the response has the expected structure
+        guard json["hits"].exists() else {
+            throw NSError(domain: "IconChanger", code: 1004,
+                          userInfo: [NSLocalizedDescriptionKey: "Invalid API response format"])
+        }
+        
+        // Count the icons
+        let iconCount = json["hits"].arrayValue.count
+        
+        // Return success and icon count
+        return (true, iconCount)
+    }
+    
     // Backup method using a different approach to search the site
     private func sendBackupRequest(_ query: String) async throws -> [IconRes] {
         let query = qeuryMix(query)

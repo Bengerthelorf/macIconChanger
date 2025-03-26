@@ -110,27 +110,48 @@ struct APISettingsView: View {
         let testController = MyQueryRequestController()
         
         do {
-            let results = try await testController.sendRequest("Chrome")
+            // Use the dedicated test function instead of the regular search
+            let result = try await testController.testAPIConnection()
             
-            // Update UI state on the main thread
             await MainActor.run {
-                if results.isEmpty {
+                if result.iconCount == 0 {
                     testResult = NSLocalizedString("API connection established but no results returned.", comment: "API testing result")
-                    testSuccess = false
+                    testSuccess = true // Still successful if we get a valid response with 0 results
                 } else {
-                    testResult = String(format: NSLocalizedString("API connection successful! Found %@ icons.", comment: "API testing result"), String(results.count))
+                    testResult = String(format: NSLocalizedString("API connection successful!", comment: "API testing result"), String(result.iconCount))
                     testSuccess = true
                 }
                 isTestingAPI = false
             }
         } catch {
-            // Update UI state on the main thread
             await MainActor.run {
-                testResult = String(format: NSLocalizedString("API test failed: %@", comment: "API testing error"), error.localizedDescription)
+                // Extract just the important message from the error
+                let errorMessage = extractErrorMessage(from: error)
+                testResult = String(format: NSLocalizedString("API test failed: %@", comment: "API testing error"), errorMessage)
                 testSuccess = false
                 isTestingAPI = false
             }
         }
+    }
+    
+    // Helper function to extract clean error messages from API errors
+    private func extractErrorMessage(from error: Error) -> String {
+        let errorDescription = error.localizedDescription
+        
+        // Check if this is a JSON error response containing a message field
+        if errorDescription.contains("API error:") {
+            // Try to extract just the "message" part from JSON error
+            if let messageStart = errorDescription.range(of: "\"message\":\""),
+               let messageEnd = errorDescription.range(of: "\"}", options: [], range: messageStart.upperBound..<errorDescription.endIndex) {
+                
+                let startIndex = messageStart.upperBound
+                let endIndex = messageEnd.lowerBound
+                return String(errorDescription[startIndex..<endIndex])
+            }
+        }
+        
+        // If we can't parse it or it's not a JSON error, return the original message
+        return errorDescription
     }
 }
 

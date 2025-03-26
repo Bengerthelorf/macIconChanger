@@ -521,8 +521,9 @@ class BackgroundService: ObservableObject {
                     showUpdateNotification(appCount: updatedApps.count)
                 }
                 
-                // Update last check time
-                lastUpdateCheck = Date()
+                await MainActor.run {
+                    lastUpdateCheck = Date()
+                }
             } catch {
                 print("Error checking for app updates: \(error.localizedDescription)")
             }
@@ -534,9 +535,12 @@ class BackgroundService: ObservableObject {
         Task {
             do {
                 try await iconManager.restoreAllCachedIcons()
-                lastScheduledRestore = Date()
                 
-                updateStatusMenu()
+                await MainActor.run {
+                    lastScheduledRestore = Date()
+                    updateStatusMenu()
+                }
+                
                 showRestoreNotification()
             } catch {
                 print("Scheduled restore failed: \(error.localizedDescription)")
@@ -557,7 +561,7 @@ class BackgroundService: ObservableObject {
                 print("Manual restore failed: \(error.localizedDescription)")
                 
                 // Show error alert
-                let alert = NSAlert()
+                let alert = await NSAlert()
                 alert.messageText = "Icon Restoration Failed"
                 alert.informativeText = error.localizedDescription
                 alert.alertStyle = .warning

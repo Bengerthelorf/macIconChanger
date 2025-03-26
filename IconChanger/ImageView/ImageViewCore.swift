@@ -95,23 +95,32 @@ struct ImageViewCore: View {
                                 .frame(minWidth: 250, minHeight: 100)
                     }
     }
-        func changeIcon(image: NSImage) {
-            task = Task {
-                do {
+    func changeIcon(image: NSImage) {
+        task = Task {
+            do {
+                await MainActor.run {
                     isTaskRunning = true
-                    try IconManager.shared.setImage(image, app: setPath)
+                }
+                
+                try IconManager.shared.setImage(image, app: setPath)
+                
+                await MainActor.run {
                     isTaskRunning = false
                     failureMessage = "Icon changed successfully."
                     isSuccessful = true
                     showSnackbar = true
-                } catch {
+                }
+            } catch {
+                await MainActor.run {
+                    isTaskRunning = false
                     failureMessage = "Failed to change the icon: \(error.localizedDescription)"
                     isSuccessful = false
                     showSnackbar = true
-                    print(error)
                 }
+                print(error)
             }
         }
+    }
 
 }
 

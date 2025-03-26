@@ -33,14 +33,19 @@ class IconManager: ObservableObject {
     }
 
     @objc func refresh() {
-        do {
-            let helper = try LaunchPadManagerDBHelper()
-
-            apps = try helper.getAllAppInfos().sorted(by: { info1, info2 in
-                info1.name.compare(info2.name) == .orderedAscending
-            })
-        } catch {
-            print(error)
+        Task {
+            do {
+                let helper = try LaunchPadManagerDBHelper()
+                let sortedApps = try helper.getAllAppInfos().sorted(by: { info1, info2 in
+                    info1.name.compare(info2.name) == .orderedAscending
+                })
+                
+                await MainActor.run {
+                    apps = sortedApps
+                }
+            } catch {
+                print(error)
+            }
         }
     }
 
@@ -114,7 +119,7 @@ class IconManager: ObservableObject {
 
     func setImage(_ image: NSImage, app: LaunchPadManagerDBHelper.AppInfo) throws {
         // First, cache the icon
-        try IconCacheManager.shared.cacheIcon(image: image, for: app.url.universalPath(), appName: app.name)
+        _ = try IconCacheManager.shared.cacheIcon(image: image, for: app.url.universalPath(), appName: app.name)
         
         // Then follow the original process to set the icon
         let imageURL = URL.documents.universalappending(path: "icon.png")
