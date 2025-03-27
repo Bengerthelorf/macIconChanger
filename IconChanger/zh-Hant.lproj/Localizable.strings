@@ -1,0 +1,396 @@
+/* No comment provided by engineer. */
+"%lld" = "%lld";
+
+/* No comment provided by engineer. */
+"%lld cached icons ready for restoration" = "已快取 %lld 個圖像可供回復";
+
+/* No comment provided by engineer. */
+"%lld/%lld" = "%lld/%lld";
+
+/* No comment provided by engineer. */
+"1. A dialog will appear requesting access to /Applications" = "1. 將會出現要求取用 /Applications 的對話框";
+
+/* (No comment) */
+"1. Open the System Setting App" = "1. 開啟「系統設定」";
+
+/* (No comment) */
+"2. Go to the security" = "2. 前往「隱私權與安全性」";
+
+/* No comment provided by engineer. */
+"2. Please choose /Applications and click OK" = "2. 請選擇 /Applications 並按一下「確定」";
+
+/* (No comment) */
+"3. Choose the Full Disk Access" = "3. 選擇「完全取用磁碟」";
+
+/* (No comment) */
+"4. Unlock it" = "4. 將其解鎖";
+
+/* (No comment) */
+"5. Choose or add the IconChanger" = "5. 選擇或加入 IconChanger";
+
+/* (No comment) */
+"6. Check the check box" = "6. 勾選註記框";
+
+/* Settings tab */
+"API" = "API";
+
+/* API settings */
+"API Key: " = "API 金鑰：";
+
+/* API testing result */
+"API connection established but no results returned." = "已建立 API 連線但未傳回任何結果。";
+
+/* API testing result */
+"API connection successful!" = "API 連線成功！";
+
+/* (No comment) */
+"API connection successful! Found %@ icons." = "API 連線成功！找到 %@ 個圖像。";
+
+/* API testing error */
+"API test failed: %@" = "API 測試失敗：%@";
+
+/* No comment provided by engineer. */
+"About Configuration Files" = "關於設定檔";
+
+/* No comment provided by engineer. */
+"After importing with CLI, restart the app to see the changes take effect." = "使用 CLI 輸入後，請重新啟動 App 以讓變更生效。";
+
+/* No comment provided by engineer. */
+"Alias Name" = "替身名稱";
+
+/* No comment provided by engineer. */
+"Alias Names" = "替身名稱";
+
+/* (No comment) */
+"Api" = "Api";
+
+/* No comment provided by engineer. */
+"App Name" = "App 名稱";
+
+/* No comment provided by engineer. */
+"App Visibility" = "App 可見性";
+
+/* No comment provided by engineer. */
+"Application" = "應用程式";
+
+/* No comment provided by engineer. */
+"Application Folders" = "應用程式檔案夾";
+
+/* No comment provided by engineer. */
+"Automatic Icon Restoration" = "自動圖像回復";
+
+/* No comment provided by engineer. */
+"Background" = "背景";
+
+/* No comment provided by engineer. */
+"Background Service" = "背景服務";
+
+/* No comment provided by engineer. */
+"Background service is running" = "背景服務正在執行";
+
+/* No comment provided by engineer. */
+"CLI Tool is installed" = "已安裝 CLI 工具";
+
+/* No comment provided by engineer. */
+"CLI Tool is not installed" = "未安裝 CLI 工具";
+
+/* (No comment) */
+"Cancel" = "取消";
+
+/* Language settings instruction */
+"Changes will take full effect after restarting the app" = "重新啟動 App 後，變更才會完全生效";
+
+/* No comment provided by engineer. */
+"Changing the icon..." = "正在更改圖像...";
+
+/* No comment provided by engineer. */
+"Check Interval:" = "檢查間隔：";
+
+/* No comment provided by engineer. */
+"Check for Updates…" = "檢查更新項目…";
+
+/* (No comment) */
+"Check the Access Permition" = "檢查取用權限";
+
+/* Language selection */
+"Simplified Chinese" = "簡體中文";
+
+/* Language selection */
+"Traditional Chinese" = "正體中文";
+
+/* Language selection */
+"Japanese" = "日文";
+
+/* (No comment) */
+"Choose from the Local" = "從本機選擇";
+
+/* No comment provided by engineer. */
+"Clear Cache" = "清除快取";
+
+/* No comment provided by engineer. */
+"Command Line" = "命令列";
+
+/* No comment provided by engineer. */
+"Command Line Tool" = "命令列工具";
+
+/* No comment provided by engineer. */
+"Configuration" = "設定";
+
+/* (No comment) */
+"Copy" = "拷貝";
+
+/* (No comment) */
+"Copy the Name" = "拷貝名稱";
+
+/* (No comment) */
+"Copy the Path Name" = "拷貝路徑名稱";
+
+/* No comment provided by engineer. */
+"Current Configuration" = "目前的設定";
+
+/* No comment provided by engineer. */
+"Custom Check Interval:" = "自訂檢查間隔：";
+
+/* No comment provided by engineer. */
+"Custom Interval:" = "自訂間隔：";
+
+/* No comment provided by engineer. */
+"Custom icons have been successfully restored." = "已成功回復自訂圖像。";
+
+/* Language selection */
+"English" = "英文";
+
+/* No comment provided by engineer. */
+"Enter a custom interval (in hours) for automatic icon restoration." = "輸入自動圖像回復的自訂間隔（以小時為單位）。";
+
+/* No comment provided by engineer. */
+"Enter a custom interval (in minutes) for checking app updates." = "輸入檢查 App 更新的自訂間隔（以分鐘為單位）。";
+
+/* No comment provided by engineer. */
+"Error" = "錯誤";
+
+/* No comment provided by engineer. */
+"Error: %@" = "錯誤：%@";
+
+/* No comment provided by engineer. */
+"Export Configuration" = "輸出設定";
+
+/* No comment provided by engineer. */
+"Export a configuration:" = "輸出設定：";
+
+/* (No comment) */
+"Finish" = "完成";
+
+/* No comment provided by engineer. */
+"Folder" = "檔案夾";
+
+/* Language selection */
+"French" = "法文";
+
+/* No comment provided by engineer. */
+"Hours" = "小時";
+
+/* No comment provided by engineer. */
+"Icon Cache" = "圖像快取";
+
+/* No comment provided by engineer. */
+"Icons Restored" = "圖像已回復";
+
+/* No comment provided by engineer. */
+"Icons will be cached automatically when you apply them to apps" = "將圖像套用到 App 時會自動快取";
+
+/* No comment provided by engineer. */
+"Import & Export" = "輸入與輸出";
+
+/* No comment provided by engineer. */
+"Import Configuration" = "輸入設定";
+
+/* No comment provided by engineer. */
+"Import a configuration:" = "輸入設定：";
+
+/* No comment provided by engineer. */
+"Important Note:" = "重要提示：";
+
+/* No comment provided by engineer. */
+"Install CLI Tool" = "安裝 CLI 工具";
+
+/* No comment provided by engineer. */
+"Install Helper Again" = "重新安裝輔助程式";
+
+/* No comment provided by engineer. */
+"Installation Path:" = "安裝路徑：";
+
+/* No comment provided by engineer. */
+"Interval:" = "間隔：";
+
+/* Settings section title
+Settings tab */
+"Language" = "語言";
+
+/* Language alert title */
+"Language Changed" = "已更改語言";
+
+/* No comment provided by engineer. */
+"Last Check:" = "上次檢查：";
+
+/* No comment provided by engineer. */
+"Last Restore:" = "上次回復：";
+
+/* No comment provided by engineer. */
+"Loading" = "載入中";
+
+/* (No comment) */
+"Local" = "本機";
+
+/* No comment provided by engineer. */
+"Minutes" = "分鐘";
+
+/* No comment provided by engineer. */
+"Next restore: %@" = "下次回復：%@";
+
+/* (No comment) */
+"No Icon" = "沒有圖像";
+
+/* (No comment) */
+"No Icons Found" = "找不到圖像";
+
+/* No comment provided by engineer. */
+"No cached icons found" = "找不到已快取的圖像";
+
+/* Alert button */
+"OK" = "確定";
+
+/* (No comment) */
+"Path" = "路徑";
+
+/* (No comment) */
+"Query Host: " = "查詢主機：";
+
+/* No comment provided by engineer. */
+"Remove from Cache" = "從快取中移除";
+
+/* (No comment) */
+"Remove the Icon from the Launchpad" = "從啟動台移除圖像";
+
+/* No comment provided by engineer. */
+"Request Access" = "要求取用權限";
+
+/* No comment provided by engineer. */
+"Restore All" = "全部回復";
+
+/* No comment provided by engineer. */
+"Restore All Cached Icons" = "回復所有快取的圖像";
+
+/* No comment provided by engineer. */
+"Restore Cached Icons" = "回復快取的圖像";
+
+/* No comment provided by engineer. */
+"Restore Icons When Apps Update" = "在 App 更新時回復圖像";
+
+/* No comment provided by engineer. */
+"Restore Icons on Schedule" = "按排程回復圖像";
+
+/* No comment provided by engineer. */
+"Restore Selected" = "回復所選項目";
+
+/* No comment provided by engineer. */
+"Restore This Icon" = "回復此圖像";
+
+/* No comment provided by engineer. */
+"Restoring icons..." = "正在回復圖像...";
+
+/* No comment provided by engineer. */
+"Run in Background" = "在背景執行";
+
+/* No comment provided by engineer. */
+"Save" = "儲存";
+
+/* No comment provided by engineer. */
+"Select an app to see its details" = "選取 App 以查看其詳細資訊";
+
+/* (No comment) */
+"Set Alias Name" = "設定替身名稱";
+
+/* No comment provided by engineer. */
+"Set Custom Check Interval" = "設定自訂檢查間隔";
+
+/* No comment provided by engineer. */
+"Set Custom Restoration Interval" = "設定自訂回復間隔";
+
+/* (No comment) */
+"Set the Alias" = "設定替身";
+
+/* No comment provided by engineer. */
+"Show More" = "顯示更多";
+
+/* No comment provided by engineer. */
+"Show in Dock" = "在 Dock 中顯示";
+
+/* No comment provided by engineer. */
+"Show in Menu Bar" = "在選單列中顯示";
+
+/* (No comment) */
+"Show in the Finder" = "在 Finder 中顯示";
+
+/* Language selection */
+"System Default" = "系統預設";
+
+/* API settings button */
+"Test API Connection" = "測試 API 連線";
+
+/* API testing status */
+"Testing..." = "測試中...";
+
+/* No comment provided by engineer. */
+"The IconChanger CLI tool provides command-line access to import and export configurations." = "IconChanger CLI 工具提供命令列權限來輸入和輸出設定。";
+
+/* No comment provided by engineer. */
+"The app will monitor your cached applications for updates and automatically restore their custom icons when updates are detected." = "App 會監視你快取的應用程式是否有更新，並在偵測到更新時自動回復其自訂圖像。";
+
+/* Language alert message */
+"The language has been changed. For the best experience, please restart the application." = "語言已更改。為獲得最佳體驗，請重新啟動應用程式。";
+
+/* (No comment) */
+"Try different search keywords" = "請嘗試不同的搜尋關鍵字";
+
+/* No comment provided by engineer. */
+"Uninstall CLI Tool" = "解除安裝 CLI 工具";
+
+/* (No comment) */
+"Unknown" = "未知";
+
+/* No comment provided by engineer. */
+"Usage Information" = "用量資訊";
+
+/* No comment provided by engineer. */
+"We Need Access to /Applications" = "我們需要取用 /Applications 的權限";
+
+/* (No comment) */
+"We Need Full Disk Access" = "我們需要「完全取用磁碟」權限";
+
+/* (No comment) */
+"You can modify the alias name for better results" = "你可以修改替身名稱以取得更好的結果";
+
+/* No comment provided by engineer. */
+"You must first export a configuration from the app before using the CLI export command." = "使用 CLI 輸出指令前，你必須先從 App 輸出設定。";
+
+/* API settings instruction */
+"You need to obtain an API key from macosicons.com" = "你需要從 macosicons.com 取得 API 金鑰";
+
+/* No comment provided by engineer. */
+"hours" = "小時";
+
+/* No comment provided by engineer. */
+"iconchanger export /path/to/save/config.json" = "iconchanger export /path/to/save/config.json";
+
+/* No comment provided by engineer. */
+"iconchanger import /path/to/config.json" = "iconchanger import /path/to/config.json";
+
+/* (No comment) */
+"macOSIcon" = "macOSIcon";
+
+/* No comment provided by engineer. */
+"macOSicons.com" = "macOSicons.com";
+
+/* No comment provided by engineer. */
+"minutes" = "分鐘";

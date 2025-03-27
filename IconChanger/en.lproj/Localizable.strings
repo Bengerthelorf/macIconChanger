@@ -1,52 +1,396 @@
-/* 
-  Localizable.strings
-  IconChanger
+/* No comment provided by engineer. */
+"%lld" = "%lld";
 
-  Created by 朱浩宇 on 2022/12/23.
-  Modified by Bengerthelorf on 2025/03/21.
-  
-*/
+/* No comment provided by engineer. */
+"%lld cached icons ready for restoration" = "%lld cached icons ready for restoration";
 
-"Unknown" = "Unknown";
-"We Need Full Disk Access" = "We Need Full Disk Access";
+/* No comment provided by engineer. */
+"%lld/%lld" = "%lld/%lld";
+
+/* No comment provided by engineer. */
+"1. A dialog will appear requesting access to /Applications" = "1. A dialog will appear requesting access to /Applications";
+
+/* (No comment) */
 "1. Open the System Setting App" = "1. Open the System Setting App";
+
+/* (No comment) */
 "2. Go to the security" = "2. Go to the security";
+
+/* No comment provided by engineer. */
+"2. Please choose /Applications and click OK" = "2. Please choose /Applications and click OK";
+
+/* (No comment) */
 "3. Choose the Full Disk Access" = "3. Choose the Full Disk Access";
+
+/* (No comment) */
 "4. Unlock it" = "4. Unlock it";
+
+/* (No comment) */
 "5. Choose or add the IconChanger" = "5. Choose or add the IconChanger";
+
+/* (No comment) */
 "6. Check the check box" = "6. Check the check box";
-"Check the Access Permition" = "Check the Access Permition";
-"Copy the Name" = "Copy the Name";
-"Path" = "Path";
-"Copy" = "Copy";
-"Copy the Path Name" = "Copy the Path Name";
-"Show in the Finder" = "Show in the Finder";
-"Set the Alias" = "Set the Alias";
-"Remove the Icon from the Launchpad" = "Remove the Icon from the Launchpad";
-"macOSIcon" = "macOSIcon";
-"Local" = "Local";
-"Cancel" = "Cancel";
-"Choose from the Local" = "Choose from the Local";
-"Api" = "Api";
-"Query Host: " = "Query Host: ";
+
+/* Settings tab */
+"API" = "API";
+
+/* API settings */
 "API Key: " = "API Key: ";
-"Finish" = "Finish";
-"You need to obtain an API key from macosicons.com" = "You need to obtain an API key from macosicons.com";
-"Test API Connection" = "Test API Connection";
-"Testing..." = "Testing...";
+
+/* API testing result */
 "API connection established but no results returned." = "API connection established but no results returned.";
+
+/* API testing result */
+"API connection successful!" = "API connection successful!";
+
+/* (No comment) */
 "API connection successful! Found %@ icons." = "API connection successful! Found %@ icons.";
+
+/* API testing error */
 "API test failed: %@" = "API test failed: %@";
-"Language" = "Language";
-"System Default" = "System Default";
-"English" = "English";
-"French" = "French";
-"Chinese" = "Chinese";
+
+/* No comment provided by engineer. */
+"About Configuration Files" = "About Configuration Files";
+
+/* No comment provided by engineer. */
+"After importing with CLI, restart the app to see the changes take effect." = "After importing with CLI, restart the app to see the changes take effect.";
+
+/* No comment provided by engineer. */
+"Alias Name" = "Alias Name";
+
+/* No comment provided by engineer. */
+"Alias Names" = "Alias Names";
+
+/* (No comment) */
+"Api" = "Api";
+
+/* No comment provided by engineer. */
+"App Name" = "App Name";
+
+/* No comment provided by engineer. */
+"App Visibility" = "App Visibility";
+
+/* No comment provided by engineer. */
+"Application" = "Application";
+
+/* No comment provided by engineer. */
+"Application Folders" = "Application Folders";
+
+/* No comment provided by engineer. */
+"Automatic Icon Restoration" = "Automatic Icon Restoration";
+
+/* No comment provided by engineer. */
+"Background" = "Background";
+
+/* No comment provided by engineer. */
+"Background Service" = "Background Service";
+
+/* No comment provided by engineer. */
+"Background service is running" = "Background service is running";
+
+/* No comment provided by engineer. */
+"CLI Tool is installed" = "CLI Tool is installed";
+
+/* No comment provided by engineer. */
+"CLI Tool is not installed" = "CLI Tool is not installed";
+
+/* (No comment) */
+"Cancel" = "Cancel";
+
+/* Language settings instruction */
 "Changes will take full effect after restarting the app" = "Changes will take full effect after restarting the app";
+
+/* No comment provided by engineer. */
+"Changing the icon..." = "Changing the icon...";
+
+/* No comment provided by engineer. */
+"Check Interval:" = "Check Interval:";
+
+/* No comment provided by engineer. */
+"Check for Updates…" = "Check for Updates…";
+
+/* (No comment) */
+"Check the Access Permition" = "Check the Access Permition";
+
+/* Language selection */
+"Simplified Chinese" = "Simplified Chinese";
+
+/* Language selection */
+"Traditional Chinese" = "Traditional Chinese";
+
+/* Language selection */
+"Japanese" = "Japanese";
+
+/* (No comment) */
+"Choose from the Local" = "Choose from the Local";
+
+/* No comment provided by engineer. */
+"Clear Cache" = "Clear Cache";
+
+/* No comment provided by engineer. */
+"Command Line" = "Command Line";
+
+/* No comment provided by engineer. */
+"Command Line Tool" = "Command Line Tool";
+
+/* No comment provided by engineer. */
+"Configuration" = "Configuration";
+
+/* (No comment) */
+"Copy" = "Copy";
+
+/* (No comment) */
+"Copy the Name" = "Copy the Name";
+
+/* (No comment) */
+"Copy the Path Name" = "Copy the Path Name";
+
+/* No comment provided by engineer. */
+"Current Configuration" = "Current Configuration";
+
+/* No comment provided by engineer. */
+"Custom Check Interval:" = "Custom Check Interval:";
+
+/* No comment provided by engineer. */
+"Custom Interval:" = "Custom Interval:";
+
+/* No comment provided by engineer. */
+"Custom icons have been successfully restored." = "Custom icons have been successfully restored.";
+
+/* Language selection */
+"English" = "English";
+
+/* No comment provided by engineer. */
+"Enter a custom interval (in hours) for automatic icon restoration." = "Enter a custom interval (in hours) for automatic icon restoration.";
+
+/* No comment provided by engineer. */
+"Enter a custom interval (in minutes) for checking app updates." = "Enter a custom interval (in minutes) for checking app updates.";
+
+/* No comment provided by engineer. */
+"Error" = "Error";
+
+/* No comment provided by engineer. */
+"Error: %@" = "Error: %@";
+
+/* No comment provided by engineer. */
+"Export Configuration" = "Export Configuration";
+
+/* No comment provided by engineer. */
+"Export a configuration:" = "Export a configuration:";
+
+/* (No comment) */
+"Finish" = "Finish";
+
+/* No comment provided by engineer. */
+"Folder" = "Folder";
+
+/* Language selection */
+"French" = "French";
+
+/* No comment provided by engineer. */
+"Hours" = "Hours";
+
+/* No comment provided by engineer. */
+"Icon Cache" = "Icon Cache";
+
+/* No comment provided by engineer. */
+"Icons Restored" = "Icons Restored";
+
+/* No comment provided by engineer. */
+"Icons will be cached automatically when you apply them to apps" = "Icons will be cached automatically when you apply them to apps";
+
+/* No comment provided by engineer. */
+"Import & Export" = "Import & Export";
+
+/* No comment provided by engineer. */
+"Import Configuration" = "Import Configuration";
+
+/* No comment provided by engineer. */
+"Import a configuration:" = "Import a configuration:";
+
+/* No comment provided by engineer. */
+"Important Note:" = "Important Note:";
+
+/* No comment provided by engineer. */
+"Install CLI Tool" = "Install CLI Tool";
+
+/* No comment provided by engineer. */
+"Install Helper Again" = "Install Helper Again";
+
+/* No comment provided by engineer. */
+"Installation Path:" = "Installation Path:";
+
+/* No comment provided by engineer. */
+"Interval:" = "Interval:";
+
+/* Settings section title
+Settings tab */
+"Language" = "Language";
+
+/* Language alert title */
 "Language Changed" = "Language Changed";
-"The language has been changed. For the best experience, please restart the application." = "The language has been changed. For the best experience, please restart the application.";
-"No Icons Found" = "No Icons Found";
-"Try different search keywords" = "Try different search keywords";
+
+/* No comment provided by engineer. */
+"Last Check:" = "Last Check:";
+
+/* No comment provided by engineer. */
+"Last Restore:" = "Last Restore:";
+
+/* No comment provided by engineer. */
+"Loading" = "Loading";
+
+/* (No comment) */
+"Local" = "Local";
+
+/* No comment provided by engineer. */
+"Minutes" = "Minutes";
+
+/* No comment provided by engineer. */
+"Next restore: %@" = "Next restore: %@";
+
+/* (No comment) */
 "No Icon" = "No Icon";
-"You can modify the alias name for better results" = "You can modify the alias name for better results";
+
+/* (No comment) */
+"No Icons Found" = "No Icons Found";
+
+/* No comment provided by engineer. */
+"No cached icons found" = "No cached icons found";
+
+/* Alert button */
+"OK" = "OK";
+
+/* (No comment) */
+"Path" = "Path";
+
+/* (No comment) */
+"Query Host: " = "Query Host: ";
+
+/* No comment provided by engineer. */
+"Remove from Cache" = "Remove from Cache";
+
+/* (No comment) */
+"Remove the Icon from the Launchpad" = "Remove the Icon from the Launchpad";
+
+/* No comment provided by engineer. */
+"Request Access" = "Request Access";
+
+/* No comment provided by engineer. */
+"Restore All" = "Restore All";
+
+/* No comment provided by engineer. */
+"Restore All Cached Icons" = "Restore All Cached Icons";
+
+/* No comment provided by engineer. */
+"Restore Cached Icons" = "Restore Cached Icons";
+
+/* No comment provided by engineer. */
+"Restore Icons When Apps Update" = "Restore Icons When Apps Update";
+
+/* No comment provided by engineer. */
+"Restore Icons on Schedule" = "Restore Icons on Schedule";
+
+/* No comment provided by engineer. */
+"Restore Selected" = "Restore Selected";
+
+/* No comment provided by engineer. */
+"Restore This Icon" = "Restore This Icon";
+
+/* No comment provided by engineer. */
+"Restoring icons..." = "Restoring icons...";
+
+/* No comment provided by engineer. */
+"Run in Background" = "Run in Background";
+
+/* No comment provided by engineer. */
+"Save" = "Save";
+
+/* No comment provided by engineer. */
+"Select an app to see its details" = "Select an app to see its details";
+
+/* (No comment) */
 "Set Alias Name" = "Set Alias Name";
+
+/* No comment provided by engineer. */
+"Set Custom Check Interval" = "Set Custom Check Interval";
+
+/* No comment provided by engineer. */
+"Set Custom Restoration Interval" = "Set Custom Restoration Interval";
+
+/* (No comment) */
+"Set the Alias" = "Set the Alias";
+
+/* No comment provided by engineer. */
+"Show More" = "Show More";
+
+/* No comment provided by engineer. */
+"Show in Dock" = "Show in Dock";
+
+/* No comment provided by engineer. */
+"Show in Menu Bar" = "Show in Menu Bar";
+
+/* (No comment) */
+"Show in the Finder" = "Show in the Finder";
+
+/* Language selection */
+"System Default" = "System Default";
+
+/* API settings button */
+"Test API Connection" = "Test API Connection";
+
+/* API testing status */
+"Testing..." = "Testing...";
+
+/* No comment provided by engineer. */
+"The IconChanger CLI tool provides command-line access to import and export configurations." = "The IconChanger CLI tool provides command-line access to import and export configurations.";
+
+/* No comment provided by engineer. */
+"The app will monitor your cached applications for updates and automatically restore their custom icons when updates are detected." = "The app will monitor your cached applications for updates and automatically restore their custom icons when updates are detected.";
+
+/* Language alert message */
+"The language has been changed. For the best experience, please restart the application." = "The language has been changed. For the best experience, please restart the application.";
+
+/* (No comment) */
+"Try different search keywords" = "Try different search keywords";
+
+/* No comment provided by engineer. */
+"Uninstall CLI Tool" = "Uninstall CLI Tool";
+
+/* (No comment) */
+"Unknown" = "Unknown";
+
+/* No comment provided by engineer. */
+"Usage Information" = "Usage Information";
+
+/* No comment provided by engineer. */
+"We Need Access to /Applications" = "We Need Access to /Applications";
+
+/* (No comment) */
+"We Need Full Disk Access" = "We Need Full Disk Access";
+
+/* (No comment) */
+"You can modify the alias name for better results" = "You can modify the alias name for better results";
+
+/* No comment provided by engineer. */
+"You must first export a configuration from the app before using the CLI export command." = "You must first export a configuration from the app before using the CLI export command.";
+
+/* API settings instruction */
+"You need to obtain an API key from macosicons.com" = "You need to obtain an API key from macosicons.com";
+
+/* No comment provided by engineer. */
+"hours" = "hours";
+
+/* No comment provided by engineer. */
+"iconchanger export /path/to/save/config.json" = "iconchanger export /path/to/save/config.json";
+
+/* No comment provided by engineer. */
+"iconchanger import /path/to/config.json" = "iconchanger import /path/to/config.json";
+
+/* (No comment) */
+"macOSIcon" = "macOSIcon";
+
+/* No comment provided by engineer. */
+"macOSicons.com" = "macOSicons.com";
+
+/* No comment provided by engineer. */
+"minutes" = "minutes";

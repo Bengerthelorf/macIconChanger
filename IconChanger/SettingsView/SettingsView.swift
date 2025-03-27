@@ -15,7 +15,9 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     case system = "system"
     case english = "en"
     case french = "fr"
-    case chinese = "zh-Hans"
+    case japanese = "ja"
+    case chinese_simplified = "zh-Hans"
+    case chinese_traditional = "zh-Hant"
     
     var id: String { self.rawValue }
     
@@ -27,8 +29,12 @@ enum AppLanguage: String, CaseIterable, Identifiable {
             return NSLocalizedString("English", comment: "Language selection")
         case .french:
             return NSLocalizedString("French", comment: "Language selection")
-        case .chinese:
-            return NSLocalizedString("Chinese", comment: "Language selection")
+        case .japanese:
+            return NSLocalizedString("Japanese", comment: "Language selection")
+        case .chinese_simplified:
+            return NSLocalizedString("Simplified Chinese", comment: "Language selection")
+        case .chinese_traditional:
+            return NSLocalizedString("Traditional Chinese", comment: "Language selection")
         }
     }
     
@@ -40,8 +46,12 @@ enum AppLanguage: String, CaseIterable, Identifiable {
             return Locale(identifier: "en")
         case .french:
             return Locale(identifier: "fr")
-        case .chinese:
+        case .japanese:
+            return Locale(identifier: "ja")
+        case .chinese_simplified:
             return Locale(identifier: "zh-Hans")
+        case .chinese_traditional:
+            return Locale(identifier: "zh-Hant")
         }
     }
 }
@@ -112,8 +122,8 @@ struct LanguageSettingsView: View {
             )) {
                 ForEach(AppLanguage.allCases) { language in
                     HStack(spacing: 12) {
-                        languageFlag(for: language)
-                            .frame(width: 24, height: 24)
+//                        languageFlag(for: language)
+//                            .frame(width: 24, height: 24)
                         Text(language.displayName)
                             .font(.body)
                     }
@@ -155,27 +165,27 @@ struct LanguageSettingsView: View {
     }
     
     // Generate corresponding icons for each language
-    @ViewBuilder
-    private func languageFlag(for language: AppLanguage) -> some View {
-        switch language {
-        case .system:
-            Image(systemName: "gearshape.fill")
-                .foregroundColor(.gray)
-                .font(.title3)
-        case .english:
-            Image(systemName: "globe.americas.fill")
-                .foregroundColor(.blue)
-                .font(.title3)
-        case .french:
-            Image(systemName: "globe.europe.africa.fill")
-                .foregroundColor(.blue)
-                .font(.title3)
-        case .chinese:
-            Image(systemName: "globe.asia.australia.fill")
-                .foregroundColor(.blue)
-                .font(.title3)
-        }
-    }
+//    @ViewBuilder
+//    private func languageFlag(for language: AppLanguage) -> some View {
+//        switch language {
+//        case .system:
+//            Image(systemName: "gearshape.fill")
+//                .foregroundColor(.gray)
+//                .font(.title3)
+//        case .english:
+//            Image(systemName: "globe.americas.fill")
+//                .foregroundColor(.blue)
+//                .font(.title3)
+//        case .french:
+//            Image(systemName: "globe.europe.africa.fill")
+//                .foregroundColor(.blue)
+//                .font(.title3)
+//        case .chinese:
+//            Image(systemName: "globe.asia.australia.fill")
+//                .foregroundColor(.blue)
+//                .font(.title3)
+//        }
+//    }
 }
 
 struct SettingsView: View {
@@ -211,10 +221,10 @@ struct SettingsView: View {
                     Label("Command Line", systemImage: "terminal")
                 }
             
-//            LanguageSettingsView()
-//                .tabItem {
-//                    Label(NSLocalizedString("Language", comment: "Settings tab"), systemImage: "globe")
-//                }
+            LanguageSettingsView()
+                .tabItem {
+                    Label(NSLocalizedString("Language", comment: "Settings tab"), systemImage: "globe")
+                }
         }
         .padding()
         .frame(width: 600, height: 500)
