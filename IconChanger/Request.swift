@@ -30,7 +30,7 @@ class MyRequestController {
                 let image = NSImage(byReferencing: URL)
                 if image.isValid {
                     print("✅ Successfully loaded local icon")
-                    return image
+                    return NSImage(data: image.tiffRepresentation ?? Data()) ?? image  // Create a new NSImage to ensure it's valid for memory safety
                 } else {
                     print("❌ Failed to load local icon from \(URL.path)")
                     return nil
@@ -98,7 +98,7 @@ class MyRequestController {
             return await MainActor.run {
                 if let image = NSImage(data: data) {
                     print("✅ Successfully created NSImage from data (size: \(image.size.width) x \(image.size.height))")
-                    return image
+                    return NSImage(data: image.tiffRepresentation ?? Data()) ?? image  // Create a new NSImage to ensure it's valid for memory safety
                 } else {
                     print("❌ Failed to create NSImage from data")
                     

@@ -49,7 +49,13 @@ struct ImageViewCore: View {
                                 ProgressView()
                             }
                             .onAppear {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+//                                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+//                                    if nsimage == nil {
+//                                        isLoading = false
+//                                    }
+//                                }
+                                Task { @MainActor in
+                                    try? await Task.sleep(nanoseconds: 3_000_000_000)
                                     if nsimage == nil {
                                         isLoading = false
                                     }
@@ -70,11 +76,12 @@ struct ImageViewCore: View {
             }        .overlay(
                         Group {
                             if showSnackbar {
-                                SnackbarView(isPresented: $showSnackbar, isSuccessful: isSuccessful, failureMessage: failureMessage)
-                                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                SnackbarView(isPresented: $showSnackbar,
+                                             isSuccessful: isSuccessful,
+                                             failureMessage: failureMessage
+                                ).frame(maxWidth: .infinity, maxHeight: .infinity)
                             }
-                        }
-                                .ignoresSafeArea()
+                        }.ignoresSafeArea()
                 )
                     .sheet(isPresented: $isTaskRunning) {
                         VStack {
@@ -90,9 +97,7 @@ struct ImageViewCore: View {
                             }) {
                                 Text("Cancel")
                             }
-                        }
-                                .padding(20)
-                                .frame(minWidth: 250, minHeight: 100)
+                        }.padding(20).frame(minWidth: 250, minHeight: 100)
                     }
     }
     func changeIcon(image: NSImage) {
@@ -102,7 +107,9 @@ struct ImageViewCore: View {
                     isTaskRunning = true
                 }
                 
-                try IconManager.shared.setImage(image, app: setPath)
+                // Create a local copy of the image for memory safety
+                let imageCopy = image
+                try IconManager.shared.setImage(imageCopy, app: setPath)
                 
                 await MainActor.run {
                     isTaskRunning = false

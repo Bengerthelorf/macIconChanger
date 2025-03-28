@@ -45,7 +45,8 @@ struct IconChangerApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .frame(minWidth: folderPermission.hasPermission ? 900 : 500, minHeight: folderPermission.hasPermission ? 500 : 300)
+                .frame(minWidth: folderPermission.hasPermission ? 900 : 500,
+                       minHeight: folderPermission.hasPermission ? 500 : 300)
                 .animation(.easeInOut, value: folderPermission.hasPermission)
                 .onAppear {
                     // Check if background service should be running
