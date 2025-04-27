@@ -1,0 +1,396 @@
+/* No comment provided by engineer. */
+"%lld" = "%lld";
+
+/* No comment provided by engineer. */
+"%lld cached icons ready for restoration" = "%lld 個のキャッシュされたアイコンを復元準備完了";
+
+/* No comment provided by engineer. */
+"%lld/%lld" = "%lld/%lld";
+
+/* No comment provided by engineer. */
+"1. A dialog will appear requesting access to /Applications" = "1. /Applicationsへのアクセスを要求するダイアログが表示されます";
+
+/* (No comment) */
+"1. Open the System Setting App" = "1. 「システム設定」を開きます";
+
+/* (No comment) */
+"2. Go to the security" = "2. 「プライバシーとセキュリティ」に移動します";
+
+/* No comment provided by engineer. */
+"2. Please choose /Applications and click OK" = "2. /Applicationsを選択し、「OK」をクリックしてください";
+
+/* (No comment) */
+"3. Choose the Full Disk Access" = "3. 「フルディスクアクセス」を選択します";
+
+/* (No comment) */
+"4. Unlock it" = "4. ロックを解除します";
+
+/* (No comment) */
+"5. Choose or add the IconChanger" = "5. IconChangerを選択または追加します";
+
+/* (No comment) */
+"6. Check the check box" = "6. チェックボックスをオンにします";
+
+/* Settings tab */
+"API" = "API";
+
+/* API settings */
+"API Key: " = "APIキー: ";
+
+/* API testing result */
+"API connection established but no results returned." = "API接続は確立されましたが、結果は返されませんでした。";
+
+/* API testing result */
+"API connection successful!" = "API接続に成功しました！";
+
+/* (No comment) */
+"API connection successful! Found %@ icons." = "API接続成功！%@ 個のアイコンが見つかりました。";
+
+/* API testing error */
+"API test failed: %@" = "APIテストに失敗しました: %@";
+
+/* No comment provided by engineer. */
+"About Configuration Files" = "構成ファイルについて";
+
+/* No comment provided by engineer. */
+"After importing with CLI, restart the app to see the changes take effect." = "CLIでインポートした後、変更を有効にするにはアプリを再起動してください。";
+
+/* No comment provided by engineer. */
+"Alias Name" = "エイリアス名";
+
+/* No comment provided by engineer. */
+"Alias Names" = "エイリアス名";
+
+/* (No comment) */
+"Api" = "Api";
+
+/* No comment provided by engineer. */
+"App Name" = "アプリ名";
+
+/* No comment provided by engineer. */
+"App Visibility" = "アプリの可視性";
+
+/* No comment provided by engineer. */
+"Application" = "アプリケーション";
+
+/* No comment provided by engineer. */
+"Application Folders" = "アプリケーションフォルダ";
+
+/* No comment provided by engineer. */
+"Automatic Icon Restoration" = "アイコンの自動復元";
+
+/* No comment provided by engineer. */
+"Background" = "バックグラウンド";
+
+/* No comment provided by engineer. */
+"Background Service" = "バックグラウンドサービス";
+
+/* No comment provided by engineer. */
+"Background service is running" = "バックグラウンドサービスが実行中です";
+
+/* No comment provided by engineer. */
+"CLI Tool is installed" = "CLIツールはインストールされています";
+
+/* No comment provided by engineer. */
+"CLI Tool is not installed" = "CLIツールはインストールされていません";
+
+/* (No comment) */
+"Cancel" = "キャンセル";
+
+/* Language settings instruction */
+"Changes will take full effect after restarting the app" = "変更はアプリを再起動した後に完全に有効になります";
+
+/* No comment provided by engineer. */
+"Changing the icon..." = "アイコンを変更中...";
+
+/* No comment provided by engineer. */
+"Check Interval:" = "チェック間隔:";
+
+/* No comment provided by engineer. */
+"Check for Updates…" = "アップデートを確認…";
+
+/* (No comment) */
+"Check the Access Permition" = "アクセス権限を確認";
+
+/* Language selection */
+"Simplified Chinese" = "簡体字中国語";
+
+/* Language selection */
+"Traditional Chinese" = "繁体字中国語";
+
+/* Language selection */
+"Japanese" = "日本語";
+
+/* (No comment) */
+"Choose from the Local" = "ローカルから選択";
+
+/* No comment provided by engineer. */
+"Clear Cache" = "キャッシュをクリア";
+
+/* No comment provided by engineer. */
+"Command Line" = "コマンドライン";
+
+/* No comment provided by engineer. */
+"Command Line Tool" = "コマンドラインツール";
+
+/* No comment provided by engineer. */
+"Configuration" = "構成";
+
+/* (No comment) */
+"Copy" = "コピー";
+
+/* (No comment) */
+"Copy the Name" = "名前をコピー";
+
+/* (No comment) */
+"Copy the Path Name" = "パス名をコピー";
+
+/* No comment provided by engineer. */
+"Current Configuration" = "現在の構成";
+
+/* No comment provided by engineer. */
+"Custom Check Interval:" = "カスタムチェック間隔:";
+
+/* No comment provided by engineer. */
+"Custom Interval:" = "カスタム間隔:";
+
+/* No comment provided by engineer. */
+"Custom icons have been successfully restored." = "カスタムアイコンは正常に復元されました。";
+
+/* Language selection */
+"English" = "英語";
+
+/* No comment provided by engineer. */
+"Enter a custom interval (in hours) for automatic icon restoration." = "アイコン自動復元のためのカスタム間隔（時間単位）を入力してください。";
+
+/* No comment provided by engineer. */
+"Enter a custom interval (in minutes) for checking app updates." = "アプリ更新チェックのためのカスタム間隔（分単位）を入力してください。";
+
+/* No comment provided by engineer. */
+"Error" = "エラー";
+
+/* No comment provided by engineer. */
+"Error: %@" = "エラー: %@";
+
+/* No comment provided by engineer. */
+"Export Configuration" = "構成をエクスポート";
+
+/* No comment provided by engineer. */
+"Export a configuration:" = "構成をエクスポート:";
+
+/* (No comment) */
+"Finish" = "完了";
+
+/* No comment provided by engineer. */
+"Folder" = "フォルダ";
+
+/* Language selection */
+"French" = "フランス語";
+
+/* No comment provided by engineer. */
+"Hours" = "時間";
+
+/* No comment provided by engineer. */
+"Icon Cache" = "アイコンキャッシュ";
+
+/* No comment provided by engineer. */
+"Icons Restored" = "アイコン復元済み";
+
+/* No comment provided by engineer. */
+"Icons will be cached automatically when you apply them to apps" = "アイコンはアプリに適用されると自動的にキャッシュされます";
+
+/* No comment provided by engineer. */
+"Import & Export" = "インポートとエクスポート";
+
+/* No comment provided by engineer. */
+"Import Configuration" = "構成をインポート";
+
+/* No comment provided by engineer. */
+"Import a configuration:" = "構成をインポート:";
+
+/* No comment provided by engineer. */
+"Important Note:" = "重要な注意:";
+
+/* No comment provided by engineer. */
+"Install CLI Tool" = "CLIツールをインストール";
+
+/* No comment provided by engineer. */
+"Install Helper Again" = "ヘルパーを再インストール";
+
+/* No comment provided by engineer. */
+"Installation Path:" = "インストールパス:";
+
+/* No comment provided by engineer. */
+"Interval:" = "間隔:";
+
+/* Settings section title
+Settings tab */
+"Language" = "言語";
+
+/* Language alert title */
+"Language Changed" = "言語が変更されました";
+
+/* No comment provided by engineer. */
+"Last Check:" = "最終チェック:";
+
+/* No comment provided by engineer. */
+"Last Restore:" = "最終復元:";
+
+/* No comment provided by engineer. */
+"Loading" = "読み込み中";
+
+/* (No comment) */
+"Local" = "ローカル";
+
+/* No comment provided by engineer. */
+"Minutes" = "分";
+
+/* No comment provided by engineer. */
+"Next restore: %@" = "次の復元: %@";
+
+/* (No comment) */
+"No Icon" = "アイコンなし";
+
+/* (No comment) */
+"No Icons Found" = "アイコンが見つかりません";
+
+/* No comment provided by engineer. */
+"No cached icons found" = "キャッシュされたアイコンが見つかりません";
+
+/* Alert button */
+"OK" = "OK";
+
+/* (No comment) */
+"Path" = "パス";
+
+/* (No comment) */
+"Query Host: " = "クエリホスト: ";
+
+/* No comment provided by engineer. */
+"Remove from Cache" = "キャッシュから削除";
+
+/* (No comment) */
+"Remove the Icon from the Launchpad" = "Launchpadからアイコンを削除";
+
+/* No comment provided by engineer. */
+"Request Access" = "アクセスを要求";
+
+/* No comment provided by engineer. */
+"Restore All" = "すべて復元";
+
+/* No comment provided by engineer. */
+"Restore All Cached Icons" = "キャッシュされたすべてのアイコンを復元";
+
+/* No comment provided by engineer. */
+"Restore Cached Icons" = "キャッシュされたアイコンを復元";
+
+/* No comment provided by engineer. */
+"Restore Icons When Apps Update" = "アプリ更新時にアイコンを復元";
+
+/* No comment provided by engineer. */
+"Restore Icons on Schedule" = "スケジュールでアイコンを復元";
+
+/* No comment provided by engineer. */
+"Restore Selected" = "選択項目を復元";
+
+/* No comment provided by engineer. */
+"Restore This Icon" = "このアイコンを復元";
+
+/* No comment provided by engineer. */
+"Restoring icons..." = "アイコンを復元中...";
+
+/* No comment provided by engineer. */
+"Run in Background" = "バックグラウンドで実行";
+
+/* No comment provided by engineer. */
+"Save" = "保存";
+
+/* No comment provided by engineer. */
+"Select an app to see its details" = "アプリを選択して詳細を表示";
+
+/* (No comment) */
+"Set Alias Name" = "エイリアス名を設定";
+
+/* No comment provided by engineer. */
+"Set Custom Check Interval" = "カスタムチェック間隔を設定";
+
+/* No comment provided by engineer. */
+"Set Custom Restoration Interval" = "カスタム復元間隔を設定";
+
+/* (No comment) */
+"Set the Alias" = "エイリアスを設定";
+
+/* No comment provided by engineer. */
+"Show More" = "さらに表示";
+
+/* No comment provided by engineer. */
+"Show in Dock" = "Dockに表示";
+
+/* No comment provided by engineer. */
+"Show in Menu Bar" = "メニューバーに表示";
+
+/* (No comment) */
+"Show in the Finder" = "Finderで表示";
+
+/* Language selection */
+"System Default" = "システムデフォルト";
+
+/* API settings button */
+"Test API Connection" = "API接続をテスト";
+
+/* API testing status */
+"Testing..." = "テスト中...";
+
+/* No comment provided by engineer. */
+"The IconChanger CLI tool provides command-line access to import and export configurations." = "IconChanger CLIツールは、構成をインポートおよびエクスポートするためのコマンドラインアクセスを提供します。";
+
+/* No comment provided by engineer. */
+"The app will monitor your cached applications for updates and automatically restore their custom icons when updates are detected." = "アプリはキャッシュされたアプリケーションの更新を監視し、更新が検出されるとカスタムアイコンを自動的に復元します。";
+
+/* Language alert message */
+"The language has been changed. For the best experience, please restart the application." = "言語が変更されました。最適な体験のために、アプリケーションを再起動してください。";
+
+/* (No comment) */
+"Try different search keywords" = "別の検索キーワードをお試しください";
+
+/* No comment provided by engineer. */
+"Uninstall CLI Tool" = "CLIツールをアンインストール";
+
+/* (No comment) */
+"Unknown" = "不明";
+
+/* No comment provided by engineer. */
+"Usage Information" = "使用情報";
+
+/* No comment provided by engineer. */
+"We Need Access to /Applications" = "/Applicationsへのアクセスが必要です";
+
+/* (No comment) */
+"We Need Full Disk Access" = "フルディスクアクセスが必要です";
+
+/* (No comment) */
+"You can modify the alias name for better results" = "より良い結果を得るためにエイリアス名を変更できます";
+
+/* No comment provided by engineer. */
+"You must first export a configuration from the app before using the CLI export command." = "CLIエクスポートコマンドを使用する前に、まずアプリから構成をエクスポートする必要があります。";
+
+/* API settings instruction */
+"You need to obtain an API key from macosicons.com" = "macosicons.comからAPIキーを取得する必要があります";
+
+/* No comment provided by engineer. */
+"hours" = "時間";
+
+/* No comment provided by engineer. */
+"iconchanger export /path/to/save/config.json" = "iconchanger export /path/to/save/config.json";
+
+/* No comment provided by engineer. */
+"iconchanger import /path/to/config.json" = "iconchanger import /path/to/config.json";
+
+/* (No comment) */
+"macOSIcon" = "macOSIcon";
+
+/* No comment provided by engineer. */
+"macOSicons.com" = "macOSicons.com";
+
+/* No comment provided by engineer. */
+"minutes" = "分";

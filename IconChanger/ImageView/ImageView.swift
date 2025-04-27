@@ -14,33 +14,35 @@ struct ImageView: View {
     let icon: IconRes
     let setPath: LaunchPadManagerDBHelper.AppInfo
     @State var preview: NSImage?
-    @State var isLoading: Bool = true  // Add loading state flag
+    @State var isLoading: Bool = true
     
-    // Add a callback to notify the parent view of icon loading status changes
     var onStatusUpdate: ((Bool) -> Void)? = nil
 
     var body: some View {
         ImageViewCore(nsimage: $preview, setPath: setPath, isLoading: $isLoading)
-                .task {
-                    do {
-                        isLoading = true  // Start loading
-                        preview = try await MyRequestController().sendRequest(icon.lowResPngUrl)
-                        if preview == nil {
-                            // Icon loading failed
-                            isLoading = false
-                            // Notify the parent view to update the status
-                            onStatusUpdate?(false)
-                        } else {
-                            // Icon loading succeeded
-                            onStatusUpdate?(true)
-                        }
-                    } catch {
+            .task {
+                do {
+                    isLoading = true
+                    // Create strong local references
+                    let iconUrl = icon.lowResPngUrl
+                    
+                    // Load the image
+                    let image = try await MyRequestController().sendRequest(iconUrl)
+                    
+                    // Update UI on the main thread
+                    await MainActor.run {
+                        preview = image
+                        isLoading = image == nil
+                        onStatusUpdate?(image != nil)
+                    }
+                } catch {
+                    await MainActor.run {
                         print(error)
-                        isLoading = false  // Loading failed
-                        // Notify the parent view to update the status
+                        isLoading = false
                         onStatusUpdate?(false)
                     }
                 }
+            }
     }
 }
 

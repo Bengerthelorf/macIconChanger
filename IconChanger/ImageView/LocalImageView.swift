@@ -13,28 +13,32 @@ import LaunchPadManagerDBHelper
 struct LocalImageView: View {
     let url: URL
     let setPath: LaunchPadManagerDBHelper.AppInfo
-
+    
     @State var nsimage: NSImage?
     @State var isLoading: Bool = true
 
     var body: some View {
         ImageViewCore(nsimage: $nsimage, setPath: setPath, isLoading: $isLoading)
-                .task {
-                    do {
-                        isLoading = true
-                        let image = try await MyRequestController().sendRequest(url)
-                        await MainActor.run {
-                            nsimage = image
-                            if nsimage == nil {
-                                isLoading = false
-                            }
-                        }
-                    } catch {
-                        await MainActor.run {
-                            print(error)
-                            isLoading = false
-                        }
+            .task {
+                do {
+                    isLoading = true
+                    // Create strong local reference
+                    let localUrl = url
+                    
+                    // Load the image
+                    let image = try await MyRequestController().sendRequest(localUrl)
+                    
+                    // Update UI on the main thread
+                    await MainActor.run {
+                        nsimage = image
+                        isLoading = image == nil
+                    }
+                } catch {
+                    await MainActor.run {
+                        print(error)
+                        isLoading = false
                     }
                 }
+            }
     }
 }
