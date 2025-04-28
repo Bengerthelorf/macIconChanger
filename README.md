@@ -139,7 +139,7 @@ IconChanger needs permission to change icons using its helper script. Please gra
 2. Type `sudo visudo` and press Enter. Enter your administrator password when prompted.
 3. Navigate to the end of the file using arrow keys. Press 'i' to enter INSERT mode.
 4. Add ONE of the following lines EXACTLY as shown (using your username is generally preferred):
-    `ALL ALL=(ALL) NOPASSWD: /Users/sniax/.iconchanger/helper.sh`
+    `ALL ALL=(ALL) NOPASSWD: /Users/username/.iconchanger/helper.sh`
     > (Note: This grants permission to all users. While less specific, it seems necessary for reliable operation in some environments.)
 5. Press 'Esc' to exit INSERT mode.
 6. Type `:wq` and press Enter to save and quit. (Use `:q!` to quit without saving if you make a mistake).
