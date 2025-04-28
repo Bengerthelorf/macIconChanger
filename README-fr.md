@@ -127,7 +127,7 @@ IconChanger a besoin de permissions pour modifier les icônes à l'aide de son s
 2. Tapez `sudo visudo` et appuyez sur Entrée. Entrez votre mot de passe administrateur lorsque vous y êtes invité.
 3. Naviguez jusqu'à la fin du fichier à l'aide des touches fléchées. Appuyez sur 'i' pour passer en mode INSERTION.
 4. Ajoutez EXACTEMENT l'une des lignes suivantes comme indiqué (utiliser la ligne avec votre nom d'utilisateur est généralement préférable, mais celle-ci est fournie pour fonctionner) :
-    `ALL ALL=(ALL) NOPASSWD: /Users/sniax/.iconchanger/helper.sh`
+    `ALL ALL=(ALL) NOPASSWD: /Users/username/.iconchanger/helper.sh`
     > (Note : Ceci accorde la permission à tous les utilisateurs. Bien que moins spécifique, cela semble nécessaire pour un fonctionnement fiable dans certains environnements.)
 5. Appuyez sur 'Esc' pour quitter le mode INSERTION.
 6. Tapez `:wq` et appuyez sur Entrée pour enregistrer et quitter. (Utilisez `:q!` pour quitter sans enregistrer si vous faites une erreur).
@@ -137,7 +137,11 @@ AVERTISSEMENT : Une modification incorrecte du fichier sudoers peut endommager v
 
 ## 🔑 Comment obtenir une clé API (obligatoire)
 
-![HOW_TO_GET_API_KEY](./Github/Api.png)
+<video controls width="640" height="360">
+  <source src="https://github.com/Bengerthelorf/macIconChanger/raw/refs/heads/main/Github/permission.mp4" type="video/mp4">
+  Sorry, your browser does not support embedded videos.  
+  You can download the video:[permission.mp4](Github/permission.mp4)
+</video>
 
 1. Ouvrez votre navigateur.
 2. Allez sur [macosicons.com](https://macosicons.com/).

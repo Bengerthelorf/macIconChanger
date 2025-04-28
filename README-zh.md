@@ -119,7 +119,11 @@ IconChanger 包含一个后台服务，可以：
 
 ## 🔑 如何获取权限 (必需)
 
-![HOW_TO_SUDO](./Github/permission.mp4)
+<video controls width="640" height="360">
+  <source src="https://github.com/Bengerthelorf/macIconChanger/raw/refs/heads/main/Github/permission.mp4" type="video/mp4">
+  Sorry, your browser does not support embedded videos.  
+  You can download the video:[permission.mp4](Github/permission.mp4)
+</video>
 
 IconChanger 需要权限才能使用其辅助脚本更改图标。请仔细编辑 sudoers 文件以授予此权限:
 
@@ -127,7 +131,7 @@ IconChanger 需要权限才能使用其辅助脚本更改图标。请仔细编�
 2. 输入 `sudo visudo` 并按 Enter 键。在提示时输入您的管理员密码。
 3. 使用箭头键导航到文件末尾。按 'i' 进入插入模式。
 4. 完全按照所示添加以下任一行（通常首选使用您的用户名对应的格式，但此处提供通用格式）：
-    `ALL ALL=(ALL) NOPASSWD: /Users/sniax/.iconchanger/helper.sh`
+    `ALL ALL=(ALL) NOPASSWD: /Users/username/.iconchanger/helper.sh`
     > (注意：这将权限授予所有用户。虽然不够具体，但在某些环境中似乎是可靠运行所必需的。)
 5. 按 'Esc' 键退出插入模式。
 6. 输入 `:wq` 并按 Enter 键保存并退出。（如果出错，输入 `:q!` 并按 Enter 键退出而不保存）。

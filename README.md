@@ -131,7 +131,11 @@ To configure the background service:
 
 ## 🔑 How to sudo permission (Required)
 
-![HOW_TO_SUDO](./Github/permission.mp4)
+<video controls width="640" height="360">
+  <source src="https://github.com/Bengerthelorf/macIconChanger/raw/refs/heads/main/Github/permission.mp4" type="video/mp4">
+  Sorry, your browser does not support embedded videos.  
+  You can download the video:[permission.mp4](Github/permission.mp4)
+</video>
 
 IconChanger needs permission to change icons using its helper script. Please grant this permission by editing the sudoers file carefully:
 
