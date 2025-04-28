@@ -119,7 +119,7 @@ Pour configurer le service en arrière-plan :
 
 ## 🔑 Comment obtenir l'autorisation sudo (obligatoire)
 
-![HOW_TO_SUDO](./Github/permission.mp4)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/f9TmrEY6GI0?si=cjKWk1y4K8evrKvh" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 IconChanger a besoin de permissions pour modifier les icônes à l'aide de son script d'aide. Veuillez accorder cette permission en modifiant soigneusement le fichier sudoers :
 
@@ -137,11 +137,7 @@ AVERTISSEMENT : Une modification incorrecte du fichier sudoers peut endommager v
 
 ## 🔑 Comment obtenir une clé API (obligatoire)
 
-<video controls width="640" height="360">
-  <source src="https://github.com/Bengerthelorf/macIconChanger/raw/refs/heads/main/Github/permission.mp4" type="video/mp4">
-  Sorry, your browser does not support embedded videos.  
-  You can download the video:[permission.mp4](Github/permission.mp4)
-</video>
+![HOW_TO_GET_API_KEY](./Github/Api.png)
 
 1. Ouvrez votre navigateur.
 2. Allez sur [macosicons.com](https://macosicons.com/).

@@ -117,25 +117,9 @@ To configure the background service:
 2. Enable "Run in Background."
 3. Choose visibility options (Menu Bar, Dock, or both).
 
-## 🔑 How to Get an API Key (Required)
-
-![HOW_TO_GET_API_KEY](./Github/Api.png)
-
-1. Open your browser.
-2. Go to [macosicons.com](https://macosicons.com/).
-3. Create an account or log in.
-4. Request an API key for use with IconChanger.
-5. Copy the API key.
-6. Open the IconChanger Settings.
-7. Input the API key.
-
 ## 🔑 How to sudo permission (Required)
 
-<video controls width="640" height="360">
-  <source src="https://github.com/Bengerthelorf/macIconChanger/raw/refs/heads/main/Github/permission.mp4" type="video/mp4">
-  Sorry, your browser does not support embedded videos.  
-  You can download the video:[permission.mp4](Github/permission.mp4)
-</video>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/f9TmrEY6GI0?si=cjKWk1y4K8evrKvh" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 IconChanger needs permission to change icons using its helper script. Please grant this permission by editing the sudoers file carefully:
 
@@ -150,6 +134,18 @@ IconChanger needs permission to change icons using its helper script. Please gra
 7. Restart IconChanger after saving the file.
 
 WARNING: Incorrectly editing sudoers can damage your system. Proceed with caution.
+
+## 🔑 How to Get an API Key (Required)
+
+![HOW_TO_GET_API_KEY](./Github/Api.png)
+
+1. Open your browser.
+2. Go to [macosicons.com](https://macosicons.com/).
+3. Create an account or log in.
+4. Request an API key for use with IconChanger.
+5. Copy the API key.
+6. Open the IconChanger Settings.
+7. Input the API key.
 
 ## ⚙️ Integration with dotfiles
 

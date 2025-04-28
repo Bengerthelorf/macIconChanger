@@ -119,11 +119,7 @@ IconChanger 包含一个后台服务，可以：
 
 ## 🔑 如何获取权限 (必需)
 
-<video controls width="640" height="360">
-  <source src="https://github.com/Bengerthelorf/macIconChanger/raw/refs/heads/main/Github/permission.mp4" type="video/mp4">
-  Sorry, your browser does not support embedded videos.  
-  You can download the video:[permission.mp4](Github/permission.mp4)
-</video>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/f9TmrEY6GI0?si=cjKWk1y4K8evrKvh" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 IconChanger 需要权限才能使用其辅助脚本更改图标。请仔细编辑 sudoers 文件以授予此权限:
 
