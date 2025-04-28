@@ -59,7 +59,6 @@
 		908A792E281A771800951B15 /* Api.png in Resources */ = {isa = PBXBuildFile; fileRef = 908A792D281A771800951B15 /* Api.png */; };
 		90B57C1B286AA2B400EE52D3 /* URL+Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90B57C1A286AA2B400EE52D3 /* URL+Document.swift */; };
 		90B57C1D286AA2F800EE52D3 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90B57C1C286AA2F800EE52D3 /* Config.swift */; };
-		90B57C20286AB90700EE52D3 /* installHelper.sh in Resources */ = {isa = PBXBuildFile; fileRef = 90B57C1F286AB90700EE52D3 /* installHelper.sh */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -144,7 +143,6 @@
 		90B57C1A286AA2B400EE52D3 /* URL+Document.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Document.swift"; sourceTree = "<group>"; };
 		90B57C1C286AA2F800EE52D3 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		90B57C1E286AA62300EE52D3 /* IconChanger.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = IconChanger.entitlements; sourceTree = "<group>"; };
-		90B57C1F286AB90700EE52D3 /* installHelper.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = installHelper.sh; sourceTree = "<group>"; };
 		90B57C21286ACBA700EE52D3 /* StringTest.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = StringTest.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 /* End PBXFileReference section */
 
@@ -255,7 +253,6 @@
 				90B57C1A286AA2B400EE52D3 /* URL+Document.swift */,
 				90B57C1C286AA2F800EE52D3 /* Config.swift */,
 				90534351286C8BDA00237F98 /* fileicon */,
-				90B57C1F286AB90700EE52D3 /* installHelper.sh */,
 				90B57C21286ACBA700EE52D3 /* StringTest.playground */,
 				90534350286B441900237F98 /* sparkle.xml */,
 				9053438A287534C300237F98 /* helper.sh */,
@@ -410,7 +407,6 @@
 				2FC131842D8F916D00F60B19 /* Localizable.strings in Resources */,
 				2F53ECDE2D91CC8500A91DD9 /* Github-Iconchanger.png in Resources */,
 				907AC4F92954038600F9F0F9 /* README-zh.md in Resources */,
-				90B57C20286AB90700EE52D3 /* installHelper.sh in Resources */,
 				900D1CF0281934C8007ABB12 /* Preview Assets.xcassets in Resources */,
 				908A7927281A5A4A00951B15 /* README.md in Resources */,
 				9017B61E295282ED005709C6 /* LICENSE in Resources */,
@@ -658,7 +654,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 112b1;
+				CURRENT_PROJECT_VERSION = 113;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"IconChanger/Preview Content\"";
 				DEVELOPMENT_TEAM = 2T53C3HYGK;
@@ -673,7 +669,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.4;
-				MARKETING_VERSION = "1.1.2-Beta1";
+				MARKETING_VERSION = 1.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zhuhaoyu.IconChanger;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -692,7 +688,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 112b1;
+				CURRENT_PROJECT_VERSION = 113;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"IconChanger/Preview Content\"";
 				DEVELOPMENT_TEAM = 2T53C3HYGK;
@@ -707,7 +703,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.4;
-				MARKETING_VERSION = "1.1.2-Beta1";
+				MARKETING_VERSION = 1.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zhuhaoyu.IconChanger;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

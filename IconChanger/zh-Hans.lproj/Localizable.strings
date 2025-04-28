@@ -394,3 +394,22 @@ Settings tab */
 
 /* No comment provided by engineer. */
 "minutes" = "分钟";
+
+"sudoers_instructions_format" = "IconChanger 需要权限才能使用其辅助脚本更改图标。请仔细编辑 sudoers 文件以授予此权限：\n\n1. 打开“终端”（位于“/应用程序/实用工具”中）。\n\n2. 输入 `sudo visudo` 并按 Enter 键。在提示时输入您的管理员密码。\n\n3. 使用箭头键导航到文件末尾。按 'i' 进入插入模式。\n\n4. 完全按照所示添加以下任一行（通常首选使用您的用户名对应的格式，但此处提供通用格式）：\n\n   ALL ALL=(ALL) NOPASSWD: %@\n\n   (注意：这将权限授予所有用户。虽然不够具体，但在某些环境中似乎是可靠运行所必需的。)\n\n5. 按 'Esc' 键退出插入模式。\n\n6. 输入 `:wq` 并按 Enter 键保存并退出。（如果出错，输入 `:q!` 并按 Enter 键退出而不保存）。\n\n7. 保存文件后重新启动 IconChanger。\n\n警告：错误地编辑 sudoers 文件可能会损坏您的系统。请谨慎操作。";
+
+"helper_files_missing_instructions_format" = "IconChanger 所需的以下辅助文件似乎缺失或无法复制：\n\n%@\n\n预期位置：%@\n\n请尝试以下操作：\n1. 确保 IconChanger 对 `~/.iconchanger` 目录具有写入权限。\n2. 重新启动 IconChanger。\n3. 如果问题仍然存在，请尝试重新安装应用程序。";
+
+"unexpected_setup_issue_format" = "发生意外的设置问题 (%@)。请确保辅助文件存在于 %@ 且 sudoers 权限正确。重新启动应用程序可能会有所帮助。";
+
+"helper_files_missing_message_format" = "无法找到或复制以下所需的辅助文件：\n\n%@\n\n请确保应用程序具有写入其支持目录 (~/.iconchanger) 的权限，并尝试重新启动应用程序。";
+
+"Checking Setup..." = "正在检查设置...";
+"3. If no dialog appears, you might need to grant access manually in System Settings > Privacy & Security > Files and Folders" = "3. 如果没有出现对话框，您可能需要在“系统设置”>“隐私与安全性”>“文件和文件夹”中手动授予访问权限";
+"Request / Check Access" = "请求 / 检查访问权限";
+"Retry Setup Check" = "重试设置检查";
+"Manual Setup Required" = "需要手动设置";
+"IconChanger needs permission to run its helper script with administrator privileges to change icons.\nThis requires a manual configuration" = "IconChanger 需要权限以管理员身份运行其辅助脚本来更改图标。\n这需要手动配置";
+"Show Setup Instructions" = "显示设置说明";
+"Setup Error" = "设置错误";
+"Check Setup Status" = "检查设置状态";
+"Manual setup check requested." = "已请求手动设置检查。";

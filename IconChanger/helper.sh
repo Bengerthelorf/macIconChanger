@@ -1,1 +1,5 @@
-sudo '%fileicon' set '%app' '%image'
+FILEICON_PATH="$1"
+APP_PATH="$2"
+IMAGE_PATH="$3"
+
+"$FILEICON_PATH" set "$APP_PATH" "$IMAGE_PATH"

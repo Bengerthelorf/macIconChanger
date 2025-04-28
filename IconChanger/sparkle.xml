@@ -4,6 +4,31 @@
     <channel>
         <title>IconChanger</title>
         <item>
+            <title>Version 1.1.3</title>
+            <link>https://github.com/Bengerthelorf/macIconChanger</link>
+            <sparkle:version>113</sparkle:version>
+            <sparkle:shortVersionString>1.1.3</sparkle:shortVersionString>
+            <pubDate>Mon, 28 Apr 2025 20:00 +0800</pubDate>
+            <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.1.3/IconChanger.dmg"
+            sparkle:edSignature="kS8W2O3Gm12smADWUVX+Yv9tqor0niJaW5eHdFzfHwYR/w5Q4ujKDZhksojY8zwcytH37/jYj824eDtsMJakBw==" length="13578055"
+            type="application/octet-stream"/>
+            <description>
+                <![CDATA[
+                <h2>✨ Version 1.1.3 - Setup Improvements & Fixes</h2>
+                <p>Fixing issues related to sudoers permissions.</p>
+                <ul>
+                    <li><strong>📝 Improved:</strong> Provides clearer and more specific setup instructions if <code>sudoers</code> permissions are missing or invalid.</li>
+                    <li><strong>⚙️ Change & Note:</strong> Updated the recommended <code>sudoers</code> rule in the setup instructions to <code>ALL ALL=(ALL) NOPASSWD: [SCRIPT_PATH]</code> for better reliability across different environments.
+                        <br/><em>(Note: This manual <code>sudoers</code> configuration method is used because the standard macOS approach for privileged operations requires code signing and notarization, which necessitates a paid Apple Developer account. As a student developer, this isn't currently feasible. This alternative allows the core functionality to be used without that requirement. Thank you for your understanding.)</em>
+                    </li>
+                    <li><strong>🐛 Fixed:</strong> Improved error handling and logging when executing the helper script, especially for <code>sudo</code> failures.</li>
+                    <li><strong>🌍 Localization:</strong> Updated and added localizations for new UI text and instructions (Chinese, Japanese, French, etc.).</li>
+                </ul>
+                <p>Updating is recommended for all users. If you upgrade from an older version and encounter issues, you may need to update your <code>sudoers</code> file according to the new in-app instructions.</p>
+                ]]>
+            </description>
+        </item>
+        <item>
             <title>Version 1.1.1 - URGENT Update</title>
             <link>https://github.com/Bengerthelorf/macIconChanger</link>
             <sparkle:version>111</sparkle:version>

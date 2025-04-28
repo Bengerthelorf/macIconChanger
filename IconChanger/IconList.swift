@@ -87,8 +87,9 @@ struct IconList: View {
                 .toolbar {
                     ToolbarItem {
                         Menu {
-                            Button("Install Helper Again") {
-                                try? iconManager.installHelperTool()
+                            Button("Check Setup Status") {
+                                print("Manual setup check requested.")
+                                iconManager.needsSetupCheck = true
                             }
                             
                             Divider()

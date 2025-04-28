@@ -394,3 +394,22 @@ Settings tab */
 
 /* No comment provided by engineer. */
 "minutes" = "分";
+
+"sudoers_instructions_format" = "IconChangerがヘルパースクリプトを使用してアイコンを変更するには権限が必要です。sudoersファイルを慎重に編集して、この権限を付与してください：\n\n1. ターミナルを開きます（/アプリケーション/ユーティリティ内）。\n\n2. `sudo visudo` と入力し、Enterキーを押します。プロンプトが表示されたら管理者パスワードを入力します。\n\n3. 矢印キーでファイルの末尾に移動します。「i」キーを押して挿入モードに入ります。\n\n4. 次の行のいずれかを（通常はユーザー名を使用する方が望ましいですが）表示されている通りに正確に追加します：\n\n   ALL ALL=(ALL) NOPASSWD: %@\n\n   (注意：これはすべてのユーザーに権限を付与します。具体的ではありませんが、一部の環境で確実に動作させるためには必要と思われる場合があります。)\n\n5. Escキーを押して挿入モードを終了します。\n\n6. `:wq` と入力し、Enterキーを押して保存し終了します。（間違えた場合は `:q!` と入力し、Enterキーを押して保存せずに終了します）。\n\n7. ファイルを保存した後、IconChangerを再起動します。\n\n警告：sudoersファイルを誤って編集すると、システムに損害を与える可能性があります。注意して進めてください。";
+
+"helper_files_missing_instructions_format" = "IconChangerに必要な以下のヘルパーファイルが見つからないか、コピーできなかったようです：\n\n%@\n\n予期される場所：%@\n\n以下をお試しください：\n1. IconChangerが `~/.iconchanger` ディレクトリへの書き込み権限を持っていることを確認します。\n2. IconChangerを再起動します。\n3. 問題が解決しない場合は、アプリケーションを再インストールしてみてください。";
+
+"unexpected_setup_issue_format" = "予期しないセットアップの問題が発生しました (%@)。ヘルパーファイルが %@ に存在し、sudoersの権限が正しいことを確認してください。アプリを再起動すると解決する場合があります。";
+
+"helper_files_missing_message_format" = "以下の必要なヘルパーファイルが見つからないか、コピーできませんでした：\n\n%@\n\nアプリケーションがそのサポートディレクトリ（~/.iconchanger）への書き込み権限を持っていることを確認し、アプリケーションを再起動してみてください。";
+
+"Checking Setup..." = "セットアップを確認中...";
+"3. If no dialog appears, you might need to grant access manually in System Settings > Privacy & Security > Files and Folders" = "3. ダイアログが表示されない場合は、「システム設定」>「プライバシーとセキュリティ」>「ファイルとフォルダ」で手動でアクセスを許可する必要がある場合があります";
+"Request / Check Access" = "アクセスをリクエスト / 確認";
+"Retry Setup Check" = "セットアップ確認を再試行";
+"Manual Setup Required" = "手動セットアップが必要";
+"IconChanger needs permission to run its helper script with administrator privileges to change icons.\nThis requires a manual configuration" = "IconChangerがヘルパースクリプトを管理者権限で実行してアイコンを変更するには権限が必要です。\nこれには手動での設定が必要です";
+"Show Setup Instructions" = "セットアップ手順を表示";
+"Setup Error" = "セットアップエラー";
+"Check Setup Status" = "セットアップ状況を確認";
+"Manual setup check requested." = "手動セットアップ確認がリクエストされました。";

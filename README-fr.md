@@ -117,6 +117,24 @@ Pour configurer le service en arrière-plan :
 2. Activez "Exécuter en arrière-plan".
 3. Choisissez les options de visibilité (Barre de menu, Dock ou les deux).
 
+## 🔑 Comment obtenir l'autorisation sudo (obligatoire)
+
+![HOW_TO_SUDO](./Github/permission.mp4)
+
+IconChanger a besoin de permissions pour modifier les icônes à l'aide de son script d'aide. Veuillez accorder cette permission en modifiant soigneusement le fichier sudoers :
+
+1. Ouvrez le Terminal (dans /Applications/Utilitaires).
+2. Tapez `sudo visudo` et appuyez sur Entrée. Entrez votre mot de passe administrateur lorsque vous y êtes invité.
+3. Naviguez jusqu'à la fin du fichier à l'aide des touches fléchées. Appuyez sur 'i' pour passer en mode INSERTION.
+4. Ajoutez EXACTEMENT l'une des lignes suivantes comme indiqué (utiliser la ligne avec votre nom d'utilisateur est généralement préférable, mais celle-ci est fournie pour fonctionner) :
+    `ALL ALL=(ALL) NOPASSWD: /Users/sniax/.iconchanger/helper.sh`
+    > (Note : Ceci accorde la permission à tous les utilisateurs. Bien que moins spécifique, cela semble nécessaire pour un fonctionnement fiable dans certains environnements.)
+5. Appuyez sur 'Esc' pour quitter le mode INSERTION.
+6. Tapez `:wq` et appuyez sur Entrée pour enregistrer et quitter. (Utilisez `:q!` pour quitter sans enregistrer si vous faites une erreur).
+7. Redémarrez IconChanger après avoir enregistré le fichier.
+
+AVERTISSEMENT : Une modification incorrecte du fichier sudoers peut endommager votre système. Procédez avec prudence.
+
 ## 🔑 Comment obtenir une clé API (obligatoire)
 
 ![HOW_TO_GET_API_KEY](./Github/Api.png)

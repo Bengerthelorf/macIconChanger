@@ -394,3 +394,31 @@ Settings tab */
 
 /* No comment provided by engineer. */
 "minutes" = "minutes";
+
+"sudoers_instructions_format" = "IconChanger needs permission to change icons using its helper script. Please grant this permission by editing the sudoers file carefully:\n\n1. Open Terminal (in /Applications/Utilities).\n\n2. Type `sudo visudo` and press Enter. Enter your administrator password when prompted.\n\n3. Navigate to the end of the file using arrow keys. Press 'i' to enter INSERT mode.\n\n4. Add ONE of the following lines EXACTLY as shown (using your username is generally preferred):\n\n   ALL ALL=(ALL) NOPASSWD: %@\n\n   (Note: This grants permission to all users. While less specific, it seems necessary for reliable operation in some environments.)\n\n5. Press 'Esc' to exit INSERT mode.\n\n6. Type `:wq` and press Enter to save and quit. (Use `:q!` to quit without saving if you make a mistake).\n\n7. Restart IconChanger after saving the file.\n\nWARNING: Incorrectly editing sudoers can damage your system. Proceed with caution.";
+
+"helper_files_missing_instructions_format" = "The following helper files required by IconChanger seem to be missing or couldn't be copied:\n\n%@\n\nExpected location: %@\n\nPlease try the following:\n1. Ensure IconChanger has write permissions for the `~/.iconchanger` directory.\n2. Restart IconChanger.\n3. If the problem persists, try reinstalling the application.";
+
+"unexpected_setup_issue_format" = "An unexpected setup issue occurred (%@). Please ensure helper files exist at %@ and sudoers permissions are correct. Restarting the app might help.";
+
+"helper_files_missing_message_format" = "The following required helper files could not be found or copied:\n\n%@\n\nPlease ensure the app has permissions to write to its support directory (~/.iconchanger) and try restarting the application.";
+
+"Checking Setup..." = "Checking Setup...";
+
+"3. If no dialog appears, you might need to grant access manually in System Settings > Privacy & Security > Files and Folders" = "3. If no dialog appears, you might need to grant access manually in System Settings > Privacy & Security > Files and Folders";
+
+"Request / Check Access" = "Request / Check Access";
+
+"Retry Setup Check" = "Retry Setup Check";
+
+"Manual Setup Required" = "Manual Setup Required";
+
+"IconChanger needs permission to run its helper script with administrator privileges to change icons.\nThis requires a manual configuration" = "IconChanger needs permission to run its helper script with administrator privileges to change icons.\nThis requires a manual configuration";
+
+"Show Setup Instructions" = "Show Setup Instructions";
+
+"Setup Error" = "Setup Error";
+
+"Check Setup Status" = "Check Setup Status";
+
+"Manual setup check requested." = "Manual setup check requested.";

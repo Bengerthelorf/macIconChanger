@@ -129,6 +129,24 @@ To configure the background service:
 6. Open the IconChanger Settings.
 7. Input the API key.
 
+## 🔑 How to sudo permission (Required)
+
+![HOW_TO_SUDO](./Github/permission.mp4)
+
+IconChanger needs permission to change icons using its helper script. Please grant this permission by editing the sudoers file carefully:
+
+1. Open Terminal (in /Applications/Utilities).
+2. Type `sudo visudo` and press Enter. Enter your administrator password when prompted.
+3. Navigate to the end of the file using arrow keys. Press 'i' to enter INSERT mode.
+4. Add ONE of the following lines EXACTLY as shown (using your username is generally preferred):
+    `ALL ALL=(ALL) NOPASSWD: /Users/sniax/.iconchanger/helper.sh`
+    > (Note: This grants permission to all users. While less specific, it seems necessary for reliable operation in some environments.)
+5. Press 'Esc' to exit INSERT mode.
+6. Type `:wq` and press Enter to save and quit. (Use `:q!` to quit without saving if you make a mistake).
+7. Restart IconChanger after saving the file.
+
+WARNING: Incorrectly editing sudoers can damage your system. Proceed with caution.
+
 ## ⚙️ Integration with dotfiles
 
 IconChanger is perfect for managing consistent app appearances across multiple Macs using dotfiles:

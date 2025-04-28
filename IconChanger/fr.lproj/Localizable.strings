@@ -394,3 +394,22 @@ Settings tab */
 
 /* No comment provided by engineer. */
 "minutes" = "minutes";
+
+"sudoers_instructions_format" = "IconChanger a besoin de permissions pour modifier les icônes à l'aide de son script d'aide. Veuillez accorder cette permission en modifiant soigneusement le fichier sudoers :\n\n1. Ouvrez le Terminal (dans /Applications/Utilitaires).\n\n2. Tapez `sudo visudo` et appuyez sur Entrée. Entrez votre mot de passe administrateur lorsque vous y êtes invité.\n\n3. Naviguez jusqu'à la fin du fichier à l'aide des touches fléchées. Appuyez sur 'i' pour passer en mode INSERTION.\n\n4. Ajoutez EXACTEMENT l'une des lignes suivantes comme indiqué (utiliser la ligne avec votre nom d'utilisateur est généralement préférable, mais celle-ci est fournie pour fonctionner) :\n\n   ALL ALL=(ALL) NOPASSWD: %@\n\n   (Note : Ceci accorde la permission à tous les utilisateurs. Bien que moins spécifique, cela semble nécessaire pour un fonctionnement fiable dans certains environnements.)\n\n5. Appuyez sur 'Esc' pour quitter le mode INSERTION.\n\n6. Tapez `:wq` et appuyez sur Entrée pour enregistrer et quitter. (Utilisez `:q!` pour quitter sans enregistrer si vous faites une erreur).\n\n7. Redémarrez IconChanger après avoir enregistré le fichier.\n\nAVERTISSEMENT : Une modification incorrecte du fichier sudoers peut endommager votre système. Procédez avec prudence.";
+
+"helper_files_missing_instructions_format" = "Les fichiers d'aide suivants requis par IconChanger semblent manquants ou n'ont pas pu être copiés :\n\n%@\n\nEmplacement attendu : %@\n\nVeuillez essayer ce qui suit :\n1. Assurez-vous qu'IconChanger dispose des autorisations d'écriture pour le répertoire `~/.iconchanger`.\n2. Redémarrez IconChanger.\n3. Si le problème persiste, essayez de réinstaller l'application.";
+
+"unexpected_setup_issue_format" = "Un problème de configuration inattendu est survenu (%@). Veuillez vous assurer que les fichiers d'aide existent dans %@ et que les permissions sudoers sont correctes. Redémarrer l'application pourrait aider.";
+
+"helper_files_missing_message_format" = "Les fichiers d'aide requis suivants n'ont pas pu être trouvés ou copiés :\n\n%@\n\nVeuillez vous assurer que l'application dispose des autorisations d'écriture pour son répertoire de support (~/.iconchanger) et essayez de redémarrer l'application.";
+
+"Checking Setup..." = "Vérification de la configuration...";
+"3. If no dialog appears, you might need to grant access manually in System Settings > Privacy & Security > Files and Folders" = "3. Si aucune boîte de dialogue n'apparaît, vous devrez peut-être accorder l'accès manuellement dans Réglages Système > Confidentialité et sécurité > Fichiers et dossiers";
+"Request / Check Access" = "Demander / Vérifier l'accès";
+"Retry Setup Check" = "Réessayer la vérification de la configuration";
+"Manual Setup Required" = "Configuration manuelle requise";
+"IconChanger needs permission to run its helper script with administrator privileges to change icons.\nThis requires a manual configuration" = "IconChanger a besoin de la permission pour exécuter son script d'aide avec les privilèges administrateur afin de modifier les icônes.\nCela nécessite une configuration manuelle";
+"Show Setup Instructions" = "Afficher les instructions de configuration";
+"Setup Error" = "Erreur de configuration";
+"Check Setup Status" = "Vérifier l'état de la configuration";
+"Manual setup check requested." = "Vérification manuelle de la configuration demandée.";

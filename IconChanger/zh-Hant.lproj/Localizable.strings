@@ -394,3 +394,22 @@ Settings tab */
 
 /* No comment provided by engineer. */
 "minutes" = "分鐘";
+
+"sudoers_instructions_format" = "IconChanger 需要權限才能使用其輔助程式碼變更圖示。請謹慎編輯 sudoers 檔案以授予此權限：\n\n1. 開啟「終端機」（位於「/應用程式/工具程式」中）。\n\n2. 輸入 `sudo visudo` 並按 Enter 鍵。在提示時輸入您的管理者密碼。\n\n3. 使用方向鍵導覽至檔案結尾。按 'i' 鍵進入插入模式。\n\n4. 完全依照所示方式加入下列其中一行（通常建議使用您的使用者名稱對應的格式，但此處提供通用格式）：\n\n   ALL ALL=(ALL) NOPASSWD: %@\n\n   (注意：這會將權限授予所有使用者。雖然不夠具體，但在某些環境中似乎是可靠操作所必需的。)\n\n5. 按 'Esc' 鍵離開插入模式。\n\n6. 輸入 `:wq` 並按 Enter 鍵儲存並離開。（如果出錯，輸入 `:q!` 並按 Enter 鍵離開而不儲存）。\n\n7. 儲存檔案後重新啟動 IconChanger。\n\n警告：不正確地編輯 sudoers 檔案可能會損壞您的系統。請謹慎操作。";
+
+"helper_files_missing_instructions_format" = "IconChanger 所需的下列輔助檔案似乎遺失或無法複製：\n\n%@\n\n預期位置：%@\n\n請嘗試下列操作：\n1. 確保 IconChanger 對 `~/.iconchanger` 目錄具有寫入權限。\n2. 重新啟動 IconChanger。\n3. 如果問題持續存在，請嘗試重新安裝應用程式。";
+
+"unexpected_setup_issue_format" = "發生未預期的設定問題 (%@)。請確保輔助檔案存在於 %@ 且 sudoers 權限正確。重新啟動應用程式可能有幫助。";
+
+"helper_files_missing_message_format" = "無法找到或複製下列所需的輔助檔案：\n\n%@\n\n請確保應用程式對其支援目錄 (~/.iconchanger) 具有寫入權限，並嘗試重新啟動應用程式。";
+
+"Checking Setup..." = "正在檢查設定...";
+"3. If no dialog appears, you might need to grant access manually in System Settings > Privacy & Security > Files and Folders" = "3. 如果沒有出現對話框，您可能需要在「系統設定」>「隱私權與安全性」>「檔案與檔案夾」中手動授予存取權限";
+"Request / Check Access" = "請求 / 檢查存取權限";
+"Retry Setup Check" = "重試設定檢查";
+"Manual Setup Required" = "需要手動設定";
+"IconChanger needs permission to run its helper script with administrator privileges to change icons.\nThis requires a manual configuration" = "IconChanger 需要權限以管理者身份執行其輔助程式碼來變更圖示。\n這需要手動設定";
+"Show Setup Instructions" = "顯示設定說明";
+"Setup Error" = "設定錯誤";
+"Check Setup Status" = "檢查設定狀態";
+"Manual setup check requested." = "已請求手動設定檢查。";
