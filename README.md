@@ -119,7 +119,7 @@ To configure the background service:
 
 ## 🔑 How to sudo permission (Required)
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/f9TmrEY6GI0?si=cjKWk1y4K8evrKvh" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+[![HOW_TO_SUDO](https://img.youtube.com/vi/f9TmrEY6GI0/0.jpg)](https://www.youtube.com/watch?v=f9TmrEY6GI0)
 
 IconChanger needs permission to change icons using its helper script. Please grant this permission by editing the sudoers file carefully:
 

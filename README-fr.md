@@ -119,7 +119,7 @@ Pour configurer le service en arrière-plan :
 
 ## 🔑 Comment obtenir l'autorisation sudo (obligatoire)
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/f9TmrEY6GI0?si=cjKWk1y4K8evrKvh" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+[![HOW_TO_SUDO](https://img.youtube.com/vi/f9TmrEY6GI0/0.jpg)](https://www.youtube.com/watch?v=f9TmrEY6GI0)
 
 IconChanger a besoin de permissions pour modifier les icônes à l'aide de son script d'aide. Veuillez accorder cette permission en modifiant soigneusement le fichier sudoers :
 

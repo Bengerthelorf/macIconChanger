@@ -119,7 +119,7 @@ IconChanger 包含一个后台服务，可以：
 
 ## 🔑 如何获取权限 (必需)
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/f9TmrEY6GI0?si=cjKWk1y4K8evrKvh" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+[![HOW_TO_SUDO](./Github/Tumbnail.png)](https://www.bilibili.com/video/av114416603370208/)
 
 IconChanger 需要权限才能使用其辅助脚本更改图标。请仔细编辑 sudoers 文件以授予此权限:
 
