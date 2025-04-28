@@ -119,8 +119,6 @@ Pour configurer le service en arrière-plan :
 
 ## 🔑 Comment obtenir l'autorisation sudo (obligatoire)
 
-[![HOW_TO_SUDO](https://img.youtube.com/vi/f9TmrEY6GI0/0.jpg)](https://www.youtube.com/watch?v=f9TmrEY6GI0)
-
 IconChanger a besoin de permissions pour modifier les icônes à l'aide de son script d'aide. Veuillez accorder cette permission en modifiant soigneusement le fichier sudoers :
 
 1. Ouvrez le Terminal (dans /Applications/Utilitaires).
@@ -134,6 +132,10 @@ IconChanger a besoin de permissions pour modifier les icônes à l'aide de son s
 7. Redémarrez IconChanger après avoir enregistré le fichier.
 
 AVERTISSEMENT : Une modification incorrecte du fichier sudoers peut endommager votre système. Procédez avec prudence.
+
+### ⬇️ Cliquez pour regarder le tutoriel vidéo
+
+[![HOW_TO_SUDO](https://img.youtube.com/vi/f9TmrEY6GI0/0.jpg)](https://www.youtube.com/watch?v=f9TmrEY6GI0)
 
 ## 🔑 Comment obtenir une clé API (obligatoire)
 

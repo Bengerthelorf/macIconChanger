@@ -119,8 +119,6 @@ IconChanger 包含一个后台服务，可以：
 
 ## 🔑 如何获取权限 (必需)
 
-[![HOW_TO_SUDO](./Github/Tumbnail.png)](https://www.bilibili.com/video/av114416603370208/)
-
 IconChanger 需要权限才能使用其辅助脚本更改图标。请仔细编辑 sudoers 文件以授予此权限:
 
 1. 打开“终端”（位于“/应用程序/实用工具”中）。
@@ -134,6 +132,10 @@ IconChanger 需要权限才能使用其辅助脚本更改图标。请仔细编�
 7. 保存文件后重新启动 IconChanger。
 
 警告：错误地编辑 sudoers 文件可能会损坏您的系统。请谨慎操作。
+
+### ⬇️ 点击查看视频教程
+
+[![HOW_TO_SUDO](./Github/Tumbnail.png)](https://www.bilibili.com/video/av114416603370208/)
 
 ## 🔑 如何获取 API 密钥（必需）
 

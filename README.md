@@ -119,8 +119,6 @@ To configure the background service:
 
 ## 🔑 How to sudo permission (Required)
 
-[![HOW_TO_SUDO](https://img.youtube.com/vi/f9TmrEY6GI0/0.jpg)](https://www.youtube.com/watch?v=f9TmrEY6GI0)
-
 IconChanger needs permission to change icons using its helper script. Please grant this permission by editing the sudoers file carefully:
 
 1. Open Terminal (in /Applications/Utilities).
@@ -134,6 +132,10 @@ IconChanger needs permission to change icons using its helper script. Please gra
 7. Restart IconChanger after saving the file.
 
 WARNING: Incorrectly editing sudoers can damage your system. Proceed with caution.
+
+## ⬇️ Click to watch the video tutorial
+
+[![HOW_TO_SUDO](https://img.youtube.com/vi/f9TmrEY6GI0/0.jpg)](https://www.youtube.com/watch?v=f9TmrEY6GI0)
 
 ## 🔑 How to Get an API Key (Required)
 
