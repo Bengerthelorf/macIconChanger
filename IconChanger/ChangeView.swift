@@ -5,6 +5,7 @@
 //  Created by 朱浩宇 on 2022/4/27.
 //  Modified by seril on 2023/7/25.
 //  Modified by Bengerthelorf on 2025/3/21.
+//  Modified by CantonMonkey on 2025/10/10.
 //
 
 import SwiftUI
@@ -32,6 +33,9 @@ struct ChangeView: View {
     @State var importImage = false
 
     @State var setAlias: String? = nil
+
+    // icon style selector
+    @State var selectedStyle: IconStyle = .all
 
     var body: some View {
         GeometryReader { geometry in
@@ -78,6 +82,17 @@ struct ChangeView: View {
                         Text("macOSicons.com")
                             .font(.headline)
                             .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        // Style selector
+                        Picker("Style", selection: $selectedStyle) {
+                            ForEach(IconStyle.allCases) { style in
+                                Text(style.displayName).tag(style)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .onChange(of: selectedStyle) { _ in
+                            loadIcons()
+                        }
                         
                         if !isLoadingIcons && successIconsCount > 0 {
                             HStack(spacing: 4) {
@@ -149,22 +164,29 @@ struct ChangeView: View {
                     inIcons = iconManager.getIconInPath(setPath.url)
                 }
                 .task {
-                    do {
-                        isLoadingIcons = true
-                        icons = try await iconManager.getIcons(setPath)
-                        totalIconsCount = icons.count
-                        successIconsCount = icons.count  // Initially assume all icons can be loaded
-                        validIcons = icons  // Initially consider all icons as valid
-                        isLoadingIcons = false
-                    } catch {
-                        print(error)
-                        isLoadingIcons = false
-                    }
+                    loadIcons()
                 }
                 .sheet(item: $setAlias) {
                     SetAliasNameView(raw: $0, lastText: AliasName.getName(for: $0) ?? "")
                 }
 //                .navigationTitle(setPath.name)
+    }
+    
+    // Function to load icons with selected style
+    private func loadIcons() {
+        Task {
+            do {
+                isLoadingIcons = true
+                icons = try await iconManager.getIcons(setPath, style: selectedStyle)
+                totalIconsCount = icons.count
+                successIconsCount = icons.count  // Initially assume all icons can be loaded
+                validIcons = icons  // Initially consider all icons as valid
+                isLoadingIcons = false
+            } catch {
+                print(error)
+                isLoadingIcons = false
+            }
+        }
     }
     
     // Function to update the icon status and count

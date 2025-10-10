@@ -4,6 +4,7 @@
 //
 //  Created by 朱浩宇 on 2022/4/27.
 //  Modified by Bengerthelorf on 2025/3/21.
+//  Modified by CantonMonkey on 2025/10/10.
 //
 
 import SwiftUI
@@ -319,7 +320,7 @@ class IconManager: ObservableObject {
         return String(url[count..<endCount] ?? "")
     }
     
-    func getIcons(_ app: LaunchPadManagerDBHelper.AppInfo) async throws -> [IconRes] {
+    func getIcons(_ app: LaunchPadManagerDBHelper.AppInfo, style: IconStyle = .all) async throws -> [IconRes] {
         let appName = app.name
         let urlName = app.url.deletingPathExtension().lastPathComponent
         let bundleName = try getAppBundleName(app)
@@ -327,15 +328,15 @@ class IconManager: ObservableObject {
         
         var res = [IconRes]()
         
-        res.append(contentsOf: try await MyQueryRequestController().sendRequest(appName))
-        res.append(contentsOf: try await MyQueryRequestController().sendRequest(urlName))
+        res.append(contentsOf: try await MyQueryRequestController().sendRequest(appName, style: style))
+        res.append(contentsOf: try await MyQueryRequestController().sendRequest(urlName, style: style))
         
         if let bundleName {
-            res.append(contentsOf: try await MyQueryRequestController().sendRequest(bundleName))
+            res.append(contentsOf: try await MyQueryRequestController().sendRequest(bundleName, style: style))
         }
         
         if let aliasName {
-            res.append(contentsOf: try await MyQueryRequestController().sendRequest(aliasName))
+            res.append(contentsOf: try await MyQueryRequestController().sendRequest(aliasName, style: style))
         }
         
         return Set(res).map {
