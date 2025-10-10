@@ -3,6 +3,7 @@
 //  IconChanger
 //
 //  Created by Bengerthelorf on 2025/03/23.
+//  Modified by CantonMonkey on 2025/10/11.
 //
 
 import SwiftUI
@@ -91,6 +92,7 @@ class BackgroundService: ObservableObject {
     // Timer for scheduled checks
     private var timer: Timer?
     private var updateCheckTimer: Timer?
+    private var fetchCacheCleanupTimer: Timer?
     
     // Initialize
     private init() {
@@ -472,22 +474,35 @@ class BackgroundService: ObservableObject {
         // Invalidate existing timers
         timer?.invalidate()
         timer = nil
-        
+
         updateCheckTimer?.invalidate()
         updateCheckTimer = nil
-        
+
+        fetchCacheCleanupTimer?.invalidate()
+        fetchCacheCleanupTimer = nil
+
         // Setup scheduled restore timer if enabled
         if enableScheduledRestore {
             // Check every hour to see if it's time to restore
             timer = Timer.scheduledTimer(timeInterval: 3600, target: self, selector: #selector(checkScheduledRestore), userInfo: nil, repeats: true)
         }
-        
+
         // Setup app update check timer if enabled
         if enableAutoRestoreOnUpdate {
             // Convert minutes to seconds
             let timeInterval = Double(autoRestoreCheckInterval * 60)
             updateCheckTimer = Timer.scheduledTimer(timeInterval: timeInterval, target: self, selector: #selector(checkForAppUpdates), userInfo: nil, repeats: true)
         }
+
+        // Setup icon fetch cache cleanup timer (every 10 minutes)
+        fetchCacheCleanupTimer = Timer.scheduledTimer(
+            timeInterval: 60,  // 10 minutes = 600 seconds
+            target: self,
+            selector: #selector(cleanupFetchCache),
+            userInfo: nil,
+            repeats: true
+        )
+        print("🕐 Icon fetch cache cleanup timer started (every 10 minutes)")
     }
     
     // Get the current active restore interval in hours
@@ -676,5 +691,13 @@ class BackgroundService: ObservableObject {
         case 120: return "Every 2 Hours"
         default: return "Every \(minutes) Minutes"
         }
+    }
+
+    // MARK: - Icon Fetch Cache Cleanup
+
+    /// Clean up icon fetch cache (called every 10 minutes)
+    @objc func cleanupFetchCache() {
+        IconFetchCacheManager.shared.clearAllCache()
+        print("🧹 Periodic cleanup: Icon fetch cache cleared")
     }
 }

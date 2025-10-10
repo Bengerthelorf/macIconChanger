@@ -326,6 +326,19 @@ class IconManager: ObservableObject {
         let bundleName = try getAppBundleName(app)
         let aliasName = AliasName.getName(for: app.url.deletingPathExtension().lastPathComponent)
         
+        // Check fetch cache first
+        if let cachedIcons = IconFetchCacheManager.shared.getCachedIcons(
+            appName: appName,
+            bundleName: bundleName,
+            aliasName: aliasName,
+            style: style.rawValue
+        ) {
+            logger.log("✅ Using cached icon fetch results for \(appName)")
+            return cachedIcons
+        }
+        
+        // Cache miss - fetch from network
+        logger.log("❌ Cache miss, fetching icons from network for \(appName)")
         var res = [IconRes]()
         
         res.append(contentsOf: try await MyQueryRequestController().sendRequest(appName, style: style))
@@ -339,9 +352,18 @@ class IconManager: ObservableObject {
             res.append(contentsOf: try await MyQueryRequestController().sendRequest(aliasName, style: style))
         }
         
-        return Set(res).map {
-            $0
-        }
+        let uniqueRes = Set(res).map { $0 }
+
+        // Store in fetch cache  // will this affect the original cache mechanism for icon files?
+        IconFetchCacheManager.shared.cacheIcons(
+            uniqueRes,
+            appName: appName,
+            bundleName: bundleName,
+            aliasName: aliasName,
+            style: style.rawValue
+        )
+
+        return uniqueRes
     }
     
     func getAppBundleName(_ app: LaunchPadManagerDBHelper.AppInfo) throws -> String? {
