@@ -354,7 +354,7 @@ class IconManager: ObservableObject {
         
         let uniqueRes = Set(res).map { $0 }
 
-        // Store in fetch cache  // will this affect the original cache mechanism for icon files?
+        // Store in fetch cache
         IconFetchCacheManager.shared.cacheIcons(
             uniqueRes,
             appName: appName,

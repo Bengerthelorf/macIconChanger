@@ -479,8 +479,9 @@ class MyQueryRequestController {
                 print("⚠️ Creating hardcoded Chrome icon as a last resort")
                 if query.lowercased().contains("chrome") {
                     if let icnsUrl = URL(string: "https://macosicons.com/api/icons/chrome/download"),
-                       let lowResPngUrl = URL(string: "https://parsefiles.back4app.com/JPaQcFfEEQ1ePBxbf6wvzkPMEqKYHhPYv8boI1Rc/476887413a132607e24df29a93a4cb3f_low_res_Chrome.png") {
-                        return [IconRes(appName: "Chrome", icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: 439)]
+                       let lowResPngUrl = URL(string: "https://parsefiles.back4app.com/JPaQcFfEEQ1ePBxbf6wvzkPMEqKYHhPYv8boI1Rc/476887413a132607e24df29a93a4cb3f_low_res_Chrome.png"),
+                       let icon = IconRes(appName: "Chrome", icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: 439) {
+                        return [icon]
                     }
                 }
                 
@@ -510,7 +511,9 @@ class MyQueryRequestController {
                    let lowResPngUrl = URL(string: lowResUrlString) {
                     
                     let downloads = item["downloads"].int ?? 0
-                    results.append(IconRes(appName: name, icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: downloads))
+                    if let icon = IconRes(appName: name, icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: downloads) {
+                        results.append(icon)
+                    }
                 }
             }
         }
@@ -526,7 +529,9 @@ class MyQueryRequestController {
                    let lowResPngUrl = URL(string: lowResUrlString) {
                     
                     let downloads = item["downloads"].int ?? 0
-                    results.append(IconRes(appName: name, icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: downloads))
+                    if let icon = IconRes(appName: name, icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: downloads) {
+                        results.append(icon)
+                    }
                 }
             }
         }
@@ -542,7 +547,9 @@ class MyQueryRequestController {
                    let lowResPngUrl = URL(string: lowResUrlString) {
                     
                     let downloads = item["downloads"].int ?? 0
-                    results.append(IconRes(appName: name, icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: downloads))
+                    if let icon = IconRes(appName: name, icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: downloads) {
+                        results.append(icon)
+                    }
                 }
             }
         }

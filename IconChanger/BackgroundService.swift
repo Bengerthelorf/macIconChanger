@@ -496,7 +496,7 @@ class BackgroundService: ObservableObject {
 
         // Setup icon fetch cache cleanup timer (every 10 minutes)
         fetchCacheCleanupTimer = Timer.scheduledTimer(
-            timeInterval: 60,  // 10 minutes = 600 seconds
+            timeInterval: 600,  // 10 minutes = 600 seconds
             target: self,
             selector: #selector(cleanupFetchCache),
             userInfo: nil,
@@ -696,8 +696,15 @@ class BackgroundService: ObservableObject {
     // MARK: - Icon Fetch Cache Cleanup
 
     /// Clean up icon fetch cache (called every 10 minutes)
+    /// Only removes entries that haven't been accessed in the last 10 minutes (true LRU)
     @objc func cleanupFetchCache() {
-        IconFetchCacheManager.shared.clearAllCache()
-        print("🧹 Periodic cleanup: Icon fetch cache cleared")
+        let maxAge: TimeInterval = 600  // 10 minutes
+        let removed = IconFetchCacheManager.shared.clearExpiredCache(olderThan: maxAge)
+
+        if removed > 0 {
+            print("🧹 Periodic cleanup: Removed \(removed) expired entries (not accessed for 10+ min)")
+        } else {
+            print("🧹 Periodic cleanup: No expired entries found")
+        }
     }
 }

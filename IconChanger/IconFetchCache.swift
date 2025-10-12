@@ -17,8 +17,8 @@ struct CachedIconRes: Codable {
     let lowResPngUrl: URL
     let downloads: Int
 
-    /// Convert to IconRes
-    func toIconRes() -> IconRes {
+    /// Convert to IconRes (may return nil if validation fails)
+    func toIconRes() -> IconRes? {
         return IconRes(
             appName: appName,
             icnsUrl: icnsUrl,
@@ -43,8 +43,9 @@ struct CachedIconRes: Codable {
 /// Cache entry for icon fetch results
 struct IconFetchCacheEntry {
     let cacheKey: String
-    let icons: [CachedIconRes]
-    let timestamp: Date
+    let icons: [CachedIconRes]    // non-failable init, change it to failable for error handling 
+    let timestamp: Date           // Creation time (for debugging/statistics)
+    var lastAccessTime: Date      // Last access time (for LRU eviction)
 }
 
 // MARK: - Icon Fetch Cache Manager
@@ -72,7 +73,7 @@ class IconFetchCacheManager {
     // MARK: - Initialization
 
     private init() {
-        print("📦 IconFetchCacheManager initialized")
+//        print("📦 IconFetchCacheManager initialized")
     }
 
     // MARK: - Cache Key Generation
@@ -114,18 +115,33 @@ class IconFetchCacheManager {
             style: style
         )
 
-        guard let entry = cache[key] else {
+        guard var entry = cache[key] else {
             missCount += 1
-            print("❌ IconFetchCache MISS: \(key)")
+//            print("❌ IconFetchCache MISS: \(key)")
             return nil
         }
 
         hitCount += 1
-        let age = Date().timeIntervalSince(entry.timestamp)
-        print("✅ IconFetchCache HIT: \(key) (age: \(String(format: "%.1f", age))s, \(entry.icons.count) icons)")
 
-        // Convert cached icons back to IconRes
-        return entry.icons.map { $0.toIconRes() }
+        // Update last access time (LRU)
+        let now = Date()
+        entry.lastAccessTime = now
+        cache[key] = entry
+
+        let age = now.timeIntervalSince(entry.timestamp)
+        let timeSinceAccess = now.timeIntervalSince(entry.lastAccessTime)
+//        print("✅ IconFetchCache HIT: \(key) (created: \(String(format: "%.1f", age))s ago, last accessed: \(String(format: "%.1f", timeSinceAccess))s ago, \(entry.icons.count) icons)")
+
+        // Convert cached icons back to IconRes, filtering out any that fail validation
+        let validIcons = entry.icons.compactMap { $0.toIconRes() }
+
+        // If all icons failed validation, log a warning
+        if validIcons.isEmpty && !entry.icons.isEmpty {
+            print("⚠️ All cached icons failed validation for \(key)")
+            return nil
+        }
+
+        return validIcons
     }
 
     /// Cache icon fetch results
@@ -148,10 +164,12 @@ class IconFetchCacheManager {
 
         let cachedIcons = icons.map { CachedIconRes.from($0) }
 
+        let now = Date()
         let entry = IconFetchCacheEntry(
             cacheKey: key,
             icons: cachedIcons,
-            timestamp: Date()
+            timestamp: now,
+            lastAccessTime: now
         )
 
         // Check if we need to evict old entries
@@ -160,18 +178,18 @@ class IconFetchCacheManager {
         }
 
         cache[key] = entry
-        print("💾 IconFetchCache STORED: \(key) (\(icons.count) icons, total: \(cache.count))")
+//        print("💾 IconFetchCache STORED: \(key) (\(icons.count) icons, total: \(cache.count))")
     }
 
-    /// Evict the oldest cache entry (by timestamp)
+    /// Evict the least recently used cache entry (by lastAccessTime)
     private func evictOldestEntry() {
-        guard let oldestKey = cache.min(by: { $0.value.timestamp < $1.value.timestamp })?.key else {
+        guard let lruKey = cache.min(by: { $0.value.lastAccessTime < $1.value.lastAccessTime })?.key else {
             return
         }
 
-        cache.removeValue(forKey: oldestKey)
+        cache.removeValue(forKey: lruKey)
         evictionCount += 1
-        print("🗑️ IconFetchCache EVICTED: \(oldestKey) (count: \(cache.count))")
+//        print("🗑️ IconFetchCache EVICTED (LRU): \(lruKey) (count: \(cache.count))")
     }
 
     /// Clear all cache entries
@@ -186,8 +204,31 @@ class IconFetchCacheManager {
         evictionCount = 0
 
         if count > 0 {
-            print("🧹 IconFetchCache CLEARED: Removed \(count) entries")
+//            print("🧹 IconFetchCache CLEARED: Removed \(count) entries")
         }
+    }
+
+    /// Clear cache entries that haven't been accessed for longer than maxAge
+    /// This implements true LRU behavior by checking lastAccessTime
+    func clearExpiredCache(olderThan maxAge: TimeInterval) -> Int {
+        cacheLock.lock()
+        defer { cacheLock.unlock() }
+
+        let now = Date()
+        let expiredKeys = cache.filter { entry in
+            // Check time since last access (not creation)
+            now.timeIntervalSince(entry.value.lastAccessTime) > maxAge
+        }.map { $0.key }
+
+        for key in expiredKeys {
+            cache.removeValue(forKey: key)
+        }
+
+        if !expiredKeys.isEmpty {
+//            print("🧹 IconFetchCache EXPIRED: Removed \(expiredKeys.count) entries not accessed for \(String(format: "%.0f", maxAge))s (total: \(cache.count) remain)")
+        }
+
+        return expiredKeys.count
     }
 
     // MARK: - Cache Statistics
@@ -213,13 +254,13 @@ class IconFetchCacheManager {
     /// Print cache statistics
     func printStatistics() {
         let stats = getStatistics()
-        print("""
-        📊 IconFetchCache Statistics:
-           - Cache Hits: \(stats.hits)
-           - Cache Misses: \(stats.misses)
-           - Hit Rate: \(String(format: "%.1f%%", stats.hitRate * 100))
-           - Cached Entries: \(stats.total) / \(maxCacheEntries)
-           - Evictions: \(stats.evictions)
-        """)
+//        print("""
+//        📊 IconFetchCache Statistics:
+//           - Cache Hits: \(stats.hits)
+//           - Cache Misses: \(stats.misses)
+//           - Hit Rate: \(String(format: "%.1f%%", stats.hitRate * 100))
+//           - Cached Entries: \(stats.total) / \(maxCacheEntries)
+//           - Evictions: \(stats.evictions)
+//        """)
     }
 }
