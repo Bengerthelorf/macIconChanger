@@ -131,26 +131,16 @@ struct IconList: View {
                         } label: {
                             Image(systemName: "ellipsis.circle")
                         }
+                        .buttonStyle(.plain)
                     }
 
                     ToolbarItem(placement: .automatic) {
-                        Button {
-                            iconManager.refresh()
-                        } label: {
-                            Image(systemName: "goforward")
-                        }
-                    }
-//                     Add a new toolbar item to show cache count (optional)
-                    ToolbarItem(placement: .automatic) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "archivebox")
-                                .font(.system(size: 12))
-                            Text("\(IconCacheManager.shared.getCachedIconsCount())")
-                                .font(.caption)
-                        }
-                        .padding(5)
-                        .background(Color.secondary.opacity(0.2))
-                        .cornerRadius(5)
+                        RefreshCacheToolbarButton(
+                            cachedCount: IconCacheManager.shared.getCachedIconsCount(),
+                            action: {
+                                iconManager.refresh()
+                            }
+                        )
                     }
                 }
     }
@@ -169,6 +159,44 @@ struct IconView: View {
             Text(app.name)
                     .frame(maxWidth: .infinity, alignment: .leading)
         }
+    }
+}
+
+
+struct RefreshCacheToolbarButton: View {
+    let cachedCount: Int
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(alignment: .center, spacing: 8) {
+                Image(systemName: "goforward")
+                    .font(.system(size: 13, weight: .semibold))
+                    .frame(width: 18, height: 18, alignment: .center)
+
+                Rectangle()
+                    .fill(Color.primary.opacity(0.2))
+                    .frame(width: 1)
+                    .frame(maxHeight: 18)
+                    .padding(.vertical, 3)
+
+                HStack(alignment: .center, spacing: 4) {
+                    Image(systemName: "archivebox")
+                        .font(.system(size: 12))
+                        .frame(width: 14, height: 14, alignment: .center)
+                    Text("\(cachedCount)")
+                        .font(.system(size: 12, weight: .medium))
+                        .monospacedDigit()
+                }
+            }
+            .frame(height: 24, alignment: .center)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+        }
+        .buttonStyle(.plain)
+        .contentShape(Capsule(style: .continuous))
+        .controlSize(.small)
+        .help("Refresh the application list and show cached icon count")
     }
 }
 
