@@ -20,6 +20,8 @@
 		2FC131892D8FB34F00F60B19 /* BackgroundSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FC131882D8FB34F00F60B19 /* BackgroundSettingsView.swift */; };
 		2FC1318B2D8FB37B00F60B19 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FC1318A2D8FB37B00F60B19 /* AppDelegate.swift */; };
 		2FC1318D2D8FB5CB00F60B19 /* BackgroundService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FC1318C2D8FB5CA00F60B19 /* BackgroundService.swift */; };
+		436C564F2E99990F00756BC7 /* IconFetchCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436C564E2E99990F00756BC7 /* IconFetchCache.swift */; };
+		43AC17352E991DBA0093962C /* IconStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43AC17342E991DBA0093962C /* IconStyle.swift */; };
 		684311E1DAA0EE528A75D6B4 /* SetAliasNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684312DDF57DD3F7FD140291 /* SetAliasNameView.swift */; };
 		684312FB180B32D3350C6687 /* ImageViewCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68431B5BF95B69F7A3E9C314 /* ImageViewCore.swift */; };
 		684313DDC8758B6A23980300 /* PermissionRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6843168B503282547D31EC35 /* PermissionRequest.swift */; };
@@ -102,6 +104,8 @@
 		2FC1318A2D8FB37B00F60B19 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2FC1318C2D8FB5CA00F60B19 /* BackgroundService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundService.swift; sourceTree = "<group>"; };
 		2FF217A62D8CEAFF00AE478C /* IconChanger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IconChanger.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		436C564E2E99990F00756BC7 /* IconFetchCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconFetchCache.swift; sourceTree = "<group>"; };
+		43AC17342E991DBA0093962C /* IconStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconStyle.swift; sourceTree = "<group>"; };
 		6843102ECDF4DE9417AD9634 /* LocalImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalImageView.swift; sourceTree = "<group>"; };
 		684310CF2CFC89861988FEC0 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = file.gitignore; path = .gitignore; sourceTree = "<group>"; };
 		684311E6ADA4C380BC5296B0 /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -232,6 +236,7 @@
 		900D1CE7281934C7007ABB12 /* IconChanger */ = {
 			isa = PBXGroup;
 			children = (
+				43AC17342E991DBA0093962C /* IconStyle.swift */,
 				2F13C0782D932A8100C645E9 /* CLI */,
 				2F4A9A192D9253CF00F4FA81 /* Config */,
 				9053434E286B2A6800237F98 /* AutoUpdater.swift */,
@@ -263,6 +268,7 @@
 				6843168B503282547D31EC35 /* PermissionRequest.swift */,
 				68431606A6C8EB7BCAA21DD2 /* SettingsView */,
 				2FC131612D8F7DB000F60B19 /* IconCache.swift */,
+				436C564E2E99990F00756BC7 /* IconFetchCache.swift */,
 				2F13C07F2D932CFC00C645E9 /* ConfigManager+CLI.swift */,
 			);
 			path = IconChanger;
@@ -431,6 +437,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				90B57C1B286AA2B400EE52D3 /* URL+Document.swift in Sources */,
+				43AC17352E991DBA0093962C /* IconStyle.swift in Sources */,
 				9083CCEE28680BE20093A1B2 /* URL+Universal.swift in Sources */,
 				90B57C1D286AA2F800EE52D3 /* Config.swift in Sources */,
 				900D1CEB281934C7007ABB12 /* ContentView.swift in Sources */,
@@ -460,6 +467,7 @@
 				684319A985908FD7F396A2B9 /* SettingsView.swift in Sources */,
 				68431C42D3D73EB33CD18CD3 /* GeneralSettingsView.swift in Sources */,
 				2FC1318D2D8FB5CB00F60B19 /* BackgroundService.swift in Sources */,
+				436C564F2E99990F00756BC7 /* IconFetchCache.swift in Sources */,
 				68431D85DB8E44D55E7421B7 /* ApplicationAliasSettingsView.swift in Sources */,
 				684319BAF8AE3F8E503A8FCD /* ApplicationSettingsView.swift in Sources */,
 				68431AECAF55382A0674F142 /* APISettingsView.swift in Sources */,
@@ -651,7 +659,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = IconChanger/IconChanger.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 113;
@@ -685,7 +692,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = IconChanger/IconChanger.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 113;

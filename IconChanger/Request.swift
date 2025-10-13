@@ -5,6 +5,7 @@
 //  Created by 朱浩宇 on 2022/4/28.
 //  Modified by seril on 2023/7/25.
 //  Modified by Bengerthelorf on 2025/3/21.
+//  Modified by CantonMonkey on 2025/10/10.
 //
 
 import Foundation
@@ -138,18 +139,18 @@ class MyRequestController {
 }
 
 class MyQueryRequestController {
-    func sendRequest(_ query: String) async throws -> [IconRes] {
-        let results = try await sendRequestToMeilisearch(query)
+    func sendRequest(_ query: String, style: IconStyle = .all) async throws -> [IconRes] {
+        let results = try await sendRequestToMeilisearch(query, style: style)
         
         if results.isEmpty {
             print("⚠️ Meilisearch API returned no results, trying backup method...")
-            return try await sendBackupRequest(query)
+            return try await sendBackupRequest(query, style: style)
         }
         
         return results
     }
     
-    private func sendRequestToMeilisearch(_ query: String) async throws -> [IconRes] {
+    private func sendRequestToMeilisearch(_ query: String, style: IconStyle) async throws -> [IconRes] {
         /* Configure session, choose between:
          * defaultSessionConfiguration
          * ephemeralSessionConfiguration
@@ -158,7 +159,7 @@ class MyQueryRequestController {
          HTTPCookieAcceptPolicy, requestCachePolicy or timeoutIntervalForRequest.
          */
         let query = qeuryMix(query)
-        print("🔍 Searching for icons with query: \(query)")
+        print("🔍 Searching for icons with query: \(query), style: \(style.displayName)")
 
         let sessionConfig = URLSessionConfiguration.default
         // Increase timeout interval
@@ -198,13 +199,19 @@ class MyQueryRequestController {
         request.addValue("application/json", forHTTPHeaderField: "Accept")
 
         // Form JSON Body
+        var filters: [String] = []
+        if let styleFilter = style.filterQuery {
+            filters.append(styleFilter)
+            print("🎨 Applying style filter: \(styleFilter)")
+        }
+
         let bodyObject: [String : Any] = [
             "query": query,
             "searchOptions": [
                 "hitsPerPage": 100,
                 "page": 1,
                 "offset": 0,
-                "filters": [],
+                "filters": filters,
                 "sort": ["timeStamp:desc", "category:asc"]
             ]
         ]
@@ -385,9 +392,9 @@ class MyQueryRequestController {
     }
     
     // Backup method using a different approach to search the site
-    private func sendBackupRequest(_ query: String) async throws -> [IconRes] {
+    private func sendBackupRequest(_ query: String, style: IconStyle) async throws -> [IconRes] {
         let query = qeuryMix(query)
-        print("🔍 Attempting backup search for: \(query)")
+        print("🔍 Attempting backup search for: \(query), style: \(style.displayName)")
         
         let sessionConfig = URLSessionConfiguration.default
         sessionConfig.timeoutIntervalForRequest = 30.0
@@ -472,8 +479,9 @@ class MyQueryRequestController {
                 print("⚠️ Creating hardcoded Chrome icon as a last resort")
                 if query.lowercased().contains("chrome") {
                     if let icnsUrl = URL(string: "https://macosicons.com/api/icons/chrome/download"),
-                       let lowResPngUrl = URL(string: "https://parsefiles.back4app.com/JPaQcFfEEQ1ePBxbf6wvzkPMEqKYHhPYv8boI1Rc/476887413a132607e24df29a93a4cb3f_low_res_Chrome.png") {
-                        return [IconRes(appName: "Chrome", icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: 439)]
+                       let lowResPngUrl = URL(string: "https://parsefiles.back4app.com/JPaQcFfEEQ1ePBxbf6wvzkPMEqKYHhPYv8boI1Rc/476887413a132607e24df29a93a4cb3f_low_res_Chrome.png"),
+                       let icon = IconRes(appName: "Chrome", icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: 439) {
+                        return [icon]
                     }
                 }
                 
@@ -503,7 +511,9 @@ class MyQueryRequestController {
                    let lowResPngUrl = URL(string: lowResUrlString) {
                     
                     let downloads = item["downloads"].int ?? 0
-                    results.append(IconRes(appName: name, icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: downloads))
+                    if let icon = IconRes(appName: name, icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: downloads) {
+                        results.append(icon)
+                    }
                 }
             }
         }
@@ -519,7 +529,9 @@ class MyQueryRequestController {
                    let lowResPngUrl = URL(string: lowResUrlString) {
                     
                     let downloads = item["downloads"].int ?? 0
-                    results.append(IconRes(appName: name, icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: downloads))
+                    if let icon = IconRes(appName: name, icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: downloads) {
+                        results.append(icon)
+                    }
                 }
             }
         }
@@ -535,7 +547,9 @@ class MyQueryRequestController {
                    let lowResPngUrl = URL(string: lowResUrlString) {
                     
                     let downloads = item["downloads"].int ?? 0
-                    results.append(IconRes(appName: name, icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: downloads))
+                    if let icon = IconRes(appName: name, icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: downloads) {
+                        results.append(icon)
+                    }
                 }
             }
         }

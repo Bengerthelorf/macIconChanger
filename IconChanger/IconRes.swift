@@ -22,7 +22,30 @@ class IconRes: Identifiable, Hashable {
         return lowResPngUrl.absoluteString
     }
     
-    init(appName: String, icnsUrl: URL, lowResPngUrl: URL, downloads: Int) {
+    init?(appName: String, icnsUrl: URL, lowResPngUrl: URL, downloads: Int) {
+        // Validate that appName is not empty
+        guard !appName.isEmpty else {
+            print("⚠️ IconRes init failed: appName is empty")
+            return nil
+        }
+
+        // Validate that URLs have valid schemes
+        guard icnsUrl.scheme == "https" || icnsUrl.scheme == "http" else {
+            print("⚠️ IconRes init failed: icnsUrl has invalid scheme: \(icnsUrl.scheme ?? "nil")")
+            return nil
+        }
+
+        guard lowResPngUrl.scheme == "https" || lowResPngUrl.scheme == "http" else {
+            print("⚠️ IconRes init failed: lowResPngUrl has invalid scheme: \(lowResPngUrl.scheme ?? "nil")")
+            return nil
+        }
+
+        // Validate that downloads is non-negative
+        guard downloads >= 0 else {
+            print("⚠️ IconRes init failed: downloads is negative: \(downloads)")
+            return nil
+        }
+
         self.appName = appName
         self.icnsUrl = icnsUrl
         self.lowResPngUrl = lowResPngUrl
