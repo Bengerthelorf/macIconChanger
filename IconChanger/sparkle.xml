@@ -4,6 +4,47 @@
     <channel>
         <title>IconChanger</title>
         <item>
+            <title>Version 1.1.4</title>
+            <link>https://github.com/Bengerthelorf/macIconChanger</link>
+            <sparkle:version>114</sparkle:version>
+            <sparkle:shortVersionString>1.1.4</sparkle:shortVersionString>
+            <pubDate>Mon, 14 Oct 2025 20:00 +0800</pubDate>
+            <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.1.4/IconChanger.dmg"
+            sparkle:edSignature="SIGNATURE_TO_BE_GENERATED" length="0"
+            type="application/octet-stream"/>
+            <description>
+                <![CDATA[
+                <h2>🎨 Version 1.1.4 - Icon Style Filtering & Smart Caching</h2>
+                <p>New features for better icon browsing and improved performance!</p>
+                <p><strong>Special thanks to <a href="https://github.com/CantonMonkey">@CantonMonkey</a> for contributing this release!</strong></p>
+                <h3>✨ New Features</h3>
+                <ul>
+                    <li><strong>🎭 Icon Style Filtering:</strong> Browse icons by style - now with Liquid Glass support!</li>
+                    <li> - Select icon styles from a dropdown menu while browsing</li>
+                    <li> - Extensible design for future style additions (Classic, Minimal, Colorful coming soon)</li>
+                    <li><strong>⚡ Smart LRU Cache System:</strong> Intelligent caching for faster icon loading</li>
+                    <li> - Automatically caches icon search results for 10 minutes</li>
+                    <li> - LRU (Least Recently Used) eviction when cache is full</li>
+                    <li> - Thread-safe with up to 500 cached entries</li>
+                    <li> - Automatic cleanup every 10 minutes</li>
+                </ul>
+                <h3>🔧 Improvements</h3>
+                <ul>
+                    <li><strong>Enhanced Validation:</strong> Better error handling for icon data</li>
+                    <li><strong>Improved Performance:</strong> Reduced network requests with smart caching</li>
+                    <li><strong>Code Quality:</strong> Refactored icon initialization with validation</li>
+                </ul>
+                <h3>🐛 Bug Fixes</h3>
+                <ul>
+                    <li>Fixed cache cleanup strategy to properly implement LRU behavior</li>
+                    <li>Fixed timer interval for cache cleanup (now correctly 10 minutes)</li>
+                    <li>Added proper nil handling for invalid icon data</li>
+                </ul>
+                <p><em>Tip: Try the new style filter when browsing icons - it makes finding the perfect icon style much easier!</em></p>
+                ]]>
+            </description>
+        </item>
+        <item>
             <title>Version 1.1.3</title>
             <link>https://github.com/Bengerthelorf/macIconChanger</link>
             <sparkle:version>113</sparkle:version>
