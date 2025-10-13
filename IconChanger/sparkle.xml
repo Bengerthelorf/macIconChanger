@@ -4,13 +4,29 @@
     <channel>
         <title>IconChanger</title>
         <item>
+            <title>Version 1.1.5</title>
+            <link>https://github.com/Bengerthelorf/macIconChanger</link>
+            <sparkle:version>115</sparkle:version>
+            <sparkle:shortVersionString>1.1.4</sparkle:shortVersionString>
+            <pubDate>Mon, 14 Oct 2025 20:00 +0800</pubDate>
+            <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.1.5/IconChanger.dmg"
+            sparkle:edSignature="MMrrOS0dfmEAZtIH0NiFuzj7MKvS5zA2/KWt+W4cmHoup3ytsfNUa8VVTDNf+0RfzuJ0ju0ycv6RBLoUiQDVBw==" length="13563457"
+            type="application/octet-stream"/>
+            <description>
+                <![CDATA[
+                <h2>Version 1.1.5 - fix</h2>
+                <p>fix: macOS 26 IconList page button display issue.</p>
+                ]]>
+            </description>
+        </item>
+        <item>
             <title>Version 1.1.4</title>
             <link>https://github.com/Bengerthelorf/macIconChanger</link>
             <sparkle:version>114</sparkle:version>
             <sparkle:shortVersionString>1.1.4</sparkle:shortVersionString>
             <pubDate>Mon, 14 Oct 2025 20:00 +0800</pubDate>
             <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.1.4/IconChanger.dmg"
-            sparkle:edSignature="SIGNATURE_TO_BE_GENERATED" length="0"
+            sparkle:edSignature="forgeted LOL" length="0"
             type="application/octet-stream"/>
             <description>
                 <![CDATA[
