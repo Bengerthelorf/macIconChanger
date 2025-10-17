@@ -4,10 +4,30 @@
     <channel>
         <title>IconChanger</title>
         <item>
+            <title>Version 1.1.6</title>
+            <link>https://github.com/Bengerthelorf/macIconChanger</link>
+            <sparkle:version>116</sparkle:version>
+            <sparkle:shortVersionString>1.1.6</sparkle:shortVersionString>
+            <pubDate>Mon, 17 Oct 2025 17:00 +0800</pubDate>
+            <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.1.6/IconChanger.dmg"
+            sparkle:edSignature="f2W3od1sgnvpnfNGOCVStfnl9pzWN6TmD2GET1ZotPYXjFzVT7rTtiNkVIFobNyiJr9nKH+KUVLscD9lFH19Aw==" length="13594174"
+            type="application/octet-stream"/>
+            <description>
+                <![CDATA[
+                    <h2>Version 1.1.6 – Background Reliability & Icon Refresh</h2>
+                    <ul>
+                        <li>Reworked background scheduling with dispatch timers for more reliable auto-restore and cache cleanup.</li>
+                        <li>Added a toolbar refresh button and automatic triggers so the icon list stays in sync after changes.</li>
+                        <li>Actor-ified the shared image loader and switched to structured logging for faster, safer icon downloads.</li>
+                    </ul>
+                ]]>
+            </description>
+        </item>
+        <item>
             <title>Version 1.1.5</title>
             <link>https://github.com/Bengerthelorf/macIconChanger</link>
             <sparkle:version>115</sparkle:version>
-            <sparkle:shortVersionString>1.1.4</sparkle:shortVersionString>
+            <sparkle:shortVersionString>1.1.5</sparkle:shortVersionString>
             <pubDate>Mon, 14 Oct 2025 20:00 +0800</pubDate>
             <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.1.5/IconChanger.dmg"
             sparkle:edSignature="MMrrOS0dfmEAZtIH0NiFuzj7MKvS5zA2/KWt+W4cmHoup3ytsfNUa8VVTDNf+0RfzuJ0ju0ycv6RBLoUiQDVBw==" length="13563457"
