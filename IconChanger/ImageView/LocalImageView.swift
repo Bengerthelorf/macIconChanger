@@ -19,19 +19,16 @@ struct LocalImageView: View {
 
     var body: some View {
         ImageViewCore(nsimage: $nsimage, setPath: setPath, isLoading: $isLoading)
-            .task {
+            .task(id: url) {
                 do {
                     isLoading = true
-                    // Create strong local reference
                     let localUrl = url
-                    
-                    // Load the image
-                    let image = try await MyRequestController().sendRequest(localUrl)
-                    
-                    // Update UI on the main thread
+
+                    let image = try await IconImageLoader.shared.image(for: localUrl)
+
                     await MainActor.run {
                         nsimage = image
-                        isLoading = image == nil
+                        isLoading = false
                     }
                 } catch {
                     await MainActor.run {

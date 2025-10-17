@@ -20,19 +20,16 @@ struct ImageView: View {
 
     var body: some View {
         ImageViewCore(nsimage: $preview, setPath: setPath, isLoading: $isLoading)
-            .task {
+            .task(id: icon.id) {
                 do {
                     isLoading = true
-                    // Create strong local references
                     let iconUrl = icon.lowResPngUrl
-                    
-                    // Load the image
-                    let image = try await MyRequestController().sendRequest(iconUrl)
-                    
-                    // Update UI on the main thread
+
+                    let image = try await IconImageLoader.shared.image(for: iconUrl)
+
                     await MainActor.run {
                         preview = image
-                        isLoading = image == nil
+                        isLoading = false
                         onStatusUpdate?(image != nil)
                     }
                 } catch {
@@ -45,4 +42,3 @@ struct ImageView: View {
             }
     }
 }
-

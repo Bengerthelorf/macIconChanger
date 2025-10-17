@@ -14,131 +14,35 @@ import SwiftyJSON
 
 class MyRequestController {
     @Sendable
-    func sendRequest(_ URL: URL) async throws -> NSImage? {
-        /* Configure session, choose between:
-         * defaultSessionConfiguration
-         * ephemeralSessionConfiguration
-         * backgroundSessionConfigurationWithIdentifier:
-         And set session-wide properties, such as: HTTPAdditionalHeaders,
-         HTTPCookieAcceptPolicy, requestCachePolicy or timeoutIntervalForRequest.
-         */
-        print("🖼️ Requesting icon from: \(URL.absoluteString)")
-        
-        if URL.isFileURL {
-            print("📁 Loading icon from local file")
-            // Create and return NSImage on the main thread
-            return await MainActor.run {
-                let image = NSImage(byReferencing: URL)
-                if image.isValid {
-                    print("✅ Successfully loaded local icon")
-                    return NSImage(data: image.tiffRepresentation ?? Data()) ?? image  // Create a new NSImage to ensure it's valid for memory safety
-                } else {
-                    print("❌ Failed to load local icon from \(URL.path)")
-                    return nil
-                }
-            }
-        }
-
-        let sessionConfig = URLSessionConfiguration.default
-        // Increase timeout interval
-        sessionConfig.timeoutIntervalForRequest = 30.0
-        sessionConfig.timeoutIntervalForResource = 60.0
-
-        /* Create session, and optionally set a URLSessionDelegate. */
-        let session = URLSession(configuration: sessionConfig, delegate: nil, delegateQueue: nil)
-
-        /* Create the Request:
-         Request (16) (GET https://media.macosicons.com/parse/files/macOSicons/acb24773e8384e032faf6b07704796d3_Spark_icon.icns)
-         */
-
-        var request = URLRequest(url: URL)
-        request.httpMethod = "GET"
-
-        // Headers
-        request.addValue("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", forHTTPHeaderField: "Accept")
-        request.addValue("en-US,en;q=0.9", forHTTPHeaderField: "Accept-Language")
-        request.addValue("keep-alive", forHTTPHeaderField: "Connection")
-        request.addValue("gzip, deflate, br", forHTTPHeaderField: "Accept-Encoding")
-        request.addValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5.1 Safari/605.1.15", forHTTPHeaderField: "User-Agent")
-        request.addValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
-
-        // For debug purposes, print all request headers
-        print("📋 Icon request headers:")
-        request.allHTTPHeaderFields?.forEach { key, value in
-            print("  \(key): \(value)")
-        }
-
-        /* Start a new Task */
-        do {
-            print("🚀 Starting download for icon")
-            let (data, response) = try await session.data(for: request)
-            
-            guard let httpResponse = response as? HTTPURLResponse else {
-                print("❌ Invalid response type, not HTTPURLResponse")
-                return nil
-            }
-            
-            print("📥 Icon response status code: \(httpResponse.statusCode)")
-            print("📥 Icon response content type: \(httpResponse.allHeaderFields["Content-Type"] ?? "unknown")")
-            print("📥 Icon response data size: \(ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .file))")
-            
-            if httpResponse.statusCode != 200 {
-                // Try to print response body to get error details
-                if let errorStr = String(data: data, encoding: .utf8) {
-                    print("❌ Error response for icon: \(errorStr)")
-                }
-                return nil
-            }
-            
-            if data.isEmpty {
-                print("⚠️ Received empty data for icon")
-                return nil
-            }
-            
-            // Create and return NSImage on the main thread
-            return await MainActor.run {
-                if let image = NSImage(data: data) {
-                    print("✅ Successfully created NSImage from data (size: \(image.size.width) x \(image.size.height))")
-                    return NSImage(data: image.tiffRepresentation ?? Data()) ?? image  // Create a new NSImage to ensure it's valid for memory safety
-                } else {
-                    print("❌ Failed to create NSImage from data")
-                    
-                    // Try to figure out what type of data we received
-                    let firstBytes = data.prefix(min(4, data.count))
-                    let hexString = firstBytes.map { String(format: "%02x", $0) }.joined()
-                    print("⚠️ First bytes of received data: \(hexString)")
-                    
-                    // Check common image file signatures
-                    if hexString.hasPrefix("89504e47") {
-                        print("📄 Data appears to be a PNG file")
-                    } else if hexString.hasPrefix("ffd8ff") {
-                        print("📄 Data appears to be a JPEG file")
-                    } else if hexString.hasPrefix("47494638") {
-                        print("📄 Data appears to be a GIF file")
-                    } else if hexString.hasPrefix("4949") || hexString.hasPrefix("4d4d") {
-                        print("📄 Data appears to be a TIFF file")
-                    } else {
-                        print("❓ Unable to determine data format from signature")
-                    }
-                    
-                    return nil
-                }
-            }
-        } catch {
-            print("❌ Error downloading icon: \(error.localizedDescription)")
-            // If we can cast to NSError, provide more details
-            if let nsError = error as NSError? {
-                print("  Domain: \(nsError.domain)")
-                print("  Code: \(nsError.code)")
-                print("  Description: \(nsError.localizedDescription)")
-                print("  User info: \(nsError.userInfo)")
-            }
-            return nil
-        }
+    func sendRequest(_ url: URL) async throws -> NSImage? {
+        try await IconImageLoader.shared.image(for: url)
     }
 }
 
 class MyQueryRequestController {
+    static let shared = MyQueryRequestController()
+
+    private let session: URLSession
+
+    init(session: URLSession = MyQueryRequestController.makeSession()) {
+        self.session = session
+    }
+
+    private static func makeSession() -> URLSession {
+        let configuration = URLSessionConfiguration.default
+        configuration.timeoutIntervalForRequest = 20.0
+        configuration.timeoutIntervalForResource = 45.0
+        configuration.httpMaximumConnectionsPerHost = 4
+        configuration.requestCachePolicy = .reloadRevalidatingCacheData
+        configuration.urlCache = URLCache(
+            memoryCapacity: 20 * 1024 * 1024,
+            diskCapacity: 80 * 1024 * 1024,
+            diskPath: "IconQueryCache"
+        )
+        configuration.httpShouldUsePipelining = true
+        return URLSession(configuration: configuration)
+    }
+
     func sendRequest(_ query: String, style: IconStyle = .all) async throws -> [IconRes] {
         let results = try await sendRequestToMeilisearch(query, style: style)
         
@@ -161,13 +65,7 @@ class MyQueryRequestController {
         let query = qeuryMix(query)
         print("🔍 Searching for icons with query: \(query), style: \(style.displayName)")
 
-        let sessionConfig = URLSessionConfiguration.default
-        // Increase timeout interval
-        sessionConfig.timeoutIntervalForRequest = 30.0
-        sessionConfig.timeoutIntervalForResource = 60.0
-
-        /* Create session, and optionally set a URLSessionDelegate. */
-        let session = URLSession(configuration: sessionConfig, delegate: nil, delegateQueue: nil)
+        let session = self.session
 
         /* Create the Request:
          Request (POST https://api.macosicons.com/api/search)
@@ -316,10 +214,7 @@ class MyQueryRequestController {
         let testQuery = "test_api_connection"
         print("🔍 Testing API connection with query: \(testQuery)")
 
-        let sessionConfig = URLSessionConfiguration.default
-        sessionConfig.timeoutIntervalForRequest = 15.0
-        
-        let session = URLSession(configuration: sessionConfig)
+        let session = self.session
         
         // Use the primary Meilisearch endpoint
         let urlString = "https://api.macosicons.com/api/search"
@@ -396,11 +291,7 @@ class MyQueryRequestController {
         let query = qeuryMix(query)
         print("🔍 Attempting backup search for: \(query), style: \(style.displayName)")
         
-        let sessionConfig = URLSessionConfiguration.default
-        sessionConfig.timeoutIntervalForRequest = 30.0
-        sessionConfig.timeoutIntervalForResource = 60.0
-        
-        let session = URLSession(configuration: sessionConfig)
+        let session = self.session
         
         // Modified to attempt direct access to other endpoints of the API
         let urlString = "https://api.macosicons.com/api/icons?q=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query)&limit=100"
@@ -602,4 +493,3 @@ extension URL {
         return URL(string: URLString)!
     }
 }
-

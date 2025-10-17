@@ -339,20 +339,41 @@ class IconManager: ObservableObject {
         
         // Cache miss - fetch from network
         logger.log("❌ Cache miss, fetching icons from network for \(appName)")
-        var res = [IconRes]()
-        
-        res.append(contentsOf: try await MyQueryRequestController().sendRequest(appName, style: style))
-        res.append(contentsOf: try await MyQueryRequestController().sendRequest(urlName, style: style))
-        
-        if let bundleName {
-            res.append(contentsOf: try await MyQueryRequestController().sendRequest(bundleName, style: style))
+
+        let queryController = MyQueryRequestController.shared
+        var orderedQueries: [String] = []
+        var seenQueries = Set<String>()
+
+        func appendQuery(_ value: String?) {
+            guard let value = value, !value.isEmpty else { return }
+            if seenQueries.insert(value).inserted {
+                orderedQueries.append(value)
+            }
         }
-        
-        if let aliasName {
-            res.append(contentsOf: try await MyQueryRequestController().sendRequest(aliasName, style: style))
+
+        appendQuery(appName)
+        appendQuery(urlName)
+        appendQuery(bundleName)
+        appendQuery(aliasName)
+
+        let fetchedIcons: [IconRes] = try await withThrowingTaskGroup(of: [IconRes].self) { group in
+            for query in orderedQueries {
+                group.addTask {
+                    try Task.checkCancellation()
+                    return try await queryController.sendRequest(query, style: style)
+                }
+            }
+
+            var aggregated: [IconRes] = []
+            for try await icons in group {
+                aggregated.append(contentsOf: icons)
+            }
+            return aggregated
         }
-        
-        let uniqueRes = Set(res).map { $0 }
+
+        let uniqueRes = Set(fetchedIcons).map { $0 }.sorted { first, second in
+            first.downloads > second.downloads
+        }
 
         // Store in fetch cache
         IconFetchCacheManager.shared.cacheIcons(

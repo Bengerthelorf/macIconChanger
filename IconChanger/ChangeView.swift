@@ -36,10 +36,13 @@ struct ChangeView: View {
 
     // icon style selector
     @State var selectedStyle: IconStyle = .all
+    @State private var loadIconsTask: Task<Void, Never>? = nil
+    @State private var currentLoadToken = UUID()
 
     var body: some View {
         GeometryReader { geometry in
-            let numberOfColumns = Int((geometry.size.width - 2 * minGridSpacing) / (imageSize + minGridSpacing))
+            let computedColumns = Int((geometry.size.width - 2 * minGridSpacing) / (imageSize + minGridSpacing))
+            let numberOfColumns = max(1, computedColumns)
             let columns = Array(repeating: GridItem(.fixed(imageSize), spacing: minGridSpacing), count: numberOfColumns)
 
             ScrollView() {
@@ -91,7 +94,7 @@ struct ChangeView: View {
                         }
                         .pickerStyle(.menu)
                         .onChange(of: selectedStyle) { _ in
-                            loadIcons()
+                            triggerIconFetch()
                         }
                         
                         if !isLoadingIcons && successIconsCount > 0 {
@@ -164,27 +167,70 @@ struct ChangeView: View {
                     inIcons = iconManager.getIconInPath(setPath.url)
                 }
                 .task {
-                    loadIcons()
+                    triggerIconFetch()
                 }
                 .sheet(item: $setAlias) {
                     SetAliasNameView(raw: $0, lastText: AliasName.getName(for: $0) ?? "")
                 }
+                .onDisappear {
+                    loadIconsTask?.cancel()
+                }
 //                .navigationTitle(setPath.name)
     }
     
-    // Function to load icons with selected style
-    private func loadIcons() {
-        Task {
-            do {
+    private func triggerIconFetch() {
+        loadIconsTask?.cancel()
+        let token = UUID()
+        currentLoadToken = token
+        let style = selectedStyle
+        let appInfo = setPath
+
+        loadIconsTask = Task {
+            await fetchIcons(for: appInfo, style: style, token: token)
+        }
+    }
+
+    private func fetchIcons(for appInfo: LaunchPadManagerDBHelper.AppInfo,
+                            style: IconStyle,
+                            token: UUID) async {
+        await MainActor.run {
+            if currentLoadToken == token {
                 isLoadingIcons = true
-                icons = try await iconManager.getIcons(setPath, style: selectedStyle)
-                totalIconsCount = icons.count
-                successIconsCount = icons.count  // Initially assume all icons can be loaded
-                validIcons = icons  // Initially consider all icons as valid
+            }
+        }
+
+        do {
+            let fetchedIcons = try await iconManager.getIcons(appInfo, style: style)
+
+            if Task.isCancelled {
+                await MainActor.run {
+                    if currentLoadToken == token {
+                        isLoadingIcons = false
+                    }
+                }
+                return
+            }
+
+            await MainActor.run {
+                guard currentLoadToken == token else { return }
+                icons = fetchedIcons
+                totalIconsCount = fetchedIcons.count
+                successIconsCount = fetchedIcons.count
+                validIcons = fetchedIcons
                 isLoadingIcons = false
-            } catch {
-                print(error)
-                isLoadingIcons = false
+            }
+        } catch is CancellationError {
+            await MainActor.run {
+                if currentLoadToken == token {
+                    isLoadingIcons = false
+                }
+            }
+        } catch {
+            await MainActor.run {
+                if currentLoadToken == token {
+                    print(error)
+                    isLoadingIcons = false
+                }
             }
         }
     }

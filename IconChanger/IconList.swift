@@ -149,10 +149,16 @@ struct IconList: View {
 
 struct IconView: View {
     let app: LaunchPadManagerDBHelper.AppInfo
+    private let icon: NSImage
+
+    init(app: LaunchPadManagerDBHelper.AppInfo) {
+        self.app = app
+        self.icon = AppIconCache.shared.icon(for: app.url)
+    }
 
     var body: some View {
         HStack {
-            Image(nsImage: NSWorkspace.shared.icon(forFile: app.url.universalPath()))
+            Image(nsImage: icon)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 32, height: 32)
