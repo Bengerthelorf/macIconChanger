@@ -175,6 +175,9 @@ struct ChangeView: View {
                 .onDisappear {
                     loadIconsTask?.cancel()
                 }
+                .onChange(of: iconManager.iconRefreshTrigger) { _ in
+                    triggerIconFetch()
+                }
 //                .navigationTitle(setPath.name)
     }
     

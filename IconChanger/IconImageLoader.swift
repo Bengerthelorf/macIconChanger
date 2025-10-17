@@ -9,13 +9,12 @@ import Foundation
 import AppKit
 
 /// Shared image loader with in-memory caching and request de-duplication.
-final class IconImageLoader {
+actor IconImageLoader {
     static let shared = IconImageLoader()
 
     private let cache = NSCache<NSURL, NSImage>()
     private let session: URLSession
     private var inFlightTasks: [NSURL: Task<NSImage?, Error>] = [:]
-    private let lock = NSLock()
 
     private init() {
         let configuration = URLSessionConfiguration.default
@@ -43,23 +42,15 @@ final class IconImageLoader {
             return cachedImage
         }
 
-        lock.lock()
         if let existingTask = inFlightTasks[nsURL] {
-            lock.unlock()
             return try await existingTask.value
         }
 
-        let task = Task<NSImage?, Error> { [weak self] in
-            guard let self = self else { return nil }
-            if url.isFileURL {
-                return self.loadLocalImage(from: url)
-            } else {
-                return try await self.downloadImage(from: url)
-            }
+        let task = Task<NSImage?, Error> {
+            try await self.fetchImage(for: url)
         }
 
         inFlightTasks[nsURL] = task
-        lock.unlock()
 
         do {
             let image = try await task.value
@@ -72,12 +63,18 @@ final class IconImageLoader {
     }
 
     private func finish(taskFor url: NSURL, with image: NSImage?) {
-        lock.lock()
         inFlightTasks.removeValue(forKey: url)
-        lock.unlock()
 
         if let image {
             cache.setObject(image, forKey: url, cost: imageCacheCost(for: image))
+        }
+    }
+
+    private func fetchImage(for url: URL) async throws -> NSImage? {
+        if url.isFileURL {
+            return loadLocalImage(from: url)
+        } else {
+            return try await downloadImage(from: url)
         }
     }
 

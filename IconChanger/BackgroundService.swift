@@ -90,9 +90,10 @@ class BackgroundService: ObservableObject {
     private let iconManager = IconManager.shared
     
     // Timer for scheduled checks
-    private var timer: Timer?
-    private var updateCheckTimer: Timer?
-    private var fetchCacheCleanupTimer: Timer?
+    private var scheduledRestoreTimer: DispatchSourceTimer?
+    private var updateCheckTimer: DispatchSourceTimer?
+    private var fetchCacheCleanupTimer: DispatchSourceTimer?
+    private let timerQueue = DispatchQueue(label: "com.iconchanger.backgroundservice.timers", qos: .utility)
     
     // Initialize
     private init() {
@@ -207,12 +208,10 @@ class BackgroundService: ObservableObject {
             statusItem = nil
         }
         
-        // Invalidate timers
-        timer?.invalidate()
-        timer = nil
-        
-        updateCheckTimer?.invalidate()
-        updateCheckTimer = nil
+        // Cancel timers
+        cancelTimer(&scheduledRestoreTimer)
+        cancelTimer(&updateCheckTimer)
+        cancelTimer(&fetchCacheCleanupTimer)
         
         // Always show in dock when not running in background
         NSApp.setActivationPolicy(.regular)
@@ -471,38 +470,45 @@ class BackgroundService: ObservableObject {
     // Setup timers for scheduled tasks
     // Changed from private to internal so it can be accessed from BackgroundSettingsView
     func setupTimers() {
-        // Invalidate existing timers
-        timer?.invalidate()
-        timer = nil
+        cancelTimer(&scheduledRestoreTimer)
+        cancelTimer(&updateCheckTimer)
+        cancelTimer(&fetchCacheCleanupTimer)
 
-        updateCheckTimer?.invalidate()
-        updateCheckTimer = nil
-
-        fetchCacheCleanupTimer?.invalidate()
-        fetchCacheCleanupTimer = nil
-
-        // Setup scheduled restore timer if enabled
         if enableScheduledRestore {
-            // Check every hour to see if it's time to restore
-            timer = Timer.scheduledTimer(timeInterval: 3600, target: self, selector: #selector(checkScheduledRestore), userInfo: nil, repeats: true)
+            scheduledRestoreTimer = makeRepeatingTimer(interval: 3600) { [weak self] in
+                self?.checkScheduledRestore()
+            }
+            checkScheduledRestore()
         }
 
-        // Setup app update check timer if enabled
         if enableAutoRestoreOnUpdate {
-            // Convert minutes to seconds
             let timeInterval = Double(autoRestoreCheckInterval * 60)
-            updateCheckTimer = Timer.scheduledTimer(timeInterval: timeInterval, target: self, selector: #selector(checkForAppUpdates), userInfo: nil, repeats: true)
+            updateCheckTimer = makeRepeatingTimer(interval: timeInterval) { [weak self] in
+                self?.checkForAppUpdates()
+            }
+            checkForAppUpdates()
         }
 
-        // Setup icon fetch cache cleanup timer (every 10 minutes)
-        fetchCacheCleanupTimer = Timer.scheduledTimer(
-            timeInterval: 600,  // 10 minutes = 600 seconds
-            target: self,
-            selector: #selector(cleanupFetchCache),
-            userInfo: nil,
-            repeats: true
-        )
-        print("🕐 Icon fetch cache cleanup timer started (every 10 minutes)")
+        fetchCacheCleanupTimer = makeRepeatingTimer(interval: 600) { [weak self] in
+            self?.cleanupFetchCache()
+        }
+        cleanupFetchCache()
+    }
+
+    private func cancelTimer(_ timer: inout DispatchSourceTimer?) {
+        guard let existing = timer else { return }
+        existing.setEventHandler {}
+        existing.cancel()
+        timer = nil
+    }
+
+    private func makeRepeatingTimer(interval: TimeInterval,
+                                    handler: @escaping @Sendable () -> Void) -> DispatchSourceTimer {
+        let timer = DispatchSource.makeTimerSource(queue: timerQueue)
+        timer.schedule(deadline: .now() + interval, repeating: interval, leeway: .seconds(30))
+        timer.setEventHandler(handler: handler)
+        timer.resume()
+        return timer
     }
     
     // Get the current active restore interval in hours
@@ -588,30 +594,35 @@ class BackgroundService: ObservableObject {
     
     // Check cached apps for updates
     private func checkCachedAppsForUpdates() async throws -> [LaunchPadManagerDBHelper.AppInfo] {
-        var updatedApps: [LaunchPadManagerDBHelper.AppInfo] = []
         let cachedIcons = IconCacheManager.shared.getAllCachedIcons()
-        
-        for cache in cachedIcons {
-            let appPath = cache.appPath
-            
-            // Verify app still exists
-            guard FileManager.default.fileExists(atPath: appPath) else {
-                continue
-            }
-            
-            // Get file modification date
-            let attributes = try? FileManager.default.attributesOfItem(atPath: appPath)
-            if let modDate = attributes?[.modificationDate] as? Date {
-                // If file was modified since last check
-                if modDate > lastUpdateCheck {
-                    // Find app info
-                    if let appInfo = iconManager.apps.first(where: { $0.url.universalPath() == appPath }) {
-                        updatedApps.append(appInfo)
-                    }
-                }
-            }
+        guard !cachedIcons.isEmpty else { return [] }
+
+        let helper = try LaunchPadManagerDBHelper()
+        let allApps = try helper.getAllAppInfos()
+        let sortedApps = allApps.sorted { $0.name.compare($1.name) == .orderedAscending }
+
+        await MainActor.run {
+            iconManager.apps = sortedApps
         }
-        
+
+        let appMap = Dictionary(uniqueKeysWithValues: sortedApps.map { ($0.url.universalPath(), $0) })
+
+        let updatedApps: [LaunchPadManagerDBHelper.AppInfo] = cachedIcons.compactMap { cache in
+            let appPath = cache.appPath
+
+            guard FileManager.default.fileExists(atPath: appPath) else {
+                return nil
+            }
+
+            let attributes = try? FileManager.default.attributesOfItem(atPath: appPath)
+            guard let modDate = attributes?[.modificationDate] as? Date,
+                  modDate > lastUpdateCheck else {
+                return nil
+            }
+
+            return appMap[appPath]
+        }
+
         return updatedApps
     }
     

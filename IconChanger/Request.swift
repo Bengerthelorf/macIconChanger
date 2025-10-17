@@ -11,6 +11,7 @@
 import Foundation
 import AppKit
 import SwiftyJSON
+import os
 
 class MyRequestController {
     @Sendable
@@ -23,9 +24,11 @@ class MyQueryRequestController {
     static let shared = MyQueryRequestController()
 
     private let session: URLSession
+    private let logger: Logger
 
     init(session: URLSession = MyQueryRequestController.makeSession()) {
         self.session = session
+        self.logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "IconChanger", category: "Network")
     }
 
     private static func makeSession() -> URLSession {
@@ -47,7 +50,7 @@ class MyQueryRequestController {
         let results = try await sendRequestToMeilisearch(query, style: style)
         
         if results.isEmpty {
-            print("⚠️ Meilisearch API returned no results, trying backup method...")
+            logger.debug("Meilisearch returned no results for '\(query, privacy: .public)'. Trying backup API.")
             return try await sendBackupRequest(query, style: style)
         }
         
@@ -63,7 +66,7 @@ class MyQueryRequestController {
          HTTPCookieAcceptPolicy, requestCachePolicy or timeoutIntervalForRequest.
          */
         let query = qeuryMix(query)
-        print("🔍 Searching for icons with query: \(query), style: \(style.displayName)")
+        logger.debug("Search '\(query, privacy: .public)' style=\(style.displayName, privacy: .public)")
 
         let session = self.session
 
@@ -71,10 +74,9 @@ class MyQueryRequestController {
          Request (POST https://api.macosicons.com/api/search)
          */
         let urlString = "https://api.macosicons.com/api/search"
-        print("🌐 API Endpoint: \(urlString)")
         
         guard let URL = URL(string: urlString) else {
-            print("❌ Invalid URL: \(urlString)")
+            logger.error("Invalid search URL.")
             return []
         }
         var request = URLRequest(url: URL)
@@ -82,15 +84,14 @@ class MyQueryRequestController {
 
         // Get API key from UserDefaults
         let apiKey = UserDefaults.standard.string(forKey: "apiKey") ?? ""
-        print("🔑 API Key status: \(apiKey.isEmpty ? "Not set" : "Set (length: \(apiKey.count))")")
+        if apiKey.isEmpty {
+            logger.warning("API key not configured; search request may be rejected.")
+        }
         
         // Headers
         if !apiKey.isEmpty {
             request.addValue(apiKey, forHTTPHeaderField: "x-api-key")
-        } else {
-            print("⚠️ Warning: No API key provided. API may reject the request.")
         }
-        
         request.addValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.5 Safari/605.1.15", forHTTPHeaderField: "User-Agent")
         request.addValue("https://macosicons.com", forHTTPHeaderField: "Origin")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -100,7 +101,7 @@ class MyQueryRequestController {
         var filters: [String] = []
         if let styleFilter = style.filterQuery {
             filters.append(styleFilter)
-            print("🎨 Applying style filter: \(styleFilter)")
+            logger.debug("Applying style filter '\(styleFilter, privacy: .public)'")
         }
 
         let bodyObject: [String : Any] = [
@@ -117,93 +118,57 @@ class MyQueryRequestController {
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: bodyObject, options: [])
             request.httpBody = jsonData
-            print("📤 Request body: \(String(data: jsonData, encoding: .utf8) ?? "Unable to convert to string")")
         } catch {
-            print("❌ Error creating request body: \(error.localizedDescription)")
+            logger.error("Failed to encode search request body: \(error.localizedDescription, privacy: .public)")
             return []
         }
 
-        // For debug purposes, print all request headers
-        print("📋 Request headers:")
-        request.allHTTPHeaderFields?.forEach { key, value in
-            print("  \(key): \(key.lowercased() == "x-api-key" ? "[HIDDEN]" : value)")
-        }
-        
         do {
             let (data, response) = try await session.data(for: request)
             
             guard let httpResponse = response as? HTTPURLResponse else {
-                print("❌ Invalid response type, not HTTPURLResponse")
+                logger.error("Search response was not HTTP.")
                 return []
             }
-            
-            print("📥 Response status code: \(httpResponse.statusCode)")
-            
-            // Print response headers for debugging
-            print("📋 Response headers:")
-            for (key, value) in httpResponse.allHeaderFields {
-                print("  \(key): \(value)")
-            }
-            
+
             if httpResponse.statusCode != 200 {
-                // Try to print response body to get error details
                 if let errorStr = String(data: data, encoding: .utf8) {
-                    print("❌ Error response: \(errorStr)")
+                    logger.error("Search request failed: \(errorStr, privacy: .public)")
                 }
                 return []
-            }
-            
-            // Print first 200 chars of response for debugging
-            if let responseStr = String(data: data, encoding: .utf8) {
-                let previewLength = min(200, responseStr.count)
-                let preview = responseStr.prefix(previewLength)
-                print("📄 Response preview: \(preview)...\(responseStr.count > previewLength ? " (truncated)" : "")")
             }
             
             let json = try JSON(data: data)
             
             // Check if the response has expected structure
             if json["hits"].exists() {
-                print("✅ Response has 'hits' property")
-                print("📊 Total hits: \(json["totalHits"].intValue)")
+                logger.debug("Received \(json["hits"].arrayValue.count) hits for '\(query, privacy: .public)'")
             } else {
-                print("⚠️ Response does not have expected 'hits' property")
-                // Print more of the response to help debug
-                if let responseStr = String(data: data, encoding: .utf8) {
-                    print("📄 Full response: \(responseStr)")
-                }
+                logger.warning("Search response missing 'hits' for '\(query, privacy: .public)'")
             }
             
             let res = json["hits"].arrayValue.compactMap { hit in
                 if let lowResPngUrl = hit["lowResPngUrl"].url, let icnsUrl = hit["icnsUrl"].url {
-                    print("✅ Found icon: \(hit["appName"].stringValue)")
                     return IconRes(appName: hit["appName"].stringValue, icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: hit["downloads"].intValue)
                 } else {
-                    print("⚠️ Missing URLs for icon: \(hit["appName"].stringValue)")
+                    logger.debug("Search hit missing URLs for '\(hit["appName"].stringValue, privacy: .public)'")
                     return nil
                 }
             }
-            
-            print("🔢 Found \(res.count) valid icons")
             
             let filteredRes = res.filter {
                 // TODO: Improve it (remove (),':) Photoshop (Beta) -> Photoshop Beta
                 $0.appName.lowercased().replace(target: " ", withString: "").contains(query.lowercased().replace(target: " ", withString: ""))
             }
-            
-            print("🔢 After filtering, \(filteredRes.count) icons remain")
+            logger.debug("Returning \(filteredRes.count) icons after filtering for '\(query, privacy: .public)'")
             
             return filteredRes.sorted { res1, res2 in
                 res1.downloads > res2.downloads
             }
         } catch {
-            print("❌ Error during API request: \(error.localizedDescription)")
-            // If we can cast to NSError, provide more details
+            logger.error("Search request error: \(error.localizedDescription, privacy: .public)")
             if let nsError = error as NSError? {
-                print("  Domain: \(nsError.domain)")
-                print("  Code: \(nsError.code)")
-                print("  Description: \(nsError.localizedDescription)")
-                print("  User info: \(nsError.userInfo)")
+                logger.debug("Search error details domain=\(nsError.domain, privacy: .public) code=\(nsError.code, privacy: .public)")
             }
             return []
         }
@@ -212,7 +177,7 @@ class MyQueryRequestController {
     func testAPIConnection() async throws -> (success: Bool, iconCount: Int) {
         // Use a common query that won't trigger the hardcoded fallback
         let testQuery = "test_api_connection"
-        print("🔍 Testing API connection with query: \(testQuery)")
+        logger.debug("Testing API connectivity.")
 
         let session = self.session
         
@@ -289,16 +254,15 @@ class MyQueryRequestController {
     // Backup method using a different approach to search the site
     private func sendBackupRequest(_ query: String, style: IconStyle) async throws -> [IconRes] {
         let query = qeuryMix(query)
-        print("🔍 Attempting backup search for: \(query), style: \(style.displayName)")
+        logger.debug("Running backup search for '\(query, privacy: .public)', style=\(style.displayName, privacy: .public)")
         
         let session = self.session
         
         // Modified to attempt direct access to other endpoints of the API
         let urlString = "https://api.macosicons.com/api/icons?q=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query)&limit=100"
-        print("🌐 Backup API Endpoint: \(urlString)")
         
         guard let url = URL(string: urlString) else {
-            print("❌ Invalid backup URL")
+            logger.error("Invalid backup search URL")
             return []
         }
         
@@ -309,7 +273,7 @@ class MyQueryRequestController {
         let apiKey = UserDefaults.standard.string(forKey: "apiKey") ?? ""
         if !apiKey.isEmpty {
             request.addValue(apiKey, forHTTPHeaderField: "x-api-key")
-            print("🔑 Added API key to backup request")
+            logger.debug("Using API key for backup search.")
         }
         
         request.addValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.5 Safari/605.1.15", forHTTPHeaderField: "User-Agent")
@@ -319,23 +283,15 @@ class MyQueryRequestController {
             let (data, response) = try await session.data(for: request)
             
             guard let httpResponse = response as? HTTPURLResponse else {
-                print("❌ Invalid response type from backup API")
+                logger.error("Backup search response was not HTTP.")
                 return []
             }
-            
-            print("📥 Backup response status code: \(httpResponse.statusCode)")
             
             if httpResponse.statusCode != 200 {
                 if let errorStr = String(data: data, encoding: .utf8) {
-                    print("❌ Error response from backup API: \(errorStr)")
+                    logger.error("Backup search failed: \(errorStr, privacy: .public)")
                 }
                 return []
-            }
-            
-            if let responseStr = String(data: data, encoding: .utf8) {
-                let previewLength = min(200, responseStr.count)
-                let preview = responseStr.prefix(previewLength)
-                print("📄 Backup response preview: \(preview)...\(responseStr.count > previewLength ? " (truncated)" : "")")
             }
             
             // Try to parse the response data
@@ -347,27 +303,21 @@ class MyQueryRequestController {
                 
                 if let results = extractIconsFromJSON(json) {
                     icons = results
-                    print("✅ Successfully extracted icon data from backup API")
                 } else {
-                    print("⚠️ Unable to extract icon data from backup API response")
+                    logger.warning("Backup search could not extract icon data.")
                     // Try to create some simple icon data so the application can continue
                     // This is only as a last resort
                     if let directData = json.array?.first {
-                        print("⚠️ Attempting to parse as direct data")
                         // Print all available keys for better understanding of the response format
                         if let jsonObj = directData.dictionary {
-                            print("📑 Available keys: \(jsonObj.keys.joined(separator: ", "))")
+                            logger.debug("Backup search response keys: \(jsonObj.keys.joined(separator: ", "), privacy: .public)")
                         }
                     }
                 }
-                
-                print("🔢 Found \(icons.count) icons from backup method")
                 return icons.sorted { $0.downloads > $1.downloads }
             } catch {
-                print("❌ JSON parsing error: \(error.localizedDescription)")
-                
+                logger.error("Backup search JSON parsing error: \(error.localizedDescription, privacy: .public)")
                 // Try another method - create a hardcoded icon as a fallback
-                print("⚠️ Creating hardcoded Chrome icon as a last resort")
                 if query.lowercased().contains("chrome") {
                     if let icnsUrl = URL(string: "https://macosicons.com/api/icons/chrome/download"),
                        let lowResPngUrl = URL(string: "https://parsefiles.back4app.com/JPaQcFfEEQ1ePBxbf6wvzkPMEqKYHhPYv8boI1Rc/476887413a132607e24df29a93a4cb3f_low_res_Chrome.png"),
@@ -380,7 +330,7 @@ class MyQueryRequestController {
             }
             
         } catch {
-            print("❌ Backup API request failed: \(error.localizedDescription)")
+            logger.error("Backup search request failed: \(error.localizedDescription, privacy: .public)")
             return []
         }
     }
@@ -393,7 +343,7 @@ class MyQueryRequestController {
         
         // Try format with "data" array
         if let dataArray = json["data"].array {
-            print("✅ Found 'data' array in response")
+            logger.debug("Backup response contained 'data' array.")
             for item in dataArray {
                 if let name = item["name"].string,
                    let icnsUrlString = item["icnsUrl"].string,
@@ -411,7 +361,7 @@ class MyQueryRequestController {
         
         // Try format with "icons" array
         else if let iconsArray = json["icons"].array {
-            print("✅ Found 'icons' array in response")
+            logger.debug("Backup response contained 'icons' array.")
             for item in iconsArray {
                 if let name = item["appName"].string,
                    let icnsUrlString = item["icnsUrl"].string,
@@ -429,7 +379,7 @@ class MyQueryRequestController {
         
         // Try format where the response is directly an array
         else if let directArray = json.array {
-            print("✅ Found direct array in response")
+            logger.debug("Backup response was a direct array.")
             for item in directArray {
                 if let name = item["appName"].string,
                    let icnsUrlString = item["icnsUrl"].string,

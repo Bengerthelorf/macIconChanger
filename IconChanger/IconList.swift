@@ -65,11 +65,22 @@ struct IconList: View {
                                         print(error)
                                     }
                                 }
-                            }
+                    }
                 }
             }
                     .listStyle(SidebarListStyle())  // Use SidebarListStyle to create a sidebar look
                     .frame(minWidth: 200, idealWidth: 300) // Adjust the width to your liking
+                    .overlay(alignment: .topTrailing) {
+                        Button {
+                            iconManager.refresh()
+                        } label: {
+                            Image(systemName: "arrow.clockwise")
+                        }
+                        .buttonStyle(.borderless)
+                        .help("Refresh Applications")
+                        .padding(.trailing, 6)
+                        .padding(.top, 8)
+                    }
 
             // Display detail view when an app is selected, otherwise display placeholder
             if let app = selectedApp {
@@ -138,7 +149,7 @@ struct IconList: View {
                         RefreshCacheToolbarButton(
                             cachedCount: IconCacheManager.shared.getCachedIconsCount(),
                             action: {
-                                iconManager.refresh()
+                                iconManager.iconRefreshTrigger = UUID()
                             }
                         )
                     }
@@ -202,7 +213,7 @@ struct RefreshCacheToolbarButton: View {
         .buttonStyle(.plain)
         .contentShape(Capsule(style: .continuous))
         .controlSize(.small)
-        .help("Refresh the application list and show cached icon count")
+        .help("Refresh the icon results and show cached icon count")
     }
 }
 

@@ -26,6 +26,7 @@ class IconManager: ObservableObject {
     @Published var icons = [(String, String)]()
     @Published var apps: [LaunchPadManagerDBHelper.AppInfo] = []
     @Published var needsSetupCheck: Bool = false
+    @Published var iconRefreshTrigger = UUID()
     
     var helperDirectoryURL: URL {
         FileManager.default.homeDirectoryForCurrentUser
