@@ -11,12 +11,12 @@ import SwiftUI
 import LaunchPadManagerDBHelper
 
 struct IconList: View {
-    @StateObject var iconManager = IconManager.shared
+    @ObservedObject var iconManager = IconManager.shared
 
     let rules = [GridItem(.adaptive(minimum: 100), alignment: .top)]
 
-    @State var setPath: LaunchPadManagerDBHelper.AppInfo? = nil
-    @State var selectedApp: LaunchPadManagerDBHelper.AppInfo? = nil
+    @State var setPath: AppItem? = nil
+    @State var selectedApp: AppItem? = nil
 
     @State var searchText: String = ""
     @State var setAlias: String?
@@ -58,11 +58,13 @@ struct IconList: View {
                                     setAlias = app.url.deletingPathExtension().lastPathComponent
                                 }
 
-                                Button("Remove the Icon from the Launchpad") {
-                                    do {
-                                        try LaunchPadManagerDBHelper().removeApp(app)
-                                    } catch {
-                                        print(error)
+                                if let original = app.originalAppInfo {
+                                    Button("Remove the Icon from the Launchpad") {
+                                        do {
+                                            try LaunchPadManagerDBHelper().removeApp(original)
+                                        } catch {
+                                            print(error)
+                                        }
                                     }
                                 }
                     }
@@ -154,15 +156,18 @@ struct IconList: View {
                         )
                     }
                 }
+                .onAppear {
+                    iconManager.refresh()
+                }
     }
 
 }
 
 struct IconView: View {
-    let app: LaunchPadManagerDBHelper.AppInfo
+    let app: AppItem
     private let icon: NSImage
 
-    init(app: LaunchPadManagerDBHelper.AppInfo) {
+    init(app: AppItem) {
         self.app = app
         self.icon = AppIconCache.shared.icon(for: app.url)
     }
@@ -225,7 +230,7 @@ extension String: @retroactive Identifiable {
 }
 
 struct MyDropDelegate: DropDelegate {
-    let app: LaunchPadManagerDBHelper.AppInfo
+    let app: AppItem
 
     func validateDrop(info: DropInfo) -> Bool {
         return info.hasItemsConforming(to: ["public.file-url"])

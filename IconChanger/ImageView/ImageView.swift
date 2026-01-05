@@ -12,7 +12,7 @@ import LaunchPadManagerDBHelper
 
 struct ImageView: View {
     let icon: IconRes
-    let setPath: LaunchPadManagerDBHelper.AppInfo
+    let setPath: AppItem
     @State var preview: NSImage?
     @State var isLoading: Bool = true
     

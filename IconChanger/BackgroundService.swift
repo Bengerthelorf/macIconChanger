@@ -593,13 +593,16 @@ class BackgroundService: ObservableObject {
     }
     
     // Check cached apps for updates
-    private func checkCachedAppsForUpdates() async throws -> [LaunchPadManagerDBHelper.AppInfo] {
+    private func checkCachedAppsForUpdates() async throws -> [AppItem] {
         let cachedIcons = IconCacheManager.shared.getAllCachedIcons()
         guard !cachedIcons.isEmpty else { return [] }
 
         let helper = try LaunchPadManagerDBHelper()
         let allApps = try helper.getAllAppInfos()
-        let sortedApps = allApps.sorted { $0.name.compare($1.name) == .orderedAscending }
+        // Convert to AppItem
+        let appItems = allApps.map { AppItem(id: $0.url, name: $0.name, url: $0.url, originalAppInfo: $0) }
+        
+        let sortedApps = appItems.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
 
         await MainActor.run {
             iconManager.apps = sortedApps
@@ -607,7 +610,7 @@ class BackgroundService: ObservableObject {
 
         let appMap = Dictionary(uniqueKeysWithValues: sortedApps.map { ($0.url.universalPath(), $0) })
 
-        let updatedApps: [LaunchPadManagerDBHelper.AppInfo] = cachedIcons.compactMap { cache in
+        let updatedApps: [AppItem] = cachedIcons.compactMap { cache in
             let appPath = cache.appPath
 
             guard FileManager.default.fileExists(atPath: appPath) else {
@@ -627,7 +630,7 @@ class BackgroundService: ObservableObject {
     }
     
     // Restore icons for updated apps
-    private func restoreUpdatedApps(_ apps: [LaunchPadManagerDBHelper.AppInfo]) async throws {
+    private func restoreUpdatedApps(_ apps: [AppItem]) async throws {
         for app in apps {
             // Get cached icon
             if let _ = IconCacheManager.shared.getIconCache(for: app.url.universalPath()),

@@ -12,7 +12,7 @@ import QuartzCore
 
 struct ImageViewCore: View {
     @Binding var nsimage: NSImage?
-    let setPath: LaunchPadManagerDBHelper.AppInfo
+    let setPath: AppItem
     @State private var isTaskRunning = false
     @State private var task: Task<Void, Never>? = nil
     @Binding var isLoading: Bool
@@ -23,7 +23,7 @@ struct ImageViewCore: View {
     @State var failureMessage = "Failed to load data."
 
     // Add an initializer method to ensure backward compatibility
-    init(nsimage: Binding<NSImage?>, setPath: LaunchPadManagerDBHelper.AppInfo, isLoading: Binding<Bool> = .constant(true)) {
+    init(nsimage: Binding<NSImage?>, setPath: AppItem, isLoading: Binding<Bool> = .constant(true)) {
         self._nsimage = nsimage
         self.setPath = setPath
         self._isLoading = isLoading

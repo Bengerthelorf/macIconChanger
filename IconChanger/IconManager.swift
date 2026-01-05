@@ -24,7 +24,7 @@ class IconManager: ObservableObject {
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "IconManager")
     
     @Published var icons = [(String, String)]()
-    @Published var apps: [LaunchPadManagerDBHelper.AppInfo] = []
+    @Published var apps: [AppItem] = []
     @Published var needsSetupCheck: Bool = false
     @Published var iconRefreshTrigger = UUID()
     
@@ -45,29 +45,66 @@ class IconManager: ObservableObject {
         let _ = NotificationCenter.default
         //        notificationCenter.addObserver(self, selector: #selector(refresh), name: NSWindow.didBecomeKeyNotification, object: nil)
         
-        do {
-            let helper = try LaunchPadManagerDBHelper()
-            apps = try helper.getAllAppInfos().sorted(by: { $0.name.compare($1.name) == .orderedAscending })
-        } catch {
-            logger.error("Error initializing LaunchPadManagerDBHelper: \(error.localizedDescription)")
-        }
+        refresh()
     }
     
     @objc func refresh() {
         Task {
+            var allApps: [AppItem] = []
+            
+            // 1. Fetch from LaunchPad DB
             do {
                 let helper = try LaunchPadManagerDBHelper()
-                let sortedApps = try helper.getAllAppInfos().sorted(by: { info1, info2 in
-                    info1.name.compare(info2.name) == .orderedAscending
-                })
-                
-                await MainActor.run {
-                    apps = sortedApps
-                }
+                let dbApps = try helper.getAllAppInfos()
+                let dbAppItems = dbApps.map { AppItem(id: $0.url, name: $0.name, url: $0.url, originalAppInfo: $0) }
+                allApps.append(contentsOf: dbAppItems)
             } catch {
-                print(error)
+                logger.error("Error fetching LaunchPad apps: \(error.localizedDescription)")
+            }
+            
+            // 2. Scan Filesystem
+            let localApps = scanLocalApps()
+            
+            // 3. Merge (prefer DB apps if duplicate URL)
+            let existingURLs = Set(allApps.map { $0.url.path })
+            for localApp in localApps {
+                if !existingURLs.contains(localApp.url.path) {
+                    allApps.append(localApp)
+                }
+            }
+            
+            let sortedApps = allApps.sorted(by: { $0.name.localizedStandardCompare($1.name) == .orderedAscending })
+            
+            await MainActor.run {
+                self.apps = sortedApps
             }
         }
+    }
+    
+    func scanLocalApps() -> [AppItem] {
+        let fileManager = FileManager.default
+        var appItems = [AppItem]()
+        
+        // Directories to scan
+        let systemApps = URL(fileURLWithPath: "/Applications")
+        let userApps = fileManager.homeDirectoryForCurrentUser.appendingPathComponent("Applications")
+        let systemCoreApps = URL(fileURLWithPath: "/System/Applications")
+        
+        let dirs = [systemApps, userApps, systemCoreApps]
+        
+        for dir in dirs {
+            // Get contents (not recursive deep scan, just top level apps for now as typical behavior)
+            guard let contents = try? fileManager.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil, options: .skipsHiddenFiles) else { continue }
+            
+            for url in contents {
+                if url.pathExtension == "app" {
+                    let name = url.deletingPathExtension().lastPathComponent
+                    appItems.append(AppItem(id: url, name: name, url: url, originalAppInfo: nil))
+                }
+            }
+        }
+        
+        return appItems
     }
     
     func ensureHelperFilesCopied() {
@@ -159,7 +196,7 @@ class IconManager: ObservableObject {
     //        try copy.write(to: path, atomically: true, encoding: .utf8)
     //    }
     
-    func setImage(_ image: NSImage, app: LaunchPadManagerDBHelper.AppInfo) throws {
+    func setImage(_ image: NSImage, app: AppItem) throws {
         logger.log("setImage called for app: \(app.name)")
         //
         ensureHelperFilesCopied()
@@ -196,7 +233,7 @@ class IconManager: ObservableObject {
         logger.log("Temporary icon file removed (if existed). setImage finished.")
     }
     
-    func setIconWithoutCaching(_ image: NSImage, app: LaunchPadManagerDBHelper.AppInfo) async throws {
+    func setIconWithoutCaching(_ image: NSImage, app: AppItem) async throws {
         logger.log("setIconWithoutCaching called for app: \(app.name)")
         
         ensureHelperFilesCopied()
@@ -294,9 +331,9 @@ class IconManager: ObservableObject {
         }
     }
     
-    func findSearchedImage(_ search: String) -> [LaunchPadManagerDBHelper.AppInfo] {
+    func findSearchedImage(_ search: String) -> [AppItem] {
         apps.filter {
-            $0.name.lowercased().contains(search.lowercased()) || $0.url.deletingPathExtension().lastPathComponent.lowercased().contains(search.lowercased())
+            $0.name.localizedCaseInsensitiveContains(search) || $0.url.deletingPathExtension().lastPathComponent.localizedCaseInsensitiveContains(search)
         }
     }
     
@@ -321,7 +358,7 @@ class IconManager: ObservableObject {
         return String(url[count..<endCount] ?? "")
     }
     
-    func getIcons(_ app: LaunchPadManagerDBHelper.AppInfo, style: IconStyle = .all) async throws -> [IconRes] {
+    func getIcons(_ app: AppItem, style: IconStyle = .all) async throws -> [IconRes] {
         let appName = app.name
         let urlName = app.url.deletingPathExtension().lastPathComponent
         let bundleName = try getAppBundleName(app)
@@ -388,7 +425,7 @@ class IconManager: ObservableObject {
         return uniqueRes
     }
     
-    func getAppBundleName(_ app: LaunchPadManagerDBHelper.AppInfo) throws -> String? {
+    func getAppBundleName(_ app: AppItem) throws -> String? {
         let plistURL = app.url.universalappending(path: "Contents").universalappending(path: "Info.plist")
         let plist = (try? NSDictionary(contentsOf: plistURL, error: ())) as? Dictionary<String, AnyObject>
         

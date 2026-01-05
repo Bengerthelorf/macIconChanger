@@ -12,7 +12,7 @@ import LaunchPadManagerDBHelper
 
 struct LocalImageView: View {
     let url: URL
-    let setPath: LaunchPadManagerDBHelper.AppInfo
+    let setPath: AppItem
     
     @State var nsimage: NSImage?
     @State var isLoading: Bool = true

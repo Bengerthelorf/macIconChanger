@@ -22,7 +22,7 @@ struct ChangeView: View {
     @State var totalIconsCount: Int = 0
     @State var successIconsCount: Int = 0
     @State var validIcons: [IconRes] = []
-    let setPath: LaunchPadManagerDBHelper.AppInfo
+    let setPath: AppItem
 
     @Environment(\.presentationMode) var presentationMode
 
@@ -193,7 +193,7 @@ struct ChangeView: View {
         }
     }
 
-    private func fetchIcons(for appInfo: LaunchPadManagerDBHelper.AppInfo,
+    private func fetchIcons(for appInfo: AppItem,
                             style: IconStyle,
                             token: UUID) async {
         await MainActor.run {
