@@ -31,6 +31,7 @@ struct IconList: View {
                             tag: app,
                             selection: $selectedApp) {
                         IconView(app: app)
+                            .id(iconManager.iconRefreshTrigger)
                     }
                             .contextMenu {
                                 Button("Copy the Name") {
@@ -165,16 +166,10 @@ struct IconList: View {
 
 struct IconView: View {
     let app: AppItem
-    private let icon: NSImage
-
-    init(app: AppItem) {
-        self.app = app
-        self.icon = AppIconCache.shared.icon(for: app.url)
-    }
 
     var body: some View {
         HStack {
-            Image(nsImage: icon)
+            Image(nsImage: AppIconCache.shared.icon(for: app.url))
                     .resizable()
                     .scaledToFit()
                     .frame(width: 32, height: 32)

@@ -214,6 +214,11 @@ class IconManager: ObservableObject {
         logger.log("Attempting to remove temporary icon file: \(imageURL.path)")
         try? FileManager.default.removeItem(at: imageURL)
         logger.log("Temporary icon file removed (if existed). setImage finished.")
+        
+        Task { @MainActor in
+            AppIconCache.shared.remove(for: app.url)
+            self.iconRefreshTrigger = UUID()
+        }
     }
     
     func setIconWithoutCaching(_ image: NSImage, app: AppItem) async throws {
@@ -247,6 +252,11 @@ class IconManager: ObservableObject {
         logger.log("Attempting to remove temporary icon file: \(imageURL.path)")
         try? FileManager.default.removeItem(at: imageURL)
         logger.log("Temporary icon file removed (if existed). setIconWithoutCaching finished.")
+        
+        await MainActor.run {
+            AppIconCache.shared.remove(for: app.url)
+            self.iconRefreshTrigger = UUID()
+        }
     }
     
     // Restore all cached icons

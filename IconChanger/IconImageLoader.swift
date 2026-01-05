@@ -148,6 +148,11 @@ final class AppIconCache {
         cache.setObject(icon, forKey: key, cost: cacheCost(for: icon))
         return icon
     }
+    
+    func remove(for appURL: URL) {
+        let key = appURL as NSURL
+        cache.removeObject(forKey: key)
+    }
 
     private func cacheCost(for image: NSImage) -> Int {
         guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
