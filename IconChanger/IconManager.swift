@@ -43,7 +43,6 @@ class IconManager: ObservableObject {
     
     init() {
         let _ = NotificationCenter.default
-        //        notificationCenter.addObserver(self, selector: #selector(refresh), name: NSWindow.didBecomeKeyNotification, object: nil)
         
         refresh()
     }
@@ -178,23 +177,7 @@ class IconManager: ObservableObject {
         }
     }
     
-    //    func setContent(_ path: URL, replacement: [String: String], run: () throws -> () = {
-    //    }) throws {
-    //        var content = try String(contentsOf: path, encoding: .utf8)
-    //        let copy = content
-    //
-    //        for (key, value) in replacement {
-    //            content = content.replace(target: "%\(key)", withString: value)
-    //        }
-    //
-    //        try content.write(to: path, atomically: true, encoding: .utf8)
-    //
-    //        print(content)
-    //
-    //        try run()
-    //
-    //        try copy.write(to: path, atomically: true, encoding: .utf8)
-    //    }
+
     
     func setImage(_ image: NSImage, app: AppItem) throws {
         logger.log("setImage called for app: \(app.name)")
@@ -351,12 +334,7 @@ class IconManager: ObservableObject {
         }
     }
     
-    func getNameFromURL(_ url: String) -> String {
-        let count = "https://media.macosicons.com/parse/files/macOSicons/81c998bdc590f1d6998187d39f6ea1d2".count
-        let endCount = url.count - ".icns".count
-        
-        return String(url[count..<endCount] ?? "")
-    }
+
     
     func getIcons(_ app: AppItem, style: IconStyle = .all) async throws -> [IconRes] {
         let appName = app.name
