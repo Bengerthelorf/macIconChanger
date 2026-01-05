@@ -4,6 +4,27 @@
     <channel>
         <title>IconChanger</title>
         <item>
+            <title>Version 1.1.7</title>
+            <link>https://github.com/Bengerthelorf/macIconChanger</link>
+            <sparkle:version>117</sparkle:version>
+            <sparkle:shortVersionString>1.1.7</sparkle:shortVersionString>
+            <pubDate>Mon, 05 Jan 2026 12:00:00 +0800</pubDate>
+            <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.1.7/IconChanger.dmg"
+            sparkle:edSignature="eF2/BEsbPY2uiB6W44dT5V0vDFinzDQaDzpZj32hpG2vUpC8hC6pUSfE4KSwf4MKRtUHmO6T7E7VOfHhxOggBw==" length="13702264"
+            type="application/octet-stream"/>
+            <description>
+                <![CDATA[
+                <h2>Version 1.1.7</h2>
+                <ul>
+                    <li><strong>New Feature: Custom App Folders</strong> - You can now customize which directories are scanned for applications in Settings.</li>
+                    <li><strong>Improved App Detection</strong> - Switched to a robust filesystem scanner, removing dependency on the Launchpad database for better reliability.</li>
+                    <li><strong>Live Updates</strong> - Sidebar icons now refresh immediately after you change them.</li>
+                    <li><strong>Bug Fix</strong> - Resolved the "Update checker failed to start" issue by optimizing the update configuration.</li>
+                </ul>
+                ]]>
+            </description>
+        </item>
+        <item>
             <title>Version 1.1.6</title>
             <link>https://github.com/Bengerthelorf/macIconChanger</link>
             <sparkle:version>116</sparkle:version>
