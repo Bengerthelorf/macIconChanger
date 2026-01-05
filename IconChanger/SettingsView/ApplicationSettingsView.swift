@@ -9,8 +9,17 @@ import SwiftUI
 
 struct ApplicationSettingsView: View {
     var body: some View {
-        Group {
-            ApplicationAliasSettingsView()
+        ScrollView {
+            VStack(spacing: 20) {
+                ApplicationAliasSettingsView()
+                    .frame(height: 500) // Occupy majority of space
+                
+                Divider()
+                
+                ApplicationFolderSettingsView()
+                    .frame(height: 250) // Sufficient space for folders
+            }
+            .padding()
         }
     }
 }

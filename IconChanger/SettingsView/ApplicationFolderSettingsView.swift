@@ -24,13 +24,16 @@ struct ApplicationFolderSettingsView: View {
                 }
 
                 Button(action: {
-                    folderPermission.removeBookmark()
+                    if let id = selectedId {
+                        folderPermission.removeBookmark(id: id)
+                        selectedId = nil
+                    }
                 }) {
                     Image(systemName: "minus")
                 }
-                        .disabled(selectedId == nil || folderPermission.permissions.first(where: { $0.id == selectedId })?.path == "/Applications")
+                        .disabled(selectedId == nil)
             }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(.borderless)
 
             Table(folderPermission.permissions, selection: $selectedId) {
                 TableColumn("Folder", value: \.path)

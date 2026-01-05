@@ -85,11 +85,11 @@ class IconManager: ObservableObject {
         var appItems = [AppItem]()
         
         // Directories to scan
-        let systemApps = URL(fileURLWithPath: "/Applications")
-        let userApps = fileManager.homeDirectoryForCurrentUser.appendingPathComponent("Applications")
-        let systemCoreApps = URL(fileURLWithPath: "/System/Applications")
+        // Use permissions managed by FolderPermission
+        let dirs = FolderPermission.shared.permissions.map { $0.bookmarkedURL }
         
-        let dirs = [systemApps, userApps, systemCoreApps]
+        // If no directories are configured, we don't scan any local paths.
+        // Users should add directories in Settings -> Application.
         
         for dir in dirs {
             // Get contents (not recursive deep scan, just top level apps for now as typical behavior)

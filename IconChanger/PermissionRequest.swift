@@ -10,9 +10,9 @@ import SwiftUI
 import Combine
 
 struct PermissionList: Identifiable {
-    let bookmarkedURL: String
+    let bookmarkedURL: URL
     var path: String {
-        return URL(string: bookmarkedURL)?.path ?? ""
+        return bookmarkedURL.path
     }
     let id = UUID()
 }
@@ -22,34 +22,61 @@ class FolderPermission: ObservableObject {
 
     @Published var permissions: [PermissionList] = []
 
-    var bookmarkData: Data? {
-        didSet {
-            UserDefaults.standard.set(bookmarkData, forKey: "bookmarkData")
+    // Key: URL absolute string, Value: Bookmark Data
+    private var bookmarks: [String: Data] {
+        get {
+            UserDefaults.standard.dictionary(forKey: "folderBookmarks") as? [String: Data] ?? [:]
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "folderBookmarks")
         }
     }
-    var url: URL?
 
     var hasPermission: Bool {
-        hasPermissionForApplicationsFolder()
+        !permissions.isEmpty
     }
 
     init() {
-        if let bookmarkData = UserDefaults.standard.data(forKey: "bookmarkData") {
-            self.bookmarkData = bookmarkData
+        restoreBookmarks()
+    }
+
+    private func restoreBookmarks() {
+        var validPermissions: [PermissionList] = []
+        var validBookmarks: [String: Data] = [:]
+        
+        for (urlString, data) in bookmarks {
             do {
-                let url = try accessBookmark(bookmarkData)
-                self.url = url
-                permissions.append(PermissionList(bookmarkedURL: url.absoluteString))
+                var isStale = false
+                let url = try URL(resolvingBookmarkData: data,
+                                  options: .withSecurityScope,
+                                  relativeTo: nil,
+                                  bookmarkDataIsStale: &isStale)
+                
+                if isStale {
+                    // Bookmark is stale, try to recreate it
+                    if url.startAccessingSecurityScopedResource() {
+                        let newData = try createBookmark(from: url)
+                        validBookmarks[urlString] = newData
+                        validPermissions.append(PermissionList(bookmarkedURL: url))
+                    }
+                } else {
+                    if url.startAccessingSecurityScopedResource() {
+                        validBookmarks[urlString] = data
+                        validPermissions.append(PermissionList(bookmarkedURL: url))
+                    }
+                }
             } catch {
-                print("Error accessing bookmark:", error)
+                print("Error restoring bookmark for \(urlString): \(error)")
             }
         }
+        
+        self.bookmarks = validBookmarks
+        self.permissions = validPermissions
     }
 
     func check() {
-//        print(permissions)
         if !hasPermission {
-            add()
+            // add() // Don't automatically add, let user decide
         }
     }
 
@@ -61,32 +88,52 @@ class FolderPermission: ObservableObject {
         openPanel.canCreateDirectories = false
         openPanel.allowsMultipleSelection = false
         openPanel.begin { (result) in
-            if result == .OK {
-                self.addBookmark(openPanel.url)
+            if result == .OK, let url = openPanel.url {
+                self.addBookmark(url)
             }
         }
     }
 
-    func addBookmark(_ url: URL?) {
-        guard let url = url else { return }
-        if permissions.contains(where: { $0.bookmarkedURL == url.absoluteString }) {
-            // The folder has already been added.
+    func addBookmark(_ url: URL) {
+        let urlString = url.absoluteString
+        
+        // Check if already exists
+        if permissions.contains(where: { $0.bookmarkedURL.absoluteString == urlString }) {
             return
         }
-        self.url = url
+        
         do {
-            let bookmark = try createBookmark(from: url)
-            bookmarkData = bookmark
-            permissions.append(PermissionList(bookmarkedURL: url.absoluteString))
+            let data = try createBookmark(from: url)
+            var currentBookmarks = bookmarks
+            currentBookmarks[urlString] = data
+            bookmarks = currentBookmarks
+            
+            permissions.append(PermissionList(bookmarkedURL: url))
+            
+            // Notify Observers
+            objectWillChange.send()
+            
+            // Trigger app refresh
+            IconManager.shared.refresh()
         } catch {
-            print("Error creating bookmark:", error)
+            print("Error creating bookmark for \(urlString): \(error)")
         }
     }
-
-    func hasPermissionForApplicationsFolder() -> Bool {
-        let safariAppURL = URL(fileURLWithPath: "/Applications/Safari.app/Contents/Info.plist")
-        let fileManager = FileManager.default
-        return fileManager.isReadableFile(atPath: safariAppURL.path)
+    
+    func removeBookmark(id: UUID) {
+        guard let index = permissions.firstIndex(where: { $0.id == id }) else { return }
+        let permission = permissions[index]
+        
+        permissions.remove(at: index)
+        
+        var currentBookmarks = bookmarks
+        currentBookmarks.removeValue(forKey: permission.bookmarkedURL.absoluteString)
+        bookmarks = currentBookmarks
+        
+        permission.bookmarkedURL.stopAccessingSecurityScopedResource()
+        
+        // Trigger app refresh
+        IconManager.shared.refresh()
     }
 
     // Create a security bookmark
@@ -95,36 +142,5 @@ class FolderPermission: ObservableObject {
                 includingResourceValuesForKeys: nil,
                 relativeTo: nil)
         return bookmarkData
-    }
-
-    // Use a security bookmark
-    func accessBookmark(_ bookmarkData: Data) throws -> URL {
-        var isStale = false
-        let bookmarkedURL = try URL(resolvingBookmarkData: bookmarkData,
-                options: .withSecurityScope,
-                relativeTo: nil,
-                bookmarkDataIsStale: &isStale)
-
-        if isStale {
-            // The bookmark data is outdated and needs to be recreated
-            // ...
-        }
-
-        if !bookmarkedURL.startAccessingSecurityScopedResource() {
-            // No permission to access the resource
-            // ...
-        }
-
-        return bookmarkedURL
-    }
-
-    func removeBookmark() {
-        guard !permissions.isEmpty else { return }
-        permissions.removeLast()
-        if let lastBookmark = permissions.last {
-            bookmarkData = lastBookmark.bookmarkedURL.data(using: .utf8)
-        } else {
-            bookmarkData = nil
-        }
     }
 }
