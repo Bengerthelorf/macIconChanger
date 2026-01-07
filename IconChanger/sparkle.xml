@@ -4,6 +4,24 @@
     <channel>
         <title>IconChanger</title>
         <item>
+            <title>Version 1.1.8</title>
+            <link>https://github.com/Bengerthelorf/macIconChanger</link>
+            <sparkle:version>118</sparkle:version>
+            <sparkle:shortVersionString>1.1.8</sparkle:shortVersionString>
+            <pubDate>Thu, 08 Jan 2026 00:19:22 +0800</pubDate>
+            <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.1.8/IconChanger.dmg"
+            sparkle:edSignature="E6XsR0KG7FzonXmDn1l1ulcmHvW9wv4Zxynz3dGZJo0pHqLvU6KOb/50ZYhh63ZUy+wniaqLw5SH0vL9bevdAQ==" length="13405944"
+            type="application/octet-stream"/>
+            <description>
+                <![CDATA[
+                <h2>Version 1.1.8</h2>
+                <ul>
+                    <li><strong>Fix:</strong> Resolved the Sparkle updater startup error popup.</li>
+                </ul>
+                ]]>
+            </description>
+        </item>
+        <item>
             <title>Version 1.1.7</title>
             <link>https://github.com/Bengerthelorf/macIconChanger</link>
             <sparkle:version>117</sparkle:version>

@@ -60,7 +60,7 @@
 		908A792A281A5AE800951B15 /* Github-Iconchanger_bak.png in Resources */ = {isa = PBXBuildFile; fileRef = 908A7929281A5AE800951B15 /* Github-Iconchanger_bak.png */; };
 		908A792E281A771800951B15 /* Api.png in Resources */ = {isa = PBXBuildFile; fileRef = 908A792D281A771800951B15 /* Api.png */; };
 		90B57C1B286AA2B400EE52D3 /* URL+Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90B57C1A286AA2B400EE52D3 /* URL+Document.swift */; };
-		90B57C1D286AA2F800EE52D3 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90B57C1C286AA2F800EE52D3 /* Config.swift */; };
+		C66396BF2F0EAD0C006729FC /* AppItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C66396BE2F0EAD0C006729FC /* AppItem.swift */; };
 		C6E571DA2EA2319C00EC9E5E /* IconImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6E571D92EA2319C00EC9E5E /* IconImageLoader.swift */; };
 /* End PBXBuildFile section */
 
@@ -146,9 +146,8 @@
 		908A7929281A5AE800951B15 /* Github-Iconchanger_bak.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Github-Iconchanger_bak.png"; sourceTree = "<group>"; };
 		908A792D281A771800951B15 /* Api.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Api.png; sourceTree = "<group>"; };
 		90B57C1A286AA2B400EE52D3 /* URL+Document.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Document.swift"; sourceTree = "<group>"; };
-		90B57C1C286AA2F800EE52D3 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		90B57C1E286AA62300EE52D3 /* IconChanger.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = IconChanger.entitlements; sourceTree = "<group>"; };
-		90B57C21286ACBA700EE52D3 /* StringTest.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = StringTest.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		C66396BE2F0EAD0C006729FC /* AppItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppItem.swift; sourceTree = "<group>"; };
 		C6E571D92EA2319C00EC9E5E /* IconImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconImageLoader.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -245,6 +244,7 @@
 				9053434D286B2A2900237F98 /* Info.plist */,
 				90B57C1E286AA62300EE52D3 /* IconChanger.entitlements */,
 				908A79012819753E00951B15 /* String+RangeSubscript.swift */,
+				C66396BE2F0EAD0C006729FC /* AppItem.swift */,
 				900D1CE8281934C7007ABB12 /* IconChangerApp.swift */,
 				900D1CEA281934C7007ABB12 /* ContentView.swift */,
 				900D1CEC281934C8007ABB12 /* Assets.xcassets */,
@@ -259,9 +259,7 @@
 				908A790A281A128700951B15 /* Request.swift */,
 				9083CCED28680BE20093A1B2 /* URL+Universal.swift */,
 				90B57C1A286AA2B400EE52D3 /* URL+Document.swift */,
-				90B57C1C286AA2F800EE52D3 /* Config.swift */,
 				90534351286C8BDA00237F98 /* fileicon */,
-				90B57C21286ACBA700EE52D3 /* StringTest.playground */,
 				90534350286B441900237F98 /* sparkle.xml */,
 				9053438A287534C300237F98 /* helper.sh */,
 				2FC1317B2D8F916D00F60B19 /* Localizable.strings */,
@@ -442,7 +440,6 @@
 				90B57C1B286AA2B400EE52D3 /* URL+Document.swift in Sources */,
 				43AC17352E991DBA0093962C /* IconStyle.swift in Sources */,
 				9083CCEE28680BE20093A1B2 /* URL+Universal.swift in Sources */,
-				90B57C1D286AA2F800EE52D3 /* Config.swift in Sources */,
 				900D1CEB281934C7007ABB12 /* ContentView.swift in Sources */,
 				908A790B281A128700951B15 /* Request.swift in Sources */,
 				9017B5FA294ED626005709C6 /* IconRes.swift in Sources */,
@@ -468,6 +465,7 @@
 				68431F5F90EFAE60C30EF968 /* AliasNameCore.swift in Sources */,
 				684313DDC8758B6A23980300 /* PermissionRequest.swift in Sources */,
 				2F13C07E2D932CB800C645E9 /* CLISettingView.swift in Sources */,
+				C66396BF2F0EAD0C006729FC /* AppItem.swift in Sources */,
 				684319A985908FD7F396A2B9 /* SettingsView.swift in Sources */,
 				68431C42D3D73EB33CD18CD3 /* GeneralSettingsView.swift in Sources */,
 				2FC1318D2D8FB5CB00F60B19 /* BackgroundService.swift in Sources */,
@@ -665,9 +663,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = IconChanger/IconChanger.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 116;
+				CURRENT_PROJECT_VERSION = 118;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"IconChanger/Preview Content\"";
 				DEVELOPMENT_TEAM = 2T53C3HYGK;
@@ -682,7 +681,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.4;
-				MARKETING_VERSION = 1.1.6;
+				MARKETING_VERSION = 1.1.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zhuhaoyu.IconChanger;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -698,9 +697,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = IconChanger/IconChanger.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 116;
+				CURRENT_PROJECT_VERSION = 118;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"IconChanger/Preview Content\"";
 				DEVELOPMENT_TEAM = 2T53C3HYGK;
@@ -715,7 +715,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.4;
-				MARKETING_VERSION = 1.1.6;
+				MARKETING_VERSION = 1.1.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zhuhaoyu.IconChanger;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -770,7 +770,7 @@
 			repositoryURL = "https://github.com/sparkle-project/Sparkle";
 			requirement = {
 				kind = upToNextMinorVersion;
-				minimumVersion = 2.3.0;
+				minimumVersion = 2.8.0;
 			};
 		};
 		9083CCE72867FDBD0093A1B2 /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
