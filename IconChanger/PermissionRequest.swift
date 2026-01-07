@@ -11,8 +11,15 @@ import Combine
 
 struct PermissionList: Identifiable {
     let bookmarkedURL: URL
+    let originalURLString: String
     var path: String {
+        if let url = URL(string: originalURLString) {
+            return url.path
+        }
         return bookmarkedURL.path
+    }
+    var displayPath: String {
+        return URL(fileURLWithPath: path).displayPath()
     }
     let id = UUID()
 }
@@ -57,12 +64,12 @@ class FolderPermission: ObservableObject {
                     if url.startAccessingSecurityScopedResource() {
                         let newData = try createBookmark(from: url)
                         validBookmarks[urlString] = newData
-                        validPermissions.append(PermissionList(bookmarkedURL: url))
+                        validPermissions.append(PermissionList(bookmarkedURL: url, originalURLString: urlString))
                     }
                 } else {
                     if url.startAccessingSecurityScopedResource() {
                         validBookmarks[urlString] = data
-                        validPermissions.append(PermissionList(bookmarkedURL: url))
+                        validPermissions.append(PermissionList(bookmarkedURL: url, originalURLString: urlString))
                     }
                 }
             } catch {
@@ -98,7 +105,7 @@ class FolderPermission: ObservableObject {
         let urlString = url.absoluteString
         
         // Check if already exists
-        if permissions.contains(where: { $0.bookmarkedURL.absoluteString == urlString }) {
+        if permissions.contains(where: { $0.originalURLString == urlString }) {
             return
         }
         
@@ -108,7 +115,7 @@ class FolderPermission: ObservableObject {
             currentBookmarks[urlString] = data
             bookmarks = currentBookmarks
             
-            permissions.append(PermissionList(bookmarkedURL: url))
+            permissions.append(PermissionList(bookmarkedURL: url, originalURLString: urlString))
             
             // Notify Observers
             objectWillChange.send()

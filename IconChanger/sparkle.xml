@@ -4,6 +4,24 @@
     <channel>
         <title>IconChanger</title>
         <item>
+            <title>Version 1.1.9</title>
+            <link>https://github.com/Bengerthelorf/macIconChanger</link>
+            <sparkle:version>119</sparkle:version>
+            <sparkle:shortVersionString>1.1.9</sparkle:shortVersionString>
+            <pubDate>Thu, 08 Jan 2026 04:44:01 +0800</pubDate>
+            <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.1.9/IconChanger.dmg"
+            sparkle:edSignature="wQ4v4WANoUrppefmgWL7KVySW2Go1uoDta6zFtLO1E3UXCh34ey05uO1b0hhIIeHOvnRxu+8V95uZLHMZRBmAQ==" length="13397679"
+            type="application/octet-stream"/>
+            <description>
+                <![CDATA[
+                <h2>Version 1.1.9</h2>
+                <ul>
+                    <li><strong>Update:</strong> Bug Fix.</li>
+                </ul>
+                ]]>
+            </description>
+        </item>
+        <item>
             <title>Version 1.1.8</title>
             <link>https://github.com/Bengerthelorf/macIconChanger</link>
             <sparkle:version>118</sparkle:version>

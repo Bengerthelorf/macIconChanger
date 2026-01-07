@@ -49,35 +49,38 @@ class IconManager: ObservableObject {
     
     @objc func refresh() {
         Task {
-            var allApps: [AppItem] = []
-            
-            // 1. Fetch from LaunchPad DB
-            do {
-                let helper = try LaunchPadManagerDBHelper()
-                let dbApps = try helper.getAllAppInfos()
-                let dbAppItems = dbApps.map { AppItem(id: $0.url, name: $0.name, url: $0.url, originalAppInfo: $0) }
-                allApps.append(contentsOf: dbAppItems)
-            } catch {
-                logger.error("Error fetching LaunchPad apps: \(error.localizedDescription)")
-            }
-            
-            // 2. Scan Filesystem
-            let localApps = scanLocalApps()
-            
-            // 3. Merge (prefer DB apps if duplicate URL)
-            let existingURLs = Set(allApps.map { $0.url.path })
-            for localApp in localApps {
-                if !existingURLs.contains(localApp.url.path) {
-                    allApps.append(localApp)
-                }
-            }
-            
-            let sortedApps = allApps.sorted(by: { $0.name.localizedStandardCompare($1.name) == .orderedAscending })
-            
+            let sortedApps = loadAppItems()
             await MainActor.run {
                 self.apps = sortedApps
             }
         }
+    }
+    
+    func loadAppItems() -> [AppItem] {
+        var allApps: [AppItem] = []
+        
+        // 1. Fetch from LaunchPad DB
+        do {
+            let helper = try LaunchPadManagerDBHelper()
+            let dbApps = try helper.getAllAppInfos()
+            let dbAppItems = dbApps.map { AppItem(name: $0.name, url: $0.url, originalAppInfo: $0) }
+            allApps.append(contentsOf: dbAppItems)
+        } catch {
+            logger.error("Error fetching LaunchPad apps: \(error.localizedDescription)")
+        }
+        
+        // 2. Scan Filesystem
+        let localApps = scanLocalApps()
+        
+        // 3. Merge (prefer DB apps if duplicate URL)
+        let existingPaths = Set(allApps.map { $0.id })
+        for localApp in localApps {
+            if !existingPaths.contains(localApp.id) {
+                allApps.append(localApp)
+            }
+        }
+        
+        return allApps.sorted(by: { $0.name.localizedStandardCompare($1.name) == .orderedAscending })
     }
     
     func scanLocalApps() -> [AppItem] {
@@ -86,19 +89,32 @@ class IconManager: ObservableObject {
         
         // Directories to scan
         // Use permissions managed by FolderPermission
-        let dirs = FolderPermission.shared.permissions.map { $0.bookmarkedURL }
+        let permissions = FolderPermission.shared.permissions
+        let maxDepth = 5
         
         // If no directories are configured, we don't scan any local paths.
         // Users should add directories in Settings -> Application.
         
-        for dir in dirs {
-            // Get contents (not recursive deep scan, just top level apps for now as typical behavior)
-            guard let contents = try? fileManager.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil, options: .skipsHiddenFiles) else { continue }
+        for permission in permissions {
+            let dir = permission.bookmarkedURL
+            guard let enumerator = fileManager.enumerator(
+                at: dir,
+                includingPropertiesForKeys: [.isDirectoryKey],
+                options: [.skipsHiddenFiles, .skipsPackageDescendants]
+            ) else {
+                continue
+            }
             
-            for url in contents {
+            for case let url as URL in enumerator {
+                if enumerator.level > maxDepth {
+                    enumerator.skipDescendants()
+                    continue
+                }
+                
                 if url.pathExtension == "app" {
                     let name = url.deletingPathExtension().lastPathComponent
-                    appItems.append(AppItem(id: url, name: name, url: url, originalAppInfo: nil))
+                    appItems.append(AppItem(name: name, url: url, originalAppInfo: nil))
+                    enumerator.skipDescendants()
                 }
             }
         }

@@ -597,12 +597,7 @@ class BackgroundService: ObservableObject {
         let cachedIcons = IconCacheManager.shared.getAllCachedIcons()
         guard !cachedIcons.isEmpty else { return [] }
 
-        let helper = try LaunchPadManagerDBHelper()
-        let allApps = try helper.getAllAppInfos()
-        // Convert to AppItem
-        let appItems = allApps.map { AppItem(id: $0.url, name: $0.name, url: $0.url, originalAppInfo: $0) }
-        
-        let sortedApps = appItems.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
+        let sortedApps = iconManager.loadAppItems()
 
         await MainActor.run {
             iconManager.apps = sortedApps

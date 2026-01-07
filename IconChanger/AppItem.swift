@@ -9,17 +9,24 @@ import Foundation
 import LaunchPadManagerDBHelper
 
 struct AppItem: Identifiable, Hashable {
-    let id: URL
     let name: String
     let url: URL
     let originalAppInfo: LaunchPadManagerDBHelper.AppInfo?
     
-    // Conformance to Hashable based on URL
+    var id: String {
+        return url.universalPath()
+    }
+    
+    var displayPath: String {
+        return url.deletingLastPathComponent().displayPath()
+    }
+    
+    // Conformance to Hashable based on path string
     static func == (lhs: AppItem, rhs: AppItem) -> Bool {
-        lhs.url == rhs.url
+        lhs.id == rhs.id
     }
     
     func hash(into hasher: inout Hasher) {
-        hasher.combine(url)
+        hasher.combine(id)
     }
 }

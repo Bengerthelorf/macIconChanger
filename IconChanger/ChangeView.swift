@@ -47,7 +47,17 @@ struct ChangeView: View {
 
             ScrollView() {
                 VStack {
-                    Text(setPath.name).font(.title).frame(maxWidth: .infinity, alignment: .leading)
+                    let hasDuplicateName = iconManager.apps.filter { $0.name == setPath.name }.count > 1
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text(setPath.name)
+                            .font(.title)
+                        if hasDuplicateName {
+                            Text("(\(setPath.displayPath))")
+                                .font(.title3)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     HStack {
                         Text("Local")
                                 .font(.headline)

@@ -26,7 +26,7 @@ struct IconList: View {
             List(selection: $selectedApp) {
                 ForEach(iconManager.apps.filter { app in
                     searchText.isEmpty || app.name.localizedStandardContains(searchText)
-                }, id: \.url) { app in
+                }, id: \.id) { app in
                     NavigationLink(destination: ChangeView(setPath: app),
                             tag: app,
                             selection: $selectedApp) {
