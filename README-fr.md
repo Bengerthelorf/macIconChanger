@@ -4,7 +4,7 @@
 
 IconChanger est une application macOS qui vous permet de personnaliser facilement les icônes de vos applications sur votre Mac. Avec une interface graphique élégante et de puissants outils en ligne de commande, IconChanger vous offre un contrôle total sur les icônes de vos applications.
 
-![preview](./Github/Github-Iconchanger.png)
+![preview](./Github/Github-Iconchanger.jpeg)
 
 ## ✨ Pourquoi IconChanger ?
 

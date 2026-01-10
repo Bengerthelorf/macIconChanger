@@ -4,7 +4,7 @@
 
 IconChanger 是一个 macOS 应用程序，可以让您轻松自定义 Mac 上的应用程序图标。通过简洁的图形界面和强大的命令行工具，IconChanger 为您提供了完全控制应用图标的能力。
 
-![预览](./Github/Github-Iconchanger.png)
+![预览](./Github/Github-Iconchanger.jpeg)
 
 ## ✨ 为什么选择 IconChanger？
 
