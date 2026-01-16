@@ -13,7 +13,6 @@
 		2F13C0802D932CFC00C645E9 /* ConfigManager+CLI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F13C07F2D932CFC00C645E9 /* ConfigManager+CLI.swift */; };
 		2F13C0832D932EDD00C645E9 /* IconChangerCLI in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2F13C06C2D9325B100C645E9 /* IconChangerCLI */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		2F4A9A1D2D92543A00F4FA81 /* ConfigSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F4A9A1C2D92543A00F4FA81 /* ConfigSettingsView.swift */; };
-		2F53ECDE2D91CC8500A91DD9 /* Github-Iconchanger.png in Resources */ = {isa = PBXBuildFile; fileRef = 2F53ECDD2D91CC8500A91DD9 /* Github-Iconchanger.png */; };
 		2FC131602D8F7D7E00F60B19 /* CachedIconsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FC1315F2D8F7D7D00F60B19 /* CachedIconsView.swift */; };
 		2FC131622D8F7DB000F60B19 /* IconCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FC131612D8F7DB000F60B19 /* IconCache.swift */; };
 		2FC131842D8F916D00F60B19 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2FC1317B2D8F916D00F60B19 /* Localizable.strings */; };
@@ -92,7 +91,6 @@
 		2F13C07D2D932CB800C645E9 /* CLISettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLISettingView.swift; sourceTree = "<group>"; };
 		2F13C07F2D932CFC00C645E9 /* ConfigManager+CLI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfigManager+CLI.swift"; sourceTree = "<group>"; };
 		2F4A9A1C2D92543A00F4FA81 /* ConfigSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigSettingsView.swift; sourceTree = "<group>"; };
-		2F53ECDD2D91CC8500A91DD9 /* Github-Iconchanger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Github-Iconchanger.png"; sourceTree = "<group>"; };
 		2F94B8FA2D94F85300B686B1 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		2F94B8FB2D94F91200B686B1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		2F94B8FC2D94F91700B686B1 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -296,7 +294,6 @@
 			isa = PBXGroup;
 			children = (
 				908A792D281A771800951B15 /* Api.png */,
-				2F53ECDD2D91CC8500A91DD9 /* Github-Iconchanger.png */,
 				908A7929281A5AE800951B15 /* Github-Iconchanger_bak.png */,
 			);
 			path = Github;
@@ -412,7 +409,6 @@
 				90534352286C8BDA00237F98 /* fileicon in Resources */,
 				9053438B287550C200237F98 /* helper.sh in Resources */,
 				2FC131842D8F916D00F60B19 /* Localizable.strings in Resources */,
-				2F53ECDE2D91CC8500A91DD9 /* Github-Iconchanger.png in Resources */,
 				907AC4F92954038600F9F0F9 /* README-zh.md in Resources */,
 				900D1CF0281934C8007ABB12 /* Preview Assets.xcassets in Resources */,
 				908A7927281A5A4A00951B15 /* README.md in Resources */,
