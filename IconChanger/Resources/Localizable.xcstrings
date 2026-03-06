@@ -1,14 +1,10 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {
-
-    },
     "(%@)" : {
 
     },
     "%lld" : {
-      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -43,6 +39,7 @@
       }
     },
     "%lld cached icons ready for restoration" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -75,6 +72,9 @@
           }
         }
       }
+    },
+    "%lld ready for restoration" : {
+
     },
     "%lld updated app(s) had their custom icons restored." : {
       "comment" : "Notification body",
@@ -500,6 +500,7 @@
       }
     },
     "About Configuration Files" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -533,7 +534,11 @@
         }
       }
     },
+    "Actions" : {
+
+    },
     "After importing with CLI, restart the app to see the changes take effect." : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -894,6 +899,9 @@
         }
       }
     },
+    "API Key" : {
+      "comment" : "Settings section"
+    },
     "API Key: " : {
       "comment" : "API settings",
       "localizations" : {
@@ -964,6 +972,9 @@
         }
       }
     },
+    "App Aliases" : {
+
+    },
     "App Icons Restored" : {
       "comment" : "Notification title",
       "localizations" : {
@@ -1032,6 +1043,9 @@
           }
         }
       }
+    },
+    "App Update Detection" : {
+
     },
     "App Visibility" : {
       "localizations" : {
@@ -1206,6 +1220,7 @@
       }
     },
     "Automatic Icon Restoration" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -1308,6 +1323,7 @@
       }
     },
     "Background service is running" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -1340,6 +1356,9 @@
           }
         }
       }
+    },
+    "Cached Icons" : {
+
     },
     "Cached Icons: %lld" : {
       "comment" : "Menu item",
@@ -1550,6 +1569,7 @@
       }
     },
     "Check Interval:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -1763,6 +1783,7 @@
       }
     },
     "CLI Tool is installed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -1797,6 +1818,7 @@
       }
     },
     "CLI Tool is not installed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -1863,6 +1885,9 @@
           }
         }
       }
+    },
+    "Command line configuration is available with the 'iconchanger' tool." : {
+
     },
     "Command Line Tool" : {
       "localizations" : {
@@ -1966,6 +1991,9 @@
           }
         }
       }
+    },
+    "Connection Test" : {
+      "comment" : "Settings section"
     },
     "Copy" : {
       "comment" : "(No comment)",
@@ -2107,6 +2135,7 @@
       }
     },
     "Custom Check Interval:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -2174,7 +2203,11 @@
         }
       }
     },
+    "Custom Interval" : {
+
+    },
     "Custom Interval:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -2729,6 +2762,46 @@
         }
       }
     },
+    "Everything is set up correctly." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Everything is set up correctly."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout est correctement configuré."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて正しくセットアップされています。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有设置均已正确配置。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有設定均已正確配置。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有設定均已正確配置。"
+          }
+        }
+      }
+    },
     "Export a configuration:" : {
       "localizations" : {
         "fr" : {
@@ -2901,6 +2974,9 @@
           }
         }
       }
+    },
+    "Export your aliases and icon cache for backup or to use on another Mac." : {
+
     },
     "Finish" : {
       "comment" : "(No comment)",
@@ -3472,6 +3548,7 @@
       }
     },
     "Import & Export" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -3678,7 +3755,11 @@
         }
       }
     },
+    "Import will only add new items, never replace or remove existing ones." : {
+
+    },
     "Important Note:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -3822,7 +3903,11 @@
         }
       }
     },
+    "Installation Path" : {
+
+    },
     "Installation Path:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -3856,7 +3941,14 @@
         }
       }
     },
+    "Installed" : {
+
+    },
+    "Interval" : {
+
+    },
     "Interval:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -3995,7 +4087,11 @@
         }
       }
     },
+    "Last Check" : {
+
+    },
     "Last Check:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -4029,7 +4125,11 @@
         }
       }
     },
+    "Last Restore" : {
+
+    },
     "Last Restore:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -4386,7 +4486,11 @@
         }
       }
     },
+    "Next Restore" : {
+
+    },
     "Next restore: %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -4558,6 +4662,9 @@
           }
         }
       }
+    },
+    "Not Installed" : {
+
     },
     "OK" : {
       "comment" : "Alert button",
@@ -5417,6 +5524,9 @@
         }
       }
     },
+    "Running" : {
+
+    },
     "Save" : {
       "localizations" : {
         "fr" : {
@@ -5451,6 +5561,9 @@
         }
       }
     },
+    "Scheduled Restoration" : {
+
+    },
     "Select an app to see its details" : {
       "localizations" : {
         "fr" : {
@@ -5484,6 +5597,9 @@
           }
         }
       }
+    },
+    "Service Status" : {
+
     },
     "Set Alias Name" : {
       "comment" : "(No comment)",
@@ -5688,6 +5804,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "設定錯誤"
+          }
+        }
+      }
+    },
+    "Setup Status" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Setup Status"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "État de la configuration"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セットアップ状態"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置状态"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定狀態"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定狀態"
           }
         }
       }
@@ -5899,6 +6055,9 @@
           }
         }
       }
+    },
+    "Status" : {
+
     },
     "Style" : {
       "localizations" : {
@@ -6418,6 +6577,9 @@
         }
       }
     },
+    "Usage" : {
+
+    },
     "Usage Information" : {
       "localizations" : {
         "fr" : {
@@ -6599,6 +6761,7 @@
       }
     },
     "You must first export a configuration from the app before using the CLI export command." : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -6631,6 +6794,9 @@
           }
         }
       }
+    },
+    "You must first export a configuration from the app before using the CLI export command. After importing with CLI, restart the app to see changes." : {
+
     },
     "You need to obtain an API key from macosicons.com" : {
       "comment" : "API settings instruction",

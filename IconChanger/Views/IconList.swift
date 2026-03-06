@@ -105,9 +105,10 @@ struct IconList: View {
                                 Label("Refresh App List", systemImage: "arrow.triangle.2.circlepath")
                             }
 
-                            Button("Check Setup Status") {
-                                print("Manual setup check requested.")
+                            Button {
                                 iconManager.needsSetupCheck = true
+                            } label: {
+                                Label("Check Setup Status", systemImage: "stethoscope")
                             }
 
                             Divider()

@@ -16,6 +16,7 @@ struct ContentView: View {
     @State private var showSetupAlert = false
     @State private var setupAlertTitle = "Setup Information"
     @State private var setupInstructions = ""
+    @State private var showSetupOKAlert = false
 
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ContentView")
 
@@ -144,11 +145,21 @@ struct ContentView: View {
          .onChange(of: iconManager.needsSetupCheck) { needsCheck in
               if needsCheck {
                    logger.log("Triggering setup check from IconManager.")
+                   let previousState = setupState
                    checkFullSetup()
+                   // Show success alert if setup is still completed (manual re-check)
+                   if case .completed = previousState, case .completed = setupState {
+                       showSetupOKAlert = true
+                   }
                    DispatchQueue.main.async {
                         iconManager.needsSetupCheck = false
                    }
               }
+         }
+         .alert("Setup Status", isPresented: $showSetupOKAlert) {
+             Button("OK", role: .cancel) { }
+         } message: {
+             Text("Everything is set up correctly.")
          }
 
     }
