@@ -94,7 +94,7 @@ struct IconChangerApp: App {
         }
 
         Settings {
-            SettingsView()
+            SettingsView(updater: updaterController.updater)
         }
     }
 }

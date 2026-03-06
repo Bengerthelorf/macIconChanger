@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Sparkle
 
 // Language manager and related types
 enum AppLanguage: String, CaseIterable, Identifiable {
@@ -125,6 +126,8 @@ struct LanguageSettingsView: View {
 }
 
 struct SettingsView: View {
+    let updater: SPUUpdater
+
     var body: some View {
         TabView {
             ApplicationSettingsView()
@@ -142,27 +145,22 @@ struct SettingsView: View {
                     Label("Background", systemImage: "clock.arrow.circlepath")
                 }
 
-            APISettingsView()
+            AdvancedSettingsView()
                 .tabItem {
-                    Label(NSLocalizedString("API", comment: "Settings tab"), systemImage: "bolt")
-                }
-
-            ConfigSettingsView()
-                .tabItem {
-                    Label("Configuration", systemImage: "square.and.arrow.up.on.square")
-                }
-
-            CLISettingsView()
-                .tabItem {
-                    Label("Command Line", systemImage: "terminal")
+                    Label("Advanced", systemImage: "gearshape.2")
                 }
 
             LanguageSettingsView()
                 .tabItem {
                     Label(NSLocalizedString("Language", comment: "Settings tab"), systemImage: "globe")
                 }
+
+            AboutSettingsView(updater: updater)
+                .tabItem {
+                    Label("About", systemImage: "info.circle")
+                }
         }
         .padding()
-        .frame(width: 600, height: 500)
+        .frame(width: 500, height: 500)
     }
 }
