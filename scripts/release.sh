@@ -249,7 +249,7 @@ info "sparkle.xml updated with new release entry."
 # ==============================================================================
 
 info "Committing version bump and appcast update..."
-git add "$PROJECT_FILE" "$SPARKLE_XML" "$PROJECT_DIR/IconChanger/Info.plist" "$PROJECT_DIR/IconChanger/sparkle.xml"
+git add -f "$PROJECT_FILE" "$SPARKLE_XML" "$PROJECT_DIR/IconChanger/Info.plist" "$PROJECT_DIR/IconChanger/sparkle.xml"
 git commit -m "release: v$VERSION
 
 Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
