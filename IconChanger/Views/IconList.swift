@@ -31,7 +31,6 @@ struct IconList: View {
                             tag: app,
                             selection: $selectedApp) {
                         IconView(app: app)
-                            .id(iconManager.iconRefreshTrigger)
                     }
                             .contextMenu {
                                 Button("Copy the Name") {
@@ -143,21 +142,57 @@ struct IconList: View {
                 .onAppear {
                     iconManager.refresh()
                 }
+                .onChange(of: iconManager.iconRefreshTrigger) { _ in
+                    AppIconCache.shared.removeAll()
+                }
     }
 
 }
 
 struct IconView: View {
     let app: AppItem
+    @ObservedObject private var iconManager = IconManager.shared
+    @State private var icon: NSImage?
 
     var body: some View {
         HStack {
-            Image(nsImage: AppIconCache.shared.icon(for: app.url))
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 32, height: 32)
+            Group {
+                if let icon {
+                    Image(nsImage: icon)
+                        .resizable()
+                        .scaledToFit()
+                } else {
+                    Image(nsImage: NSWorkspace.shared.icon(for: .applicationBundle))
+                        .resizable()
+                        .scaledToFit()
+                        .opacity(0.3)
+                }
+            }
+            .frame(width: 32, height: 32)
+
             Text(app.name)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .task(id: app.url) {
+            await loadIcon()
+        }
+        .onChange(of: iconManager.iconRefreshTrigger) { _ in
+            icon = nil
+            Task { await loadIcon() }
+        }
+    }
+
+    private func loadIcon() async {
+        if let cached = AppIconCache.shared.cachedIcon(for: app.url) {
+            icon = cached
+            return
+        }
+        let url = app.url
+        let loaded = await Task.detached(priority: .userInitiated) {
+            AppIconCache.shared.icon(for: url)
+        }.value
+        if !Task.isCancelled {
+            icon = loaded
         }
     }
 }

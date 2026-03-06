@@ -146,6 +146,7 @@ final class AppIconCache {
         cache.totalCostLimit = 20 * 1024 * 1024
     }
 
+    /// Returns the cached icon if available, otherwise loads from disk synchronously.
     func icon(for appURL: URL) -> NSImage {
         let key = appURL as NSURL
         if let cached = cache.object(forKey: key) {
@@ -155,6 +156,11 @@ final class AppIconCache {
         let icon = NSWorkspace.shared.icon(forFile: appURL.path)
         cache.setObject(icon, forKey: key, cost: cacheCost(for: icon))
         return icon
+    }
+
+    /// Returns the icon only if it is already in the cache (no disk I/O).
+    func cachedIcon(for appURL: URL) -> NSImage? {
+        cache.object(forKey: appURL as NSURL)
     }
 
     func remove(for appURL: URL) {
