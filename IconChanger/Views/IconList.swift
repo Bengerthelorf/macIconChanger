@@ -169,6 +169,13 @@ struct IconView: View {
         .task(id: app.url) {
             await loadIcon()
         }
+        .onAppear {
+            // Fallback: if .task didn't set the icon (e.g. cancelled during fast scroll),
+            // pick it up from cache synchronously when the row reappears.
+            if icon == nil, let cached = AppIconCache.shared.cachedIcon(for: app.url) {
+                icon = cached
+            }
+        }
         .onChange(of: iconManager.iconRefreshTrigger) { _ in
             icon = nil
             Task { await loadIcon() }
@@ -184,9 +191,10 @@ struct IconView: View {
         let loaded = await Task.detached(priority: .userInitiated) {
             AppIconCache.shared.icon(for: url)
         }.value
-        if !Task.isCancelled {
-            icon = loaded
-        }
+        // Don't check Task.isCancelled — the detached task completed independently
+        // and setting @State on a disappeared view is harmless. This ensures the icon
+        // is ready if the view reappears before .task re-fires.
+        icon = loaded
     }
 }
 
