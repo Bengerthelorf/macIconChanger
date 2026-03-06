@@ -67,10 +67,9 @@ struct IconList: View {
                     }
                 }
             }
-                    .listStyle(SidebarListStyle())  // Use SidebarListStyle to create a sidebar look
-                    .frame(minWidth: 200, idealWidth: 300) // Adjust the width to your liking
+                    .listStyle(SidebarListStyle())
+                    .frame(minWidth: 200, idealWidth: 300)
 
-            // Placeholder detail view; NavigationLink replaces this when selected
             Text("Select an app to see its details")
                     .foregroundColor(.secondary)
         }
@@ -170,8 +169,6 @@ struct IconView: View {
             await loadIcon()
         }
         .onAppear {
-            // Fallback: if .task didn't set the icon (e.g. cancelled during fast scroll),
-            // pick it up from cache synchronously when the row reappears.
             if icon == nil, let cached = AppIconCache.shared.cachedIcon(for: app.url) {
                 icon = cached
             }
@@ -191,9 +188,6 @@ struct IconView: View {
         let loaded = await Task.detached(priority: .userInitiated) {
             AppIconCache.shared.icon(for: url)
         }.value
-        // Don't check Task.isCancelled — the detached task completed independently
-        // and setting @State on a disappeared view is harmless. This ensures the icon
-        // is ready if the view reappears before .task re-fires.
         icon = loaded
     }
 }

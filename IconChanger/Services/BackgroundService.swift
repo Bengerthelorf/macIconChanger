@@ -490,7 +490,6 @@ class BackgroundService: ObservableObject {
         cancelTimer(&fetchCacheCleanupTimer)
 
         if enableScheduledRestore {
-            // Calculate the actual time until next restore.
             let intervalHours = getActiveRestoreInterval()
             let intervalSeconds = TimeInterval(intervalHours * 3600)
             let nextRestore = lastScheduledRestore.addingTimeInterval(intervalSeconds)
@@ -511,7 +510,6 @@ class BackgroundService: ObservableObject {
             }
         }
 
-        // Only run fetch cache cleanup if there are entries, and use a longer interval.
         if IconFetchCacheManager.shared.getCacheCount() > 0 {
             fetchCacheCleanupTimer = makeRepeatingTimer(interval: 900) { [weak self] in
                 self?.cleanupFetchCache()
@@ -529,7 +527,6 @@ class BackgroundService: ObservableObject {
     private func makeRepeatingTimer(interval: TimeInterval,
                                     handler: @escaping @Sendable () -> Void) -> DispatchSourceTimer {
         let timer = DispatchSource.makeTimerSource(queue: timerQueue)
-        // Use generous leeway (10% of interval, min 30s) so the OS can coalesce wakes.
         let leeway = max(30, Int(interval * 0.10))
         timer.schedule(deadline: .now() + interval, repeating: interval, leeway: .seconds(leeway))
         timer.setEventHandler(handler: handler)
@@ -537,7 +534,6 @@ class BackgroundService: ObservableObject {
         return timer
     }
 
-    /// Creates a timer that fires after `initialDelay`, then repeats every `repeatingInterval`.
     private func makeOneShotThenRepeatingTimer(initialDelay: TimeInterval,
                                                repeatingInterval: TimeInterval,
                                                handler: @escaping @Sendable () -> Void) -> DispatchSourceTimer {
@@ -598,8 +594,6 @@ class BackgroundService: ObservableObject {
                 await MainActor.run {
                     lastScheduledRestore = Date()
                     updateStatusMenu()
-                    // Reschedule the timer so the next fire uses the correct interval
-                    // relative to the new lastScheduledRestore.
                     setupTimers()
                 }
 

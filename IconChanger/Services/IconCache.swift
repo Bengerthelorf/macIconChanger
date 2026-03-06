@@ -145,7 +145,6 @@ class IconCacheManager {
         saveCache()
         lock.unlock()
 
-        // Delete files outside the lock to avoid blocking other operations
         for url in urlsToDelete {
             try? FileManager.default.removeItem(at: url)
         }

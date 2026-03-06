@@ -48,11 +48,9 @@ class IconManager: ObservableObject {
     }
     
     @objc func refresh() {
-        // Cancel any in-flight refresh to avoid redundant parallel scans.
         refreshTask?.cancel()
         refreshTask = Task {
-            // Brief debounce — coalesces rapid successive calls.
-            try? await Task.sleep(nanoseconds: 150_000_000) // 150ms
+            try? await Task.sleep(nanoseconds: 150_000_000) // debounce
             guard !Task.isCancelled else { return }
             let sortedApps = loadAppItems()
             guard !Task.isCancelled else { return }
@@ -167,11 +165,9 @@ class IconManager: ObservableObject {
     
     
     
-    /// Copies a bundled file to the destination, replacing it if the contents differ.
     private func copyIfNeeded(from sourcePath: String, to destPath: String, name: String) {
         let fm = FileManager.default
         if fm.fileExists(atPath: destPath) {
-            // Compare file contents; replace if they differ (e.g. after app update)
             if let sourceData = fm.contents(atPath: sourcePath),
                let destData = fm.contents(atPath: destPath),
                sourceData == destData {
@@ -285,7 +281,6 @@ class IconManager: ObservableObject {
         logger.log("Starting restoreAllCachedIcons...")
         try ensureSetupCompleted()
 
-        // Ensure we have a populated app list; reload if empty.
         let currentApps: [AppItem] = await MainActor.run { apps }
         let appList: [AppItem]
         if currentApps.isEmpty {
@@ -587,9 +582,7 @@ class IconManager: ObservableObject {
         }
         logger.log("Helper files exist.")
         
-        // Now check sudoers permission
         let helperPath = self.helperScriptURL.path
-        // Escape spaces for the grep regex pattern (dots matching any char is harmless here)
         let escapedHelperPathForGrep = helperPath.replacingOccurrences(of: " ", with: "[[:space:]]")
 
         let grepPattern = "NOPASSWD:[[:space:]]*\(escapedHelperPathForGrep)"
