@@ -615,8 +615,9 @@ class BackgroundService: ObservableObject {
         Task {
             do {
                 try await iconManager.restoreAllCachedIcons()
-                lastScheduledRestore = Date()
-                
+                await MainActor.run {
+                    lastScheduledRestore = Date()
+                }
                 updateStatusMenu()
                 showRestoreNotification()
             } catch {

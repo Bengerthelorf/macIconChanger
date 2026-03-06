@@ -138,14 +138,17 @@ class IconCacheManager {
     // Clear all cached icons
     func clearCache() {
         lock.lock()
-        for cache in cachedIcons.values {
-            let iconURL = Self.cacheDirectory.appendingPathComponent(cache.iconFileName)
-            try? FileManager.default.removeItem(at: iconURL)
+        let urlsToDelete = cachedIcons.values.map {
+            Self.cacheDirectory.appendingPathComponent($0.iconFileName)
         }
-
         cachedIcons.removeAll()
         saveCache()
         lock.unlock()
+
+        // Delete files outside the lock to avoid blocking other operations
+        for url in urlsToDelete {
+            try? FileManager.default.removeItem(at: url)
+        }
     }
 
     func addImportedCache(_ cache: IconCache) {

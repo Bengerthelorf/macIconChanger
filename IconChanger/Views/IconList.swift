@@ -73,13 +73,9 @@ struct IconList: View {
                     .listStyle(SidebarListStyle())  // Use SidebarListStyle to create a sidebar look
                     .frame(minWidth: 200, idealWidth: 300) // Adjust the width to your liking
 
-            // Display detail view when an app is selected, otherwise display placeholder
-            if let app = selectedApp {
-                ChangeView(setPath: app)
-            } else {
-                Text("Select an app to see its details")
-                        .foregroundColor(.secondary)
-            }
+            // Placeholder detail view; NavigationLink replaces this when selected
+            Text("Select an app to see its details")
+                    .foregroundColor(.secondary)
         }
 
                 .sheet(item: $setAlias) {
