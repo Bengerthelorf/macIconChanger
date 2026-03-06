@@ -233,7 +233,7 @@ extension NSWorkspace {
     }
 
     func openLocationService(for type: SystemServiceType) {
-        let url = URL(string: type.rawValue)!
+        guard let url = URL(string: type.rawValue) else { return }
         NSWorkspace.shared.open(url)
     }
 }

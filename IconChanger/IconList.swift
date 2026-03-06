@@ -242,7 +242,7 @@ struct MyDropDelegate: DropDelegate {
                             do {
                                 try await IconManager.shared.setImage(nsimage, app: app)
                             } catch {
-                                fatalError(error.localizedDescription)
+                                print("Failed to set icon via drag and drop: \(error.localizedDescription)")
                             }
                         }
                     }

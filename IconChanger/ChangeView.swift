@@ -159,14 +159,14 @@ struct ChangeView: View {
                     switch result {
                     case .success(let url):
                         if url.startAccessingSecurityScopedResource() {
+                            defer { url.stopAccessingSecurityScopedResource() }
                             if let nsimage = NSImage(contentsOf: url) {
                                 do {
                                     try IconManager.shared.setImage(nsimage, app: setPath)
                                 } catch {
-                                    fatalError(error.localizedDescription)
+                                    print("Failed to set icon from local file: \(error.localizedDescription)")
                                 }
                             }
-                            url.stopAccessingSecurityScopedResource()
                         }
                     case .failure(let error):
                         print(error)
