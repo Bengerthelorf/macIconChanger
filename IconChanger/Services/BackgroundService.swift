@@ -616,8 +616,9 @@ class BackgroundService: ObservableObject {
         }
     }
     
-    // Check cached apps for updates — lightweight: only checks mod dates of cached apps,
-    // does NOT reload the full app list.
+    // Check cached apps for updates — compares each app's modification date
+    // against the timestamp when its icon was cached. Only returns apps that
+    // were modified AFTER their custom icon was applied.
     private func checkCachedAppsForUpdates() async throws -> [AppItem] {
         let cachedIcons = IconCacheManager.shared.getAllCachedIcons()
         guard !cachedIcons.isEmpty else { return [] }
@@ -633,16 +634,16 @@ class BackgroundService: ObservableObject {
             appMap = Dictionary(uniqueKeysWithValues: currentApps.map { ($0.url.universalPath(), $0) })
         }
 
-        let checkDate = lastUpdateCheck
-
         let updatedApps: [AppItem] = cachedIcons.compactMap { cache in
             let appPath = cache.appPath
             guard let appItem = appMap[appPath] else { return nil }
 
-            // Only stat() the file if we have a matching app — avoid unnecessary disk I/O.
+            // Compare the app's modification date against when we cached its icon.
+            // If the app was modified after the icon was cached, it likely got updated
+            // and needs its custom icon re-applied.
             guard let attributes = try? FileManager.default.attributesOfItem(atPath: appPath),
                   let modDate = attributes[.modificationDate] as? Date,
-                  modDate > checkDate else {
+                  modDate > cache.timestamp else {
                 return nil
             }
 
@@ -652,15 +653,17 @@ class BackgroundService: ObservableObject {
         return updatedApps
     }
     
-    // Restore icons for updated apps
+    // Restore icons for updated apps and bump their cache timestamps
     private func restoreUpdatedApps(_ apps: [AppItem]) async throws {
         for app in apps {
-            // Get cached icon
-            if let _ = IconCacheManager.shared.getIconCache(for: app.url.universalPath()),
-               let iconURL = IconCacheManager.shared.getCachedIconURL(for: app.url.universalPath()),
+            let appPath = app.url.universalPath()
+            if let _ = IconCacheManager.shared.getIconCache(for: appPath),
+               let iconURL = IconCacheManager.shared.getCachedIconURL(for: appPath),
                let image = NSImage(contentsOf: iconURL) {
-                // Restore icon
                 try await iconManager.setIconWithoutCaching(image, app: app)
+                // Update the cache timestamp so this app isn't detected as
+                // "updated" again on the next check cycle.
+                IconCacheManager.shared.updateTimestamp(for: appPath)
             }
         }
     }

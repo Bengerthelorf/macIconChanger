@@ -105,6 +105,21 @@ class IconCacheManager {
         return cachedIcons.count
     }
 
+    // Update the timestamp of a cached icon (e.g. after re-applying it)
+    func updateTimestamp(for appPath: String, to date: Date = Date()) {
+        lock.lock()
+        if let existing = cachedIcons[appPath] {
+            cachedIcons[appPath] = IconCache(
+                appPath: existing.appPath,
+                iconFileName: existing.iconFileName,
+                appName: existing.appName,
+                timestamp: date
+            )
+            saveCache()
+        }
+        lock.unlock()
+    }
+
     // Remove a cached icon
     func removeCachedIcon(for appPath: String) {
         lock.lock()
