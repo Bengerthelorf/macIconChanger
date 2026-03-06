@@ -1,0 +1,173 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - 'v*.*.*'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve packages
+        run: xcodebuild -resolvePackageDependencies -project IconChanger.xcodeproj -scheme IconChanger
+
+      - name: Build (CI check)
+        if: "!startsWith(github.ref, 'refs/tags/')"
+        run: |
+          xcodebuild build \
+            -project IconChanger.xcodeproj \
+            -scheme IconChanger \
+            -configuration Release \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            -quiet
+
+      - name: Import signing certificate
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          CERTIFICATE_P12: ${{ secrets.CERTIFICATE_P12 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+        run: |
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          KEYCHAIN_PASSWORD=$(openssl rand -base64 32)
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          echo "$CERTIFICATE_P12" | base64 --decode > $RUNNER_TEMP/certificate.p12
+          security import $RUNNER_TEMP/certificate.p12 \
+            -P "$CERTIFICATE_PASSWORD" \
+            -A -t cert -f pkcs12 \
+            -k "$KEYCHAIN_PATH"
+
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychains -d user -s "$KEYCHAIN_PATH" login.keychain-db
+
+      - name: Archive
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          xcodebuild archive \
+            -project IconChanger.xcodeproj \
+            -scheme IconChanger \
+            -configuration Release \
+            -archivePath build/IconChanger.xcarchive \
+            -quiet
+
+      - name: Export app
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          # Extract .app from archive directly (no notarization needed)
+          cp -R build/IconChanger.xcarchive/Products/Applications/IconChanger.app build/
+
+      - name: Create DMG
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          mkdir -p build/dmg
+          cp -R build/IconChanger.app build/dmg/
+          ln -s /Applications build/dmg/Applications
+          hdiutil create \
+            -volname "IconChanger" \
+            -srcfolder build/dmg \
+            -ov -format UDZO \
+            build/IconChanger.dmg
+
+      - name: Sign DMG with Sparkle EdDSA
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          SPARKLE_KEY: ${{ secrets.SPARKLE_EDDSA_KEY }}
+        run: |
+          # Download Sparkle tools
+          curl -sL "https://github.com/sparkle-project/Sparkle/releases/download/2.8.0/Sparkle-2.8.0.tar.xz" -o /tmp/sparkle.tar.xz
+          mkdir -p /tmp/sparkle
+          tar xf /tmp/sparkle.tar.xz -C /tmp/sparkle
+          SIGN_UPDATE="/tmp/sparkle/bin/sign_update"
+
+          echo "$SPARKLE_KEY" > /tmp/sparkle_key
+          SIGNATURE=$("$SIGN_UPDATE" build/IconChanger.dmg --ed-key-file /tmp/sparkle_key)
+          rm -f /tmp/sparkle_key
+
+          DMG_SIZE=$(stat -f%z build/IconChanger.dmg)
+          echo "DMG_SIZE=$DMG_SIZE" >> $GITHUB_ENV
+
+          ED_SIG=$(echo "$SIGNATURE" | grep -o 'sparkle:edSignature="[^"]*"' | sed 's/sparkle:edSignature="//;s/"//')
+          echo "ED_SIGNATURE=$ED_SIG" >> $GITHUB_ENV
+
+      - name: Update sparkle.xml
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          BUILD_NUMBER=$(echo "$VERSION" | tr -d '.')
+          TAG=${GITHUB_REF#refs/tags/}
+          PUBDATE=$(date -u "+%a, %d %b %Y %H:%M:%S +0000")
+          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/IconChanger.dmg"
+
+          NEW_ITEM="        <item>\n\
+                      <title>Version $VERSION</title>\n\
+                      <link>https://github.com/${{ github.repository }}</link>\n\
+                      <sparkle:version>$BUILD_NUMBER</sparkle:version>\n\
+                      <sparkle:shortVersionString>$VERSION</sparkle:shortVersionString>\n\
+                      <pubDate>$PUBDATE</pubDate>\n\
+                      <enclosure url=\"$DOWNLOAD_URL\"\n\
+                      sparkle:edSignature=\"$ED_SIGNATURE\" length=\"$DMG_SIZE\"\n\
+                      type=\"application/octet-stream\"/>\n\
+                  </item>"
+
+          # Insert after <title>IconChanger</title>
+          sed -i '' "/<title>IconChanger<\/title>/a\\
+          $NEW_ITEM
+          " IconChanger/Resources/sparkle.xml
+
+      - name: Commit and push appcast
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git checkout main
+          git add IconChanger/Resources/sparkle.xml
+          git diff --cached --quiet && echo "No changes" || git commit -m "release: update appcast for ${GITHUB_REF#refs/tags/}"
+          git push origin main
+
+      - name: Generate changelog
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          echo "## What's Changed" > CHANGELOG.md
+          echo "" >> CHANGELOG.md
+
+          if [ -n "$PREVIOUS_TAG" ]; then
+            git log --pretty=format:"- %s" ${PREVIOUS_TAG}..HEAD -- ':!IconChanger/Resources/sparkle.xml' >> CHANGELOG.md
+            echo "" >> CHANGELOG.md
+            echo "" >> CHANGELOG.md
+            echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/${PREVIOUS_TAG}...${TAG}" >> CHANGELOG.md
+          else
+            git log --pretty=format:"- %s" >> CHANGELOG.md
+          fi
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/IconChanger.dmg
+          body_path: CHANGELOG.md
+          draft: false
+          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cleanup keychain
+        if: always() && startsWith(github.ref, 'refs/tags/')
+        run: |
+          security delete-keychain $RUNNER_TEMP/app-signing.keychain-db 2>/dev/null || true
