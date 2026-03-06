@@ -8,6 +8,16 @@
             <link>https://github.com/Bengerthelorf/macIconChanger</link>
             <sparkle:version>131</sparkle:version>
             <sparkle:shortVersionString>1.3.1</sparkle:shortVersionString>
+            <pubDate>Fri, 06 Mar 2026 23:41:41 +0000</pubDate>
+            <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.3.1/IconChanger.dmg"
+            sparkle:edSignature="jWrQZ31taNYXeKd9Z5qZEL4aRVJz5CVijyILZNjYfIzr/YypinLrl08OtkryShx7/kZ/E7mGmHr1kjucUxigCA==" length="10669863"
+            type="application/octet-stream"/>
+        </item>
+        <item>
+            <title>Version 1.3.1</title>
+            <link>https://github.com/Bengerthelorf/macIconChanger</link>
+            <sparkle:version>131</sparkle:version>
+            <sparkle:shortVersionString>1.3.1</sparkle:shortVersionString>
             <pubDate>Fri, 06 Mar 2026 23:29:14 +0000</pubDate>
             <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.3.1/IconChanger.dmg"
             sparkle:edSignature="yWzA7wpknrI7G2VvMViton5dSkOWTtckpX1/NCWA/lcZImtKuPA6+0fOSwkQ5Jx6oHxUUAVCgqk1xWTcZ6BjDg==" length="9477510"
