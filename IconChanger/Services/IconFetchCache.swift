@@ -128,9 +128,6 @@ class IconFetchCacheManager {
         entry.lastAccessTime = now
         cache[key] = entry
 
-        let age = now.timeIntervalSince(entry.timestamp)
-        let timeSinceAccess = now.timeIntervalSince(entry.lastAccessTime)
-//        print("✅ IconFetchCache HIT: \(key) (created: \(String(format: "%.1f", age))s ago, last accessed: \(String(format: "%.1f", timeSinceAccess))s ago, \(entry.icons.count) icons)")
 
         // Convert cached icons back to IconRes, filtering out any that fail validation
         let validIcons = entry.icons.compactMap { $0.toIconRes() }
@@ -251,16 +248,4 @@ class IconFetchCacheManager {
         return (hitCount, missCount, cache.count, hitRate, evictionCount)
     }
 
-    /// Print cache statistics
-    func printStatistics() {
-        let stats = getStatistics()
-//        print("""
-//        📊 IconFetchCache Statistics:
-//           - Cache Hits: \(stats.hits)
-//           - Cache Misses: \(stats.misses)
-//           - Hit Rate: \(String(format: "%.1f%%", stats.hitRate * 100))
-//           - Cached Entries: \(stats.total) / \(maxCacheEntries)
-//           - Evictions: \(stats.evictions)
-//        """)
-    }
 }

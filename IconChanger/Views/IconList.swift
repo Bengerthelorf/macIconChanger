@@ -240,7 +240,7 @@ struct MyDropDelegate: DropDelegate {
 
                         if let nsimage = NSImage(contentsOf: url) {
                             do {
-                                try await IconManager.shared.setImage(nsimage, app: app)
+                                try IconManager.shared.setImage(nsimage, app: app)
                             } catch {
                                 print("Failed to set icon via drag and drop: \(error.localizedDescription)")
                             }

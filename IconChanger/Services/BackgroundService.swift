@@ -580,14 +580,16 @@ class BackgroundService: ObservableObject {
                 showRestoreNotification()
             } catch {
                 print("Manual restore failed: \(error.localizedDescription)")
-                
-                // Show error alert
-                let alert = await NSAlert()
-                alert.messageText = "Icon Restoration Failed"
-                alert.informativeText = error.localizedDescription
-                alert.alertStyle = .warning
-                alert.addButton(withTitle: "OK")
-                alert.runModal()
+
+                // Show error alert on main actor
+                await MainActor.run {
+                    let alert = NSAlert()
+                    alert.messageText = "Icon Restoration Failed"
+                    alert.informativeText = error.localizedDescription
+                    alert.alertStyle = .warning
+                    alert.addButton(withTitle: "OK")
+                    alert.runModal()
+                }
             }
         }
     }

@@ -6,7 +6,12 @@
 //
 
 import Foundation
-import AppKit
+@preconcurrency import AppKit
+
+/// Wrapper to safely pass NSImage across concurrency boundaries.
+private struct SendableImage: @unchecked Sendable {
+    let image: NSImage?
+}
 
 /// Shared image loader with in-memory caching and request de-duplication.
 actor IconImageLoader {
@@ -14,7 +19,7 @@ actor IconImageLoader {
 
     private let cache = NSCache<NSURL, NSImage>()
     private let session: URLSession
-    private var inFlightTasks: [NSURL: Task<NSImage?, Error>] = [:]
+    private var inFlightTasks: [NSURL: Task<SendableImage, Error>] = [:]
 
     private init() {
         let configuration = URLSessionConfiguration.default
@@ -43,19 +48,20 @@ actor IconImageLoader {
         }
 
         if let existingTask = inFlightTasks[nsURL] {
-            return try await existingTask.value
+            return try await existingTask.value.image
         }
 
-        let task = Task<NSImage?, Error> {
-            try await self.fetchImage(for: url)
+        let task = Task<SendableImage, Error> {
+            let img = try await self.fetchImage(for: url)
+            return SendableImage(image: img)
         }
 
         inFlightTasks[nsURL] = task
 
         do {
-            let image = try await task.value
-            finish(taskFor: nsURL, with: image)
-            return image
+            let result = try await task.value
+            finish(taskFor: nsURL, with: result.image)
+            return result.image
         } catch {
             finish(taskFor: nsURL, with: nil)
             throw error
@@ -148,7 +154,7 @@ final class AppIconCache {
         cache.setObject(icon, forKey: key, cost: cacheCost(for: icon))
         return icon
     }
-    
+
     func remove(for appURL: URL) {
         let key = appURL as NSURL
         cache.removeObject(forKey: key)

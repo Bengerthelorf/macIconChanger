@@ -469,7 +469,6 @@ class IconManager: ObservableObject {
         // Collect output asynchronously to prevent pipe buffer deadlocks
         var outputData = Data()
         var errorData = Data()
-        let outputLock = NSLock()
 
         let outputHandle = pipe.fileHandleForReading
         let errorHandle = errorPipe.fileHandleForReading
