@@ -186,7 +186,9 @@ struct ChangeView: View {
                     loadIconsTask?.cancel()
                 }
                 .onChange(of: iconManager.iconRefreshTrigger) { _ in
-                    triggerIconFetch()
+                    // Only refresh the local .icns list; the online icon grid doesn't change
+                    // when the user applies an icon.
+                    inIcons = iconManager.getIconInPath(setPath.url)
                 }
 //                .navigationTitle(setPath.name)
     }

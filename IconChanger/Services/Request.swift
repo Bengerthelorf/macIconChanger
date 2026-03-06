@@ -33,13 +33,14 @@ class MyQueryRequestController {
 
     private static func makeSession() -> URLSession {
         let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 20.0
-        configuration.timeoutIntervalForResource = 45.0
+        configuration.timeoutIntervalForRequest = 15.0
+        configuration.timeoutIntervalForResource = 30.0
         configuration.httpMaximumConnectionsPerHost = 4
         configuration.requestCachePolicy = .reloadRevalidatingCacheData
+        // API responses are small JSON; keep a modest cache.
         configuration.urlCache = URLCache(
-            memoryCapacity: 20 * 1024 * 1024,
-            diskCapacity: 80 * 1024 * 1024,
+            memoryCapacity: 5 * 1024 * 1024,
+            diskCapacity: 30 * 1024 * 1024,
             diskPath: "IconQueryCache"
         )
         configuration.httpShouldUsePipelining = true
@@ -96,7 +97,7 @@ class MyQueryRequestController {
         let bodyObject: [String : Any] = [
             "query": query,
             "searchOptions": [
-                "hitsPerPage": 100,
+                "hitsPerPage": 50,
                 "page": 1,
                 "offset": 0,
                 "filters": filters,
@@ -248,7 +249,7 @@ class MyQueryRequestController {
         let session = self.session
         
         // Modified to attempt direct access to other endpoints of the API
-        let urlString = "https://api.macosicons.com/api/icons?q=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query)&limit=100"
+        let urlString = "https://api.macosicons.com/api/icons?q=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query)&limit=50"
         
         guard let url = URL(string: urlString) else {
             logger.error("Invalid backup search URL")

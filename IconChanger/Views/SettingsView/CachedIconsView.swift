@@ -15,7 +15,7 @@ struct CachedIconsView: View {
     @State private var isRestoring = false
     @State private var restoreError: Error? = nil
     @State private var showRestoreSuccess = false
-    
+
     var body: some View {
         VStack {
             if cachedIcons.isEmpty {
@@ -24,11 +24,11 @@ struct CachedIconsView: View {
                         .font(.system(size: 50))
                         .foregroundColor(.secondary)
                         .padding(.bottom, 10)
-                    
+
                     Text("No cached icons found")
                         .font(.headline)
                         .foregroundColor(.secondary)
-                    
+
                     Text("Icons will be cached automatically when you apply them to apps")
                         .font(.caption)
                         .foregroundColor(.secondary)
@@ -39,36 +39,7 @@ struct CachedIconsView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 List(cachedIcons, selection: $selectedIconIds) { cache in
-                    HStack(spacing: 16) {
-                        let iconURL = IconCacheManager.cacheDirectory.appendingPathComponent(cache.iconFileName)
-                        if let image = NSImage(contentsOf: iconURL) {
-                            Image(nsImage: image)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 40, height: 40)
-                                .cornerRadius(8)
-                        } else {
-                            Image(systemName: "questionmark.square")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 40, height: 40)
-                                .foregroundColor(.secondary)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(cache.appName)
-                                .font(.headline)
-                            
-                            HStack {
-                                Image(systemName: "clock")
-                                    .font(.system(size: 10))
-                                    .foregroundColor(.secondary)
-                                Text(formatDate(cache.timestamp))
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                    }
+                    CachedIconRow(cache: cache)
                     .padding(.vertical, 4)
                     .contextMenu {
                         Button {
@@ -76,9 +47,9 @@ struct CachedIconsView: View {
                         } label: {
                             Label("Restore This Icon", systemImage: "arrow.clockwise")
                         }
-                        
+
                         Divider()
-                        
+
                         Button(role: .destructive) {
                             removeCachedIcon(cache)
                         } label: {
@@ -86,7 +57,7 @@ struct CachedIconsView: View {
                         }
                     }
                 }
-                
+
                 HStack {
                     Button {
                         restoreAllIcons()
@@ -94,18 +65,18 @@ struct CachedIconsView: View {
                         Label("Restore All", systemImage: "arrow.clockwise")
                     }
                     .disabled(cachedIcons.isEmpty || isRestoring)
-                    
+
                     Spacer()
-                    
+
                     Button {
                         restoreSelected()
                     } label: {
                         Label("Restore Selected", systemImage: "arrow.clockwise.circle")
                     }
                     .disabled(selectedIconIds.isEmpty || isRestoring)
-                    
+
                     Spacer()
-                    
+
                     Button(role: .destructive) {
                         clearCache()
                     } label: {
@@ -124,17 +95,17 @@ struct CachedIconsView: View {
                 ProgressView()
                     .scaleEffect(1.5)
                     .padding(.bottom, 10)
-                
+
                 Text("Restoring icons...")
                     .font(.headline)
-                
+
                 if let error = restoreError {
                     Text("Error: \(error.localizedDescription)")
                         .foregroundColor(.red)
                         .padding()
                         .multilineTextAlignment(.center)
                 }
-                
+
                 Button("Cancel") {
                     isRestoring = false
                 }
@@ -150,35 +121,28 @@ struct CachedIconsView: View {
             Text("Custom icons have been successfully restored.")
         }
     }
-    
+
     private func loadCachedIcons() {
         cachedIcons = IconCacheManager.shared.getAllCachedIcons()
-            .sorted { $0.timestamp > $1.timestamp } // Sort by most recently applied
+            .sorted { $0.timestamp > $1.timestamp }
     }
-    
-    private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
-    }
-    
+
     private func restoreSingleIcon(_ cache: IconCache) {
         Task {
             isRestoring = true
             restoreError = nil
-            
+
             do {
                 let appPath = cache.appPath
                 let iconURL = IconCacheManager.cacheDirectory.appendingPathComponent(cache.iconFileName)
-                
+
                 if FileManager.default.fileExists(atPath: appPath) &&
                    FileManager.default.fileExists(atPath: iconURL.path) {
-                    
+
                     if let image = NSImage(contentsOf: iconURL),
                        let appInfo = iconManager.apps.first(where: { $0.url.universalPath() == appPath }) {
                         try await iconManager.setIconWithoutCaching(image, app: appInfo)
-                        
+
                         await MainActor.run {
                             isRestoring = false
                             showRestoreSuccess = true
@@ -203,26 +167,26 @@ struct CachedIconsView: View {
             }
         }
     }
-    
+
     private func restoreSelected() {
         guard !selectedIconIds.isEmpty else { return }
-        
+
         let selectedCaches = cachedIcons.filter { selectedIconIds.contains($0.id) }
-        
+
         Task {
             isRestoring = true
             restoreError = nil
-            
+
             var failedApps: [(String, Error)] = []
-            
+
             for cache in selectedCaches {
                 do {
                     let appPath = cache.appPath
                     let iconURL = IconCacheManager.cacheDirectory.appendingPathComponent(cache.iconFileName)
-                    
+
                     if FileManager.default.fileExists(atPath: appPath) &&
                        FileManager.default.fileExists(atPath: iconURL.path) {
-                        
+
                         if let image = NSImage(contentsOf: iconURL),
                            let appInfo = iconManager.apps.first(where: { $0.url.universalPath() == appPath }) {
                             try await iconManager.setIconWithoutCaching(image, app: appInfo)
@@ -232,10 +196,10 @@ struct CachedIconsView: View {
                     failedApps.append((cache.appName, error))
                 }
             }
-            
+
             await MainActor.run {
                 isRestoring = false
-                
+
                 if failedApps.isEmpty {
                     showRestoreSuccess = true
                 } else {
@@ -244,15 +208,15 @@ struct CachedIconsView: View {
             }
         }
     }
-    
+
     private func restoreAllIcons() {
         Task {
             isRestoring = true
             restoreError = nil
-            
+
             do {
                 try await iconManager.restoreAllCachedIcons()
-                
+
                 await MainActor.run {
                     isRestoring = false
                     showRestoreSuccess = true
@@ -265,14 +229,69 @@ struct CachedIconsView: View {
             }
         }
     }
-    
+
     private func removeCachedIcon(_ cache: IconCache) {
         IconCacheManager.shared.removeCachedIcon(for: cache.appPath)
         loadCachedIcons()
     }
-    
+
     private func clearCache() {
         IconCacheManager.shared.clearCache()
         cachedIcons = []
+    }
+}
+
+/// Row view that loads the cached icon image asynchronously to avoid blocking the main thread.
+private struct CachedIconRow: View {
+    let cache: IconCache
+    @State private var image: NSImage?
+
+    private static let dateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateStyle = .medium
+        f.timeStyle = .short
+        return f
+    }()
+
+    var body: some View {
+        HStack(spacing: 16) {
+            Group {
+                if let image {
+                    Image(nsImage: image)
+                        .resizable()
+                        .scaledToFit()
+                } else {
+                    Image(systemName: "questionmark.square")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundColor(.secondary)
+                }
+            }
+            .frame(width: 40, height: 40)
+            .cornerRadius(8)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(cache.appName)
+                    .font(.headline)
+
+                HStack {
+                    Image(systemName: "clock")
+                        .font(.system(size: 10))
+                        .foregroundColor(.secondary)
+                    Text(Self.dateFormatter.string(from: cache.timestamp))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
+        .task(id: cache.id) {
+            let url = IconCacheManager.cacheDirectory.appendingPathComponent(cache.iconFileName)
+            let loaded = await Task.detached(priority: .utility) { () -> Data? in
+                try? Data(contentsOf: url)
+            }.value
+            if let data = loaded {
+                image = NSImage(data: data)
+            }
+        }
     }
 }

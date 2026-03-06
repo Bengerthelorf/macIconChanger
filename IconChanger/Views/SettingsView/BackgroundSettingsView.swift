@@ -370,30 +370,27 @@ struct BackgroundSettingsView: View {
         .frame(width: 350, height: 200)
     }
     
-    // Helper function to format dates
+    private static let shortDateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateStyle = .short
+        f.timeStyle = .short
+        return f
+    }()
+
     private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
+        Self.shortDateFormatter.string(from: date)
     }
-    
-    // Calculate next restore time
+
     private func calculateNextRestoreTime() -> String {
         guard backgroundService.enableScheduledRestore && backgroundService.lastScheduledRestore != Date.distantPast else {
             return "Not scheduled"
         }
-        
+
         let interval = backgroundService.useCustomScheduledRestoreInterval ?
             backgroundService.customScheduledRestoreInterval : backgroundService.scheduledRestoreInterval
-        
+
         let nextRestoreDate = backgroundService.lastScheduledRestore.addingTimeInterval(TimeInterval(interval * 3600))
-        
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .short
-        
-        return formatter.string(from: nextRestoreDate)
+        return Self.shortDateFormatter.string(from: nextRestoreDate)
     }
     
     // Handle visibility changes to ensure at least one option is selected

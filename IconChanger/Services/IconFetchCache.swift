@@ -57,7 +57,7 @@ class IconFetchCacheManager {
     // MARK: - Properties
 
     /// Maximum number of cache entries (prevent memory overflow)
-    private let maxCacheEntries: Int = 500
+    private let maxCacheEntries: Int = 200
 
     /// In-memory cache storage (not persisted)
     private var cache: [String: IconFetchCacheEntry] = [:]

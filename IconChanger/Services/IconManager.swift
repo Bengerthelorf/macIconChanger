@@ -27,7 +27,9 @@ class IconManager: ObservableObject {
     @Published var apps: [AppItem] = []
     @Published var needsSetupCheck: Bool = false
     @Published var iconRefreshTrigger = UUID()
-    
+
+    private var refreshTask: Task<Void, Never>?
+
     var helperDirectoryURL: URL {
         FileManager.default.homeDirectoryForCurrentUser
             .appendingPathComponent(".iconchanger", isDirectory: true)
@@ -46,8 +48,14 @@ class IconManager: ObservableObject {
     }
     
     @objc func refresh() {
-        Task {
+        // Cancel any in-flight refresh to avoid redundant parallel scans.
+        refreshTask?.cancel()
+        refreshTask = Task {
+            // Brief debounce — coalesces rapid successive calls.
+            try? await Task.sleep(nanoseconds: 150_000_000) // 150ms
+            guard !Task.isCancelled else { return }
             let sortedApps = loadAppItems()
+            guard !Task.isCancelled else { return }
             await MainActor.run {
                 self.apps = sortedApps
             }

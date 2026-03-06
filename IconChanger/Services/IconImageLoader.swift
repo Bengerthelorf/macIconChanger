@@ -23,21 +23,21 @@ actor IconImageLoader {
 
     private init() {
         let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 20
-        configuration.timeoutIntervalForResource = 40
+        configuration.timeoutIntervalForRequest = 15
+        configuration.timeoutIntervalForResource = 30
         configuration.requestCachePolicy = .returnCacheDataElseLoad
 
-        // Give URLSession its own cache so repeated scrolls hit disk/memory instead of network.
+        // Rely on NSCache for in-memory; use modest URLSession disk cache only.
         configuration.urlCache = URLCache(
-            memoryCapacity: 50 * 1024 * 1024,
-            diskCapacity: 200 * 1024 * 1024,
+            memoryCapacity: 10 * 1024 * 1024,
+            diskCapacity: 100 * 1024 * 1024,
             diskPath: "IconImageLoaderCache"
         )
 
         session = URLSession(configuration: configuration)
 
-        cache.countLimit = 256
-        cache.totalCostLimit = 60 * 1024 * 1024
+        cache.countLimit = 150
+        cache.totalCostLimit = 30 * 1024 * 1024
     }
 
     func image(for url: URL) async throws -> NSImage? {
@@ -110,17 +110,19 @@ actor IconImageLoader {
     }
 
     private func detach(image: NSImage) -> NSImage? {
-        guard let tiffData = image.tiffRepresentation else {
+        guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
             return image
         }
+        let rep = NSBitmapImageRep(cgImage: cgImage)
+        rep.size = image.size
+        let detached = NSImage(size: rep.size)
+        detached.addRepresentation(rep)
+        return detached
+    }
 
-        guard let representation = NSBitmapImageRep(data: tiffData) else {
-            return image
-        }
-
-        let detachedImage = NSImage(size: representation.size)
-        detachedImage.addRepresentation(representation)
-        return detachedImage
+    /// Drop all in-memory cached images to reduce memory footprint (e.g. when entering background).
+    func purgeMemoryCache() {
+        cache.removeAllObjects()
     }
 
     private func imageCacheCost(for image: NSImage) -> Int {
@@ -140,8 +142,8 @@ final class AppIconCache {
     private let cache = NSCache<NSURL, NSImage>()
 
     private init() {
-        cache.countLimit = 512
-        cache.totalCostLimit = 40 * 1024 * 1024
+        cache.countLimit = 200
+        cache.totalCostLimit = 20 * 1024 * 1024
     }
 
     func icon(for appURL: URL) -> NSImage {
@@ -158,6 +160,10 @@ final class AppIconCache {
     func remove(for appURL: URL) {
         let key = appURL as NSURL
         cache.removeObject(forKey: key)
+    }
+
+    func removeAll() {
+        cache.removeAllObjects()
     }
 
     private func cacheCost(for image: NSImage) -> Int {
