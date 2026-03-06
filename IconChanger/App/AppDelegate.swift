@@ -24,10 +24,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         if !flag {
-            NSApp.activate(ignoringOtherApps: true)
+            NSApp.setActivationPolicy(.regular)
             return true
         }
         return false
+    }
+
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        if backgroundService.runInBackground {
+            backgroundService.handleLastWindowClosed()
+            return false
+        }
+        return true
     }
 }
 

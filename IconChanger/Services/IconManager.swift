@@ -119,15 +119,11 @@ class IconManager: ObservableObject {
     }
     
     func ensureHelperFilesCopied() {
-        logger.log("Ensuring helper files are copied...")
         let helperDir = helperDirectoryURL.path
-        
+
         do {
             if !FileManager.default.fileExists(atPath: helperDir) {
-                logger.log("Helper directory does not exist, creating: \(helperDir)")
                 try FileManager.default.createDirectory(at: helperDirectoryURL, withIntermediateDirectories: true, attributes: nil)
-            } else {
-                logger.log("Helper directory exists: \(helperDir)")
             }
             
             guard let fileiconBundlePath = Bundle.main.path(forResource: "fileicon", ofType: nil) else {
@@ -148,8 +144,6 @@ class IconManager: ObservableObject {
             copyIfNeeded(from: helperBundlePath, to: helperDestPath, name: "helper.sh")
             _ = try? Self.safeShell("chmod u+x '\(helperDestPath.shellEscaped)'")
             
-            logger.log("ensureHelperFilesCopied finished successfully.")
-            
         } catch {
             logger.error("Error during ensureHelperFilesCopied: \(error.localizedDescription)")
         }
@@ -163,17 +157,12 @@ class IconManager: ObservableObject {
             if let sourceData = fm.contents(atPath: sourcePath),
                let destData = fm.contents(atPath: destPath),
                sourceData == destData {
-                logger.log("'\(name)' is up to date at \(destPath)")
                 return
             }
-            logger.log("'\(name)' is outdated, replacing at \(destPath)")
             try? fm.removeItem(atPath: destPath)
-        } else {
-            logger.log("'\(name)' does not exist, copying to \(destPath)")
         }
         do {
             try fm.copyItem(atPath: sourcePath, toPath: destPath)
-            logger.log("'\(name)' copied successfully.")
         } catch {
             logger.error("Failed to copy '\(name)': \(error.localizedDescription)")
         }
@@ -241,13 +230,10 @@ class IconManager: ObservableObject {
         try runHelperTool(appPath: app.url.universalPath(), imagePath: imageURL.path)
     }
 
-    /// Remove the custom icon from an app, restoring its original bundle icon.
-    /// Uses setxattr syscall to clear the FinderInfo flag and removes the Icon\r file.
     func removeIcon(from app: AppItem) throws {
         let appPath = app.url.universalPath()
         logger.log("removeIcon called for app: \(app.name) at \(appPath)")
 
-        // Step 1: Clear the custom icon flag (bit 0x04 at byte 8) in com.apple.FinderInfo
         let finderInfoName = "com.apple.FinderInfo"
         var finderInfo = [UInt8](repeating: 0, count: 32)
         let size = getxattr(appPath, finderInfoName, &finderInfo, 32, 0, 0)
@@ -256,7 +242,6 @@ class IconManager: ObservableObject {
             if finderInfo[8] & 0x04 != 0 {
                 finderInfo[8] = finderInfo[8] & ~0x04
 
-                // If all bytes are zero, remove the attribute entirely
                 let allZero = finderInfo.allSatisfy { $0 == 0 }
                 if allZero {
                     removexattr(appPath, finderInfoName, 0)
@@ -269,16 +254,13 @@ class IconManager: ObservableObject {
                                       userInfo: [NSLocalizedDescriptionKey: "Failed to clear custom icon flag: \(err)"])
                     }
                 }
-                logger.log("FinderInfo custom icon flag cleared.")
             }
         }
 
-        // Step 2: Remove the Icon\r file
         let iconFile = app.url.appendingPathComponent("Icon\r")
         if FileManager.default.fileExists(atPath: iconFile.path) {
             do {
                 try FileManager.default.removeItem(at: iconFile)
-                logger.log("Icon\\r file removed.")
             } catch {
                 logger.error("Failed to remove Icon\\r: \(error.localizedDescription)")
                 throw NSError(domain: "IconManager", code: 31,
@@ -286,7 +268,6 @@ class IconManager: ObservableObject {
             }
         }
 
-        // Step 3: Remove from icon cache
         IconCacheManager.shared.removeCachedIcon(for: appPath)
 
         Task { @MainActor in
@@ -473,35 +454,24 @@ class IconManager: ObservableObject {
         let fileiconPath = self.fileiconURL.path
         
         let command = "sudo -n '\(helperToolPath.shellEscaped)' '\(fileiconPath.shellEscaped)' '\(appPath.shellEscaped)' '\(imagePath.shellEscaped)'"
-        logger.log("Executing command with -n: \(command)")
-        
+        logger.debug("Executing: \(command)")
+
         let output: String
         do {
-            output = try Self.safeShell(command, timeout: 15.0) // 15 second timeout
-            logger.log("Helper tool output: \(output)")
+            output = try Self.safeShell(command, timeout: 15.0)
         } catch let error as ShellError {
-            logger.error("safeShell failed: \(error.localizedDescription)")
             switch error {
             case .commandFailed(let status, let errOutput):
-                logger.error("Helper tool exited with status \(status). Output: \(errOutput)")
-                throw NSError(domain: "IconManager", code: 10, userInfo: [NSLocalizedDescriptionKey: "Helper tool failed (status: \(status)). Output: \(errOutput). Check sudoers configuration and file permissions."])
+                throw NSError(domain: "IconManager", code: 10, userInfo: [NSLocalizedDescriptionKey: "Helper tool failed (status: \(status)): \(errOutput)"])
             case .timeout:
-                logger.error("Helper tool command timed out.")
-                throw NSError(domain: "IconManager", code: 14, userInfo: [NSLocalizedDescriptionKey: "Helper tool command timed out. Check for password prompts or system load."])
-            case .taskCreationFailed(let underlyingError):
-                logger.error("Failed to create task for helper tool: \(underlyingError?.localizedDescription ?? "Unknown reason")")
-                throw NSError(domain: "IconManager", code: 15, userInfo: [NSLocalizedDescriptionKey: "Failed to start helper tool process."])
+                throw NSError(domain: "IconManager", code: 14, userInfo: [NSLocalizedDescriptionKey: "Helper tool timed out"])
+            case .taskCreationFailed:
+                throw NSError(domain: "IconManager", code: 15, userInfo: [NSLocalizedDescriptionKey: "Failed to start helper tool process"])
             }
-        } catch {
-            logger.error("An unexpected error occurred running the helper tool: \(error.localizedDescription)")
-            throw error
         }
-        
+
         if output.lowercased().contains("incorrect password") || output.lowercased().contains("try again") {
-            logger.error("Helper tool output suggests a password was required unexpectedly: \(output)")
-            throw NSError(domain: "IconManager", code: 16, userInfo: [NSLocalizedDescriptionKey: "Helper tool unexpectedly asked for a password. Check sudoers configuration. Output: \(output)"])
-        } else {
-            logger.log("Helper tool executed apparently successfully.")
+            throw NSError(domain: "IconManager", code: 16, userInfo: [NSLocalizedDescriptionKey: "Helper tool unexpectedly asked for a password: \(output)"])
         }
     }
     
@@ -537,7 +507,6 @@ class IconManager: ObservableObject {
         task.environment = ProcessInfo.processInfo.environment
         task.environment?["PATH"] = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:" + (task.environment?["PATH"] ?? "")
 
-        // Read output asynchronously to prevent pipe buffer deadlocks
         var outputData = Data()
         var errorData = Data()
 
@@ -597,17 +566,12 @@ class IconManager: ObservableObject {
     }
     
     
-    /// Automatically configure the sudoers entry via a macOS admin password prompt.
     func configureSudoers() throws {
         let helperPath = self.helperScriptURL.path
         let sudoersLine = "ALL ALL=(ALL) NOPASSWD: \(helperPath)"
         let sudoersFile = "/etc/sudoers.d/iconchanger"
-
-        // Write to a temp file first, validate with visudo, then move into place.
-        // This prevents writing a malformed sudoers file that could lock out sudo.
         let tmpFile = "/tmp/iconchanger_sudoers_\(ProcessInfo.processInfo.processIdentifier)"
 
-        // Build the shell command: write → validate → install
         let commands = [
             "echo '\(sudoersLine.shellEscaped)' > '\(tmpFile.shellEscaped)'",
             "visudo -c -f '\(tmpFile.shellEscaped)'",
@@ -645,12 +609,9 @@ class IconManager: ObservableObject {
                           userInfo: [NSLocalizedDescriptionKey: String(format: NSLocalizedString("Failed to configure permissions: %@", comment: "Sudoers config error"), errorOutput)])
         }
 
-        logger.log("Sudoers configuration completed successfully.")
     }
 
     func checkSetupStatus() -> SetupStatus {
-        logger.log("Checking setup status...")
-        
         var missingFiles: [String] = []
         let helperExists = FileManager.default.fileExists(atPath: self.helperScriptURL.path)
         let fileiconExists = FileManager.default.fileExists(atPath: self.fileiconURL.path)
@@ -665,10 +626,8 @@ class IconManager: ObservableObject {
         }
         
         if !missingFiles.isEmpty {
-            logger.error("Setup check failed: Helper files missing.")
             return .helperFilesMissing(missingFiles: missingFiles)
         }
-        logger.log("Helper files exist.")
         
         let helperPath = self.helperScriptURL.path
         let escapedHelperPathForGrep = helperPath.replacingOccurrences(of: " ", with: "[[:space:]]")
@@ -677,25 +636,14 @@ class IconManager: ObservableObject {
 
         let checkCommand = "sudo -n -l | grep -q -E '\(grepPattern.shellEscaped)'"
         
-        logger.log("Executing sudoers check command: \(checkCommand)")
-        
         do {
             _ = try Self.safeShell(checkCommand)
-            logger.log("Sudoers check successful: NOPASSWD rule for helper script found and effective.")
             return .completed
         } catch let error as ShellError {
             switch error {
             case .commandFailed(let status, let output):
-                if status == 1 {
-                    logger.warning("Sudoers check failed: Pattern \"\(grepPattern)\" not found in sudo -n -l output.")
-                    logger.warning("Run 'sudo -n -l' in Terminal to check the exact output format.")
-                    return .sudoersPermissionMissing
-                } else {
-                    logger.error("Sudoers check command failed with status \(status). Output: \(output). Assuming permission missing.")
-                    logger.error("Detailed error output: \(output)")
-                    logger.warning("Run 'sudo -n -l' in Terminal to check the exact output format and potential errors.")
-                    return .sudoersPermissionMissing
-                }
+                logger.debug("Sudoers check failed (status \(status)): \(output)")
+                return .sudoersPermissionMissing
             case .timeout:
                 logger.error("Sudoers check command timed out. Assuming permission missing.")
                 return .sudoersPermissionMissing

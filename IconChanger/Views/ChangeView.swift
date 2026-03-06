@@ -9,6 +9,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 import LaunchPadManagerDBHelper
 
 struct ChangeView: View {
@@ -30,7 +31,7 @@ struct ChangeView: View {
 
     @State var isExpanded: Bool = false
 
-    @State var importImage = false
+    @State var importedImageURL: URL? = nil
 
     @State var setAlias: String? = nil
 
@@ -71,7 +72,7 @@ struct ChangeView: View {
                                 .font(.headline)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         Button("Choose from the Local") {
-                            importImage.toggle()
+                            chooseLocalIcon()
                         }
                     }
 
@@ -163,19 +164,11 @@ struct ChangeView: View {
                         .padding()
             }
         }
-                .fileImporter(isPresented: $importImage, allowedContentTypes: [.image, .icns]) { result in
-                    switch result {
-                    case .success(let url):
-                        if url.startAccessingSecurityScopedResource() {
-                            defer { url.stopAccessingSecurityScopedResource() }
-                            if let nsimage = NSImage(contentsOf: url) {
-                                do {
-                                    try IconManager.shared.setImage(nsimage, app: setPath)
-                                } catch { }
-                            }
-                        }
-                    case .failure:
-                        break
+                .onChange(of: importedImageURL) { url in
+                    guard let url = url else { return }
+                    defer { importedImageURL = nil }
+                    if let nsimage = NSImage(contentsOf: url) {
+                        try? IconManager.shared.setImage(nsimage, app: setPath)
                     }
                 }
                 .padding(10)
@@ -216,6 +209,18 @@ struct ChangeView: View {
                 }
     }
     
+    private func chooseLocalIcon() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.image, .icns]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        panel.begin { response in
+            if response == .OK, let url = panel.url {
+                importedImageURL = url
+            }
+        }
+    }
+
     private func triggerIconFetch() {
         loadIconsTask?.cancel()
         let token = UUID()
@@ -272,24 +277,16 @@ struct ChangeView: View {
         }
     }
     
-    // Function to update the icon status and count
     private func updateIconStatus(icon: IconRes, isValid: Bool) {
-        // If the status becomes invalid and was previously valid
         if !isValid && icon.isValidIcon {
             icon.isValidIcon = false
             if successIconsCount > 0 {
                 successIconsCount -= 1
             }
-            
-            // Remove invalid icons from the validIcons array
             validIcons.removeAll { $0.id == icon.id }
-        }
-        // If the status becomes valid and was previously invalid (theoretically won't happen, but kept just in case)
-        else if isValid && !icon.isValidIcon {
+        } else if isValid && !icon.isValidIcon {
             icon.isValidIcon = true
             successIconsCount += 1
-            
-            // Ensure the icon is in the validIcons array
             if !validIcons.contains(where: { $0.id == icon.id }) {
                 validIcons.append(icon)
             }

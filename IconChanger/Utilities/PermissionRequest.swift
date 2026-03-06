@@ -119,10 +119,7 @@ class FolderPermission: ObservableObject {
             
             permissions.append(PermissionList(bookmarkedURL: url, originalURLString: urlString))
             
-            // Notify Observers
             objectWillChange.send()
-            
-            // Trigger app refresh
             IconManager.shared.refresh()
         } catch {
             logger.error("Error creating bookmark for \(urlString): \(error.localizedDescription)")
@@ -140,12 +137,9 @@ class FolderPermission: ObservableObject {
         bookmarks = currentBookmarks
         
         permission.bookmarkedURL.stopAccessingSecurityScopedResource()
-        
-        // Trigger app refresh
         IconManager.shared.refresh()
     }
 
-    // Create a security bookmark
     func createBookmark(from url: URL) throws -> Data {
         let bookmarkData = try url.bookmarkData(options: .withSecurityScope,
                 includingResourceValuesForKeys: nil,

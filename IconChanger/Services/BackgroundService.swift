@@ -156,19 +156,6 @@ class BackgroundService: ObservableObject {
         if let date = UserDefaults.standard.object(forKey: "lastUpdateCheck") as? Date {
             self.lastUpdateCheck = date
         }
-
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(setupBackgroundMode),
-            name: NSApplication.didFinishLaunchingNotification,
-            object: nil
-        )
-    }
-
-    @objc func setupBackgroundMode() {
-        if runInBackground {
-            startBackgroundService()
-        }
     }
 
     func startBackgroundService() {
@@ -178,7 +165,6 @@ class BackgroundService: ObservableObject {
 
         requestNotificationPermission()
         setupTimers()
-        updateDockVisibility()
 
         runInBackground = true
     }
@@ -219,11 +205,28 @@ class BackgroundService: ObservableObject {
 
     @objc func openMainWindow(_ sender: Any?) {
         NSApp.setActivationPolicy(.regular)
-        NSApp.activate(ignoringOtherApps: true)
 
-        if NSApp.windows.isEmpty || !NSApp.windows.contains(where: { $0.isVisible }) {
-            NotificationCenter.default.post(name: NSNotification.Name("OpenMainWindow"), object: nil)
+        // If there's still a window alive, just show it
+        if let window = NSApp.windows.first(where: { $0.canBecomeMain }) {
+            window.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
         }
+
+        let config = NSWorkspace.OpenConfiguration()
+        config.activates = true
+        NSWorkspace.shared.openApplication(
+            at: Bundle.main.bundleURL,
+            configuration: config
+        ) { _, _ in }
+    }
+
+    func handleLastWindowClosed() {
+        guard runInBackground else { return }
+        if !showInDock {
+            NSApp.setActivationPolicy(.accessory)
+        }
+        purgeImageCaches()
     }
 
     func updateStatusMenu() {
@@ -232,28 +235,33 @@ class BackgroundService: ObservableObject {
         let appName = Bundle.main.infoDictionary?["CFBundleName"] as? String ?? "IconChanger"
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
         let appInfoItem = NSMenuItem(title: "\(appName) \(appVersion)", action: nil, keyEquivalent: "")
+        appInfoItem.image = NSImage(systemSymbolName: "app.badge.checkmark.fill", accessibilityDescription: nil)
         appInfoItem.isEnabled = false
         menu.addItem(appInfoItem)
 
         menu.addItem(NSMenuItem.separator())
 
         let openItem = NSMenuItem(title: NSLocalizedString("Open IconChanger", comment: "Menu item"), action: #selector(openMainWindow(_:)), keyEquivalent: "o")
+        openItem.image = NSImage(systemSymbolName: "macwindow", accessibilityDescription: nil)
         openItem.target = self
         menu.addItem(openItem)
 
         let cachedCount = IconCacheManager.shared.getCachedIconsCount()
         let cachedCountItem = NSMenuItem(title: String(format: NSLocalizedString("Cached Icons: %lld", comment: "Menu item"), cachedCount), action: nil, keyEquivalent: "")
+        cachedCountItem.image = NSImage(systemSymbolName: "square.stack.3d.up", accessibilityDescription: nil)
         cachedCountItem.isEnabled = false
         menu.addItem(cachedCountItem)
 
         menu.addItem(NSMenuItem.separator())
 
         let restoreItem = NSMenuItem(title: NSLocalizedString("Restore Cached Icons", comment: "Menu item"), action: #selector(restoreCachedIcons), keyEquivalent: "r")
+        restoreItem.image = NSImage(systemSymbolName: "arrow.clockwise", accessibilityDescription: nil)
         restoreItem.target = self
         menu.addItem(restoreItem)
 
         if lastScheduledRestore != Date.distantPast {
             let lastRestoreItem = NSMenuItem(title: String(format: NSLocalizedString("Last Restore: %@", comment: "Menu item"), Self.shortDateFormatter.string(from: lastScheduledRestore)), action: nil, keyEquivalent: "")
+            lastRestoreItem.image = NSImage(systemSymbolName: "clock", accessibilityDescription: nil)
             lastRestoreItem.isEnabled = false
             menu.addItem(lastRestoreItem)
         }
@@ -263,11 +271,13 @@ class BackgroundService: ObservableObject {
         let settingsSubmenu = NSMenu()
 
         let menuBarItem = NSMenuItem(title: NSLocalizedString("Show in Menu Bar", comment: "Menu item"), action: #selector(toggleMenuBarVisibility), keyEquivalent: "")
+        menuBarItem.image = NSImage(systemSymbolName: "menubar.rectangle", accessibilityDescription: nil)
         menuBarItem.target = self
         menuBarItem.state = showInMenuBar ? .on : .off
         settingsSubmenu.addItem(menuBarItem)
 
         let dockItem = NSMenuItem(title: NSLocalizedString("Show in Dock", comment: "Menu item"), action: #selector(toggleDockVisibility), keyEquivalent: "")
+        dockItem.image = NSImage(systemSymbolName: "dock.rectangle", accessibilityDescription: nil)
         dockItem.target = self
         dockItem.state = showInDock ? .on : .off
         settingsSubmenu.addItem(dockItem)
@@ -275,6 +285,7 @@ class BackgroundService: ObservableObject {
         settingsSubmenu.addItem(NSMenuItem.separator())
 
         let autoRestoreItem = NSMenuItem(title: NSLocalizedString("Auto-Restore on Schedule", comment: "Menu item"), action: #selector(toggleScheduledRestore), keyEquivalent: "")
+        autoRestoreItem.image = NSImage(systemSymbolName: "calendar.badge.clock", accessibilityDescription: nil)
         autoRestoreItem.target = self
         autoRestoreItem.state = enableScheduledRestore ? .on : .off
         settingsSubmenu.addItem(autoRestoreItem)
@@ -302,6 +313,7 @@ class BackgroundService: ObservableObject {
             intervalSubmenu.addItem(customIntervalItem)
 
             let intervalMenuItem = NSMenuItem(title: NSLocalizedString("Restore Interval", comment: "Menu item"), action: nil, keyEquivalent: "")
+            intervalMenuItem.image = NSImage(systemSymbolName: "timer", accessibilityDescription: nil)
             intervalMenuItem.submenu = intervalSubmenu
             settingsSubmenu.addItem(intervalMenuItem)
         }
@@ -309,6 +321,7 @@ class BackgroundService: ObservableObject {
         settingsSubmenu.addItem(NSMenuItem.separator())
 
         let autoUpdateItem = NSMenuItem(title: NSLocalizedString("Auto-Restore When Apps Update", comment: "Menu item"), action: #selector(toggleAutoRestoreOnUpdate), keyEquivalent: "")
+        autoUpdateItem.image = NSImage(systemSymbolName: "arrow.triangle.2.circlepath", accessibilityDescription: nil)
         autoUpdateItem.target = self
         autoUpdateItem.state = enableAutoRestoreOnUpdate ? .on : .off
         settingsSubmenu.addItem(autoUpdateItem)
@@ -325,17 +338,20 @@ class BackgroundService: ObservableObject {
             }
 
             let checkIntervalMenuItem = NSMenuItem(title: NSLocalizedString("Check Interval", comment: "Menu item"), action: nil, keyEquivalent: "")
+            checkIntervalMenuItem.image = NSImage(systemSymbolName: "timer", accessibilityDescription: nil)
             checkIntervalMenuItem.submenu = checkIntervalSubmenu
             settingsSubmenu.addItem(checkIntervalMenuItem)
         }
 
         let settingsItem = NSMenuItem(title: NSLocalizedString("Settings", comment: "Menu item"), action: nil, keyEquivalent: ",")
+        settingsItem.image = NSImage(systemSymbolName: "gearshape", accessibilityDescription: nil)
         settingsItem.submenu = settingsSubmenu
         menu.addItem(settingsItem)
 
         menu.addItem(NSMenuItem.separator())
 
         let quitItem = NSMenuItem(title: NSLocalizedString("Quit", comment: "Menu item"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        quitItem.image = NSImage(systemSymbolName: "power", accessibilityDescription: nil)
         quitItem.target = NSApplication.shared
         menu.addItem(quitItem)
 
@@ -352,9 +368,9 @@ class BackgroundService: ObservableObject {
     }
 
     private func updateDockVisibility() {
-        if runInBackground && !showInDock {
+        let hasVisibleWindow = NSApp.windows.contains(where: { $0.isVisible && $0.canBecomeMain })
+        if runInBackground && !showInDock && !hasVisibleWindow {
             NSApp.setActivationPolicy(.accessory)
-            purgeImageCaches()
         } else {
             NSApp.setActivationPolicy(.regular)
         }

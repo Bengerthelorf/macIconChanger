@@ -44,7 +44,7 @@ struct CachedIconRes: Codable {
 /// Cache entry for icon fetch results
 struct IconFetchCacheEntry {
     let cacheKey: String
-    let icons: [CachedIconRes]    // non-failable init, change it to failable for error handling 
+    let icons: [CachedIconRes]
     let timestamp: Date           // Creation time (for debugging/statistics)
     var lastAccessTime: Date      // Last access time (for LRU eviction)
 }
@@ -125,7 +125,6 @@ class IconFetchCacheManager {
 
         hitCount += 1
 
-        // Update last access time (LRU)
         let now = Date()
         entry.lastAccessTime = now
         cache[key] = entry
@@ -202,9 +201,6 @@ class IconFetchCacheManager {
         missCount = 0
         evictionCount = 0
 
-        if count > 0 {
-//            print("🧹 IconFetchCache CLEARED: Removed \(count) entries")
-        }
     }
 
     /// Clear cache entries that haven't been accessed for longer than maxAge
@@ -216,16 +212,11 @@ class IconFetchCacheManager {
 
         let now = Date()
         let expiredKeys = cache.filter { entry in
-            // Check time since last access (not creation)
             now.timeIntervalSince(entry.value.lastAccessTime) > maxAge
         }.map { $0.key }
 
         for key in expiredKeys {
             cache.removeValue(forKey: key)
-        }
-
-        if !expiredKeys.isEmpty {
-//            print("🧹 IconFetchCache EXPIRED: Removed \(expiredKeys.count) entries not accessed for \(String(format: "%.0f", maxAge))s (total: \(cache.count) remain)")
         }
 
         return expiredKeys.count

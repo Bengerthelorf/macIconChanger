@@ -4,7 +4,6 @@
 //
 //  Created by 朱浩宇 on 2022/4/27.
 //  Modified by seril on 2023/7/25.
-//  Modified to add background service on 2025/3/23.
 //
 
 import SwiftUI
@@ -39,9 +38,6 @@ struct IconChangerApp: App {
                        minHeight: folderPermission.hasPermission ? 500 : 300)
                 .animation(.easeInOut, value: folderPermission.hasPermission)
                 .onAppear {
-                    if backgroundService.runInBackground {
-                        backgroundService.startBackgroundService()
-                    }
                     cliManager.checkInstallation()
                     ConfigManager.shared.checkForCLIImports()
                 }

@@ -40,7 +40,6 @@ struct ApplicationFolderSettingsView: View {
 
             }
                     .onChange(of: selectedId) { newValue in
-                        // Handle selection change if needed
                     }
                     .onAppear {
                         folderPermission.check()

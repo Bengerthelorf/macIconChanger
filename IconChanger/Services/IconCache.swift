@@ -3,8 +3,6 @@
 //  IconChanger
 //
 //  Created by Bengerthelorf on 2025/03/23.
-//  Modified on 2025/03/24 to add configuration import support
-//  Modified on 2025/03/25 to add funtion for Importing and Exporting configuration
 //
 
 import Foundation

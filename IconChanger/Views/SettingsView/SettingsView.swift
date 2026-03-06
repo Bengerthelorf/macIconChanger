@@ -4,8 +4,6 @@
 //
 //  Created by 朱浩宇 on 2022/4/28.
 //  Modified by Bengerthelorf on 2025/3/21.
-//  Modified to add background service on 2025/3/23.
-//  Modified to add configuration import/export on 2025/3/25.
 //
 
 import SwiftUI

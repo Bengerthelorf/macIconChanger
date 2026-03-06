@@ -153,19 +153,15 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            logger.log("ContentView appeared. Initializing setup check.")
             checkFullSetup()
         }
-        .onChange(of: folderPermission.hasPermission) { hasPermission in
-             logger.log("Folder permission changed to: \(hasPermission). Re-checking setup.")
+        .onChange(of: folderPermission.hasPermission) { _ in
              checkFullSetup()
         }
          .onChange(of: iconManager.needsSetupCheck) { needsCheck in
               if needsCheck {
-                   logger.log("Triggering setup check from IconManager.")
                    let previousState = setupState
                    checkFullSetup()
-                   // Show success alert if setup is still completed (manual re-check)
                    if case .completed = previousState, case .completed = setupState {
                        showSetupOKAlert = true
                    }
@@ -183,33 +179,29 @@ struct ContentView: View {
     }
 
     func checkFullSetup() {
-        logger.log("Starting checkFullSetup...")
         setupState = .checking
 
         if !folderPermission.hasPermission {
-            logger.log("Folder permission missing.")
             setupState = .needsPermission
             return
         }
-        logger.log("Folder permission granted.")
 
         iconManager.ensureHelperFilesCopied()
 
         let detailedStatus = iconManager.checkSetupStatus()
-        logger.log("Detailed setup status result: \(String(describing: detailedStatus))")
+        logger.debug("Setup status: \(String(describing: detailedStatus))")
 
         switch detailedStatus {
         case .completed:
-            logger.log("Setup check complete and successful.")
             setupState = .completed
         case .helperFilesMissing(let missingFiles):
-            logger.error("Setup check failed: Helper files missing.")
+            logger.error("Helper files missing")
             setupState = .needsHelperFiles(missingFiles: missingFiles)
         case .sudoersPermissionMissing:
-            logger.error("Setup check failed: Sudoers permission missing.")
+            logger.error("Sudoers permission missing")
             setupState = .needsSudoersSetup
         case .unknownError(let message):
-             logger.error("Setup check failed with unknown error: \(message)")
+             logger.error("Setup error: \(message)")
              setupState = .error(message)
         }
     }

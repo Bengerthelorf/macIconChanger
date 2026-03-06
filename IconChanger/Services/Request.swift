@@ -165,13 +165,11 @@ class MyQueryRequestController {
     }
     
     func testAPIConnection() async throws -> (success: Bool, iconCount: Int) {
-        // Use a common query that won't trigger the hardcoded fallback
         let testQuery = "test_api_connection"
         logger.debug("Testing API connectivity.")
 
         let session = self.session
         
-        // Use the primary Meilisearch endpoint
         let urlString = "https://api.macosicons.com/api/search"
         guard let URL = URL(string: urlString) else {
             throw NSError(domain: "IconChanger", code: 1001, userInfo: [NSLocalizedDescriptionKey: "Invalid API endpoint URL"])
@@ -248,7 +246,6 @@ class MyQueryRequestController {
         
         let session = self.session
         
-        // Modified to attempt direct access to other endpoints of the API
         let urlString = "https://api.macosicons.com/api/icons?q=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query)&limit=50"
         
         guard let url = URL(string: urlString) else {

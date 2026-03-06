@@ -17,12 +17,10 @@ struct ImageViewCore: View {
     @State private var task: Task<Void, Never>? = nil
     @Binding var isLoading: Bool
 
-    // Add a new State variable for showing an alert
     @State var showSnackbar = false
     @State var isSuccessful = true
     @State var failureMessage = "Failed to load data."
 
-    // Add an initializer method to ensure backward compatibility
     init(nsimage: Binding<NSImage?>, setPath: AppItem, isLoading: Binding<Bool> = .constant(true)) {
         self._nsimage = nsimage
         self.setPath = setPath
