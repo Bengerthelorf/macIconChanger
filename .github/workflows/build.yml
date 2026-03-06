@@ -133,7 +133,10 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git checkout main
+          cp IconChanger/Resources/sparkle.xml /tmp/sparkle.xml.updated
+          git fetch origin main
+          git checkout -B main origin/main
+          cp /tmp/sparkle.xml.updated IconChanger/Resources/sparkle.xml
           git add IconChanger/Resources/sparkle.xml
           git diff --cached --quiet && echo "No changes" || git commit -m "release: update appcast for ${GITHUB_REF#refs/tags/}"
           git push origin main
