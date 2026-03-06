@@ -78,9 +78,9 @@ info "Bumping version to $VERSION (build $BUILD_NUMBER)..."
 # Update MARKETING_VERSION (both Debug and Release configs for IconChanger target)
 sed -i '' "s/MARKETING_VERSION = [0-9]*\.[0-9]*\.[0-9]*;/MARKETING_VERSION = $VERSION;/g" "$PROJECT_FILE"
 
-# Update CURRENT_PROJECT_VERSION for the main target (121 -> new build number)
-# Only update the ones that are currently 121 (the main app target, not CLI which is 110)
-sed -i '' "s/CURRENT_PROJECT_VERSION = 121;/CURRENT_PROJECT_VERSION = $BUILD_NUMBER;/g" "$PROJECT_FILE"
+# Update CURRENT_PROJECT_VERSION for the main target (skip CLI target which is 110)
+# Match any build number that isn't 110
+sed -i '' "/CURRENT_PROJECT_VERSION = 110;/!s/CURRENT_PROJECT_VERSION = [0-9]*;/CURRENT_PROJECT_VERSION = $BUILD_NUMBER;/g" "$PROJECT_FILE"
 
 info "Version bumped in project file."
 
