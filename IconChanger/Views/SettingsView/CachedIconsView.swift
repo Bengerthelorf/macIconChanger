@@ -15,6 +15,11 @@ struct CachedIconsView: View {
     @State private var isRestoring = false
     @State private var restoreError: Error? = nil
     @State private var showRestoreSuccess = false
+    @State private var showDeleteConfirmation = false
+
+    private var isAllSelected: Bool {
+        !cachedIcons.isEmpty && selectedIconIds.count == cachedIcons.count
+    }
 
     var body: some View {
         VStack {
@@ -78,11 +83,14 @@ struct CachedIconsView: View {
                     Spacer()
 
                     Button(role: .destructive) {
-                        clearCache()
+                        showDeleteConfirmation = true
                     } label: {
-                        Label("Clear Cache", systemImage: "trash")
+                        Label(
+                            isAllSelected ? "Clear All Cache" : "Remove Selected",
+                            systemImage: "trash"
+                        )
                     }
-                    .disabled(cachedIcons.isEmpty)
+                    .disabled(selectedIconIds.isEmpty)
                 }
                 .padding()
             }
@@ -119,6 +127,24 @@ struct CachedIconsView: View {
             Button("OK", role: .cancel) { }
         } message: {
             Text("Custom icons have been successfully restored.")
+        }
+        .confirmationDialog(
+            isAllSelected
+                ? "Are you sure you want to clear all \(cachedIcons.count) cached icons?"
+                : "Are you sure you want to remove \(selectedIconIds.count) selected icon(s) from the cache?",
+            isPresented: $showDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button(isAllSelected ? "Clear All Cache" : "Remove Selected", role: .destructive) {
+                if isAllSelected {
+                    clearCache()
+                } else {
+                    removeSelectedIcons()
+                }
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("This action cannot be undone. You will need to re-apply icons to cache them again.")
         }
     }
 
@@ -235,8 +261,19 @@ struct CachedIconsView: View {
         loadCachedIcons()
     }
 
+    private func removeSelectedIcons() {
+        for id in selectedIconIds {
+            if let cache = cachedIcons.first(where: { $0.id == id }) {
+                IconCacheManager.shared.removeCachedIcon(for: cache.appPath)
+            }
+        }
+        selectedIconIds.removeAll()
+        loadCachedIcons()
+    }
+
     private func clearCache() {
         IconCacheManager.shared.clearCache()
+        selectedIconIds.removeAll()
         cachedIcons = []
     }
 }
