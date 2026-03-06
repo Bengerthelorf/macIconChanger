@@ -113,7 +113,7 @@ jobs:
           DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/IconChanger.dmg"
 
           python3 -c "
-          import sys
+          import sys, re
           item = '''        <item>
                       <title>Version $VERSION</title>
                       <link>https://github.com/${{ github.repository }}</link>
@@ -125,6 +125,11 @@ jobs:
                       type=\"application/octet-stream\"/>
                   </item>'''
           xml = open('IconChanger/Resources/sparkle.xml').read()
+          # Remove existing entries for this version to avoid duplicates on re-release
+          xml = re.sub(
+              r'\s*<item>\s*<title>Version ' + re.escape('$VERSION') + r'</title>.*?</item>',
+              '', xml, flags=re.DOTALL
+          )
           marker = '<title>IconChanger</title>'
           idx = xml.find(marker)
           if idx == -1:
