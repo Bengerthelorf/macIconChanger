@@ -541,6 +541,57 @@ class IconManager: ObservableObject {
     }
     
     
+    /// Automatically configure the sudoers entry via a macOS admin password prompt.
+    func configureSudoers() throws {
+        let helperPath = self.helperScriptURL.path
+        let sudoersLine = "ALL ALL=(ALL) NOPASSWD: \(helperPath)"
+        let sudoersFile = "/etc/sudoers.d/iconchanger"
+
+        // Write to a temp file first, validate with visudo, then move into place.
+        // This prevents writing a malformed sudoers file that could lock out sudo.
+        let tmpFile = "/tmp/iconchanger_sudoers_\(ProcessInfo.processInfo.processIdentifier)"
+
+        // Build the shell command: write → validate → install
+        let commands = [
+            "echo '\(sudoersLine.shellEscaped)' > '\(tmpFile.shellEscaped)'",
+            "visudo -c -f '\(tmpFile.shellEscaped)'",
+            "mv '\(tmpFile.shellEscaped)' '\(sudoersFile.shellEscaped)'",
+            "chmod 0440 '\(sudoersFile.shellEscaped)'",
+            "chown root:wheel '\(sudoersFile.shellEscaped)'"
+        ].joined(separator: " && ")
+
+        logger.log("Running sudoers configuration via osascript...")
+
+        let task = Process()
+        let errorPipe = Pipe()
+        task.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
+        let appleScript = "do shell script \"\(commands.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\""))\" with administrator privileges"
+        task.arguments = ["-e", appleScript]
+        task.standardOutput = Pipe()
+        task.standardError = errorPipe
+
+        try task.run()
+        task.waitUntilExit()
+
+        let errorOutput = String(data: errorPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
+
+        if task.terminationStatus != 0 {
+            // Clean up temp file on failure
+            try? FileManager.default.removeItem(atPath: tmpFile)
+
+            if errorOutput.contains("User canceled") || errorOutput.contains("-128") {
+                logger.log("User canceled the admin password dialog.")
+                throw NSError(domain: "IconManager", code: 20,
+                              userInfo: [NSLocalizedDescriptionKey: NSLocalizedString("Setup was canceled.", comment: "User canceled admin dialog")])
+            }
+            logger.error("Sudoers configuration failed: \(errorOutput)")
+            throw NSError(domain: "IconManager", code: 21,
+                          userInfo: [NSLocalizedDescriptionKey: String(format: NSLocalizedString("Failed to configure permissions: %@", comment: "Sudoers config error"), errorOutput)])
+        }
+
+        logger.log("Sudoers configuration completed successfully.")
+    }
+
     func checkSetupStatus() -> SetupStatus {
         logger.log("Checking setup status...")
         

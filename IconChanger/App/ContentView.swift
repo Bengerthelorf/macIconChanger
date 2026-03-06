@@ -13,10 +13,9 @@ struct ContentView: View {
     @StateObject var folderPermission = FolderPermission.shared
     @StateObject var iconManager = IconManager.shared
     @State private var setupState: SetupState = .checking
-    @State private var showSetupAlert = false
-    @State private var setupAlertTitle = "Setup Information"
-    @State private var setupInstructions = ""
     @State private var showSetupOKAlert = false
+    @State private var isConfiguring = false
+    @State private var configError: String?
 
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ContentView")
 
@@ -85,24 +84,49 @@ struct ContentView: View {
             case .needsSudoersSetup:
                  VStack(spacing: 15) {
                       Image(systemName: "lock.shield.fill")
-                          .resizable().scaledToFit().frame(width: 40, height: 40).foregroundColor(.red)
+                          .resizable().scaledToFit().frame(width: 40, height: 40).foregroundColor(.orange)
                           .padding(.bottom, 5)
-                     Text("Manual Setup Required")
+                     Text("Permission Setup")
                          .font(.title2.bold())
-                     Text("IconChanger needs permission to run its helper script with administrator privileges to change icons.\nThis requires a manual configuration")
+                     Text("IconChanger needs administrator privileges to change app icons.\nClick the button below and enter your password to complete setup.")
                           .multilineTextAlignment(.center)
                           .foregroundColor(.secondary)
                          .padding(.horizontal)
-                     Button("Show Setup Instructions") {
-                         setupAlertTitle = "Sudoers Setup Instructions"
-                         showSetupAlert = true
+
+                     if isConfiguring {
+                         ProgressView("Configuring...")
+                             .padding(.top)
+                     } else {
+                         Button {
+                             configError = nil
+                             isConfiguring = true
+                             DispatchQueue.global(qos: .userInitiated).async {
+                                 do {
+                                     try iconManager.configureSudoers()
+                                     DispatchQueue.main.async {
+                                         isConfiguring = false
+                                         checkFullSetup()
+                                     }
+                                 } catch {
+                                     DispatchQueue.main.async {
+                                         isConfiguring = false
+                                         configError = error.localizedDescription
+                                     }
+                                 }
+                             }
+                         } label: {
+                             Label("Configure Permissions", systemImage: "lock.open.fill")
+                         }
+                         .controlSize(.large)
+                         .padding(.top)
                      }
-                     .padding(.top)
-                     Button("Retry Setup Check") {
-                          setupState = .checking
-                          DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                              checkFullSetup()
-                          }
+
+                     if let configError {
+                         Text(configError)
+                             .foregroundColor(.red)
+                             .font(.caption)
+                             .multilineTextAlignment(.center)
+                             .padding(.horizontal)
                      }
                  }
                  .padding()
@@ -135,12 +159,6 @@ struct ContentView: View {
         .onChange(of: folderPermission.hasPermission) { hasPermission in
              logger.log("Folder permission changed to: \(hasPermission). Re-checking setup.")
              checkFullSetup()
-        }
-        // MARK: - Updated Alert
-        .alert(setupAlertTitle, isPresented: $showSetupAlert) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text(setupInstructions)
         }
          .onChange(of: iconManager.needsSetupCheck) { needsCheck in
               if needsCheck {
@@ -186,11 +204,9 @@ struct ContentView: View {
             setupState = .completed
         case .helperFilesMissing(let missingFiles):
             logger.error("Setup check failed: Helper files missing.")
-            prepareSetupInstructions(for: detailedStatus)
             setupState = .needsHelperFiles(missingFiles: missingFiles)
         case .sudoersPermissionMissing:
             logger.error("Setup check failed: Sudoers permission missing.")
-            prepareSetupInstructions(for: detailedStatus)
             setupState = .needsSudoersSetup
         case .unknownError(let message):
              logger.error("Setup check failed with unknown error: \(message)")
@@ -198,26 +214,6 @@ struct ContentView: View {
         }
     }
 
-    func prepareSetupInstructions(for status: SetupStatus) {
-        let helperPath = IconManager.shared.helperScriptURL.path
-
-        switch status {
-        case .sudoersPermissionMissing:
-            logger.log("Preparing sudoers setup instructions.")
-            let formatString = NSLocalizedString("sudoers_instructions_format", comment: "Instructions for sudoers setup, %@ is the helper script path")
-            setupInstructions = String(format: formatString, helperPath)
-
-        case .helperFilesMissing(let missingFiles):
-             logger.log("Preparing helper files missing instructions.")
-            let formatString = NSLocalizedString("helper_files_missing_instructions_format", comment: "Instructions when helper files are missing. First %@ is list of files, second %@ is expected path.")
-            setupInstructions = String(format: formatString, missingFiles.joined(separator: "\n"), IconManager.shared.helperDirectoryURL.path)
-
-        default:
-             logger.log("Preparing generic setup instructions for status: \(String(describing: status))")
-            let formatString = NSLocalizedString("unexpected_setup_issue_format", comment: "Generic setup error message. First %@ is the status description, second %@ is the helper path.")
-            setupInstructions = String(format: formatString, String(describing: status), helperPath)
-        }
-    }
 }
 
 struct ContentView_Previews: PreviewProvider {
