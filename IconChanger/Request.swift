@@ -58,21 +58,10 @@ class MyQueryRequestController {
     }
     
     private func sendRequestToMeilisearch(_ query: String, style: IconStyle) async throws -> [IconRes] {
-        /* Configure session, choose between:
-         * defaultSessionConfiguration
-         * ephemeralSessionConfiguration
-         * backgroundSessionConfigurationWithIdentifier:
-         And set session-wide properties, such as: HTTPAdditionalHeaders,
-         HTTPCookieAcceptPolicy, requestCachePolicy or timeoutIntervalForRequest.
-         */
         let query = qeuryMix(query)
         logger.debug("Search '\(query, privacy: .public)' style=\(style.displayName, privacy: .public)")
 
         let session = self.session
-
-        /* Create the Request:
-         Request (POST https://api.macosicons.com/api/search)
-         */
         let urlString = "https://api.macosicons.com/api/search"
         
         guard let URL = URL(string: urlString) else {
@@ -317,15 +306,6 @@ class MyQueryRequestController {
                 return icons.sorted { $0.downloads > $1.downloads }
             } catch {
                 logger.error("Backup search JSON parsing error: \(error.localizedDescription, privacy: .public)")
-                // Try another method - create a hardcoded icon as a fallback
-                if query.lowercased().contains("chrome") {
-                    if let icnsUrl = URL(string: "https://macosicons.com/api/icons/chrome/download"),
-                       let lowResPngUrl = URL(string: "https://parsefiles.back4app.com/JPaQcFfEEQ1ePBxbf6wvzkPMEqKYHhPYv8boI1Rc/476887413a132607e24df29a93a4cb3f_low_res_Chrome.png"),
-                       let icon = IconRes(appName: "Chrome", icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: 439) {
-                        return [icon]
-                    }
-                }
-                
                 return []
             }
             

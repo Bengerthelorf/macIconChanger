@@ -193,24 +193,11 @@ class IconManager: ObservableObject {
     
 
     
-    func setImage(_ image: NSImage, app: AppItem) throws {
-        logger.log("setImage called for app: \(app.name)")
-        //
+    private func ensureSetupCompleted() throws {
         ensureHelperFilesCopied()
-        
-        // First, cache the icon
-        _ = try IconCacheManager.shared.cacheIcon(image: image, for: app.url.universalPath(), appName: app.name)
-        logger.log("Icon cached for \(app.name)")
-        
-        let tempDir = FileManager.default.temporaryDirectory
-        let imageURL = tempDir.appendingPathComponent("icon_\(UUID().uuidString).png")
-        logger.log("Saving temporary icon to: \(imageURL.path)")
-        
-        Self.saveImage(image, atUrl: imageURL)
-        
         let status = checkSetupStatus()
         guard case .completed = status else {
-            logger.error("Setup incomplete (\(String(describing: status))), cannot set icon for \(app.name).")
+            logger.error("Setup incomplete: \(String(describing: status))")
             let errorDescription: String
             switch status {
             case .helperFilesMissing(let missingFiles):
@@ -222,74 +209,49 @@ class IconManager: ObservableObject {
             }
             throw NSError(domain: "IconManager", code: 11, userInfo: [NSLocalizedDescriptionKey: errorDescription])
         }
-        
+    }
+
+    private func applyIcon(_ image: NSImage, to app: AppItem) throws {
+        let tempDir = FileManager.default.temporaryDirectory
+        let imageURL = tempDir.appendingPathComponent("icon_\(UUID().uuidString).png")
+
+        Self.saveImage(image, atUrl: imageURL)
+        defer { try? FileManager.default.removeItem(at: imageURL) }
+
         try runHelperTool(appPath: app.url.universalPath(), imagePath: imageURL.path)
-        
-        logger.log("Attempting to remove temporary icon file: \(imageURL.path)")
-        try? FileManager.default.removeItem(at: imageURL)
-        logger.log("Temporary icon file removed (if existed). setImage finished.")
-        
+    }
+
+    func setImage(_ image: NSImage, app: AppItem) throws {
+        logger.log("setImage called for app: \(app.name)")
+
+        _ = try IconCacheManager.shared.cacheIcon(image: image, for: app.url.universalPath(), appName: app.name)
+        logger.log("Icon cached for \(app.name)")
+
+        try ensureSetupCompleted()
+        try applyIcon(image, to: app)
+
         Task { @MainActor in
             AppIconCache.shared.remove(for: app.url)
             self.iconRefreshTrigger = UUID()
         }
     }
-    
+
     func setIconWithoutCaching(_ image: NSImage, app: AppItem) async throws {
         logger.log("setIconWithoutCaching called for app: \(app.name)")
-        
-        ensureHelperFilesCopied()
-        
-        let status = checkSetupStatus()
-        guard case .completed = status else {
-            logger.error("Setup incomplete (\(String(describing: status))), cannot set icon without caching for \(app.name).")
-            let errorDescription: String
-            switch status {
-            case .helperFilesMissing(let missingFiles):
-                errorDescription = "Required helper files are missing: \(missingFiles.joined(separator: ", ")). Please check setup."
-            case .sudoersPermissionMissing:
-                errorDescription = "Sudo permission for helper script is missing or incorrect. Please check setup."
-            default:
-                errorDescription = "An unknown setup error occurred. Please check setup."
-            }
-            throw NSError(domain: "IconManager", code: 12, userInfo: [NSLocalizedDescriptionKey: errorDescription])
-        }
-        
-        let tempDir = FileManager.default.temporaryDirectory
-        let imageURL = tempDir.appendingPathComponent("icon_\(UUID().uuidString).png")
-        logger.log("Saving temporary icon to: \(imageURL.path)")
-        
-        Self.saveImage(image, atUrl: imageURL)
-        
-        try runHelperTool(appPath: app.url.universalPath(), imagePath: imageURL.path)
-        
-        logger.log("Attempting to remove temporary icon file: \(imageURL.path)")
-        try? FileManager.default.removeItem(at: imageURL)
-        logger.log("Temporary icon file removed (if existed). setIconWithoutCaching finished.")
-        
+
+        try ensureSetupCompleted()
+        try applyIcon(image, to: app)
+
         await MainActor.run {
             AppIconCache.shared.remove(for: app.url)
             self.iconRefreshTrigger = UUID()
         }
     }
-    
+
     // Restore all cached icons
     func restoreAllCachedIcons() async throws {
         logger.log("Starting restoreAllCachedIcons...")
-        let initialStatus = checkSetupStatus()
-        guard case .completed = initialStatus else {
-            logger.error("Setup incomplete (\(String(describing: initialStatus))), cannot restore icons.")
-            let errorDescription: String
-            switch initialStatus {
-            case .helperFilesMissing(let missingFiles):
-                errorDescription = "Required helper files are missing: \(missingFiles.joined(separator: ", ")). Cannot restore icons."
-            case .sudoersPermissionMissing:
-                errorDescription = "Sudo permission for helper script is missing or incorrect. Cannot restore icons."
-            default:
-                errorDescription = "An unknown setup error occurred. Cannot restore icons."
-            }
-            throw NSError(domain: "IconManager", code: 13, userInfo: [NSLocalizedDescriptionKey: errorDescription])
-        }
+        try ensureSetupCompleted()
         
         let cachedIcons = IconCacheManager.shared.getAllCachedIcons()
         var failedApps: [(String, Error)] = []
