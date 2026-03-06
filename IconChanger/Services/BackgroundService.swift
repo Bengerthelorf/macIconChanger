@@ -490,12 +490,16 @@ class BackgroundService: ObservableObject {
         cancelTimer(&fetchCacheCleanupTimer)
 
         if enableScheduledRestore {
-            // Calculate the actual time until next restore instead of polling every hour.
-            let interval = getActiveRestoreInterval()
-            let nextRestore = lastScheduledRestore.addingTimeInterval(TimeInterval(interval * 3600))
+            // Calculate the actual time until next restore.
+            let intervalHours = getActiveRestoreInterval()
+            let intervalSeconds = TimeInterval(intervalHours * 3600)
+            let nextRestore = lastScheduledRestore.addingTimeInterval(intervalSeconds)
             let delay = max(60, nextRestore.timeIntervalSinceNow) // at least 60s
 
-            scheduledRestoreTimer = makeRepeatingTimer(interval: delay) { [weak self] in
+            scheduledRestoreTimer = makeOneShotThenRepeatingTimer(
+                initialDelay: delay,
+                repeatingInterval: intervalSeconds
+            ) { [weak self] in
                 self?.checkScheduledRestore()
             }
         }
@@ -528,6 +532,18 @@ class BackgroundService: ObservableObject {
         // Use generous leeway (10% of interval, min 30s) so the OS can coalesce wakes.
         let leeway = max(30, Int(interval * 0.10))
         timer.schedule(deadline: .now() + interval, repeating: interval, leeway: .seconds(leeway))
+        timer.setEventHandler(handler: handler)
+        timer.resume()
+        return timer
+    }
+
+    /// Creates a timer that fires after `initialDelay`, then repeats every `repeatingInterval`.
+    private func makeOneShotThenRepeatingTimer(initialDelay: TimeInterval,
+                                               repeatingInterval: TimeInterval,
+                                               handler: @escaping @Sendable () -> Void) -> DispatchSourceTimer {
+        let timer = DispatchSource.makeTimerSource(queue: timerQueue)
+        let leeway = max(30, Int(repeatingInterval * 0.10))
+        timer.schedule(deadline: .now() + initialDelay, repeating: repeatingInterval, leeway: .seconds(leeway))
         timer.setEventHandler(handler: handler)
         timer.resume()
         return timer
@@ -578,12 +594,15 @@ class BackgroundService: ObservableObject {
         Task {
             do {
                 try await iconManager.restoreAllCachedIcons()
-                
+
                 await MainActor.run {
                     lastScheduledRestore = Date()
                     updateStatusMenu()
+                    // Reschedule the timer so the next fire uses the correct interval
+                    // relative to the new lastScheduledRestore.
+                    setupTimers()
                 }
-                
+
                 showRestoreNotification()
             } catch {
                 print("Scheduled restore failed: \(error.localizedDescription)")

@@ -38,8 +38,10 @@ class CLIManager: ObservableObject {
                 }
                 
                 // Use osascript to execute the sudo command for installation
+                let escapedBundlePath = bundlePath.shellEscaped
+                let escapedInstallLocation = installLocation.shellEscaped
                 let script = """
-                do shell script "cp '\(bundlePath)' '\(installLocation)' && chmod +x '\(installLocation)'" with administrator privileges
+                do shell script "cp '\(escapedBundlePath)' '\(escapedInstallLocation)' && chmod +x '\(escapedInstallLocation)'" with administrator privileges
                 """
                 
                 let appleScript = NSAppleScript(source: script)
@@ -71,7 +73,7 @@ class CLIManager: ObservableObject {
             do {
                 // Use osascript to execute the sudo command for uninstallation
                 let script = """
-                do shell script "rm '\(installLocation)'" with administrator privileges
+                do shell script "rm '\(installLocation.shellEscaped)'" with administrator privileges
                 """
                 
                 let appleScript = NSAppleScript(source: script)

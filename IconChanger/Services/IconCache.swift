@@ -59,7 +59,9 @@ class IconCacheManager {
         let iconFileName = "\(UUID().uuidString).png"
         let iconURL = Self.cacheDirectory.appendingPathComponent(iconFileName)
 
-        IconManager.saveImage(image, atUrl: iconURL)
+        if let saveError = IconManager.saveImage(image, atUrl: iconURL) {
+            throw saveError
+        }
 
         let iconCache = IconCache(
             appPath: appPath,

@@ -151,24 +151,12 @@ class IconManager: ObservableObject {
             
             let fileiconDestPath = fileiconURL.path
             let helperDestPath = helperScriptURL.path
-            
-            if !FileManager.default.fileExists(atPath: fileiconDestPath) {
-                logger.log("Copying 'fileicon' from bundle to \(fileiconDestPath)")
-                try FileManager.default.copyItem(atPath: fileiconBundlePath, toPath: fileiconDestPath)
-                logger.log("'fileicon' copied.")
-            } else {
-                logger.log("'fileicon' already exists at \(fileiconDestPath)")
-            }
-            _ = try? Self.safeShell("chmod u+x '\(fileiconDestPath)'")
-            
-            if !FileManager.default.fileExists(atPath: helperDestPath) {
-                logger.log("Copying 'helper.sh' from bundle to \(helperDestPath)")
-                try FileManager.default.copyItem(atPath: helperBundlePath, toPath: helperDestPath)
-                logger.log("'helper.sh' copied.")
-            } else {
-                logger.log("'helper.sh' already exists at \(helperDestPath)")
-            }
-            _ = try? Self.safeShell("chmod u+x '\(helperDestPath)'")
+
+            copyIfNeeded(from: fileiconBundlePath, to: fileiconDestPath, name: "fileicon")
+            _ = try? Self.safeShell("chmod u+x '\(fileiconDestPath.shellEscaped)'")
+
+            copyIfNeeded(from: helperBundlePath, to: helperDestPath, name: "helper.sh")
+            _ = try? Self.safeShell("chmod u+x '\(helperDestPath.shellEscaped)'")
             
             logger.log("ensureHelperFilesCopied finished successfully.")
             
@@ -179,23 +167,57 @@ class IconManager: ObservableObject {
     
     
     
-    static func saveImage(_ image: NSImage, atUrl url: URL) {
-        guard
-            let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil)
-        else {
-            return
-        } // TODO: handle error
+    /// Copies a bundled file to the destination, replacing it if the contents differ.
+    private func copyIfNeeded(from sourcePath: String, to destPath: String, name: String) {
+        let fm = FileManager.default
+        if fm.fileExists(atPath: destPath) {
+            // Compare file contents; replace if they differ (e.g. after app update)
+            if let sourceData = fm.contents(atPath: sourcePath),
+               let destData = fm.contents(atPath: destPath),
+               sourceData == destData {
+                logger.log("'\(name)' is up to date at \(destPath)")
+                return
+            }
+            logger.log("'\(name)' is outdated, replacing at \(destPath)")
+            try? fm.removeItem(atPath: destPath)
+        } else {
+            logger.log("'\(name)' does not exist, copying to \(destPath)")
+        }
+        do {
+            try fm.copyItem(atPath: sourcePath, toPath: destPath)
+            logger.log("'\(name)' copied successfully.")
+        } catch {
+            logger.error("Failed to copy '\(name)': \(error.localizedDescription)")
+        }
+    }
+
+    enum ImageSaveError: Error, LocalizedError {
+        case cgImageConversionFailed
+        case pngEncodingFailed
+
+        var errorDescription: String? {
+            switch self {
+            case .cgImageConversionFailed: return "Failed to convert NSImage to CGImage."
+            case .pngEncodingFailed: return "Failed to encode image as PNG."
+            }
+        }
+    }
+
+    @discardableResult
+    static func saveImage(_ image: NSImage, atUrl url: URL) -> Error? {
+        guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+            return ImageSaveError.cgImageConversionFailed
+        }
         let newRep = NSBitmapImageRep(cgImage: cgImage)
         newRep.size = image.size
-        guard
-            let pngData = newRep.representation(using: .png, properties: [:])
-        else {
-            return
-        } // TODO: handle error
+        guard let pngData = newRep.representation(using: .png, properties: [:]) else {
+            return ImageSaveError.pngEncodingFailed
+        }
         do {
             try pngData.write(to: url)
+            return nil
         } catch {
-            print("error saving: \(error)")
+            return error
         }
     }
     
@@ -223,7 +245,9 @@ class IconManager: ObservableObject {
         let tempDir = FileManager.default.temporaryDirectory
         let imageURL = tempDir.appendingPathComponent("icon_\(UUID().uuidString).png")
 
-        Self.saveImage(image, atUrl: imageURL)
+        if let saveError = Self.saveImage(image, atUrl: imageURL) {
+            throw saveError
+        }
         defer { try? FileManager.default.removeItem(at: imageURL) }
 
         try runHelperTool(appPath: app.url.universalPath(), imagePath: imageURL.path)
@@ -260,22 +284,34 @@ class IconManager: ObservableObject {
     func restoreAllCachedIcons() async throws {
         logger.log("Starting restoreAllCachedIcons...")
         try ensureSetupCompleted()
-        
+
+        // Ensure we have a populated app list; reload if empty.
+        let currentApps: [AppItem] = await MainActor.run { apps }
+        let appList: [AppItem]
+        if currentApps.isEmpty {
+            let loaded = loadAppItems()
+            await MainActor.run { apps = loaded }
+            appList = loaded
+        } else {
+            appList = currentApps
+        }
+        let appMap = Dictionary(uniqueKeysWithValues: appList.map { ($0.url.universalPath(), $0) })
+
         let cachedIcons = IconCacheManager.shared.getAllCachedIcons()
         var failedApps: [(String, Error)] = []
-        
+
         for cache in cachedIcons {
             do {
                 let appPath = cache.appPath
                 let iconURL = IconCacheManager.cacheDirectory.appendingPathComponent(cache.iconFileName)
-                
+
                 // Check if the app and icon still exist
                 if FileManager.default.fileExists(atPath: appPath) &&
                     FileManager.default.fileExists(atPath: iconURL.path) {
-                    
+
                     // Load the icon image
                     if let image = NSImage(contentsOf: iconURL) {
-                        if let appInfo = apps.first(where: { $0.url.universalPath() == appPath }) {
+                        if let appInfo = appMap[appPath] {
                             // Set the icon (without re-caching to avoid duplication)
                             try await setIconWithoutCaching(image, app: appInfo)
                             logger.info("Successfully restored icon for \(cache.appName)")
@@ -408,7 +444,7 @@ class IconManager: ObservableObject {
         let helperToolPath = self.helperScriptURL.path
         let fileiconPath = self.fileiconURL.path
         
-        let command = "sudo -n '\(helperToolPath)' '\(fileiconPath)' '\(appPath)' '\(imagePath)'"
+        let command = "sudo -n '\(helperToolPath.shellEscaped)' '\(fileiconPath.shellEscaped)' '\(appPath.shellEscaped)' '\(imagePath.shellEscaped)'"
         logger.log("Executing command with -n: \(command)")
         
         let output: String
@@ -559,11 +595,16 @@ class IconManager: ObservableObject {
         
         // Now check sudoers permission
         let helperPath = self.helperScriptURL.path
-        let escapedHelperPathForGrep = helperPath.replacingOccurrences(of: " ", with: "\\\\ ")
-        
+        // Escape regex metacharacters and shell special characters in the path
+        let regexMetachars = CharacterSet(charactersIn: "[](){}.*+?^$|\\")
+        let escapedHelperPathForGrep = helperPath.unicodeScalars.map { scalar in
+            regexMetachars.contains(scalar) ? "\\\\\(scalar)" : String(scalar)
+        }.joined().replacingOccurrences(of: " ", with: "[[:space:]]")
+
         let grepPattern = "NOPASSWD:[[:space:]]*\(escapedHelperPathForGrep)"
-        
-        let checkCommand = "sudo -n -l | grep -q -E \"\(grepPattern)\""
+
+        // Use single quotes for the grep pattern to avoid shell interpretation
+        let checkCommand = "sudo -n -l | grep -q -E '\(grepPattern.shellEscaped)'"
         
         logger.log("Executing sudoers check command: \(checkCommand)")
         
@@ -607,5 +648,11 @@ extension LaunchPadManagerDBHelper.AppInfo: @retroactive Identifiable {
 extension String {
     func replace(target: String, withString: String) -> String {
         return self.replacingOccurrences(of: target, with: withString, options: NSString.CompareOptions.literal, range: nil)
+    }
+
+    /// Escape a string for safe use inside single-quoted shell arguments.
+    /// Replaces `'` with `'\''` (end quote, escaped quote, start quote).
+    var shellEscaped: String {
+        self.replacingOccurrences(of: "'", with: "'\\''")
     }
 }
