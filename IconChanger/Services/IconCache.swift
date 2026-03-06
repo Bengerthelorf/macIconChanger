@@ -25,7 +25,6 @@ class IconCacheManager {
     private var cachedIcons: [String: IconCache] = [:]
     private let lock = NSLock()
 
-    // Get the cache directory
     static var cacheDirectory: URL {
         let path = "\(NSHomeDirectory())/.iconchanger/cache"
         let url = URL(fileURLWithPath: path)
@@ -39,7 +38,6 @@ class IconCacheManager {
         loadCache()
     }
 
-    // Load cached icons from UserDefaults
     private func loadCache() {
         if let data = UserDefaults.standard.data(forKey: cacheKey),
            let decoded = try? JSONDecoder().decode([String: IconCache].self, from: data) {
@@ -47,14 +45,12 @@ class IconCacheManager {
         }
     }
 
-    // Save cached icons to UserDefaults (must be called while lock is held)
     private func saveCache() {
         if let encoded = try? JSONEncoder().encode(cachedIcons) {
             UserDefaults.standard.set(encoded, forKey: cacheKey)
         }
     }
 
-    // Add or update a cached icon
     func cacheIcon(image: NSImage, for appPath: String, appName: String) throws -> URL {
         let iconFileName = "\(UUID().uuidString).png"
         let iconURL = Self.cacheDirectory.appendingPathComponent(iconFileName)
@@ -78,14 +74,12 @@ class IconCacheManager {
         return iconURL
     }
 
-    // Get cached icon for an app
     func getIconCache(for appPath: String) -> IconCache? {
         lock.lock()
         defer { lock.unlock() }
         return cachedIcons[appPath]
     }
 
-    // Get cached icon URL for an app
     func getCachedIconURL(for appPath: String) -> URL? {
         lock.lock()
         defer { lock.unlock() }
@@ -93,21 +87,18 @@ class IconCacheManager {
         return Self.cacheDirectory.appendingPathComponent(cache.iconFileName)
     }
 
-    // Get all cached icons
     func getAllCachedIcons() -> [IconCache] {
         lock.lock()
         defer { lock.unlock() }
         return Array(cachedIcons.values)
     }
 
-    // Count cached icons
     func getCachedIconsCount() -> Int {
         lock.lock()
         defer { lock.unlock() }
         return cachedIcons.count
     }
 
-    // Update the timestamp of a cached icon (e.g. after re-applying it)
     func updateTimestamp(for appPath: String, to date: Date = Date()) {
         lock.lock()
         if let existing = cachedIcons[appPath] {
@@ -122,7 +113,6 @@ class IconCacheManager {
         lock.unlock()
     }
 
-    // Remove a cached icon
     func removeCachedIcon(for appPath: String) {
         lock.lock()
         if let cache = cachedIcons[appPath] {
@@ -135,7 +125,6 @@ class IconCacheManager {
         lock.unlock()
     }
 
-    // Clear all cached icons
     func clearCache() {
         lock.lock()
         let urlsToDelete = cachedIcons.values.map {
@@ -158,7 +147,6 @@ class IconCacheManager {
     }
 }
 
-// Error type for restore failures
 enum RestoreError: Error, LocalizedError {
     case someFailed(failed: [(String, Error)])
     case appNotFound(String)

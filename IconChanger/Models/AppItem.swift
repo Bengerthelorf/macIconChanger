@@ -21,7 +21,6 @@ struct AppItem: Identifiable, Hashable {
         return url.deletingLastPathComponent().displayPath()
     }
     
-    // Conformance to Hashable based on path string
     static func == (lhs: AppItem, rhs: AppItem) -> Bool {
         lhs.id == rhs.id
     }

@@ -23,7 +23,7 @@ enum IconStyle: String, CaseIterable, Identifiable {
     var filterQuery: String? {
         switch self {
         case .all:
-            return nil  // return all categories
+            return nil
         case .liquidGlass:
             return "isLiquidGlass = true"
         //scalable

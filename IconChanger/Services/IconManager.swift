@@ -63,7 +63,6 @@ class IconManager: ObservableObject {
     func loadAppItems() -> [AppItem] {
         var allApps: [AppItem] = []
         
-        // 1. Fetch from LaunchPad DB
         do {
             let helper = try LaunchPadManagerDBHelper()
             let dbApps = try helper.getAllAppInfos()
@@ -73,10 +72,8 @@ class IconManager: ObservableObject {
             logger.error("Error fetching LaunchPad apps: \(error.localizedDescription)")
         }
         
-        // 2. Scan Filesystem
         let localApps = scanLocalApps()
-        
-        // 3. Merge (prefer DB apps if duplicate URL)
+
         let existingPaths = Set(allApps.map { $0.id })
         for localApp in localApps {
             if !existingPaths.contains(localApp.id) {
@@ -91,14 +88,9 @@ class IconManager: ObservableObject {
         let fileManager = FileManager.default
         var appItems = [AppItem]()
         
-        // Directories to scan
-        // Use permissions managed by FolderPermission
         let permissions = FolderPermission.shared.permissions
         let maxDepth = 5
-        
-        // If no directories are configured, we don't scan any local paths.
-        // Users should add directories in Settings -> Application.
-        
+
         for permission in permissions {
             let dir = permission.bookmarkedURL
             guard let enumerator = fileManager.enumerator(
@@ -276,7 +268,6 @@ class IconManager: ObservableObject {
         }
     }
 
-    // Restore all cached icons
     func restoreAllCachedIcons() async throws {
         logger.log("Starting restoreAllCachedIcons...")
         try ensureSetupCompleted()
@@ -300,14 +291,11 @@ class IconManager: ObservableObject {
                 let appPath = cache.appPath
                 let iconURL = IconCacheManager.cacheDirectory.appendingPathComponent(cache.iconFileName)
 
-                // Check if the app and icon still exist
                 if FileManager.default.fileExists(atPath: appPath) &&
                     FileManager.default.fileExists(atPath: iconURL.path) {
 
-                    // Load the icon image
                     if let image = NSImage(contentsOf: iconURL) {
                         if let appInfo = appMap[appPath] {
-                            // Set the icon (without re-caching to avoid duplication)
                             try await setIconWithoutCaching(image, app: appInfo)
                             logger.info("Successfully restored icon for \(cache.appName)")
                         } else {
@@ -315,16 +303,14 @@ class IconManager: ObservableObject {
                         }
                     } else {
                         logger.error("Could not load cached icon image for \(cache.appName) from \(iconURL.path)")
-                        IconCacheManager.shared.removeCachedIcon(for: appPath) // Remove cache if icon is broken
+                        IconCacheManager.shared.removeCachedIcon(for: appPath)
                         throw RestoreError.iconFileNotFound(cache.appName)
                     }
                 } else if !FileManager.default.fileExists(atPath: appPath) {
                     logger.warning("App at path \(appPath) no longer exists, removing cache for \(cache.appName).")
-                    // App no longer exists, remove from cache
                     IconCacheManager.shared.removeCachedIcon(for: appPath)
                 } else if !FileManager.default.fileExists(atPath: iconURL.path) {
                     logger.warning("Icon file \(cache.iconFileName) missing for \(cache.appName), removing cache.")
-                    // Icon file missing, remove from cache
                     IconCacheManager.shared.removeCachedIcon(for: appPath)
                 }
             } catch {
@@ -361,19 +347,17 @@ class IconManager: ObservableObject {
         let bundleName = try getAppBundleName(app)
         let aliasName = AliasName.getName(for: app.url.deletingPathExtension().lastPathComponent)
         
-        // Check fetch cache first
         if let cachedIcons = IconFetchCacheManager.shared.getCachedIcons(
             appName: appName,
             bundleName: bundleName,
             aliasName: aliasName,
             style: style.rawValue
         ) {
-            logger.log("✅ Using cached icon fetch results for \(appName)")
+            logger.log("Using cached icon fetch results for \(appName)")
             return cachedIcons
         }
         
-        // Cache miss - fetch from network
-        logger.log("❌ Cache miss, fetching icons from network for \(appName)")
+        logger.log("Cache miss, fetching icons from network for \(appName)")
 
         let queryController = MyQueryRequestController.shared
         var orderedQueries: [String] = []
@@ -410,7 +394,6 @@ class IconManager: ObservableObject {
             first.downloads > second.downloads
         }
 
-        // Store in fetch cache
         IconFetchCacheManager.shared.cacheIcons(
             uniqueRes,
             appName: appName,
@@ -455,12 +438,11 @@ class IconManager: ObservableObject {
             }
         } catch {
             logger.error("An unexpected error occurred running the helper tool: \(error.localizedDescription)")
-            throw error // Re-throw other unexpected errors
+            throw error
         }
         
         if output.lowercased().contains("incorrect password") || output.lowercased().contains("try again") {
             logger.error("Helper tool output suggests a password was required unexpectedly: \(output)")
-            // This shouldn't happen if sudoers is correct, but catch it just in case.
             throw NSError(domain: "IconManager", code: 16, userInfo: [NSLocalizedDescriptionKey: "Helper tool unexpectedly asked for a password. Check sudoers configuration. Output: \(output)"])
         } else {
             logger.log("Helper tool executed apparently successfully.")
@@ -499,7 +481,7 @@ class IconManager: ObservableObject {
         task.environment = ProcessInfo.processInfo.environment
         task.environment?["PATH"] = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:" + (task.environment?["PATH"] ?? "")
 
-        // Collect output asynchronously to prevent pipe buffer deadlocks
+        // Read output asynchronously to prevent pipe buffer deadlocks
         var outputData = Data()
         var errorData = Data()
 
@@ -540,7 +522,6 @@ class IconManager: ObservableObject {
             task.terminate()
         }
 
-        // Wait for pipe reads to finish
         outputGroup.wait()
 
         let output = String(data: outputData, encoding: .utf8) ?? ""
@@ -633,8 +614,6 @@ extension String {
         return self.replacingOccurrences(of: target, with: withString, options: NSString.CompareOptions.literal, range: nil)
     }
 
-    /// Escape a string for safe use inside single-quoted shell arguments.
-    /// Replaces `'` with `'\''` (end quote, escaped quote, start quote).
     var shellEscaped: String {
         self.replacingOccurrences(of: "'", with: "'\\''")
     }

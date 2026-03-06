@@ -34,7 +34,6 @@ struct ChangeView: View {
 
     @State var setAlias: String? = nil
 
-    // icon style selector
     @State var selectedStyle: IconStyle = .all
     @State private var loadIconsTask: Task<Void, Never>? = nil
     @State private var currentLoadToken = UUID()

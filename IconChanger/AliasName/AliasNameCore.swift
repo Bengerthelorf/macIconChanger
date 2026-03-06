@@ -8,12 +8,12 @@
 import Foundation
 
 struct AliasName: Identifiable {
-    let id: String // Swift requires the `id` to conform to the `Identifiable` protocol
+    let id: String
     var appName: String
-    var aliasName: String // This property is now mutable
+    var aliasName: String
 
     init(appName: String, aliasName: String) {
-        self.id = appName // We use `appName` as the `id` because it is unique
+        self.id = appName
         self.appName = appName
         self.aliasName = aliasName
     }
