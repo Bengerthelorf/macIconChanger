@@ -2002,6 +2002,12 @@
         }
       }
     },
+    "Configure Permissions" : {
+
+    },
+    "Configuring..." : {
+
+    },
     "Connection Test" : {
       "comment" : "Settings section"
     },
@@ -2988,6 +2994,9 @@
     "Export your aliases and icon cache for backup or to use on another Mac." : {
 
     },
+    "Failed to configure permissions: %@" : {
+      "comment" : "Sudoers config error"
+    },
     "Finish" : {
       "comment" : "(No comment)",
       "localizations" : {
@@ -3134,6 +3143,7 @@
     },
     "helper_files_missing_instructions_format" : {
       "comment" : "Instructions when helper files are missing. First %@ is list of files, second %@ is expected path.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3419,7 +3429,11 @@
         }
       }
     },
+    "IconChanger needs administrator privileges to change app icons.\nClick the button below and enter your password to complete setup." : {
+
+    },
     "IconChanger needs permission to run its helper script with administrator privileges to change icons.\nThis requires a manual configuration" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -4395,6 +4409,7 @@
       }
     },
     "Manual Setup Required" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -4780,6 +4795,9 @@
           }
         }
       }
+    },
+    "Permission Setup" : {
+
     },
     "Preset Intervals" : {
       "comment" : "Menu item",
@@ -5861,6 +5879,9 @@
         }
       }
     },
+    "Setup was canceled." : {
+      "comment" : "User canceled admin dialog"
+    },
     "Show in Dock" : {
       "comment" : "Menu item",
       "localizations" : {
@@ -6001,6 +6022,7 @@
       }
     },
     "Show Setup Instructions" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -6114,6 +6136,7 @@
     },
     "sudoers_instructions_format" : {
       "comment" : "Instructions for sudoers setup, %@ is the helper script path",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -6478,6 +6501,7 @@
     },
     "unexpected_setup_issue_format" : {
       "comment" : "Generic setup error message. First %@ is the status description, second %@ is the helper path.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

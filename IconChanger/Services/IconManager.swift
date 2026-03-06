@@ -241,6 +241,62 @@ class IconManager: ObservableObject {
         try runHelperTool(appPath: app.url.universalPath(), imagePath: imageURL.path)
     }
 
+    /// Remove the custom icon from an app, restoring its original bundle icon.
+    /// Uses setxattr syscall to clear the FinderInfo flag and removes the Icon\r file.
+    func removeIcon(from app: AppItem) throws {
+        let appPath = app.url.universalPath()
+        logger.log("removeIcon called for app: \(app.name) at \(appPath)")
+
+        // Step 1: Clear the custom icon flag (bit 0x04 at byte 8) in com.apple.FinderInfo
+        let finderInfoName = "com.apple.FinderInfo"
+        var finderInfo = [UInt8](repeating: 0, count: 32)
+        let size = getxattr(appPath, finderInfoName, &finderInfo, 32, 0, 0)
+
+        if size > 0 {
+            if finderInfo[8] & 0x04 != 0 {
+                finderInfo[8] = finderInfo[8] & ~0x04
+
+                // If all bytes are zero, remove the attribute entirely
+                let allZero = finderInfo.allSatisfy { $0 == 0 }
+                if allZero {
+                    removexattr(appPath, finderInfoName, 0)
+                } else {
+                    let result = setxattr(appPath, finderInfoName, &finderInfo, 32, 0, 0)
+                    if result != 0 {
+                        let err = String(cString: strerror(errno))
+                        logger.error("Failed to clear FinderInfo custom icon flag: \(err)")
+                        throw NSError(domain: "IconManager", code: 30,
+                                      userInfo: [NSLocalizedDescriptionKey: "Failed to clear custom icon flag: \(err)"])
+                    }
+                }
+                logger.log("FinderInfo custom icon flag cleared.")
+            }
+        }
+
+        // Step 2: Remove the Icon\r file
+        let iconFile = app.url.appendingPathComponent("Icon\r")
+        if FileManager.default.fileExists(atPath: iconFile.path) {
+            do {
+                try FileManager.default.removeItem(at: iconFile)
+                logger.log("Icon\\r file removed.")
+            } catch {
+                logger.error("Failed to remove Icon\\r: \(error.localizedDescription)")
+                throw NSError(domain: "IconManager", code: 31,
+                              userInfo: [NSLocalizedDescriptionKey: "Failed to remove custom icon file: \(error.localizedDescription)"])
+            }
+        }
+
+        // Step 3: Remove from icon cache
+        IconCacheManager.shared.removeCachedIcon(for: appPath)
+
+        Task { @MainActor in
+            AppIconCache.shared.remove(for: app.url)
+            self.iconRefreshTrigger = UUID()
+        }
+
+        logger.log("Icon restored to default for \(app.name)")
+    }
+
     func setImage(_ image: NSImage, app: AppItem) throws {
         logger.log("setImage called for app: \(app.name)")
 

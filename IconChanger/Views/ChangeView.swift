@@ -37,6 +37,8 @@ struct ChangeView: View {
     @State var selectedStyle: IconStyle = .all
     @State private var loadIconsTask: Task<Void, Never>? = nil
     @State private var currentLoadToken = UUID()
+    @State private var showRestoreConfirm = false
+    @State private var restoreError: String?
 
     var body: some View {
         GeometryReader { geometry in
@@ -55,6 +57,13 @@ struct ChangeView: View {
                                 .font(.title3)
                                 .foregroundColor(.secondary)
                         }
+                        Spacer()
+                        Button {
+                            showRestoreConfirm = true
+                        } label: {
+                            Label("Restore Default", systemImage: "arrow.uturn.backward")
+                        }
+                        .help("Restore the original app icon")
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     HStack {
@@ -183,11 +192,28 @@ struct ChangeView: View {
                     loadIconsTask?.cancel()
                 }
                 .onChange(of: iconManager.iconRefreshTrigger) { _ in
-                    // Only refresh the local .icns list; the online icon grid doesn't change
-                    // when the user applies an icon.
                     inIcons = iconManager.getIconInPath(setPath.url)
                 }
-//                .navigationTitle(setPath.name)
+                .confirmationDialog("Restore Default Icon", isPresented: $showRestoreConfirm) {
+                    Button("Restore", role: .destructive) {
+                        do {
+                            try iconManager.removeIcon(from: setPath)
+                        } catch {
+                            restoreError = error.localizedDescription
+                        }
+                    }
+                    Button("Cancel", role: .cancel) { }
+                } message: {
+                    Text("This will remove the custom icon and restore the original icon for \(setPath.name).")
+                }
+                .alert("Restore Failed", isPresented: Binding(
+                    get: { restoreError != nil },
+                    set: { if !$0 { restoreError = nil } }
+                )) {
+                    Button("OK", role: .cancel) { }
+                } message: {
+                    Text(restoreError ?? "")
+                }
     }
     
     private func triggerIconFetch() {

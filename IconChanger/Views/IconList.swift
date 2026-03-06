@@ -55,6 +55,10 @@ struct IconList: View {
                                     setAlias = app.url.deletingPathExtension().lastPathComponent
                                 }
 
+                                Button("Restore Default Icon") {
+                                    try? iconManager.removeIcon(from: app)
+                                }
+
                                 if let original = app.originalAppInfo {
                                     Button("Remove the Icon from the Launchpad") {
                                         do {
