@@ -42,9 +42,7 @@ struct AliasNameOld {
             } else {
                 UserDefaults.standard.set(try JSONEncoder().encode([raw: name]), forKey: "AliasName")
             }
-        } catch {
-            print(error)
-        }
+        } catch { }
     }
 
     static func setEmpty(for raw: String) {
@@ -53,9 +51,7 @@ struct AliasNameOld {
                 names[raw] = nil
                 UserDefaults.standard.set(try JSONEncoder().encode(names), forKey: "AliasName")
             }
-        } catch {
-            print(error)
-        }
+        } catch { }
     }
 }
 

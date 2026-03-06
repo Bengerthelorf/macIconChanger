@@ -8,6 +8,7 @@
 
 import SwiftUI
 import Combine
+import os
 
 struct PermissionList: Identifiable {
     let bookmarkedURL: URL
@@ -26,6 +27,7 @@ struct PermissionList: Identifiable {
 
 class FolderPermission: ObservableObject {
     static let shared = FolderPermission()
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "FolderPermission")
 
     @Published var permissions: [PermissionList] = []
 
@@ -73,7 +75,7 @@ class FolderPermission: ObservableObject {
                     }
                 }
             } catch {
-                print("Error restoring bookmark for \(urlString): \(error)")
+                logger.error("Error restoring bookmark for \(urlString): \(error.localizedDescription)")
             }
         }
         
@@ -123,7 +125,7 @@ class FolderPermission: ObservableObject {
             // Trigger app refresh
             IconManager.shared.refresh()
         } catch {
-            print("Error creating bookmark for \(urlString): \(error)")
+            logger.error("Error creating bookmark for \(urlString): \(error.localizedDescription)")
         }
     }
     

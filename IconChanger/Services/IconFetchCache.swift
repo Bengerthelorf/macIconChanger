@@ -7,6 +7,7 @@
 
 import Foundation
 import AppKit
+import os
 
 // MARK: - Codable IconRes Wrapper
 
@@ -53,6 +54,7 @@ struct IconFetchCacheEntry {
 /// Manager for icon fetch results caching (in-memory, periodically cleared)
 class IconFetchCacheManager {
     static let shared = IconFetchCacheManager()
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "IconFetchCache")
 
     // MARK: - Properties
 
@@ -134,7 +136,7 @@ class IconFetchCacheManager {
 
         // If all icons failed validation, log a warning
         if validIcons.isEmpty && !entry.icons.isEmpty {
-            print("⚠️ All cached icons failed validation for \(key)")
+            logger.warning("All cached icons failed validation for \(key)")
             return nil
         }
 
@@ -207,6 +209,7 @@ class IconFetchCacheManager {
 
     /// Clear cache entries that haven't been accessed for longer than maxAge
     /// This implements true LRU behavior by checking lastAccessTime
+    @discardableResult
     func clearExpiredCache(olderThan maxAge: TimeInterval) -> Int {
         cacheLock.lock()
         defer { cacheLock.unlock() }

@@ -34,7 +34,6 @@ struct ImageView: View {
                     }
                 } catch {
                     await MainActor.run {
-                        print(error)
                         isLoading = false
                         onStatusUpdate?(false)
                     }

@@ -124,7 +124,6 @@ struct ImageViewCore: View {
                     isSuccessful = false
                     showSnackbar = true
                 }
-                print(error)
             }
         }
     }

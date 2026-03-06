@@ -18,7 +18,7 @@ extension ConfigManager {
                 try data.write(to: latestExportFile)
                 return exportUrl
             } catch {
-                print("Error saving for CLI: \(error.localizedDescription)")
+                logger.error("Error saving for CLI: \(error.localizedDescription)")
             }
         }
         return nil
@@ -34,11 +34,11 @@ extension ConfigManager {
 
             do {
                 let result = importConfiguration(from: importedFile)
-                print("CLI Import completed: \(result.aliases) aliases and \(result.icons) icons imported")
+                logger.info("CLI Import completed: \(result.aliases) aliases and \(result.icons) icons imported")
 
                 try FileManager.default.removeItem(at: flagFile)
             } catch {
-                print("Error processing CLI import: \(error.localizedDescription)")
+                logger.error("Error processing CLI import: \(error.localizedDescription)")
             }
         }
     }

@@ -10,9 +10,11 @@ import SwiftyJSON
 import Cocoa
 import UniformTypeIdentifiers
 import UserNotifications
+import os
 
 class ConfigManager {
     static let shared = ConfigManager()
+    let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ConfigManager")
 
     struct AppConfiguration: Codable {
         var appAliases: [AliasConfig] = []
@@ -62,7 +64,7 @@ class ConfigManager {
             try data.write(to: exportURL)
             return exportURL
         } catch {
-            print("Error exporting configuration: \(error.localizedDescription)")
+            logger.error("Error exporting configuration: \(error.localizedDescription)")
             return nil
         }
     }
@@ -107,7 +109,7 @@ class ConfigManager {
 
             return (importedAliases, importedIcons)
         } catch {
-            print("Error importing configuration: \(error.localizedDescription)")
+            logger.error("Error importing configuration: \(error.localizedDescription)")
             return (0, 0)
         }
     }
@@ -139,7 +141,7 @@ class ConfigManager {
                             success: true
                         )
                     } catch {
-                        print("Error saving to selected location: \(error.localizedDescription)")
+                        self.logger.error("Error saving to selected location: \(error.localizedDescription)")
                         self.showNotification(
                             title: NSLocalizedString("Export Failed", comment: "Notification title"),
                             message: String(format: NSLocalizedString("Unable to save configuration file: %@", comment: "Notification body"), error.localizedDescription),
@@ -211,15 +213,15 @@ class ConfigManager {
 
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
-                print("Failed to send notification: \(error.localizedDescription)")
+                self.logger.error("Failed to send notification: \(error.localizedDescription)")
             }
         }
     }
 
     init() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, error in
             if let error = error {
-                print("Notification permission request failed: \(error.localizedDescription)")
+                self.logger.error("Notification permission request failed: \(error.localizedDescription)")
             }
         }
     }

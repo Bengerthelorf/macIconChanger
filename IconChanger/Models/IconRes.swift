@@ -22,22 +22,18 @@ class IconRes: Identifiable, Hashable {
     
     init?(appName: String, icnsUrl: URL, lowResPngUrl: URL, downloads: Int) {
         guard !appName.isEmpty else {
-            print("⚠️ IconRes init failed: appName is empty")
             return nil
         }
 
         guard icnsUrl.scheme == "https" || icnsUrl.scheme == "http" else {
-            print("⚠️ IconRes init failed: icnsUrl has invalid scheme: \(icnsUrl.scheme ?? "nil")")
             return nil
         }
 
         guard lowResPngUrl.scheme == "https" || lowResPngUrl.scheme == "http" else {
-            print("⚠️ IconRes init failed: lowResPngUrl has invalid scheme: \(lowResPngUrl.scheme ?? "nil")")
             return nil
         }
 
         guard downloads >= 0 else {
-            print("⚠️ IconRes init failed: downloads is negative: \(downloads)")
             return nil
         }
 

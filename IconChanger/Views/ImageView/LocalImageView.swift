@@ -32,7 +32,6 @@ struct LocalImageView: View {
                     }
                 } catch {
                     await MainActor.run {
-                        print(error)
                         isLoading = false
                     }
                 }

@@ -10,9 +10,11 @@ import SwiftUI
 import Combine
 import LaunchPadManagerDBHelper
 import UserNotifications
+import os
 
 class BackgroundService: ObservableObject {
     static let shared = BackgroundService()
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "BackgroundService")
 
     private var statusItem: NSStatusItem?
     private var statusMenu: NSMenu?
@@ -184,7 +186,7 @@ class BackgroundService: ObservableObject {
     private func requestNotificationPermission() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
             if let error = error {
-                print("Error requesting notification permission: \(error.localizedDescription)")
+                self.logger.error("Error requesting notification permission: \(error.localizedDescription)")
             }
         }
     }
@@ -516,7 +518,7 @@ class BackgroundService: ObservableObject {
                     lastUpdateCheck = Date()
                 }
             } catch {
-                print("Error checking for app updates: \(error.localizedDescription)")
+                logger.error("Error checking for app updates: \(error.localizedDescription)")
             }
         }
     }
@@ -534,7 +536,7 @@ class BackgroundService: ObservableObject {
 
                 showRestoreNotification()
             } catch {
-                print("Scheduled restore failed: \(error.localizedDescription)")
+                logger.error("Scheduled restore failed: \(error.localizedDescription)")
             }
         }
     }
@@ -549,7 +551,7 @@ class BackgroundService: ObservableObject {
                 updateStatusMenu()
                 showRestoreNotification()
             } catch {
-                print("Manual restore failed: \(error.localizedDescription)")
+                logger.error("Manual restore failed: \(error.localizedDescription)")
 
                 await MainActor.run {
                     let alert = NSAlert()
@@ -619,7 +621,7 @@ class BackgroundService: ObservableObject {
 
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
-                print("Error showing notification: \(error.localizedDescription)")
+                self.logger.error("Error showing notification: \(error.localizedDescription)")
             }
         }
     }
@@ -638,7 +640,7 @@ class BackgroundService: ObservableObject {
 
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
-                print("Error showing notification: \(error.localizedDescription)")
+                self.logger.error("Error showing notification: \(error.localizedDescription)")
             }
         }
     }
@@ -666,10 +668,6 @@ class BackgroundService: ObservableObject {
 
     @objc func cleanupFetchCache() {
         let maxAge: TimeInterval = 600
-        let removed = IconFetchCacheManager.shared.clearExpiredCache(olderThan: maxAge)
-
-        if removed > 0 {
-            print("Periodic cleanup: Removed \(removed) expired entries")
-        }
+        IconFetchCacheManager.shared.clearExpiredCache(olderThan: maxAge)
     }
 }

@@ -162,13 +162,11 @@ struct ChangeView: View {
                             if let nsimage = NSImage(contentsOf: url) {
                                 do {
                                     try IconManager.shared.setImage(nsimage, app: setPath)
-                                } catch {
-                                    print("Failed to set icon from local file: \(error.localizedDescription)")
-                                }
+                                } catch { }
                             }
                         }
-                    case .failure(let error):
-                        print(error)
+                    case .failure:
+                        break
                     }
                 }
                 .padding(10)
@@ -242,7 +240,6 @@ struct ChangeView: View {
         } catch {
             await MainActor.run {
                 if currentLoadToken == token {
-                    print(error)
                     isLoadingIcons = false
                 }
             }

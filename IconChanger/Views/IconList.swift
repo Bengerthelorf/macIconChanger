@@ -59,9 +59,7 @@ struct IconList: View {
                                     Button("Remove the Icon from the Launchpad") {
                                         do {
                                             try LaunchPadManagerDBHelper().removeApp(original)
-                                        } catch {
-                                            print(error)
-                                        }
+                                        } catch { }
                                     }
                                 }
                     }
