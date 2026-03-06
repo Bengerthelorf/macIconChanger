@@ -173,6 +173,7 @@ struct BackgroundSettingsView: View {
                 } footer: {
                     if backgroundService.enableAutoRestoreOnUpdate {
                         Text("The app will monitor your cached applications for updates and automatically restore their custom icons when updates are detected.")
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
 

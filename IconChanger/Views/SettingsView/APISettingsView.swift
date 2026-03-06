@@ -22,6 +22,7 @@ struct APISettingsView: View {
                 Label(NSLocalizedString("API Key", comment: "Settings section"), systemImage: "key")
             } footer: {
                 Text(NSLocalizedString("You need to obtain an API key from macosicons.com", comment: "API settings instruction"))
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             Section {

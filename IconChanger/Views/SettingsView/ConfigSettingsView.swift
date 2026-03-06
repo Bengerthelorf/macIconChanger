@@ -65,6 +65,7 @@ struct ConfigSettingsView: View {
                     Text("Import will only add new items, never replace or remove existing ones.")
                     Text("Command line configuration is available with the 'iconchanger' tool.")
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .formStyle(.grouped)

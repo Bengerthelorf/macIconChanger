@@ -110,6 +110,7 @@ struct LanguageSettingsView: View {
                 Label(NSLocalizedString("Language", comment: "Settings section title"), systemImage: "globe")
             } footer: {
                 Label(NSLocalizedString("Changes will take full effect after restarting the app", comment: "Language settings instruction"), systemImage: "info.circle")
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .formStyle(.grouped)
