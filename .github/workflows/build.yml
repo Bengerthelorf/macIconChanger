@@ -112,21 +112,27 @@ jobs:
           PUBDATE=$(date -u "+%a, %d %b %Y %H:%M:%S +0000")
           DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/IconChanger.dmg"
 
-          NEW_ITEM="        <item>\n\
-                      <title>Version $VERSION</title>\n\
-                      <link>https://github.com/${{ github.repository }}</link>\n\
-                      <sparkle:version>$BUILD_NUMBER</sparkle:version>\n\
-                      <sparkle:shortVersionString>$VERSION</sparkle:shortVersionString>\n\
-                      <pubDate>$PUBDATE</pubDate>\n\
-                      <enclosure url=\"$DOWNLOAD_URL\"\n\
-                      sparkle:edSignature=\"$ED_SIGNATURE\" length=\"$DMG_SIZE\"\n\
-                      type=\"application/octet-stream\"/>\n\
-                  </item>"
-
-          # Insert after <title>IconChanger</title>
-          sed -i '' "/<title>IconChanger<\/title>/a\\
-          $NEW_ITEM
-          " IconChanger/Resources/sparkle.xml
+          python3 -c "
+          import sys
+          item = '''        <item>
+                      <title>Version $VERSION</title>
+                      <link>https://github.com/${{ github.repository }}</link>
+                      <sparkle:version>$BUILD_NUMBER</sparkle:version>
+                      <sparkle:shortVersionString>$VERSION</sparkle:shortVersionString>
+                      <pubDate>$PUBDATE</pubDate>
+                      <enclosure url=\"$DOWNLOAD_URL\"
+                      sparkle:edSignature=\"$ED_SIGNATURE\" length=\"$DMG_SIZE\"
+                      type=\"application/octet-stream\"/>
+                  </item>'''
+          xml = open('IconChanger/Resources/sparkle.xml').read()
+          marker = '<title>IconChanger</title>'
+          idx = xml.find(marker)
+          if idx == -1:
+              sys.exit('marker not found')
+          insert_pos = xml.index('\n', idx) + 1
+          xml = xml[:insert_pos] + item + '\n' + xml[insert_pos:]
+          open('IconChanger/Resources/sparkle.xml', 'w').write(xml)
+          "
 
       - name: Commit and push appcast
         if: startsWith(github.ref, 'refs/tags/')
