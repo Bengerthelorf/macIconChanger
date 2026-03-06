@@ -5179,6 +5179,9 @@
         }
       }
     },
+    "Restore" : {
+
+    },
     "Restore All" : {
       "localizations" : {
         "fr" : {
@@ -5281,6 +5284,15 @@
           }
         }
       }
+    },
+    "Restore Default" : {
+
+    },
+    "Restore Default Icon" : {
+
+    },
+    "Restore Failed" : {
+
     },
     "Restore Icons on Schedule" : {
       "localizations" : {
@@ -5418,6 +5430,9 @@
           }
         }
       }
+    },
+    "Restore the original app icon" : {
+
     },
     "Restore This Icon" : {
       "localizations" : {
@@ -6385,6 +6400,9 @@
       }
     },
     "This action cannot be undone. You will need to re-apply icons to cache them again." : {
+
+    },
+    "This will remove the custom icon and restore the original icon for %@." : {
 
     },
     "Traditional Chinese" : {
