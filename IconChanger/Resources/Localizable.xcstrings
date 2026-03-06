@@ -1149,6 +1149,12 @@
         }
       }
     },
+    "Are you sure you want to clear all %lld cached icons?" : {
+
+    },
+    "Are you sure you want to remove %lld selected icon(s) from the cache?" : {
+
+    },
     "Auto-Restore on Schedule" : {
       "comment" : "Menu item",
       "localizations" : {
@@ -1748,7 +1754,11 @@
         }
       }
     },
+    "Clear All Cache" : {
+
+    },
     "Clear Cache" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -5038,6 +5048,9 @@
         }
       }
     },
+    "Remove Selected" : {
+
+    },
     "Remove the Icon from the Launchpad" : {
       "comment" : "(No comment)",
       "localizations" : {
@@ -6347,6 +6360,9 @@
           }
         }
       }
+    },
+    "This action cannot be undone. You will need to re-apply icons to cache them again." : {
+
     },
     "Traditional Chinese" : {
       "comment" : "Language selection",
