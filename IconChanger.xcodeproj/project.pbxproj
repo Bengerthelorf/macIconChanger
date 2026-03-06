@@ -14,7 +14,6 @@
 		2F4A9A1D2D92543A00F4FA81 /* ConfigSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F4A9A1C2D92543A00F4FA81 /* ConfigSettingsView.swift */; };
 		2FC131602D8F7D7E00F60B19 /* CachedIconsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FC1315F2D8F7D7D00F60B19 /* CachedIconsView.swift */; };
 		2FC131622D8F7DB000F60B19 /* IconCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FC131612D8F7DB000F60B19 /* IconCache.swift */; };
-		2FC131842D8F916D00F60B19 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2FC1317B2D8F916D00F60B19 /* Localizable.strings */; };
 		2FC131892D8FB34F00F60B19 /* BackgroundSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FC131882D8FB34F00F60B19 /* BackgroundSettingsView.swift */; };
 		2FC1318B2D8FB37B00F60B19 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FC1318A2D8FB37B00F60B19 /* AppDelegate.swift */; };
 		2FC1318D2D8FB5CB00F60B19 /* BackgroundService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FC1318C2D8FB5CA00F60B19 /* BackgroundService.swift */; };
@@ -58,6 +57,7 @@
 		908A792A281A5AE800951B15 /* Github-Iconchanger_bak.png in Resources */ = {isa = PBXBuildFile; fileRef = 908A7929281A5AE800951B15 /* Github-Iconchanger_bak.png */; };
 		908A792E281A771800951B15 /* Api.png in Resources */ = {isa = PBXBuildFile; fileRef = 908A792D281A771800951B15 /* Api.png */; };
 		90B57C1B286AA2B400EE52D3 /* URL+Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90B57C1A286AA2B400EE52D3 /* URL+Document.swift */; };
+		C6222E042F5B61260004A1D8 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = C6222E032F5B61260004A1D8 /* Localizable.xcstrings */; };
 		C66396BF2F0EAD0C006729FC /* AppItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C66396BE2F0EAD0C006729FC /* AppItem.swift */; };
 		C6E571DA2EA2319C00EC9E5E /* IconImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6E571D92EA2319C00EC9E5E /* IconImageLoader.swift */; };
 /* End PBXBuildFile section */
@@ -89,14 +89,8 @@
 		2F13C0762D93267A00C645E9 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		2F13C07D2D932CB800C645E9 /* CLISettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLISettingView.swift; sourceTree = "<group>"; };
 		2F4A9A1C2D92543A00F4FA81 /* ConfigSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigSettingsView.swift; sourceTree = "<group>"; };
-		2F94B8FA2D94F85300B686B1 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
-		2F94B8FB2D94F91200B686B1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		2F94B8FC2D94F91700B686B1 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		2F94B8FD2D94F92100B686B1 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
-		2F94B8FE2D94F93200B686B1 /* zh-HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-HK"; path = "zh-HK.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		2FC1315F2D8F7D7D00F60B19 /* CachedIconsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedIconsView.swift; sourceTree = "<group>"; };
 		2FC131612D8F7DB000F60B19 /* IconCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconCache.swift; sourceTree = "<group>"; };
-		2FC1317A2D8F916D00F60B19 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		2FC131882D8FB34F00F60B19 /* BackgroundSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundSettingsView.swift; sourceTree = "<group>"; };
 		2FC1318A2D8FB37B00F60B19 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2FC1318C2D8FB5CA00F60B19 /* BackgroundService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundService.swift; sourceTree = "<group>"; };
@@ -143,6 +137,7 @@
 		908A792D281A771800951B15 /* Api.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Api.png; sourceTree = "<group>"; };
 		90B57C1A286AA2B400EE52D3 /* URL+Document.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Document.swift"; sourceTree = "<group>"; };
 		90B57C1E286AA62300EE52D3 /* IconChanger.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = IconChanger.entitlements; sourceTree = "<group>"; };
+		C6222E032F5B61260004A1D8 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		C66396BE2F0EAD0C006729FC /* AppItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppItem.swift; sourceTree = "<group>"; };
 		C6E571D92EA2319C00EC9E5E /* IconImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconImageLoader.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -347,7 +342,7 @@
 				90534351286C8BDA00237F98 /* fileicon */,
 				9053438A287534C300237F98 /* helper.sh */,
 				90534350286B441900237F98 /* sparkle.xml */,
-				2FC1317B2D8F916D00F60B19 /* Localizable.strings */,
+				C6222E032F5B61260004A1D8 /* Localizable.xcstrings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -460,8 +455,8 @@
 			files = (
 				908A792A281A5AE800951B15 /* Github-Iconchanger_bak.png in Resources */,
 				90534352286C8BDA00237F98 /* fileicon in Resources */,
+				C6222E042F5B61260004A1D8 /* Localizable.xcstrings in Resources */,
 				9053438B287550C200237F98 /* helper.sh in Resources */,
-				2FC131842D8F916D00F60B19 /* Localizable.strings in Resources */,
 				907AC4F92954038600F9F0F9 /* README-zh.md in Resources */,
 				900D1CF0281934C8007ABB12 /* Preview Assets.xcassets in Resources */,
 				908A7927281A5A4A00951B15 /* README.md in Resources */,
@@ -526,22 +521,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXVariantGroup section */
-		2FC1317B2D8F916D00F60B19 /* Localizable.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				2FC1317A2D8F916D00F60B19 /* en */,
-				2F94B8FA2D94F85300B686B1 /* ja */,
-				2F94B8FB2D94F91200B686B1 /* zh-Hans */,
-				2F94B8FC2D94F91700B686B1 /* zh-Hant */,
-				2F94B8FD2D94F92100B686B1 /* fr */,
-				2F94B8FE2D94F93200B686B1 /* zh-HK */,
-			);
-			name = Localizable.strings;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		2F13C0712D9325B200C645E9 /* Debug */ = {
@@ -634,6 +613,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 12.4;
 				MARKETING_VERSION = "";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -696,6 +676,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 12.4;
 				MARKETING_VERSION = "";
 				MTL_ENABLE_DEBUG_INFO = NO;
