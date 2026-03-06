@@ -20,10 +20,11 @@ struct IconCache: Codable, Identifiable {
 
 class IconCacheManager {
     static let shared = IconCacheManager()
-    
+
     private let cacheKey = "com.iconchanger.cachedIcons"
     private var cachedIcons: [String: IconCache] = [:]
-    
+    private let lock = NSLock()
+
     // Get the cache directory
     static var cacheDirectory: URL {
         let path = "\(NSHomeDirectory())/.iconchanger/cache"
@@ -33,11 +34,11 @@ class IconCacheManager {
         }
         return url
     }
-    
+
     init() {
         loadCache()
     }
-    
+
     // Load cached icons from UserDefaults
     private func loadCache() {
         if let data = UserDefaults.standard.data(forKey: cacheKey),
@@ -45,88 +46,96 @@ class IconCacheManager {
             cachedIcons = decoded
         }
     }
-    
-    // Save cached icons to UserDefaults
+
+    // Save cached icons to UserDefaults (must be called while lock is held)
     private func saveCache() {
         if let encoded = try? JSONEncoder().encode(cachedIcons) {
             UserDefaults.standard.set(encoded, forKey: cacheKey)
         }
     }
-    
+
     // Add or update a cached icon
     func cacheIcon(image: NSImage, for appPath: String, appName: String) throws -> URL {
-        // Generate a unique filename for the icon
         let iconFileName = "\(UUID().uuidString).png"
         let iconURL = Self.cacheDirectory.appendingPathComponent(iconFileName)
-        
-        // Save the image to the cache directory
+
         IconManager.saveImage(image, atUrl: iconURL)
-        
-        // Create and store the cache information
+
         let iconCache = IconCache(
             appPath: appPath,
             iconFileName: iconFileName,
             appName: appName,
             timestamp: Date()
         )
-        
+
+        lock.lock()
         cachedIcons[appPath] = iconCache
         saveCache()
-        
+        lock.unlock()
+
         return iconURL
     }
-    
+
     // Get cached icon for an app
     func getIconCache(for appPath: String) -> IconCache? {
+        lock.lock()
+        defer { lock.unlock() }
         return cachedIcons[appPath]
     }
-    
+
     // Get cached icon URL for an app
     func getCachedIconURL(for appPath: String) -> URL? {
+        lock.lock()
+        defer { lock.unlock() }
         guard let cache = cachedIcons[appPath] else { return nil }
         return Self.cacheDirectory.appendingPathComponent(cache.iconFileName)
     }
-    
+
     // Get all cached icons
     func getAllCachedIcons() -> [IconCache] {
+        lock.lock()
+        defer { lock.unlock() }
         return Array(cachedIcons.values)
     }
-    
+
     // Count cached icons
     func getCachedIconsCount() -> Int {
+        lock.lock()
+        defer { lock.unlock() }
         return cachedIcons.count
     }
-    
+
     // Remove a cached icon
     func removeCachedIcon(for appPath: String) {
+        lock.lock()
         if let cache = cachedIcons[appPath] {
-            // Remove the icon file
             let iconURL = Self.cacheDirectory.appendingPathComponent(cache.iconFileName)
             try? FileManager.default.removeItem(at: iconURL)
-            
-            // Remove from cache
+
             cachedIcons.removeValue(forKey: appPath)
             saveCache()
         }
+        lock.unlock()
     }
-    
+
     // Clear all cached icons
     func clearCache() {
-        // Remove all icon files
+        lock.lock()
         for cache in cachedIcons.values {
             let iconURL = Self.cacheDirectory.appendingPathComponent(cache.iconFileName)
             try? FileManager.default.removeItem(at: iconURL)
         }
-        
-        // Clear cache
+
         cachedIcons.removeAll()
         saveCache()
+        lock.unlock()
     }
-    
+
     func addImportedCache(_ cache: IconCache) {
-        // Create a new cache entry
+        lock.lock()
         cachedIcons[cache.appPath] = cache
         saveCache()
+        lock.unlock()
     }
 }
 

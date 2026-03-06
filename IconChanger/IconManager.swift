@@ -494,73 +494,74 @@ class IconManager: ObservableObject {
         let task = Process()
         let pipe = Pipe()
         let errorPipe = Pipe()
-        
+
         task.standardOutput = pipe
         task.standardError = errorPipe
         task.arguments = ["-c", command]
-        task.executableURL = URL(fileURLWithPath: "/bin/zsh") // Or /bin/bash
+        task.executableURL = URL(fileURLWithPath: "/bin/zsh")
         task.standardInput = nil
-        
-        // Set environment, crucial for finding commands if PATH is modified
+
         task.environment = ProcessInfo.processInfo.environment
         task.environment?["PATH"] = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:" + (task.environment?["PATH"] ?? "")
-        
-        
-        let group = DispatchGroup()
-        group.enter()
-        
+
+        // Collect output asynchronously to prevent pipe buffer deadlocks
+        var outputData = Data()
+        var errorData = Data()
+        let outputLock = NSLock()
+
+        let outputHandle = pipe.fileHandleForReading
+        let errorHandle = errorPipe.fileHandleForReading
+
+        let outputQueue = DispatchQueue(label: "com.iconchanger.shell.stdout")
+        let errorQueue = DispatchQueue(label: "com.iconchanger.shell.stderr")
+
+        let outputGroup = DispatchGroup()
+        outputGroup.enter()
+        outputQueue.async {
+            outputData = outputHandle.readDataToEndOfFile()
+            outputGroup.leave()
+        }
+        outputGroup.enter()
+        errorQueue.async {
+            errorData = errorHandle.readDataToEndOfFile()
+            outputGroup.leave()
+        }
+
+        let semaphore = DispatchSemaphore(value: 0)
         var timedOut = false
-        let timer = Timer.scheduledTimer(withTimeInterval: timeout, repeats: false) { _ in
-            if task.isRunning {
-                timedOut = true
-                task.terminate()
-                print("Shell command timed out, terminating task.")
-                group.leave()
-            }
+
+        task.terminationHandler = { _ in
+            semaphore.signal()
         }
-        
-        task.terminationHandler = { process in
-            timer.invalidate()
-            if !timedOut {
-                group.leave()
-            }
-        }
-        
+
         do {
             try task.run()
-            print("Executing shell command: \(command)")
         } catch {
-            print("Failed to run task: \(error)")
-            timer.invalidate()
-            group.leave()
             throw ShellError.taskCreationFailed(error)
         }
-        
-        group.wait() // Wait for task to finish or timeout
-        
-        let outputData = pipe.fileHandleForReading.readDataToEndOfFile()
-        let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
+
+        let waitResult = semaphore.wait(timeout: .now() + timeout)
+        if waitResult == .timedOut {
+            timedOut = true
+            task.terminate()
+        }
+
+        // Wait for pipe reads to finish
+        outputGroup.wait()
+
         let output = String(data: outputData, encoding: .utf8) ?? ""
         let errorOutput = String(data: errorData, encoding: .utf8) ?? ""
-        
         let status = task.terminationStatus
-        
-        print("Shell command finished. Status: \(status), Timed Out: \(timedOut)")
-        print("Stdout: \(output)")
-        print("Stderr: \(errorOutput)")
-        
-        
+
         if timedOut {
             throw ShellError.timeout
         }
-        
+
         if status != 0 {
-            // Combine stdout and stderr for error context
             let combinedOutput = "Stdout:\n\(output)\nStderr:\n\(errorOutput)".trimmingCharacters(in: .whitespacesAndNewlines)
             throw ShellError.commandFailed(status: status, output: combinedOutput.isEmpty ? "No output" : combinedOutput)
         }
-        
-        // If status is 0, return stdout, even if there's stderr output (some tools use stderr for info)
+
         return output
     }
     
