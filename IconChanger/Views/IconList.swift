@@ -73,17 +73,6 @@ struct IconList: View {
             }
                     .listStyle(SidebarListStyle())  // Use SidebarListStyle to create a sidebar look
                     .frame(minWidth: 200, idealWidth: 300) // Adjust the width to your liking
-                    .overlay(alignment: .topTrailing) {
-                        Button {
-                            iconManager.refresh()
-                        } label: {
-                            Image(systemName: "arrow.clockwise")
-                        }
-                        .buttonStyle(.borderless)
-                        .help("Refresh Applications")
-                        .padding(.trailing, 6)
-                        .padding(.top, 8)
-                    }
 
             // Display detail view when an app is selected, otherwise display placeholder
             if let app = selectedApp {
@@ -99,37 +88,41 @@ struct IconList: View {
                 }
                 .searchable(text: $searchText)
                 .toolbar {
-                    ToolbarItem {
+                    ToolbarItem(placement: .automatic) {
+                        Button {
+                            iconManager.iconRefreshTrigger = UUID()
+                        } label: {
+                            Image(systemName: "arrow.clockwise")
+                        }
+                        .help("Refresh Icon Display")
+                    }
+
+                    ToolbarItem(placement: .automatic) {
                         Menu {
+                            Button {
+                                iconManager.refresh()
+                            } label: {
+                                Label("Refresh App List", systemImage: "arrow.triangle.2.circlepath")
+                            }
+
                             Button("Check Setup Status") {
                                 print("Manual setup check requested.")
                                 iconManager.needsSetupCheck = true
                             }
-                            
+
                             Divider()
-                            
-                            // Add new option to restore cached icons
+
                             Button {
                                 Task {
                                     do {
                                         try await iconManager.restoreAllCachedIcons()
-                                        // Show success notification using a simple alert
                                         let alert = NSAlert()
                                         alert.messageText = NSLocalizedString("Icons Restored", comment: "Alert title")
                                         alert.informativeText = NSLocalizedString("All cached custom icons have been successfully restored.", comment: "Alert body")
                                         alert.alertStyle = .informational
                                         alert.addButton(withTitle: NSLocalizedString("OK", comment: "Alert button"))
                                         alert.runModal()
-                                    } catch let error as RestoreError {
-                                        // Show error notification
-                                        let alert = NSAlert()
-                                        alert.messageText = NSLocalizedString("Error Restoring Icons", comment: "Alert title")
-                                        alert.informativeText = error.localizedDescription
-                                        alert.alertStyle = .critical
-                                        alert.addButton(withTitle: NSLocalizedString("OK", comment: "Alert button"))
-                                        alert.runModal()
                                     } catch {
-                                        // Generic error
                                         let alert = NSAlert()
                                         alert.messageText = NSLocalizedString("Error Restoring Icons", comment: "Alert title")
                                         alert.informativeText = error.localizedDescription
@@ -141,20 +134,9 @@ struct IconList: View {
                             } label: {
                                 Label("Restore Cached Icons", systemImage: "arrow.clockwise")
                             }
-
                         } label: {
                             Image(systemName: "ellipsis.circle")
                         }
-                        .buttonStyle(.plain)
-                    }
-
-                    ToolbarItem(placement: .automatic) {
-                        RefreshCacheToolbarButton(
-                            cachedCount: IconCacheManager.shared.getCachedIconsCount(),
-                            action: {
-                                iconManager.iconRefreshTrigger = UUID()
-                            }
-                        )
                     }
                 }
                 .onAppear {
@@ -179,43 +161,6 @@ struct IconView: View {
     }
 }
 
-
-struct RefreshCacheToolbarButton: View {
-    let cachedCount: Int
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(alignment: .center, spacing: 8) {
-                Image(systemName: "goforward")
-                    .font(.system(size: 13, weight: .semibold))
-                    .frame(width: 18, height: 18, alignment: .center)
-
-                Rectangle()
-                    .fill(Color.primary.opacity(0.2))
-                    .frame(width: 1)
-                    .frame(maxHeight: 18)
-                    .padding(.vertical, 3)
-
-                HStack(alignment: .center, spacing: 4) {
-                    Image(systemName: "archivebox")
-                        .font(.system(size: 12))
-                        .frame(width: 14, height: 14, alignment: .center)
-                    Text("\(cachedCount)")
-                        .font(.system(size: 12, weight: .medium))
-                        .monospacedDigit()
-                }
-            }
-            .frame(height: 24, alignment: .center)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
-        }
-        .buttonStyle(.plain)
-        .contentShape(Capsule(style: .continuous))
-        .controlSize(.small)
-        .help("Refresh the icon results and show cached icon count")
-    }
-}
 
 
 extension String: @retroactive Identifiable {

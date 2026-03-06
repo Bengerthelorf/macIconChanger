@@ -8,6 +8,7 @@
 
     },
     "%lld" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -4775,7 +4776,48 @@
         }
       }
     },
+    "Refresh App List" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh App List"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualiser la liste des apps"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリ一覧を更新"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刷新应用列表"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新整理應用程式列表"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新整理應用程式列表"
+          }
+        }
+      }
+    },
     "Refresh Applications" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4815,42 +4857,42 @@
         }
       }
     },
-    "Refresh the icon results and show cached icon count" : {
+    "Refresh Icon Display" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Refresh the icon results and show cached icon count"
+            "value" : "Refresh Icon Display"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Actualiser les résultats d'icônes et afficher le nombre d'icônes en cache"
+            "value" : "Actualiser l'affichage des icônes"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "アイコンの結果を更新し、キャッシュされたアイコン数を表示"
+            "value" : "アイコン表示を更新"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "刷新图标结果并显示缓存图标数量"
+            "value" : "刷新图标显示"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "重新整理圖像結果並顯示快取圖像數量"
+            "value" : "重新整理圖像顯示"
           }
         },
         "zh-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "重新整理圖像結果並顯示快取圖像數量"
+            "value" : "重新整理圖像顯示"
           }
         }
       }
