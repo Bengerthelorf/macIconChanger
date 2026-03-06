@@ -45,8 +45,6 @@ struct AliasNameOld {
         } catch {
             print(error)
         }
-
-        UserDefaults.standard.synchronize()
     }
 
     static func setEmpty(for raw: String) {
@@ -58,8 +56,6 @@ struct AliasNameOld {
         } catch {
             print(error)
         }
-
-        UserDefaults.standard.synchronize()
     }
 }
 

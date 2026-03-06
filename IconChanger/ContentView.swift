@@ -189,7 +189,6 @@ struct ContentView: View {
 
     func prepareSetupInstructions(for status: SetupStatus) {
         let helperPath = IconManager.shared.helperScriptURL.path
-        _ = ProcessInfo.processInfo.userName
 
         switch status {
         case .sudoersPermissionMissing:

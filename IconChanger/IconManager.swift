@@ -42,8 +42,6 @@ class IconManager: ObservableObject {
     }
     
     init() {
-        let _ = NotificationCenter.default
-        
         refresh()
     }
     
