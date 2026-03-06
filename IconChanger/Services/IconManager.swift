@@ -589,15 +589,11 @@ class IconManager: ObservableObject {
         
         // Now check sudoers permission
         let helperPath = self.helperScriptURL.path
-        // Escape regex metacharacters and shell special characters in the path
-        let regexMetachars = CharacterSet(charactersIn: "[](){}.*+?^$|\\")
-        let escapedHelperPathForGrep = helperPath.unicodeScalars.map { scalar in
-            regexMetachars.contains(scalar) ? "\\\\\(scalar)" : String(scalar)
-        }.joined().replacingOccurrences(of: " ", with: "[[:space:]]")
+        // Escape spaces for the grep regex pattern (dots matching any char is harmless here)
+        let escapedHelperPathForGrep = helperPath.replacingOccurrences(of: " ", with: "[[:space:]]")
 
         let grepPattern = "NOPASSWD:[[:space:]]*\(escapedHelperPathForGrep)"
 
-        // Use single quotes for the grep pattern to avoid shell interpretation
         let checkCommand = "sudo -n -l | grep -q -E '\(grepPattern.shellEscaped)'"
         
         logger.log("Executing sudoers check command: \(checkCommand)")
