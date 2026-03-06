@@ -413,3 +413,50 @@ Settings tab */
 "Setup Error" = "セットアップエラー";
 "Check Setup Status" = "セットアップ状況を確認";
 "Manual setup check requested." = "手動セットアップ確認がリクエストされました。";
+
+/* Menu bar items */
+"Open IconChanger" = "IconChangerを開く";
+"Cached Icons: %lld" = "キャッシュアイコン: %lld";
+"Last Restore: %@" = "最終復元: %@";
+"Auto-Restore on Schedule" = "スケジュールで自動復元";
+"Preset Intervals" = "プリセット間隔";
+"Custom: %@" = "カスタム: %@";
+"Restore Interval" = "復元間隔";
+"Auto-Restore When Apps Update" = "アプリ更新時に自動復元";
+"Check Interval" = "チェック間隔";
+"Settings" = "設定";
+"Quit" = "終了";
+
+/* Alert messages */
+"Icon Restoration Failed" = "アイコンの復元に失敗しました";
+"All cached custom icons have been successfully restored." = "キャッシュされたすべてのカスタムアイコンが正常に復元されました。";
+"Error Restoring Icons" = "アイコンの復元中にエラー";
+"Visibility Required" = "表示が必要です";
+"IconChanger needs to be visible in either the menu bar or the dock when running in the background." = "バックグラウンドで実行中は、IconChangerはメニューバーまたはDockに表示される必要があります。";
+
+/* Notification messages */
+"All cached app icons have been successfully restored." = "キャッシュされたすべてのアプリアイコンが正常に復元されました。";
+"App Icons Restored" = "アプリアイコン復元済み";
+"%lld updated app(s) had their custom icons restored." = "%lld 個の更新されたアプリのカスタムアイコンが復元されました。";
+
+/* Config import/export */
+"Export IconChanger Configuration" = "IconChanger設定をエクスポート";
+"Import IconChanger Configuration" = "IconChanger設定をインポート";
+"Export Successful" = "エクスポート成功";
+"Configuration exported successfully" = "設定が正常にエクスポートされました";
+"Export Failed" = "エクスポート失敗";
+"Unable to save configuration file: %@" = "設定ファイルを保存できません: %@";
+"Import Successful" = "インポート成功";
+"Imported %lld aliases and %lld icons" = "%lld 個のエイリアスと %lld 個のアイコンをインポートしました";
+"Import Complete" = "インポート完了";
+"No new items were found to import" = "インポートする新しい項目が見つかりませんでした";
+
+/* Time intervals */
+"Every Hour" = "毎時";
+"Every Day" = "毎日";
+"Every 2 Days" = "2日ごと";
+"Every 3 Days" = "3日ごと";
+"Every %lld Hours" = "%lld 時間ごと";
+"Every Minute" = "毎分";
+"Every 2 Hours" = "2時間ごと";
+"Every %lld Minutes" = "%lld 分ごと";

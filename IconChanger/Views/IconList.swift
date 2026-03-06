@@ -115,26 +115,26 @@ struct IconList: View {
                                         try await iconManager.restoreAllCachedIcons()
                                         // Show success notification using a simple alert
                                         let alert = NSAlert()
-                                        alert.messageText = "Icons Restored"
-                                        alert.informativeText = "All cached custom icons have been successfully restored."
+                                        alert.messageText = NSLocalizedString("Icons Restored", comment: "Alert title")
+                                        alert.informativeText = NSLocalizedString("All cached custom icons have been successfully restored.", comment: "Alert body")
                                         alert.alertStyle = .informational
-                                        alert.addButton(withTitle: "OK")
+                                        alert.addButton(withTitle: NSLocalizedString("OK", comment: "Alert button"))
                                         alert.runModal()
                                     } catch let error as RestoreError {
                                         // Show error notification
                                         let alert = NSAlert()
-                                        alert.messageText = "Error Restoring Icons"
+                                        alert.messageText = NSLocalizedString("Error Restoring Icons", comment: "Alert title")
                                         alert.informativeText = error.localizedDescription
                                         alert.alertStyle = .critical
-                                        alert.addButton(withTitle: "OK")
+                                        alert.addButton(withTitle: NSLocalizedString("OK", comment: "Alert button"))
                                         alert.runModal()
                                     } catch {
                                         // Generic error
                                         let alert = NSAlert()
-                                        alert.messageText = "Error Restoring Icons"
+                                        alert.messageText = NSLocalizedString("Error Restoring Icons", comment: "Alert title")
                                         alert.informativeText = error.localizedDescription
                                         alert.alertStyle = .critical
-                                        alert.addButton(withTitle: "OK")
+                                        alert.addButton(withTitle: NSLocalizedString("OK", comment: "Alert button"))
                                         alert.runModal()
                                     }
                                 }

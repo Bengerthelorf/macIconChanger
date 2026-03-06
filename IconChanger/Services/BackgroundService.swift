@@ -260,20 +260,20 @@ class BackgroundService: ObservableObject {
         menu.addItem(NSMenuItem.separator())
         
         // Show main window
-        let openItem = NSMenuItem(title: "Open IconChanger", action: #selector(openMainWindow(_:)), keyEquivalent: "o")
+        let openItem = NSMenuItem(title: NSLocalizedString("Open IconChanger", comment: "Menu item"), action: #selector(openMainWindow(_:)), keyEquivalent: "o")
         openItem.target = self
         menu.addItem(openItem)
         
         // Cached Icons count
         let cachedCount = IconCacheManager.shared.getCachedIconsCount()
-        let cachedCountItem = NSMenuItem(title: "Cached Icons: \(cachedCount)", action: nil, keyEquivalent: "")
+        let cachedCountItem = NSMenuItem(title: String(format: NSLocalizedString("Cached Icons: %lld", comment: "Menu item"), cachedCount), action: nil, keyEquivalent: "")
         cachedCountItem.isEnabled = false
         menu.addItem(cachedCountItem)
         
         menu.addItem(NSMenuItem.separator())
         
         // Restore icons manually
-        let restoreItem = NSMenuItem(title: "Restore Cached Icons", action: #selector(restoreCachedIcons), keyEquivalent: "r")
+        let restoreItem = NSMenuItem(title: NSLocalizedString("Restore Cached Icons", comment: "Menu item"), action: #selector(restoreCachedIcons), keyEquivalent: "r")
         restoreItem.target = self
         menu.addItem(restoreItem)
         
@@ -282,7 +282,7 @@ class BackgroundService: ObservableObject {
             let formatter = DateFormatter()
             formatter.dateStyle = .short
             formatter.timeStyle = .short
-            let lastRestoreItem = NSMenuItem(title: "Last Restore: \(formatter.string(from: lastScheduledRestore))", action: nil, keyEquivalent: "")
+            let lastRestoreItem = NSMenuItem(title: String(format: NSLocalizedString("Last Restore: %@", comment: "Menu item"), formatter.string(from: lastScheduledRestore)), action: nil, keyEquivalent: "")
             lastRestoreItem.isEnabled = false
             menu.addItem(lastRestoreItem)
         }
@@ -293,13 +293,13 @@ class BackgroundService: ObservableObject {
         let settingsSubmenu = NSMenu()
         
         // Menu bar visibility
-        let menuBarItem = NSMenuItem(title: "Show in Menu Bar", action: #selector(toggleMenuBarVisibility), keyEquivalent: "")
+        let menuBarItem = NSMenuItem(title: NSLocalizedString("Show in Menu Bar", comment: "Menu item"), action: #selector(toggleMenuBarVisibility), keyEquivalent: "")
         menuBarItem.target = self
         menuBarItem.state = showInMenuBar ? .on : .off
         settingsSubmenu.addItem(menuBarItem)
         
         // Dock visibility
-        let dockItem = NSMenuItem(title: "Show in Dock", action: #selector(toggleDockVisibility), keyEquivalent: "")
+        let dockItem = NSMenuItem(title: NSLocalizedString("Show in Dock", comment: "Menu item"), action: #selector(toggleDockVisibility), keyEquivalent: "")
         dockItem.target = self
         dockItem.state = showInDock ? .on : .off
         settingsSubmenu.addItem(dockItem)
@@ -307,7 +307,7 @@ class BackgroundService: ObservableObject {
         settingsSubmenu.addItem(NSMenuItem.separator())
         
         // Auto restore on schedule
-        let autoRestoreItem = NSMenuItem(title: "Auto-Restore on Schedule", action: #selector(toggleScheduledRestore), keyEquivalent: "")
+        let autoRestoreItem = NSMenuItem(title: NSLocalizedString("Auto-Restore on Schedule", comment: "Menu item"), action: #selector(toggleScheduledRestore), keyEquivalent: "")
         autoRestoreItem.target = self
         autoRestoreItem.state = enableScheduledRestore ? .on : .off
         settingsSubmenu.addItem(autoRestoreItem)
@@ -317,7 +317,7 @@ class BackgroundService: ObservableObject {
             let intervalSubmenu = NSMenu()
             
             // Regular intervals
-            let regularIntervalsItem = NSMenuItem(title: "Preset Intervals", action: nil, keyEquivalent: "")
+            let regularIntervalsItem = NSMenuItem(title: NSLocalizedString("Preset Intervals", comment: "Menu item"), action: nil, keyEquivalent: "")
             regularIntervalsItem.isEnabled = false
             intervalSubmenu.addItem(regularIntervalsItem)
             
@@ -332,12 +332,12 @@ class BackgroundService: ObservableObject {
             // Custom interval
             intervalSubmenu.addItem(NSMenuItem.separator())
             
-            let customIntervalItem = NSMenuItem(title: "Custom: \(formatInterval(customScheduledRestoreInterval))", action: #selector(toggleCustomRestoreInterval), keyEquivalent: "")
+            let customIntervalItem = NSMenuItem(title: String(format: NSLocalizedString("Custom: %@", comment: "Menu item"), formatInterval(customScheduledRestoreInterval)), action: #selector(toggleCustomRestoreInterval), keyEquivalent: "")
             customIntervalItem.target = self
             customIntervalItem.state = useCustomScheduledRestoreInterval ? .on : .off
             intervalSubmenu.addItem(customIntervalItem)
             
-            let intervalMenuItem = NSMenuItem(title: "Restore Interval", action: nil, keyEquivalent: "")
+            let intervalMenuItem = NSMenuItem(title: NSLocalizedString("Restore Interval", comment: "Menu item"), action: nil, keyEquivalent: "")
             intervalMenuItem.submenu = intervalSubmenu
             settingsSubmenu.addItem(intervalMenuItem)
         }
@@ -345,7 +345,7 @@ class BackgroundService: ObservableObject {
         settingsSubmenu.addItem(NSMenuItem.separator())
         
         // Auto restore on update
-        let autoUpdateItem = NSMenuItem(title: "Auto-Restore When Apps Update", action: #selector(toggleAutoRestoreOnUpdate), keyEquivalent: "")
+        let autoUpdateItem = NSMenuItem(title: NSLocalizedString("Auto-Restore When Apps Update", comment: "Menu item"), action: #selector(toggleAutoRestoreOnUpdate), keyEquivalent: "")
         autoUpdateItem.target = self
         autoUpdateItem.state = enableAutoRestoreOnUpdate ? .on : .off
         settingsSubmenu.addItem(autoUpdateItem)
@@ -362,20 +362,20 @@ class BackgroundService: ObservableObject {
                 checkIntervalSubmenu.addItem(intervalItem)
             }
             
-            let checkIntervalMenuItem = NSMenuItem(title: "Check Interval", action: nil, keyEquivalent: "")
+            let checkIntervalMenuItem = NSMenuItem(title: NSLocalizedString("Check Interval", comment: "Menu item"), action: nil, keyEquivalent: "")
             checkIntervalMenuItem.submenu = checkIntervalSubmenu
             settingsSubmenu.addItem(checkIntervalMenuItem)
         }
         
         // Settings menu item
-        let settingsItem = NSMenuItem(title: "Settings", action: nil, keyEquivalent: ",")
+        let settingsItem = NSMenuItem(title: NSLocalizedString("Settings", comment: "Menu item"), action: nil, keyEquivalent: ",")
         settingsItem.submenu = settingsSubmenu
         menu.addItem(settingsItem)
         
         menu.addItem(NSMenuItem.separator())
         
         // Quit
-        let quitItem = NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        let quitItem = NSMenuItem(title: NSLocalizedString("Quit", comment: "Menu item"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         quitItem.target = NSApplication.shared
         menu.addItem(quitItem)
         
@@ -584,10 +584,10 @@ class BackgroundService: ObservableObject {
                 // Show error alert on main actor
                 await MainActor.run {
                     let alert = NSAlert()
-                    alert.messageText = "Icon Restoration Failed"
+                    alert.messageText = NSLocalizedString("Icon Restoration Failed", comment: "Alert title")
                     alert.informativeText = error.localizedDescription
                     alert.alertStyle = .warning
-                    alert.addButton(withTitle: "OK")
+                    alert.addButton(withTitle: NSLocalizedString("OK", comment: "Alert button"))
                     alert.runModal()
                 }
             }
@@ -642,8 +642,8 @@ class BackgroundService: ObservableObject {
     // Show restoration notification using the modern UserNotifications framework
     private func showRestoreNotification() {
         let content = UNMutableNotificationContent()
-        content.title = "Icons Restored"
-        content.body = "All cached app icons have been successfully restored."
+        content.title = NSLocalizedString("Icons Restored", comment: "Notification title")
+        content.body = NSLocalizedString("All cached app icons have been successfully restored.", comment: "Notification body")
         content.sound = UNNotificationSound.default
         
         // Create a request with a unique identifier
@@ -664,8 +664,8 @@ class BackgroundService: ObservableObject {
     // Show update notification
     private func showUpdateNotification(appCount: Int) {
         let content = UNMutableNotificationContent()
-        content.title = "App Icons Restored"
-        content.body = "\(appCount) updated app(s) had their custom icons restored."
+        content.title = NSLocalizedString("App Icons Restored", comment: "Notification title")
+        content.body = String(format: NSLocalizedString("%lld updated app(s) had their custom icons restored.", comment: "Notification body"), appCount)
         content.sound = UNNotificationSound.default
         
         // Create a request with a unique identifier
@@ -686,21 +686,21 @@ class BackgroundService: ObservableObject {
     // Helper to format time interval (hours)
     func formatInterval(_ hours: Int) -> String {
         switch hours {
-        case 1: return "Every Hour"
-        case 24: return "Every Day"
-        case 48: return "Every 2 Days"
-        case 72: return "Every 3 Days"
-        default: return "Every \(hours) Hours"
+        case 1: return NSLocalizedString("Every Hour", comment: "Interval option")
+        case 24: return NSLocalizedString("Every Day", comment: "Interval option")
+        case 48: return NSLocalizedString("Every 2 Days", comment: "Interval option")
+        case 72: return NSLocalizedString("Every 3 Days", comment: "Interval option")
+        default: return String(format: NSLocalizedString("Every %lld Hours", comment: "Interval option"), hours)
         }
     }
-    
+
     // Helper to format minute interval
     func formatMinuteInterval(_ minutes: Int) -> String {
         switch minutes {
-        case 1: return "Every Minute"
-        case 60: return "Every Hour"
-        case 120: return "Every 2 Hours"
-        default: return "Every \(minutes) Minutes"
+        case 1: return NSLocalizedString("Every Minute", comment: "Interval option")
+        case 60: return NSLocalizedString("Every Hour", comment: "Interval option")
+        case 120: return NSLocalizedString("Every 2 Hours", comment: "Interval option")
+        default: return String(format: NSLocalizedString("Every %lld Minutes", comment: "Interval option"), minutes)
         }
     }
 

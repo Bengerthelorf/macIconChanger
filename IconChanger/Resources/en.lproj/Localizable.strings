@@ -422,3 +422,50 @@ Settings tab */
 "Check Setup Status" = "Check Setup Status";
 
 "Manual setup check requested." = "Manual setup check requested.";
+
+/* Menu bar items */
+"Open IconChanger" = "Open IconChanger";
+"Cached Icons: %lld" = "Cached Icons: %lld";
+"Last Restore: %@" = "Last Restore: %@";
+"Auto-Restore on Schedule" = "Auto-Restore on Schedule";
+"Preset Intervals" = "Preset Intervals";
+"Custom: %@" = "Custom: %@";
+"Restore Interval" = "Restore Interval";
+"Auto-Restore When Apps Update" = "Auto-Restore When Apps Update";
+"Check Interval" = "Check Interval";
+"Settings" = "Settings";
+"Quit" = "Quit";
+
+/* Alert messages */
+"Icon Restoration Failed" = "Icon Restoration Failed";
+"All cached custom icons have been successfully restored." = "All cached custom icons have been successfully restored.";
+"Error Restoring Icons" = "Error Restoring Icons";
+"Visibility Required" = "Visibility Required";
+"IconChanger needs to be visible in either the menu bar or the dock when running in the background." = "IconChanger needs to be visible in either the menu bar or the dock when running in the background.";
+
+/* Notification messages */
+"All cached app icons have been successfully restored." = "All cached app icons have been successfully restored.";
+"App Icons Restored" = "App Icons Restored";
+"%lld updated app(s) had their custom icons restored." = "%lld updated app(s) had their custom icons restored.";
+
+/* Config import/export */
+"Export IconChanger Configuration" = "Export IconChanger Configuration";
+"Import IconChanger Configuration" = "Import IconChanger Configuration";
+"Export Successful" = "Export Successful";
+"Configuration exported successfully" = "Configuration exported successfully";
+"Export Failed" = "Export Failed";
+"Unable to save configuration file: %@" = "Unable to save configuration file: %@";
+"Import Successful" = "Import Successful";
+"Imported %lld aliases and %lld icons" = "Imported %lld aliases and %lld icons";
+"Import Complete" = "Import Complete";
+"No new items were found to import" = "No new items were found to import";
+
+/* Time intervals */
+"Every Hour" = "Every Hour";
+"Every Day" = "Every Day";
+"Every 2 Days" = "Every 2 Days";
+"Every 3 Days" = "Every 3 Days";
+"Every %lld Hours" = "Every %lld Hours";
+"Every Minute" = "Every Minute";
+"Every 2 Hours" = "Every 2 Hours";
+"Every %lld Minutes" = "Every %lld Minutes";

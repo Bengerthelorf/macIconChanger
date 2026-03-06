@@ -131,7 +131,7 @@ class ConfigManager {
     // Export configuration dialog
     func showExportDialog() {
         let savePanel = NSSavePanel()
-        savePanel.title = "Export IconChanger Configuration"
+        savePanel.title = NSLocalizedString("Export IconChanger Configuration", comment: "Save panel title")
         savePanel.nameFieldLabel = "Save As:"
         savePanel.canCreateDirectories = true
         savePanel.showsTagField = false
@@ -154,15 +154,15 @@ class ConfigManager {
                         
                         // Show success notification
                         self.showNotification(
-                            title: "Export Successful",
-                            message: "Configuration exported successfully",
+                            title: NSLocalizedString("Export Successful", comment: "Notification title"),
+                            message: NSLocalizedString("Configuration exported successfully", comment: "Notification body"),
                             success: true
                         )
                     } catch {
                         print("Error saving to selected location: \(error.localizedDescription)")
                         self.showNotification(
-                            title: "Export Failed",
-                            message: "Unable to save configuration file: \(error.localizedDescription)",
+                            title: NSLocalizedString("Export Failed", comment: "Notification title"),
+                            message: String(format: NSLocalizedString("Unable to save configuration file: %@", comment: "Notification body"), error.localizedDescription),
                             success: false
                         )
                     }
@@ -174,7 +174,7 @@ class ConfigManager {
     // Import configuration dialog
     func showImportDialog() {
         let openPanel = NSOpenPanel()
-        openPanel.title = "Import IconChanger Configuration"
+        openPanel.title = NSLocalizedString("Import IconChanger Configuration", comment: "Open panel title")
         openPanel.showsResizeIndicator = true
         openPanel.showsHiddenFiles = false
         openPanel.canChooseDirectories = false
@@ -190,14 +190,14 @@ class ConfigManager {
                 // Show success notification
                 if results.aliases > 0 || results.icons > 0 {
                     self.showNotification(
-                        title: "Import Successful",
-                        message: "Imported \(results.aliases) aliases and \(results.icons) icons",
+                        title: NSLocalizedString("Import Successful", comment: "Notification title"),
+                        message: String(format: NSLocalizedString("Imported %lld aliases and %lld icons", comment: "Notification body"), results.aliases, results.icons),
                         success: true
                     )
                 } else {
                     self.showNotification(
-                        title: "Import Complete",
-                        message: "No new items were found to import",
+                        title: NSLocalizedString("Import Complete", comment: "Notification title"),
+                        message: NSLocalizedString("No new items were found to import", comment: "Notification body"),
                         success: true
                     )
                 }

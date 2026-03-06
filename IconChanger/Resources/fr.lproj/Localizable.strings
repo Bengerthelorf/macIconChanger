@@ -413,3 +413,50 @@ Settings tab */
 "Setup Error" = "Erreur de configuration";
 "Check Setup Status" = "Vérifier l'état de la configuration";
 "Manual setup check requested." = "Vérification manuelle de la configuration demandée.";
+
+/* Menu bar items */
+"Open IconChanger" = "Ouvrir IconChanger";
+"Cached Icons: %lld" = "Icônes en cache : %lld";
+"Last Restore: %@" = "Dernière restauration : %@";
+"Auto-Restore on Schedule" = "Restauration automatique programmée";
+"Preset Intervals" = "Intervalles prédéfinis";
+"Custom: %@" = "Personnalisé : %@";
+"Restore Interval" = "Intervalle de restauration";
+"Auto-Restore When Apps Update" = "Restauration automatique lors des mises à jour";
+"Check Interval" = "Intervalle de vérification";
+"Settings" = "Réglages";
+"Quit" = "Quitter";
+
+/* Alert messages */
+"Icon Restoration Failed" = "Échec de la restauration des icônes";
+"All cached custom icons have been successfully restored." = "Toutes les icônes personnalisées en cache ont été restaurées avec succès.";
+"Error Restoring Icons" = "Erreur lors de la restauration des icônes";
+"Visibility Required" = "Visibilité requise";
+"IconChanger needs to be visible in either the menu bar or the dock when running in the background." = "IconChanger doit être visible dans la barre des menus ou le Dock lorsqu'il s'exécute en tâche de fond.";
+
+/* Notification messages */
+"All cached app icons have been successfully restored." = "Toutes les icônes d'applications en cache ont été restaurées avec succès.";
+"App Icons Restored" = "Icônes d'applications restaurées";
+"%lld updated app(s) had their custom icons restored." = "%lld application(s) mise(s) à jour ont eu leurs icônes personnalisées restaurées.";
+
+/* Config import/export */
+"Export IconChanger Configuration" = "Exporter la configuration IconChanger";
+"Import IconChanger Configuration" = "Importer la configuration IconChanger";
+"Export Successful" = "Exportation réussie";
+"Configuration exported successfully" = "Configuration exportée avec succès";
+"Export Failed" = "Échec de l'exportation";
+"Unable to save configuration file: %@" = "Impossible d'enregistrer le fichier de configuration : %@";
+"Import Successful" = "Importation réussie";
+"Imported %lld aliases and %lld icons" = "%lld alias et %lld icônes importés";
+"Import Complete" = "Importation terminée";
+"No new items were found to import" = "Aucun nouvel élément à importer";
+
+/* Time intervals */
+"Every Hour" = "Toutes les heures";
+"Every Day" = "Tous les jours";
+"Every 2 Days" = "Tous les 2 jours";
+"Every 3 Days" = "Tous les 3 jours";
+"Every %lld Hours" = "Toutes les %lld heures";
+"Every Minute" = "Toutes les minutes";
+"Every 2 Hours" = "Toutes les 2 heures";
+"Every %lld Minutes" = "Toutes les %lld minutes";

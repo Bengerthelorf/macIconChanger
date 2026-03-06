@@ -413,3 +413,50 @@ Settings tab */
 "Setup Error" = "設定錯誤";
 "Check Setup Status" = "檢查設定狀態";
 "Manual setup check requested." = "已請求手動設定檢查。";
+
+/* Menu bar items */
+"Open IconChanger" = "開啟 IconChanger";
+"Cached Icons: %lld" = "快取圖像：%lld";
+"Last Restore: %@" = "上次回復：%@";
+"Auto-Restore on Schedule" = "按排程自動回復";
+"Preset Intervals" = "預設間隔";
+"Custom: %@" = "自訂：%@";
+"Restore Interval" = "回復間隔";
+"Auto-Restore When Apps Update" = "應用程式更新時自動回復";
+"Check Interval" = "檢查間隔";
+"Settings" = "設定";
+"Quit" = "結束";
+
+/* Alert messages */
+"Icon Restoration Failed" = "圖像回復失敗";
+"All cached custom icons have been successfully restored." = "所有快取的自訂圖像已成功回復。";
+"Error Restoring Icons" = "回復圖像時出錯";
+"Visibility Required" = "需要可見性";
+"IconChanger needs to be visible in either the menu bar or the dock when running in the background." = "在背景執行時，IconChanger 需要在選單列或 Dock 中顯示。";
+
+/* Notification messages */
+"All cached app icons have been successfully restored." = "所有快取的應用程式圖像已成功回復。";
+"App Icons Restored" = "應用程式圖像已回復";
+"%lld updated app(s) had their custom icons restored." = "%lld 個已更新的應用程式已回復其自訂圖像。";
+
+/* Config import/export */
+"Export IconChanger Configuration" = "輸出 IconChanger 設定";
+"Import IconChanger Configuration" = "輸入 IconChanger 設定";
+"Export Successful" = "輸出成功";
+"Configuration exported successfully" = "設定已成功輸出";
+"Export Failed" = "輸出失敗";
+"Unable to save configuration file: %@" = "無法儲存設定檔：%@";
+"Import Successful" = "輸入成功";
+"Imported %lld aliases and %lld icons" = "已輸入 %lld 個替身和 %lld 個圖像";
+"Import Complete" = "輸入完成";
+"No new items were found to import" = "未找到需要輸入的新項目";
+
+/* Time intervals */
+"Every Hour" = "每小時";
+"Every Day" = "每天";
+"Every 2 Days" = "每 2 天";
+"Every 3 Days" = "每 3 天";
+"Every %lld Hours" = "每 %lld 小時";
+"Every Minute" = "每分鐘";
+"Every 2 Hours" = "每 2 小時";
+"Every %lld Minutes" = "每 %lld 分鐘";

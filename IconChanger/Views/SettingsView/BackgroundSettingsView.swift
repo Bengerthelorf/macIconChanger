@@ -406,10 +406,10 @@ struct BackgroundSettingsView: View {
             
             // Show an alert explaining why
             let alert = NSAlert()
-            alert.messageText = "Visibility Required"
-            alert.informativeText = "IconChanger needs to be visible in either the menu bar or the dock when running in the background."
+            alert.messageText = NSLocalizedString("Visibility Required", comment: "Alert title")
+            alert.informativeText = NSLocalizedString("IconChanger needs to be visible in either the menu bar or the dock when running in the background.", comment: "Alert body")
             alert.alertStyle = .informational
-            alert.addButton(withTitle: "OK")
+            alert.addButton(withTitle: NSLocalizedString("OK", comment: "Alert button"))
             alert.runModal()
         }
     }
