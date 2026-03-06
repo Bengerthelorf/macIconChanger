@@ -67,8 +67,7 @@ if git rev-parse "$TAG" >/dev/null 2>&1; then
     error "Tag $TAG already exists."
 fi
 
-# Check for create-dmg
-command -v create-dmg >/dev/null 2>&1 || error "create-dmg not found. Install with: brew install create-dmg"
+# hdiutil is always available on macOS
 
 # ==============================================================================
 # Step 1: Bump version in Xcode project
@@ -155,19 +154,21 @@ info "Exported: $APP_PATH"
 info "Creating DMG..."
 rm -f "$DMG_PATH"
 
-create-dmg \
-    --volname "IconChanger" \
-    --window-pos 200 120 \
-    --window-size 600 400 \
-    --icon-size 100 \
-    --icon "IconChanger.app" 150 190 \
-    --app-drop-link 450 190 \
-    --no-internet-enable \
-    "$DMG_PATH" \
-    "$APP_PATH" 2>&1 || true
+DMG_STAGING="$BUILD_DIR/dmg_staging"
+rm -rf "$DMG_STAGING"
+mkdir -p "$DMG_STAGING"
+cp -R "$APP_PATH" "$DMG_STAGING/"
+ln -s /Applications "$DMG_STAGING/Applications"
 
-# create-dmg returns non-zero if it can't set background image, but DMG is still created
+hdiutil create \
+    -volname "IconChanger" \
+    -srcfolder "$DMG_STAGING" \
+    -ov \
+    -format UDZO \
+    "$DMG_PATH" 2>&1
+
 [[ -f "$DMG_PATH" ]] || error "DMG creation failed."
+rm -rf "$DMG_STAGING"
 
 DMG_SIZE=$(stat -f%z "$DMG_PATH")
 info "DMG created: $DMG_PATH ($DMG_SIZE bytes)"
