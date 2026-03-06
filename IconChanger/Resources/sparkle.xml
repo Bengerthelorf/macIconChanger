@@ -8,6 +8,29 @@
             <link>https://github.com/Bengerthelorf/macIconChanger</link>
             <sparkle:version>130</sparkle:version>
             <sparkle:shortVersionString>1.3.0</sparkle:shortVersionString>
+            <pubDate>Fri, 06 Mar 2026 22:09:59 +0000</pubDate>
+            <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.3.0/IconChanger.dmg"
+            sparkle:edSignature="EUNI7VdeHXe1AAMqXzLFh03+YEW5uxRRAlZuqM4tRMzBCtpdwHzYmhqq6Cz+zcJoioka1tT03x6hJ3NBdid2CA==" length="10633796"
+            type="application/octet-stream"/>
+            <description>
+                <![CDATA[
+                <h2>Version 1.3.0</h2>
+                <ul>
+                    <li><strong>New:</strong> One-click permission setup — no more manual sudoers editing.</li>
+                    <li><strong>New:</strong> Restore default app icons (fully restores macOS 26 icon features).</li>
+                    <li><strong>Fix:</strong> Icons not loading when scrolling sidebar quickly.</li>
+                    <li><strong>Fix:</strong> Shell injection prevention and security hardening.</li>
+                    <li><strong>Fix:</strong> Thread safety and performance improvements.</li>
+                    <li><strong>Perf:</strong> Replaced debug print() with os.Logger for better release performance.</li>
+                </ul>
+                ]]>
+            </description>
+        </item>
+        <item>
+            <title>Version 1.3.0</title>
+            <link>https://github.com/Bengerthelorf/macIconChanger</link>
+            <sparkle:version>130</sparkle:version>
+            <sparkle:shortVersionString>1.3.0</sparkle:shortVersionString>
             <pubDate>Fri, 06 Mar 2026 22:01:23 +0000</pubDate>
             <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.3.0/IconChanger.dmg"
             sparkle:edSignature="1jv8Ve2HGV4vuAMjGrh1y9aKWps0l8rfBqCmOXWdcxMHDphDTtgJLsFxqOSBhBnb5aJtYS6ajWOHhkZil4R6DQ==" length="10633782"
