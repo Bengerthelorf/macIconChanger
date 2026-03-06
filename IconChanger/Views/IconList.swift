@@ -13,9 +13,6 @@ import LaunchPadManagerDBHelper
 struct IconList: View {
     @ObservedObject var iconManager = IconManager.shared
 
-    let rules = [GridItem(.adaptive(minimum: 100), alignment: .top)]
-
-    @State var setPath: AppItem? = nil
     @State var selectedApp: AppItem? = nil
 
     @State var searchText: String = ""
@@ -201,35 +198,3 @@ extension String: @retroactive Identifiable {
     }
 }
 
-struct MyDropDelegate: DropDelegate {
-    let app: AppItem
-
-    func validateDrop(info: DropInfo) -> Bool {
-        return info.hasItemsConforming(to: ["public.file-url"])
-    }
-
-    func performDrop(info: DropInfo) -> Bool {
-        if let item = info.itemProviders(for: ["public.file-url"]).first {
-            item.loadItem(forTypeIdentifier: "public.file-url", options: nil) { (urlData, error) in
-                Task {
-                    if let urlData = urlData as? Data {
-                        let url = NSURL(absoluteURLWithDataRepresentation: urlData, relativeTo: nil) as URL
-
-                        if let nsimage = NSImage(contentsOf: url) {
-                            do {
-                                try IconManager.shared.setImage(nsimage, app: app)
-                            } catch {
-                                print("Failed to set icon via drag and drop: \(error.localizedDescription)")
-                            }
-                        }
-                    }
-                }
-            }
-
-            return true
-
-        } else {
-            return false
-        }
-    }
-}

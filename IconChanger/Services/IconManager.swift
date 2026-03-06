@@ -344,12 +344,6 @@ class IconManager: ObservableObject {
         }
     }
     
-    func findSearchedImage(_ search: String) -> [AppItem] {
-        apps.filter {
-            $0.name.localizedCaseInsensitiveContains(search) || $0.url.deletingPathExtension().lastPathComponent.localizedCaseInsensitiveContains(search)
-        }
-    }
-    
     func getIconInPath(_ url: URL) -> [URL] {
         let url = url.appendingPathComponent("Contents").appendingPathComponent("Resources")
         let file = (try? FileManager.default.contentsOfDirectory(atPath: url.path)) ?? [String]()
