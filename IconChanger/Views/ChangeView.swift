@@ -41,6 +41,7 @@ struct ChangeView: View {
     @State private var showRestoreConfirm = false
     @State private var restoreError: String?
     @State private var setIconError: String?
+    @State private var isDragOver = false
 
     var body: some View {
         GeometryReader { geometry in
@@ -65,6 +66,7 @@ struct ChangeView: View {
                         } label: {
                             Label("Restore Default", systemImage: "arrow.uturn.backward")
                         }
+                        .keyboardShortcut(.delete, modifiers: .command)
                         .help("Restore the original app icon")
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -75,6 +77,7 @@ struct ChangeView: View {
                         Button("Choose from the Local") {
                             chooseLocalIcon()
                         }
+                        .keyboardShortcut("o", modifiers: .command)
                     }
 
                     if inIcons.isEmpty {
@@ -165,6 +168,16 @@ struct ChangeView: View {
                         .padding()
             }
         }
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .strokeBorder(Color.accentColor, lineWidth: 3)
+                        .background(Color.accentColor.opacity(0.1).cornerRadius(12))
+                        .opacity(isDragOver ? 1 : 0)
+                        .animation(.easeInOut(duration: 0.15), value: isDragOver)
+                )
+                .onDrop(of: [.image, .fileURL], isTargeted: $isDragOver) { providers in
+                    handleDrop(providers: providers)
+                }
                 .onChange(of: importedImageURL) { url in
                     guard let url = url else { return }
                     defer { importedImageURL = nil }
@@ -222,6 +235,49 @@ struct ChangeView: View {
                 }
     }
     
+    private func handleDrop(providers: [NSItemProvider]) -> Bool {
+        guard let provider = providers.first else { return false }
+
+        // Try file URL first (covers dragged files from Finder)
+        if provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) {
+            provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, _ in
+                guard let data = item as? Data,
+                      let url = URL(dataRepresentation: data, relativeTo: nil) else { return }
+                let imageTypes: Set<String> = ["png", "jpg", "jpeg", "tiff", "tif", "icns", "heic", "webp", "bmp", "gif", "svg"]
+                guard imageTypes.contains(url.pathExtension.lowercased()) else { return }
+                DispatchQueue.main.async {
+                    importedImageURL = url
+                }
+            }
+            return true
+        }
+
+        // Try image data directly (covers dragged images from other apps)
+        if provider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
+            provider.loadItem(forTypeIdentifier: UTType.image.identifier, options: nil) { item, _ in
+                if let url = item as? URL {
+                    DispatchQueue.main.async {
+                        importedImageURL = url
+                    }
+                } else if let data = item as? Data, let image = NSImage(data: data) {
+                    // Save to temp file and set URL
+                    let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("dropped_icon_\(UUID().uuidString).png")
+                    if let tiffData = image.tiffRepresentation,
+                       let bitmapRep = NSBitmapImageRep(data: tiffData),
+                       let pngData = bitmapRep.representation(using: .png, properties: [:]) {
+                        try? pngData.write(to: tempURL)
+                        DispatchQueue.main.async {
+                            importedImageURL = tempURL
+                        }
+                    }
+                }
+            }
+            return true
+        }
+
+        return false
+    }
+
     private func chooseLocalIcon() {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [.image, .icns]

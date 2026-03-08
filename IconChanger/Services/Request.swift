@@ -93,7 +93,7 @@ class MyQueryRequestController {
     }
     
     private func sendRequestToMeilisearch(_ query: String, style: IconStyle) async throws -> [IconRes] {
-        let query = qeuryMix(query)
+        let query = queryMix(query)
         logger.debug("Search '\(query, privacy: .public)' style=\(style.displayName, privacy: .public)")
 
         let session = self.session
@@ -275,7 +275,7 @@ class MyQueryRequestController {
     
     // Backup method using a different approach to search the site
     private func sendBackupRequest(_ query: String, style: IconStyle) async throws -> [IconRes] {
-        let query = qeuryMix(query)
+        let query = queryMix(query)
         logger.debug("Running backup search for '\(query, privacy: .public)', style=\(style.displayName, privacy: .public)")
         
         let session = self.session
@@ -410,7 +410,7 @@ class MyQueryRequestController {
         return results.isEmpty ? nil : results
     }
 
-    func qeuryMix(_ query: String) -> String {
+    func queryMix(_ query: String) -> String {
         switch query {
         case "PyCharm Professional Edition": return "PyCharm"
         case "Discord PTB": return "Discord"

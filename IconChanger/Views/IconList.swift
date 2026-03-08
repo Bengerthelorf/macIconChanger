@@ -90,6 +90,7 @@ struct IconList: View {
                             Image(systemName: "arrow.clockwise")
                         }
                         .help("Refresh Icon Display")
+                        .keyboardShortcut("r", modifiers: .command)
                     }
 
                     ToolbarItem(placement: .automatic) {

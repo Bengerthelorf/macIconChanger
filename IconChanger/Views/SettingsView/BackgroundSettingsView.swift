@@ -257,7 +257,7 @@ struct BackgroundSettingsView: View {
                     showCustomRestoreIntervalDialog = false
                 }
                 .keyboardShortcut(.defaultAction)
-                .disabled(Int(temporaryCustomRestoreInterval) == nil || Int(temporaryCustomRestoreInterval)! <= 0)
+                .disabled((Int(temporaryCustomRestoreInterval) ?? 0) <= 0)
             }
         }
         .padding()
@@ -294,7 +294,7 @@ struct BackgroundSettingsView: View {
                     showCustomCheckIntervalDialog = false
                 }
                 .keyboardShortcut(.defaultAction)
-                .disabled(Int(temporaryCustomCheckInterval) == nil || Int(temporaryCustomCheckInterval)! <= 0)
+                .disabled((Int(temporaryCustomCheckInterval) ?? 0) <= 0)
             }
         }
         .padding()
@@ -314,7 +314,7 @@ struct BackgroundSettingsView: View {
 
     private func calculateNextRestoreTime() -> String {
         guard backgroundService.enableScheduledRestore && backgroundService.lastScheduledRestore != Date.distantPast else {
-            return "Not scheduled"
+            return NSLocalizedString("Not scheduled", comment: "Status when no restore is scheduled")
         }
 
         let interval = backgroundService.useCustomScheduledRestoreInterval ?

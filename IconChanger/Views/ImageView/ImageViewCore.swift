@@ -19,7 +19,7 @@ struct ImageViewCore: View {
 
     @State var showSnackbar = false
     @State var isSuccessful = true
-    @State var failureMessage = "Failed to load data."
+    @State var failureMessage = NSLocalizedString("Failed to load data.", comment: "Default error message")
 
     init(nsimage: Binding<NSImage?>, setPath: AppItem, isLoading: Binding<Bool> = .constant(true)) {
         self._nsimage = nsimage
@@ -47,11 +47,6 @@ struct ImageViewCore: View {
                                 ProgressView()
                             }
                             .onAppear {
-//                                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-//                                    if nsimage == nil {
-//                                        isLoading = false
-//                                    }
-//                                }
                                 Task { @MainActor in
                                     try? await Task.sleep(nanoseconds: 3_000_000_000)
                                     if nsimage == nil {
@@ -111,14 +106,14 @@ struct ImageViewCore: View {
                 
                 await MainActor.run {
                     isTaskRunning = false
-                    failureMessage = "Icon changed successfully."
+                    failureMessage = NSLocalizedString("Icon changed successfully.", comment: "Success message")
                     isSuccessful = true
                     showSnackbar = true
                 }
             } catch {
                 await MainActor.run {
                     isTaskRunning = false
-                    failureMessage = "Failed to change the icon: \(error.localizedDescription)"
+                    failureMessage = String(format: NSLocalizedString("Failed to change the icon: %@", comment: "Error message with details"), error.localizedDescription)
                     isSuccessful = false
                     showSnackbar = true
                 }

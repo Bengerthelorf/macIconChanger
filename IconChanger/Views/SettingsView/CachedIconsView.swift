@@ -175,13 +175,13 @@ struct CachedIconsView: View {
                         }
                     } else {
                         await MainActor.run {
-                            restoreError = NSError(domain: "IconChanger", code: 1, userInfo: [NSLocalizedDescriptionKey: "Could not load icon or app no longer exists"])
+                            restoreError = NSError(domain: "IconChanger", code: 1, userInfo: [NSLocalizedDescriptionKey: NSLocalizedString("Could not load icon or app no longer exists", comment: "Error when icon or app is missing")])
                             isRestoring = false
                         }
                     }
                 } else {
                     await MainActor.run {
-                        restoreError = NSError(domain: "IconChanger", code: 2, userInfo: [NSLocalizedDescriptionKey: "App or cached icon file no longer exists"])
+                        restoreError = NSError(domain: "IconChanger", code: 2, userInfo: [NSLocalizedDescriptionKey: NSLocalizedString("App or cached icon file no longer exists", comment: "Error when app or cache file is missing")])
                         isRestoring = false
                     }
                 }

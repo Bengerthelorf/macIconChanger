@@ -34,6 +34,6 @@ enum IconStyle: String, CaseIterable, Identifiable {
 
     /// category name display
     var displayName: String {
-        return self.rawValue
+        return NSLocalizedString(self.rawValue, comment: "Icon style name")
     }
 }
