@@ -17,6 +17,8 @@ struct IconList: View {
 
     @State var searchText: String = ""
     @State var setAlias: String?
+    @State private var appToRestore: AppItem?
+    @State private var restoreError: String?
 
     var body: some View {
         NavigationView {
@@ -56,7 +58,7 @@ struct IconList: View {
                                 }
 
                                 Button("Restore Default Icon") {
-                                    try? iconManager.removeIcon(from: app)
+                                    appToRestore = app
                                 }
 
                                 if let original = app.originalAppInfo {
@@ -138,6 +140,31 @@ struct IconList: View {
                 }
                 .onChange(of: iconManager.iconRefreshTrigger) { _ in
                     AppIconCache.shared.removeAll()
+                }
+                .confirmationDialog("Restore Default Icon", isPresented: Binding(
+                    get: { appToRestore != nil },
+                    set: { if !$0 { appToRestore = nil } }
+                )) {
+                    Button("Restore", role: .destructive) {
+                        if let app = appToRestore {
+                            do {
+                                try iconManager.removeIcon(from: app)
+                            } catch {
+                                restoreError = error.localizedDescription
+                            }
+                        }
+                    }
+                    Button("Cancel", role: .cancel) { }
+                } message: {
+                    Text("This will remove the custom icon and restore the original icon for \(appToRestore?.name ?? "").")
+                }
+                .alert("Restore Failed", isPresented: Binding(
+                    get: { restoreError != nil },
+                    set: { if !$0 { restoreError = nil } }
+                )) {
+                    Button("OK", role: .cancel) { }
+                } message: {
+                    Text(restoreError ?? "")
                 }
     }
 
