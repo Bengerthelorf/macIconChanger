@@ -28,7 +28,7 @@ struct AdvancedSettingsView: View {
         Form {
             // MARK: - API
             Section {
-                TextField(NSLocalizedString("API Key: ", comment: "API settings"), text: $apiKey)
+                SecureField(NSLocalizedString("API Key: ", comment: "API settings"), text: $apiKey)
                     .onChange(of: apiKey) { newValue in
                         KeychainHelper.save(key: "apiKey", value: newValue)
                     }

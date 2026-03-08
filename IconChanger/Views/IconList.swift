@@ -29,7 +29,7 @@ struct IconList: View {
                     NavigationLink(destination: ChangeView(setPath: app),
                             tag: app,
                             selection: $selectedApp) {
-                        IconView(app: app)
+                        IconView(app: app, refreshTrigger: iconManager.iconRefreshTrigger)
                     }
                             .contextMenu {
                                 Button("Copy the Name") {
@@ -172,7 +172,7 @@ struct IconList: View {
 
 struct IconView: View {
     let app: AppItem
-    @ObservedObject private var iconManager = IconManager.shared
+    let refreshTrigger: UUID
     @State private var icon: NSImage?
 
     var body: some View {
@@ -202,8 +202,7 @@ struct IconView: View {
                 icon = cached
             }
         }
-        .onChange(of: iconManager.iconRefreshTrigger) { _ in
-            icon = nil
+        .onChange(of: refreshTrigger) { _ in
             Task { await loadIcon() }
         }
     }
