@@ -14,9 +14,16 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     case system = "system"
     case english = "en"
     case french = "fr"
+    case german = "de"
+    case spanish = "es"
+    case portuguese = "pt"
+    case italian = "it"
+    case russian = "ru"
     case japanese = "ja"
+    case korean = "ko"
     case chinese_simplified = "zh-Hans"
     case chinese_traditional = "zh-Hant"
+    case chinese_hongkong = "zh-HK"
 
     var id: String { self.rawValue }
 
@@ -28,30 +35,31 @@ enum AppLanguage: String, CaseIterable, Identifiable {
             return NSLocalizedString("English", comment: "Language selection")
         case .french:
             return NSLocalizedString("French", comment: "Language selection")
+        case .german:
+            return NSLocalizedString("German", comment: "Language selection")
+        case .spanish:
+            return NSLocalizedString("Spanish", comment: "Language selection")
+        case .portuguese:
+            return NSLocalizedString("Portuguese", comment: "Language selection")
+        case .italian:
+            return NSLocalizedString("Italian", comment: "Language selection")
+        case .russian:
+            return NSLocalizedString("Russian", comment: "Language selection")
         case .japanese:
             return NSLocalizedString("Japanese", comment: "Language selection")
+        case .korean:
+            return NSLocalizedString("Korean", comment: "Language selection")
         case .chinese_simplified:
             return NSLocalizedString("Simplified Chinese", comment: "Language selection")
         case .chinese_traditional:
             return NSLocalizedString("Traditional Chinese", comment: "Language selection")
+        case .chinese_hongkong:
+            return NSLocalizedString("Chinese (Hong Kong)", comment: "Language selection")
         }
     }
 
     var locale: Locale {
-        switch self {
-        case .system:
-            return Locale.current
-        case .english:
-            return Locale(identifier: "en")
-        case .french:
-            return Locale(identifier: "fr")
-        case .japanese:
-            return Locale(identifier: "ja")
-        case .chinese_simplified:
-            return Locale(identifier: "zh-Hans")
-        case .chinese_traditional:
-            return Locale(identifier: "zh-Hant")
-        }
+        Locale(identifier: rawValue == "system" ? Locale.current.identifier : rawValue)
     }
 }
 
