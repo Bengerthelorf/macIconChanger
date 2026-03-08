@@ -79,6 +79,15 @@ struct IconChangerApp: App {
                 }
             }
 
+            CommandGroup(replacing: .help) {
+                Button("IconChanger Help") {
+                    if let url = URL(string: "https://bengerthelorf.github.io/macIconChanger/") {
+                        NSWorkspace.shared.open(url)
+                    }
+                }
+                .keyboardShortcut("?", modifiers: .command)
+            }
+
             CommandGroup(after: .appSettings) {
                 Menu("Command Line Tool") {
                     if cliManager.isInstalled {
