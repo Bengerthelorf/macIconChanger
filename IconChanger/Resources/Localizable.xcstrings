@@ -3,16 +3,10 @@
   "strings": {
     "(%@)": {
       "localizations": {
-        "zh-Hans": {
+        "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "（%@）"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "（%@）"
+            "value": "(%@)"
           }
         },
         "ja": {
@@ -27,10 +21,16 @@
             "value": "(%@)"
           }
         },
-        "fr": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "(%@)"
+            "value": "（%@）"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "（%@）"
           }
         },
         "zh-HK": {
@@ -55,6 +55,12 @@
             "value": "%lld"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -68,12 +74,6 @@
           }
         },
         "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld"
-          }
-        },
-        "ko": {
           "stringUnit": {
             "state": "translated",
             "value": "%lld"
@@ -95,6 +95,12 @@
             "value": "%lld 個復元準備完了"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld개 복원 준비 완료"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -111,12 +117,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld 個可回復"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld개 복원 준비 완료"
           }
         }
       }
@@ -136,6 +136,12 @@
             "value": "%lld 個の更新されたアプリのカスタムアイコンが復元されました。"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld개의 업데이트된 앱에 사용자 지정 아이콘이 복원되었습니다."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -152,12 +158,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld 個已更新的應用程式已回復其自訂圖像。"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld개의 업데이트된 앱에 사용자 지정 아이콘이 복원되었습니다."
           }
         }
       }
@@ -176,6 +176,12 @@
             "value": "%lld/%lld"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld/%lld"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -189,12 +195,6 @@
           }
         },
         "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld/%lld"
-          }
-        },
-        "ko": {
           "stringUnit": {
             "state": "translated",
             "value": "%lld/%lld"
@@ -216,6 +216,12 @@
             "value": "1. /Applicationsへのアクセスを要求するダイアログが表示されます"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1. /Applications 접근을 요청하는 대화 상자가 나타납니다"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -233,12 +239,6 @@
             "state": "translated",
             "value": "1. 將會出現要求取用 /Applications 的對話框"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "1. /Applications 접근을 요청하는 대화 상자가 나타납니다"
-          }
         }
       }
     },
@@ -254,6 +254,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "2. /Applicationsを選択し、「OK」をクリックしてください"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2. /Applications를 선택하고 확인을 클릭하세요"
           }
         },
         "zh-Hans": {
@@ -273,12 +279,6 @@
             "state": "translated",
             "value": "2. 請選擇 /Applications 並按一下「確定」"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "2. /Applications를 선택하고 확인을 클릭하세요"
-          }
         }
       }
     },
@@ -294,6 +294,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "3. ダイアログが表示されない場合は、「システム設定」>「プライバシーとセキュリティ」>「ファイルとフォルダ」で手動でアクセスを許可する必要がある場合があります"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3. 대화 상자가 나타나지 않으면 시스템 설정 > 개인 정보 보호 및 보안 > 파일 및 폴더에서 수동으로 접근을 허용하세요"
           }
         },
         "zh-Hans": {
@@ -313,12 +319,6 @@
             "state": "translated",
             "value": "3. 如果沒有出現對話框，您可能需要在「系統設定」>「私隱與保安」>「檔案與資料夾」中手動授予存取權限"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "3. 대화 상자가 나타나지 않으면 시스템 설정 > 개인 정보 보호 및 보안 > 파일 및 폴더에서 수동으로 접근을 허용하세요"
-          }
         }
       }
     },
@@ -334,6 +334,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "について"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "정보"
           }
         },
         "zh-Hans": {
@@ -353,12 +359,6 @@
             "state": "translated",
             "value": "關於"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "정보"
-          }
         }
       }
     },
@@ -374,6 +374,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アクション"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "작업"
           }
         },
         "zh-Hans": {
@@ -393,12 +399,6 @@
             "state": "translated",
             "value": "操作"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "작업"
-          }
         }
       }
     },
@@ -414,6 +414,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "詳細"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "고급"
           }
         },
         "zh-Hans": {
@@ -433,12 +439,6 @@
             "state": "translated",
             "value": "進階"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "고급"
-          }
         }
       }
     },
@@ -454,6 +454,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "エイリアス名"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "별칭"
           }
         },
         "zh-Hans": {
@@ -472,12 +478,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "替身名稱"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "별칭"
           }
         }
       }
@@ -496,6 +496,12 @@
             "value": "エイリアス名"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "별칭 이름"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -512,12 +518,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "替身名稱"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "별칭 이름"
           }
         }
       }
@@ -537,6 +537,12 @@
             "value": "キャッシュされたすべてのアプリアイコンが正常に復元されました。"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "모든 캐시된 앱 아이콘이 성공적으로 복원되었습니다."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -553,12 +559,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "所有快取的應用程式圖像已成功回復。"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "모든 캐시된 앱 아이콘이 성공적으로 복원되었습니다."
           }
         }
       }
@@ -578,6 +578,12 @@
             "value": "キャッシュされたすべてのカスタムアイコンが正常に復元されました。"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "모든 캐시된 사용자 지정 아이콘이 성공적으로 복원되었습니다."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -594,12 +600,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "所有快取的自訂圖像已成功回復。"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "모든 캐시된 사용자 지정 아이콘이 성공적으로 복원되었습니다."
           }
         }
       }
@@ -619,6 +619,12 @@
             "value": "API接続は確立されましたが、結果は返されませんでした。"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "API 연결은 성공했지만 결과가 반환되지 않았습니다."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -635,12 +641,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "已建立 API 連線但未傳回任何結果。"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "API 연결은 성공했지만 결과가 반환되지 않았습니다."
           }
         }
       }
@@ -660,6 +660,12 @@
             "value": "API接続に成功しました！"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "API 연결 성공!"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -676,12 +682,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "API 連線成功！"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "API 연결 성공!"
           }
         }
       }
@@ -701,6 +701,12 @@
             "value": "APIキー"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "API 키"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -717,12 +723,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "API 金鑰"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "API 키"
           }
         }
       }
@@ -742,6 +742,12 @@
             "value": "APIキー: "
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "API 키: "
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -758,12 +764,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "API 金鑰："
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "API 키: "
           }
         }
       }
@@ -783,6 +783,12 @@
             "value": "APIテストに失敗しました: %@"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "API 테스트 실패: %@"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -800,12 +806,6 @@
             "state": "translated",
             "value": "API 測試失敗：%@"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "API 테스트 실패: %@"
-          }
         }
       }
     },
@@ -821,6 +821,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アプリエイリアス"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱 별칭"
           }
         },
         "zh-Hans": {
@@ -840,12 +846,6 @@
             "state": "translated",
             "value": "應用程式別名"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "앱 별칭"
-          }
         }
       }
     },
@@ -862,6 +862,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アプリアイコン復元済み"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱 아이콘 복원됨"
           }
         },
         "zh-Hans": {
@@ -881,12 +887,6 @@
             "state": "translated",
             "value": "應用程式圖像已回復"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "앱 아이콘 복원됨"
-          }
         }
       }
     },
@@ -902,6 +902,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アプリ名"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱 이름"
           }
         },
         "zh-Hans": {
@@ -921,12 +927,6 @@
             "state": "translated",
             "value": "應用程式名稱"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "앱 이름"
-          }
         }
       }
     },
@@ -942,6 +942,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アプリ更新検出"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱 업데이트 감지"
           }
         },
         "zh-Hans": {
@@ -961,12 +967,6 @@
             "state": "translated",
             "value": "應用程式更新偵測"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "앱 업데이트 감지"
-          }
         }
       }
     },
@@ -982,6 +982,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アプリの可視性"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱 표시"
           }
         },
         "zh-Hans": {
@@ -1001,12 +1007,6 @@
             "state": "translated",
             "value": "應用程式可見性"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "앱 표시"
-          }
         }
       }
     },
@@ -1022,6 +1022,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アプリケーション"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "응용 프로그램"
           }
         },
         "zh-Hans": {
@@ -1041,12 +1047,6 @@
             "state": "translated",
             "value": "應用程式"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "응용 프로그램"
-          }
         }
       }
     },
@@ -1062,6 +1062,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アプリケーションフォルダ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "응용 프로그램 폴더"
           }
         },
         "zh-Hans": {
@@ -1081,12 +1087,6 @@
             "state": "translated",
             "value": "應用程式資料夾"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "응용 프로그램 폴더"
-          }
         }
       }
     },
@@ -1102,6 +1102,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "キャッシュされた %lld 個のアイコンをすべて削除しますか？"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "캐시된 아이콘 %lld개를 모두 삭제하시겠습니까?"
           }
         },
         "zh-Hans": {
@@ -1121,12 +1127,6 @@
             "state": "translated",
             "value": "確定要清除全部 %lld 個快取圖像嗎？"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "캐시된 아이콘 %lld개를 모두 삭제하시겠습니까?"
-          }
         }
       }
     },
@@ -1142,6 +1142,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "選択した %lld 個のアイコンをキャッシュから削除しますか？"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "선택한 아이콘 %lld개를 캐시에서 제거하시겠습니까?"
           }
         },
         "zh-Hans": {
@@ -1161,12 +1167,6 @@
             "state": "translated",
             "value": "確定要從快取中移除選取的 %lld 個圖像嗎？"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "선택한 아이콘 %lld개를 캐시에서 제거하시겠습니까?"
-          }
         }
       }
     },
@@ -1183,6 +1183,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "スケジュールで自動復元"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "일정에 따라 자동 복원"
           }
         },
         "zh-Hans": {
@@ -1202,12 +1208,6 @@
             "state": "translated",
             "value": "按排程自動回復"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "일정에 따라 자동 복원"
-          }
         }
       }
     },
@@ -1224,6 +1224,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アプリ更新時に自動復元"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱 업데이트 시 자동 복원"
           }
         },
         "zh-Hans": {
@@ -1243,12 +1249,6 @@
             "state": "translated",
             "value": "應用程式更新時自動回復"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "앱 업데이트 시 자동 복원"
-          }
         }
       }
     },
@@ -1264,6 +1264,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "バックグラウンド"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "백그라운드"
           }
         },
         "zh-Hans": {
@@ -1283,12 +1289,6 @@
             "state": "translated",
             "value": "背景"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "백그라운드"
-          }
         }
       }
     },
@@ -1304,6 +1304,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "バックグラウンドサービス"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "백그라운드 서비스"
           }
         },
         "zh-Hans": {
@@ -1323,12 +1329,6 @@
             "state": "translated",
             "value": "背景服務"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "백그라운드 서비스"
-          }
         }
       }
     },
@@ -1344,6 +1344,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "キャッシュされたアイコン"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "캐시된 아이콘"
           }
         },
         "zh-Hans": {
@@ -1363,12 +1369,6 @@
             "state": "translated",
             "value": "快取圖像"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "캐시된 아이콘"
-          }
         }
       }
     },
@@ -1385,6 +1385,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "キャッシュアイコン: %lld"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "캐시된 아이콘: %lld"
           }
         },
         "zh-Hans": {
@@ -1404,12 +1410,6 @@
             "state": "translated",
             "value": "快取圖像：%lld"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "캐시된 아이콘: %lld"
-          }
         }
       }
     },
@@ -1428,6 +1428,12 @@
             "value": "キャンセル"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "취소"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1444,12 +1450,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "取消"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "취소"
           }
         }
       }
@@ -1469,6 +1469,12 @@
             "value": "変更はアプリを再起動した後に完全に有効になります"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱을 다시 시작하면 변경 사항이 적용됩니다"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -1486,12 +1492,6 @@
             "state": "translated",
             "value": "重新啟動應用程式後，變更才會完全生效"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "앱을 다시 시작하면 변경 사항이 적용됩니다"
-          }
         }
       }
     },
@@ -1507,6 +1507,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アイコンを変更中..."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아이콘 변경 중..."
           }
         },
         "zh-Hans": {
@@ -1526,12 +1532,6 @@
             "state": "translated",
             "value": "正在更改圖像..."
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "아이콘 변경 중..."
-          }
         }
       }
     },
@@ -1547,6 +1547,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アップデートを確認…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "업데이트 확인…"
           }
         },
         "zh-Hans": {
@@ -1566,12 +1572,6 @@
             "state": "translated",
             "value": "檢查更新項目…"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "업데이트 확인…"
-          }
         }
       }
     },
@@ -1588,6 +1588,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "チェック間隔"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "확인 간격"
           }
         },
         "zh-Hans": {
@@ -1607,12 +1613,6 @@
             "state": "translated",
             "value": "檢查間隔"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "확인 간격"
-          }
         }
       }
     },
@@ -1628,6 +1628,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "セットアップ状況を確認"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "설정 상태 확인"
           }
         },
         "zh-Hans": {
@@ -1647,12 +1653,6 @@
             "state": "translated",
             "value": "檢查設定狀態"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "설정 상태 확인"
-          }
         }
       }
     },
@@ -1668,6 +1668,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "セットアップを確認中..."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "설정 확인 중..."
           }
         },
         "zh-Hans": {
@@ -1687,12 +1693,6 @@
             "state": "translated",
             "value": "正在檢查設定..."
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "설정 확인 중..."
-          }
         }
       }
     },
@@ -1709,6 +1709,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ローカルから選択"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "로컬에서 선택"
           }
         },
         "zh-Hans": {
@@ -1728,12 +1734,6 @@
             "state": "translated",
             "value": "從本機選擇"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "로컬에서 선택"
-          }
         }
       }
     },
@@ -1749,6 +1749,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "すべてのキャッシュを消去"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "모든 캐시 삭제"
           }
         },
         "zh-Hans": {
@@ -1768,12 +1774,6 @@
             "state": "translated",
             "value": "清除所有快取"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "모든 캐시 삭제"
-          }
         }
       }
     },
@@ -1789,6 +1789,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "コマンドライン設定は 'iconchanger' ツールで利用できます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "'iconchanger' 도구를 사용하여 명령줄 구성을 할 수 있습니다."
           }
         },
         "zh-Hans": {
@@ -1808,12 +1814,6 @@
             "state": "translated",
             "value": "可透過 'iconchanger' 命令列工具進行設定。"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "'iconchanger' 도구를 사용하여 명령줄 구성을 할 수 있습니다."
-          }
         }
       }
     },
@@ -1829,6 +1829,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "コマンドラインツール"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "명령줄 도구"
           }
         },
         "zh-Hans": {
@@ -1848,12 +1854,6 @@
             "state": "translated",
             "value": "指令行工具"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "명령줄 도구"
-          }
         }
       }
     },
@@ -1869,6 +1869,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "構成"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구성"
           }
         },
         "zh-Hans": {
@@ -1888,12 +1894,6 @@
             "state": "translated",
             "value": "設定"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "구성"
-          }
         }
       }
     },
@@ -1910,6 +1910,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "設定が正常にエクスポートされました"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구성이 성공적으로 내보내졌습니다"
           }
         },
         "zh-Hans": {
@@ -1929,16 +1935,11 @@
             "state": "translated",
             "value": "設定已成功輸出"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "구성이 성공적으로 내보내졌습니다"
-          }
         }
       }
     },
     "Configure Permissions": {
+      "comment": "Alert button",
       "localizations": {
         "fr": {
           "stringUnit": {
@@ -1950,6 +1951,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "権限を設定"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "권한 구성"
           }
         },
         "zh-Hans": {
@@ -1969,12 +1976,6 @@
             "state": "translated",
             "value": "設定權限"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "권한 구성"
-          }
         }
       }
     },
@@ -1990,6 +1991,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "設定中..."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구성 중..."
           }
         },
         "zh-Hans": {
@@ -2009,12 +2016,6 @@
             "state": "translated",
             "value": "設定中..."
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "구성 중..."
-          }
         }
       }
     },
@@ -2031,6 +2032,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "接続テスト"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "연결 테스트"
           }
         },
         "zh-Hans": {
@@ -2050,12 +2057,6 @@
             "state": "translated",
             "value": "連線測試"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "연결 테스트"
-          }
         }
       }
     },
@@ -2072,6 +2073,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "コピー"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "복사"
           }
         },
         "zh-Hans": {
@@ -2091,12 +2098,6 @@
             "state": "translated",
             "value": "複製"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "복사"
-          }
         }
       }
     },
@@ -2113,6 +2114,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "名前をコピー"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이름 복사"
           }
         },
         "zh-Hans": {
@@ -2132,12 +2139,6 @@
             "state": "translated",
             "value": "複製名稱"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "이름 복사"
-          }
         }
       }
     },
@@ -2154,6 +2155,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "パス名をコピー"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "경로 이름 복사"
           }
         },
         "zh-Hans": {
@@ -2173,12 +2180,6 @@
             "state": "translated",
             "value": "複製路徑名稱"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "경로 이름 복사"
-          }
         }
       }
     },
@@ -2194,6 +2195,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "現在の構成"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "현재 구성"
           }
         },
         "zh-Hans": {
@@ -2213,12 +2220,6 @@
             "state": "translated",
             "value": "目前的設定"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "현재 구성"
-          }
         }
       }
     },
@@ -2234,6 +2235,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "カスタムアイコンは正常に復元されました。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사용자 지정 아이콘이 성공적으로 복원되었습니다."
           }
         },
         "zh-Hans": {
@@ -2253,12 +2260,6 @@
             "state": "translated",
             "value": "已成功回復自訂圖像。"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "사용자 지정 아이콘이 성공적으로 복원되었습니다."
-          }
         }
       }
     },
@@ -2274,6 +2275,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "カスタム間隔"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사용자 지정 간격"
           }
         },
         "zh-Hans": {
@@ -2293,12 +2300,6 @@
             "state": "translated",
             "value": "自訂間隔"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "사용자 지정 간격"
-          }
         }
       }
     },
@@ -2315,6 +2316,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "カスタム: %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사용자 지정: %@"
           }
         },
         "zh-Hans": {
@@ -2334,12 +2341,6 @@
             "state": "translated",
             "value": "自訂：%@"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "사용자 지정: %@"
-          }
         }
       }
     },
@@ -2356,6 +2357,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "英語"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "영어"
           }
         },
         "zh-Hans": {
@@ -2375,12 +2382,6 @@
             "state": "translated",
             "value": "英文"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "영어"
-          }
         }
       }
     },
@@ -2396,6 +2397,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アイコン自動復元のためのカスタム間隔（時間単位）を入力してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "자동 아이콘 복원을 위한 사용자 지정 간격(시간)을 입력하세요."
           }
         },
         "zh-Hans": {
@@ -2415,12 +2422,6 @@
             "state": "translated",
             "value": "輸入自動圖像回復的自訂間隔（以小時為單位）。"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "자동 아이콘 복원을 위한 사용자 지정 간격(시간)을 입력하세요."
-          }
         }
       }
     },
@@ -2436,6 +2437,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アプリ更新チェックのためのカスタム間隔（分単位）を入力してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱 업데이트 확인을 위한 사용자 지정 간격(분)을 입력하세요."
           }
         },
         "zh-Hans": {
@@ -2455,12 +2462,6 @@
             "state": "translated",
             "value": "輸入檢查應用程式更新的自訂間隔（以分鐘為單位）。"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "앱 업데이트 확인을 위한 사용자 지정 간격(분)을 입력하세요."
-          }
         }
       }
     },
@@ -2476,6 +2477,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "エラー"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오류"
           }
         },
         "zh-Hans": {
@@ -2495,12 +2502,6 @@
             "state": "translated",
             "value": "錯誤"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "오류"
-          }
         }
       }
     },
@@ -2517,6 +2518,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アイコンの復元中にエラー"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아이콘 복원 오류"
           }
         },
         "zh-Hans": {
@@ -2536,12 +2543,6 @@
             "state": "translated",
             "value": "回復圖像時出錯"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "아이콘 복원 오류"
-          }
         }
       }
     },
@@ -2557,6 +2558,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "エラー: %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오류: %@"
           }
         },
         "zh-Hans": {
@@ -2576,12 +2583,6 @@
             "state": "translated",
             "value": "錯誤：%@"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "오류: %@"
-          }
         }
       }
     },
@@ -2598,6 +2599,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld 時間ごと"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld시간마다"
           }
         },
         "zh-Hans": {
@@ -2617,12 +2624,6 @@
             "state": "translated",
             "value": "每 %lld 小時"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld시간마다"
-          }
         }
       }
     },
@@ -2639,6 +2640,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld 分ごと"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld분마다"
           }
         },
         "zh-Hans": {
@@ -2658,12 +2665,6 @@
             "state": "translated",
             "value": "每 %lld 分鐘"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld분마다"
-          }
         }
       }
     },
@@ -2682,6 +2683,12 @@
             "value": "2日ごと"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2일마다"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2698,12 +2705,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "每 2 天"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "2일마다"
           }
         }
       }
@@ -2723,6 +2724,12 @@
             "value": "2時間ごと"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2시간마다"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2739,12 +2746,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "每 2 小時"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "2시간마다"
           }
         }
       }
@@ -2764,6 +2765,12 @@
             "value": "3日ごと"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3일마다"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2780,12 +2787,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "每 3 天"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "3일마다"
           }
         }
       }
@@ -2805,6 +2806,12 @@
             "value": "毎日"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "매일"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2821,12 +2828,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "每天"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "매일"
           }
         }
       }
@@ -2846,6 +2847,12 @@
             "value": "毎時"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "매시간"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2862,12 +2869,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "每小時"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "매시간"
           }
         }
       }
@@ -2887,6 +2888,12 @@
             "value": "毎分"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "매분"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2903,12 +2910,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "每分鐘"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "매분"
           }
         }
       }
@@ -2933,6 +2934,12 @@
             "value": "すべて正しくセットアップされています。"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "모든 설정이 올바르게 완료되었습니다."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -2950,12 +2957,6 @@
             "state": "translated",
             "value": "所有設定均已正確配置。"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "모든 설정이 올바르게 완료되었습니다."
-          }
         }
       }
     },
@@ -2971,6 +2972,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "構成をエクスポート:"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구성 내보내기:"
           }
         },
         "zh-Hans": {
@@ -2990,12 +2997,6 @@
             "state": "translated",
             "value": "輸出設定："
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "구성 내보내기:"
-          }
         }
       }
     },
@@ -3011,6 +3012,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "構成をエクスポート"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구성 내보내기"
           }
         },
         "zh-Hans": {
@@ -3030,12 +3037,6 @@
             "state": "translated",
             "value": "輸出設定"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "구성 내보내기"
-          }
         }
       }
     },
@@ -3052,6 +3053,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "エクスポート失敗"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "내보내기 실패"
           }
         },
         "zh-Hans": {
@@ -3071,12 +3078,6 @@
             "state": "translated",
             "value": "輸出失敗"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "내보내기 실패"
-          }
         }
       }
     },
@@ -3093,6 +3094,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "IconChanger設定をエクスポート"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IconChanger 구성 내보내기"
           }
         },
         "zh-Hans": {
@@ -3112,12 +3119,6 @@
             "state": "translated",
             "value": "輸出 IconChanger 設定"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "IconChanger 구성 내보내기"
-          }
         }
       }
     },
@@ -3134,6 +3135,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "エクスポート成功"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "내보내기 성공"
           }
         },
         "zh-Hans": {
@@ -3153,12 +3160,6 @@
             "state": "translated",
             "value": "輸出成功"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "내보내기 성공"
-          }
         }
       }
     },
@@ -3174,6 +3175,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "エイリアスとアイコンキャッシュをバックアップまたは別の Mac で使用するためにエクスポートします。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "백업하거나 다른 Mac에서 사용하기 위해 별칭과 아이콘 캐시를 내보냅니다."
           }
         },
         "zh-Hans": {
@@ -3193,12 +3200,6 @@
             "state": "translated",
             "value": "匯出別名和圖像快取，用於備份或在其他 Mac 上使用。"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "백업하거나 다른 Mac에서 사용하기 위해 별칭과 아이콘 캐시를 내보냅니다."
-          }
         }
       }
     },
@@ -3215,6 +3216,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "権限の設定に失敗しました：%@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "권한 구성 실패: %@"
           }
         },
         "zh-Hans": {
@@ -3234,27 +3241,16 @@
             "state": "translated",
             "value": "設定權限失敗：%@"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "권한 구성 실패: %@"
-          }
         }
       }
     },
     "Failed to Set Icon": {
+      "comment": "Alert title",
       "localizations": {
-        "zh-Hans": {
+        "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "设置图标失败"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "設定圖示失敗"
+            "value": "Échec de la définition de l'icône"
           }
         },
         "ja": {
@@ -3269,10 +3265,16 @@
             "value": "아이콘 설정 실패"
           }
         },
-        "fr": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Échec de la définition de l'icône"
+            "value": "设置图标失败"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定圖示失敗"
           }
         },
         "zh-HK": {
@@ -3298,6 +3300,12 @@
             "value": "完了"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "완료"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3315,12 +3323,6 @@
             "state": "translated",
             "value": "完成"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "완료"
-          }
         }
       }
     },
@@ -3336,6 +3338,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "フォルダ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "폴더"
           }
         },
         "zh-Hans": {
@@ -3355,12 +3363,6 @@
             "state": "translated",
             "value": "資料夾"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "폴더"
-          }
         }
       }
     },
@@ -3377,6 +3379,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "フランス語"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "프랑스어"
           }
         },
         "zh-Hans": {
@@ -3396,12 +3404,6 @@
             "state": "translated",
             "value": "法文"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "프랑스어"
-          }
         }
       }
     },
@@ -3417,6 +3419,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "GitHub リポジトリ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 저장소"
           }
         },
         "zh-Hans": {
@@ -3435,12 +3443,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "GitHub 儲存庫"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "GitHub 저장소"
           }
         }
       }
@@ -3465,6 +3467,12 @@
             "value": "ヘルパーファイルが見つかりません"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "헬퍼 파일 누락"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3481,12 +3489,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "輔助檔案遺失"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "헬퍼 파일 누락"
           }
         }
       }
@@ -3512,6 +3514,12 @@
             "value": "以下の必要なヘルパーファイルが見つからないか、コピーできませんでした：\n\n%@\n\nアプリケーションがそのサポートディレクトリ（~/.iconchanger）への書き込み権限を持っていることを確認し、アプリケーションを再起動してみてください。"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "helper_files_missing_message_format"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3528,12 +3536,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "無法找到或複製下列所需的輔助檔案：\n\n%@\n\n請確保應用程式對其支援目錄 (~/.iconchanger) 具有寫入權限，並嘗試重新啟動應用程式。"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "helper_files_missing_message_format"
           }
         }
       }
@@ -3552,6 +3554,12 @@
             "value": "時間"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시간"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3568,12 +3576,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "小時"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "시간"
           }
         }
       }
@@ -3592,6 +3594,12 @@
             "value": "時間"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시간"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3609,12 +3617,6 @@
             "state": "translated",
             "value": "小時"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "시간"
-          }
         }
       }
     },
@@ -3630,6 +3632,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アイコンキャッシュ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아이콘 캐시"
           }
         },
         "zh-Hans": {
@@ -3649,12 +3657,6 @@
             "state": "translated",
             "value": "圖像快取"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "아이콘 캐시"
-          }
         }
       }
     },
@@ -3671,6 +3673,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アイコンの復元に失敗しました"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아이콘 복원 실패"
           }
         },
         "zh-Hans": {
@@ -3690,12 +3698,6 @@
             "state": "translated",
             "value": "圖像回復失敗"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "아이콘 복원 실패"
-          }
         }
       }
     },
@@ -3708,6 +3710,12 @@
           }
         },
         "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IconChanger"
+          }
+        },
+        "ko": {
           "stringUnit": {
             "state": "translated",
             "value": "IconChanger"
@@ -3726,12 +3734,6 @@
           }
         },
         "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "IconChanger"
-          }
-        },
-        "ko": {
           "stringUnit": {
             "state": "translated",
             "value": "IconChanger"
@@ -3753,6 +3755,12 @@
             "value": "iconchanger export /path/to/save/config.json"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iconchanger export /path/to/save/config.json"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3766,12 +3774,6 @@
           }
         },
         "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iconchanger export /path/to/save/config.json"
-          }
-        },
-        "ko": {
           "stringUnit": {
             "state": "translated",
             "value": "iconchanger export /path/to/save/config.json"
@@ -3793,6 +3795,12 @@
             "value": "iconchanger import /path/to/config.json"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iconchanger import /path/to/config.json"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3810,27 +3818,15 @@
             "state": "translated",
             "value": "iconchanger import /path/to/config.json"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iconchanger import /path/to/config.json"
-          }
         }
       }
     },
     "IconChanger needs administrator privileges to change app icons.\nClick the button below and enter your password to complete setup.": {
       "localizations": {
-        "zh-Hans": {
+        "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "IconChanger 需要管理员权限来更改应用图标。\n点击下方按钮并输入密码以完成设置。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "IconChanger 需要管理員權限來更改應用程式圖示。\n點擊下方按鈕並輸入密碼以完成設定。"
+            "value": "IconChanger a besoin des privilèges administrateur pour modifier les icônes des apps.\nCliquez sur le bouton ci-dessous et entrez votre mot de passe pour terminer la configuration."
           }
         },
         "ja": {
@@ -3845,10 +3841,16 @@
             "value": "IconChanger는 앱 아이콘을 변경하려면 관리자 권한이 필요합니다.\n아래 버튼을 클릭하고 비밀번호를 입력하여 설정을 완료하세요."
           }
         },
-        "fr": {
+        "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "IconChanger a besoin des privilèges administrateur pour modifier les icônes des apps.\nCliquez sur le bouton ci-dessous et entrez votre mot de passe pour terminer la configuration."
+            "value": "IconChanger 需要管理员权限来更改应用图标。\n点击下方按钮并输入密码以完成设置。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IconChanger 需要管理員權限來更改應用程式圖示。\n點擊下方按鈕並輸入密碼以完成設定。"
           }
         },
         "zh-HK": {
@@ -3874,6 +3876,12 @@
             "value": "バックグラウンドで実行中は、IconChangerはメニューバーまたはDockに表示される必要があります。"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "백그라운드에서 실행할 때 IconChanger는 메뉴 바 또는 Dock에 표시되어야 합니다."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3890,12 +3898,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "在背景執行時，IconChanger 需要在選單列或 Dock 中顯示。"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "백그라운드에서 실행할 때 IconChanger는 메뉴 바 또는 Dock에 표시되어야 합니다."
           }
         }
       }
@@ -3915,6 +3917,12 @@
             "value": "アイコン復元済み"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아이콘 복원됨"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -3932,12 +3940,6 @@
             "state": "translated",
             "value": "圖像已回復"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "아이콘 복원됨"
-          }
         }
       }
     },
@@ -3953,6 +3955,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アイコンはアプリに適用されると自動的にキャッシュされます"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱에 적용하면 아이콘이 자동으로 캐시됩니다"
           }
         },
         "zh-Hans": {
@@ -3972,12 +3980,6 @@
             "state": "translated",
             "value": "將圖像套用到應用程式時會自動快取"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "앱에 적용하면 아이콘이 자동으로 캐시됩니다"
-          }
         }
       }
     },
@@ -3993,6 +3995,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "構成をインポート:"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구성 가져오기:"
           }
         },
         "zh-Hans": {
@@ -4012,12 +4020,6 @@
             "state": "translated",
             "value": "輸入設定："
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "구성 가져오기:"
-          }
         }
       }
     },
@@ -4034,6 +4036,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "インポート完了"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "가져오기 완료"
           }
         },
         "zh-Hans": {
@@ -4053,12 +4061,6 @@
             "state": "translated",
             "value": "輸入完成"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "가져오기 완료"
-          }
         }
       }
     },
@@ -4074,6 +4076,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "構成をインポート"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구성 가져오기"
           }
         },
         "zh-Hans": {
@@ -4093,12 +4101,6 @@
             "state": "translated",
             "value": "輸入設定"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "구성 가져오기"
-          }
         }
       }
     },
@@ -4115,6 +4117,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "IconChanger設定をインポート"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IconChanger 구성 가져오기"
           }
         },
         "zh-Hans": {
@@ -4134,12 +4142,6 @@
             "state": "translated",
             "value": "輸入 IconChanger 設定"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "IconChanger 구성 가져오기"
-          }
         }
       }
     },
@@ -4156,6 +4158,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "インポート成功"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "가져오기 성공"
           }
         },
         "zh-Hans": {
@@ -4175,12 +4183,6 @@
             "state": "translated",
             "value": "輸入成功"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "가져오기 성공"
-          }
         }
       }
     },
@@ -4196,6 +4198,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "インポートは新しい項目の追加のみで、既存の項目を置換・削除しません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "가져오기는 새 항목만 추가하며 기존 항목을 대체하거나 제거하지 않습니다."
           }
         },
         "zh-Hans": {
@@ -4215,12 +4223,6 @@
             "state": "translated",
             "value": "匯入只會新增項目，唔會取代或刪除現有項目。"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "가져오기는 새 항목만 추가하며 기존 항목을 대체하거나 제거하지 않습니다."
-          }
         }
       }
     },
@@ -4237,6 +4239,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld 個のエイリアスと %lld 個のアイコンをインポートしました"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "별칭 %lld개와 아이콘 %lld개를 가져왔습니다"
           }
         },
         "zh-Hans": {
@@ -4256,12 +4264,6 @@
             "state": "translated",
             "value": "已輸入 %lld 個替身和 %lld 個圖像"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "별칭 %lld개와 아이콘 %lld개를 가져왔습니다"
-          }
         }
       }
     },
@@ -4277,6 +4279,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "インストール"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "설치"
           }
         },
         "zh-Hans": {
@@ -4296,12 +4304,6 @@
             "state": "translated",
             "value": "安裝"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "설치"
-          }
         }
       }
     },
@@ -4317,6 +4319,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "CLIツールをインストール"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CLI 도구 설치"
           }
         },
         "zh-Hans": {
@@ -4336,12 +4344,6 @@
             "state": "translated",
             "value": "安裝 CLI 工具"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "CLI 도구 설치"
-          }
         }
       }
     },
@@ -4357,6 +4359,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "インストール先：%@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "설치 경로: %@"
           }
         },
         "zh-Hans": {
@@ -4376,12 +4384,6 @@
             "state": "translated",
             "value": "安裝路徑：%@"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "설치 경로: %@"
-          }
         }
       }
     },
@@ -4397,6 +4399,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "インストール先"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "설치 경로"
           }
         },
         "zh-Hans": {
@@ -4416,12 +4424,6 @@
             "state": "translated",
             "value": "安裝路徑"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "설치 경로"
-          }
         }
       }
     },
@@ -4437,6 +4439,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "インストール済み"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "설치됨"
           }
         },
         "zh-Hans": {
@@ -4456,12 +4464,6 @@
             "state": "translated",
             "value": "已安裝"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "설치됨"
-          }
         }
       }
     },
@@ -4477,6 +4479,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "間隔"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "간격"
           }
         },
         "zh-Hans": {
@@ -4496,12 +4504,6 @@
             "state": "translated",
             "value": "間隔"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "간격"
-          }
         }
       }
     },
@@ -4518,6 +4520,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "日本語"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "일본어"
           }
         },
         "zh-Hans": {
@@ -4537,12 +4545,6 @@
             "state": "translated",
             "value": "日文"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "일본어"
-          }
         }
       }
     },
@@ -4559,6 +4561,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "言語"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "언어"
           }
         },
         "zh-Hans": {
@@ -4578,12 +4586,6 @@
             "state": "translated",
             "value": "語言"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "언어"
-          }
         }
       }
     },
@@ -4600,6 +4602,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "言語が変更されました"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "언어 변경됨"
           }
         },
         "zh-Hans": {
@@ -4619,12 +4627,6 @@
             "state": "translated",
             "value": "已更改語言"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "언어 변경됨"
-          }
         }
       }
     },
@@ -4640,6 +4642,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "最終チェック"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "마지막 확인"
           }
         },
         "zh-Hans": {
@@ -4659,12 +4667,6 @@
             "state": "translated",
             "value": "上次檢查"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "마지막 확인"
-          }
         }
       }
     },
@@ -4680,6 +4682,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "最終復元"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "마지막 복원"
           }
         },
         "zh-Hans": {
@@ -4699,12 +4707,6 @@
             "state": "translated",
             "value": "上次回復"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "마지막 복원"
-          }
         }
       }
     },
@@ -4721,6 +4723,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "最終復元: %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "마지막 복원: %@"
           }
         },
         "zh-Hans": {
@@ -4740,12 +4748,6 @@
             "state": "translated",
             "value": "上次回復：%@"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "마지막 복원: %@"
-          }
         }
       }
     },
@@ -4761,6 +4763,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "読み込み中"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "로딩 중"
           }
         },
         "zh-Hans": {
@@ -4780,12 +4788,6 @@
             "state": "translated",
             "value": "載入中"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "로딩 중"
-          }
         }
       }
     },
@@ -4802,6 +4804,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "ローカル"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "로컬"
           }
         },
         "zh-Hans": {
@@ -4821,12 +4829,6 @@
             "state": "translated",
             "value": "本機"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "로컬"
-          }
         }
       }
     },
@@ -4839,6 +4841,12 @@
           }
         },
         "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macosicons.com"
+          }
+        },
+        "ko": {
           "stringUnit": {
             "state": "translated",
             "value": "macosicons.com"
@@ -4857,12 +4865,6 @@
           }
         },
         "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "macosicons.com"
-          }
-        },
-        "ko": {
           "stringUnit": {
             "state": "translated",
             "value": "macosicons.com"
@@ -4884,6 +4886,12 @@
             "value": "macOSicons.com"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOSicons.com"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -4897,12 +4905,6 @@
           }
         },
         "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "macOSicons.com"
-          }
-        },
-        "ko": {
           "stringUnit": {
             "state": "translated",
             "value": "macOSicons.com"
@@ -4924,6 +4926,12 @@
             "value": "Bengerthelorf & コントリビューターによる開発"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bengerthelorf 및 기여자들이 만듦"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -4940,12 +4948,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "由 Bengerthelorf 及貢獻者開發"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bengerthelorf 및 기여자들이 만듦"
           }
         }
       }
@@ -4964,6 +4966,12 @@
             "value": "分"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "분"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -4980,12 +4988,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "分鐘"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "분"
           }
         }
       }
@@ -5004,6 +5006,12 @@
             "value": "分"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "분"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -5021,12 +5029,6 @@
             "state": "translated",
             "value": "分鐘"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "분"
-          }
         }
       }
     },
@@ -5042,6 +5044,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "次回復元"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다음 복원"
           }
         },
         "zh-Hans": {
@@ -5061,12 +5069,6 @@
             "state": "translated",
             "value": "下次回復"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "다음 복원"
-          }
         }
       }
     },
@@ -5082,6 +5084,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "キャッシュされたアイコンが見つかりません"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "캐시된 아이콘 없음"
           }
         },
         "zh-Hans": {
@@ -5101,12 +5109,6 @@
             "state": "translated",
             "value": "找不到已快取的圖像"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "캐시된 아이콘 없음"
-          }
         }
       }
     },
@@ -5123,6 +5125,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アイコンなし"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아이콘 없음"
           }
         },
         "zh-Hans": {
@@ -5142,12 +5150,6 @@
             "state": "translated",
             "value": "沒有圖像"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "아이콘 없음"
-          }
         }
       }
     },
@@ -5164,6 +5166,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アイコンが見つかりません"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아이콘을 찾을 수 없음"
           }
         },
         "zh-Hans": {
@@ -5183,12 +5191,6 @@
             "state": "translated",
             "value": "找不到圖像"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "아이콘을 찾을 수 없음"
-          }
         }
       }
     },
@@ -5205,6 +5207,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "インポートする新しい項目が見つかりませんでした"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "가져올 새 항목이 없습니다"
           }
         },
         "zh-Hans": {
@@ -5224,12 +5232,6 @@
             "state": "translated",
             "value": "未找到需要輸入的新項目"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "가져올 새 항목이 없습니다"
-          }
         }
       }
     },
@@ -5245,6 +5247,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "未インストール"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "설치되지 않음"
           }
         },
         "zh-Hans": {
@@ -5264,12 +5272,6 @@
             "state": "translated",
             "value": "未安裝"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "설치되지 않음"
-          }
         }
       }
     },
@@ -5286,6 +5288,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "OK"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "확인"
           }
         },
         "zh-Hans": {
@@ -5305,12 +5313,6 @@
             "state": "translated",
             "value": "確定"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "확인"
-          }
         }
       }
     },
@@ -5327,6 +5329,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "IconChangerを開く"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IconChanger 열기"
           }
         },
         "zh-Hans": {
@@ -5346,12 +5354,6 @@
             "state": "translated",
             "value": "開啟 IconChanger"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "IconChanger 열기"
-          }
         }
       }
     },
@@ -5368,6 +5370,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "パス"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "경로"
           }
         },
         "zh-Hans": {
@@ -5387,12 +5395,6 @@
             "state": "translated",
             "value": "路徑"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "경로"
-          }
         }
       }
     },
@@ -5408,6 +5410,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "権限設定"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "권한 설정"
           }
         },
         "zh-Hans": {
@@ -5427,12 +5435,6 @@
             "state": "translated",
             "value": "權限設定"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "권한 설정"
-          }
         }
       }
     },
@@ -5449,6 +5451,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "プリセット間隔"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사전 설정 간격"
           }
         },
         "zh-Hans": {
@@ -5468,12 +5476,6 @@
             "state": "translated",
             "value": "預設間隔"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "사전 설정 간격"
-          }
         }
       }
     },
@@ -5492,6 +5494,12 @@
             "value": "終了"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "종료"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -5508,12 +5516,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "結束"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "종료"
           }
         }
       }
@@ -5538,6 +5540,12 @@
             "value": "アプリ一覧を更新"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱 목록 새로고침"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -5554,12 +5562,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "重新整理應用程式列表"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "앱 목록 새로고침"
           }
         }
       }
@@ -5584,6 +5586,12 @@
             "value": "アイコン表示を更新"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아이콘 표시 새로고침"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -5601,12 +5609,6 @@
             "state": "translated",
             "value": "重新整理圖像顯示"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "아이콘 표시 새로고침"
-          }
         }
       }
     },
@@ -5622,6 +5624,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "キャッシュから削除"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "캐시에서 제거"
           }
         },
         "zh-Hans": {
@@ -5641,12 +5649,6 @@
             "state": "translated",
             "value": "從快取中移除"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "캐시에서 제거"
-          }
         }
       }
     },
@@ -5662,6 +5664,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "選択を削除"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "선택 항목 제거"
           }
         },
         "zh-Hans": {
@@ -5681,12 +5689,6 @@
             "state": "translated",
             "value": "移除所選"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "선택 항목 제거"
-          }
         }
       }
     },
@@ -5703,6 +5705,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Launchpadからアイコンを削除"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Launchpad에서 아이콘 제거"
           }
         },
         "zh-Hans": {
@@ -5722,12 +5730,6 @@
             "state": "translated",
             "value": "從啟動台移除圖像"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Launchpad에서 아이콘 제거"
-          }
         }
       }
     },
@@ -5743,6 +5745,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アクセスをリクエスト / 確認"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "접근 요청 / 확인"
           }
         },
         "zh-Hans": {
@@ -5762,12 +5770,6 @@
             "state": "translated",
             "value": "請求 / 檢查存取權限"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "접근 요청 / 확인"
-          }
         }
       }
     },
@@ -5783,6 +5785,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "復元"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "복원"
           }
         },
         "zh-Hans": {
@@ -5802,12 +5810,6 @@
             "state": "translated",
             "value": "回復"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "복원"
-          }
         }
       }
     },
@@ -5823,6 +5825,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "すべて復元"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "모두 복원"
           }
         },
         "zh-Hans": {
@@ -5842,12 +5850,6 @@
             "state": "translated",
             "value": "全部回復"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "모두 복원"
-          }
         }
       }
     },
@@ -5863,6 +5865,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "キャッシュされたすべてのアイコンを復元"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "모든 캐시된 아이콘 복원"
           }
         },
         "zh-Hans": {
@@ -5882,12 +5890,6 @@
             "state": "translated",
             "value": "回復所有快取的圖像"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "모든 캐시된 아이콘 복원"
-          }
         }
       }
     },
@@ -5904,6 +5906,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "キャッシュされたアイコンを復元"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "캐시된 아이콘 복원"
           }
         },
         "zh-Hans": {
@@ -5923,12 +5931,6 @@
             "state": "translated",
             "value": "回復快取的圖像"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "캐시된 아이콘 복원"
-          }
         }
       }
     },
@@ -5944,6 +5946,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "デフォルトに戻す"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "기본값으로 복원"
           }
         },
         "zh-Hans": {
@@ -5963,12 +5971,6 @@
             "state": "translated",
             "value": "回復預設"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "기본값으로 복원"
-          }
         }
       }
     },
@@ -5984,6 +5986,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "デフォルトアイコンに戻す"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "기본 아이콘으로 복원"
           }
         },
         "zh-Hans": {
@@ -6003,16 +6011,11 @@
             "state": "translated",
             "value": "回復預設圖像"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "기본 아이콘으로 복원"
-          }
         }
       }
     },
     "Restore Failed": {
+      "comment": "Alert title",
       "localizations": {
         "fr": {
           "stringUnit": {
@@ -6024,6 +6027,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "復元に失敗"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "복원 실패"
           }
         },
         "zh-Hans": {
@@ -6043,12 +6052,6 @@
             "state": "translated",
             "value": "回復失敗"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "복원 실패"
-          }
         }
       }
     },
@@ -6064,6 +6067,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "スケジュールでアイコンを復元"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "일정에 따라 아이콘 복원"
           }
         },
         "zh-Hans": {
@@ -6083,12 +6092,6 @@
             "state": "translated",
             "value": "按排程回復圖像"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "일정에 따라 아이콘 복원"
-          }
         }
       }
     },
@@ -6104,6 +6107,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アプリ更新時にアイコンを復元"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱 업데이트 시 아이콘 복원"
           }
         },
         "zh-Hans": {
@@ -6123,12 +6132,6 @@
             "state": "translated",
             "value": "在應用程式更新時回復圖像"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "앱 업데이트 시 아이콘 복원"
-          }
         }
       }
     },
@@ -6145,6 +6148,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "復元間隔"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "복원 간격"
           }
         },
         "zh-Hans": {
@@ -6164,12 +6173,6 @@
             "state": "translated",
             "value": "回復間隔"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "복원 간격"
-          }
         }
       }
     },
@@ -6185,6 +6188,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "選択項目を復元"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "선택 항목 복원"
           }
         },
         "zh-Hans": {
@@ -6204,12 +6213,6 @@
             "state": "translated",
             "value": "回復所選項目"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "선택 항목 복원"
-          }
         }
       }
     },
@@ -6225,6 +6228,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アプリの元のアイコンに戻す"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "원래 앱 아이콘으로 복원"
           }
         },
         "zh-Hans": {
@@ -6244,12 +6253,6 @@
             "state": "translated",
             "value": "回復應用程式嘅原始圖像"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "원래 앱 아이콘으로 복원"
-          }
         }
       }
     },
@@ -6265,6 +6268,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "このアイコンを復元"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 아이콘 복원"
           }
         },
         "zh-Hans": {
@@ -6284,12 +6293,6 @@
             "state": "translated",
             "value": "回復此圖像"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "이 아이콘 복원"
-          }
         }
       }
     },
@@ -6305,6 +6308,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アイコンを復元中..."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아이콘 복원 중..."
           }
         },
         "zh-Hans": {
@@ -6324,12 +6333,6 @@
             "state": "translated",
             "value": "正在回復圖像..."
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "아이콘 복원 중..."
-          }
         }
       }
     },
@@ -6345,6 +6348,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "セットアップ確認を再試行"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "설정 확인 다시 시도"
           }
         },
         "zh-Hans": {
@@ -6364,12 +6373,6 @@
             "state": "translated",
             "value": "重試設定檢查"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "설정 확인 다시 시도"
-          }
         }
       }
     },
@@ -6385,6 +6388,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "バックグラウンドで実行"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "백그라운드에서 실행"
           }
         },
         "zh-Hans": {
@@ -6404,12 +6413,6 @@
             "state": "translated",
             "value": "在背景執行"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "백그라운드에서 실행"
-          }
         }
       }
     },
@@ -6425,6 +6428,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "実行中"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "실행 중"
           }
         },
         "zh-Hans": {
@@ -6444,12 +6453,6 @@
             "state": "translated",
             "value": "執行中"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "실행 중"
-          }
         }
       }
     },
@@ -6465,6 +6468,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "保存"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "저장"
           }
         },
         "zh-Hans": {
@@ -6484,12 +6493,6 @@
             "state": "translated",
             "value": "儲存"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "저장"
-          }
         }
       }
     },
@@ -6505,6 +6508,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "スケジュール復元"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "예약 복원"
           }
         },
         "zh-Hans": {
@@ -6524,12 +6533,6 @@
             "state": "translated",
             "value": "排程回復"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "예약 복원"
-          }
         }
       }
     },
@@ -6545,6 +6548,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アプリを選択して詳細を表示"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱을 선택하여 세부 정보를 확인하세요"
           }
         },
         "zh-Hans": {
@@ -6564,12 +6573,6 @@
             "state": "translated",
             "value": "選取應用程式以查看其詳細資訊"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "앱을 선택하여 세부 정보를 확인하세요"
-          }
         }
       }
     },
@@ -6585,6 +6588,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "サービス状態"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "서비스 상태"
           }
         },
         "zh-Hans": {
@@ -6604,12 +6613,6 @@
             "state": "translated",
             "value": "服務狀態"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "서비스 상태"
-          }
         }
       }
     },
@@ -6626,6 +6629,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "エイリアス名を設定"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "별칭 이름 설정"
           }
         },
         "zh-Hans": {
@@ -6645,12 +6654,6 @@
             "state": "translated",
             "value": "設定替身名稱"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "별칭 이름 설정"
-          }
         }
       }
     },
@@ -6666,6 +6669,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "カスタムチェック間隔を設定"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사용자 지정 확인 간격 설정"
           }
         },
         "zh-Hans": {
@@ -6685,12 +6694,6 @@
             "state": "translated",
             "value": "設定自訂檢查間隔"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "사용자 지정 확인 간격 설정"
-          }
         }
       }
     },
@@ -6706,6 +6709,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "カスタム復元間隔を設定"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사용자 지정 복원 간격 설정"
           }
         },
         "zh-Hans": {
@@ -6725,12 +6734,6 @@
             "state": "translated",
             "value": "設定自訂回復間隔"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "사용자 지정 복원 간격 설정"
-          }
         }
       }
     },
@@ -6747,6 +6750,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "エイリアスを設定"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "별칭 설정"
           }
         },
         "zh-Hans": {
@@ -6766,12 +6775,6 @@
             "state": "translated",
             "value": "設定替身"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "별칭 설정"
-          }
         }
       }
     },
@@ -6788,6 +6791,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "設定"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "설정"
           }
         },
         "zh-Hans": {
@@ -6807,12 +6816,6 @@
             "state": "translated",
             "value": "設定"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "설정"
-          }
         }
       }
     },
@@ -6828,6 +6831,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "セットアップエラー"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "설정 오류"
           }
         },
         "zh-Hans": {
@@ -6846,12 +6855,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "設定錯誤"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "설정 오류"
           }
         }
       }
@@ -6876,6 +6879,12 @@
             "value": "セットアップ状態"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "설정 상태"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -6892,12 +6901,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "設定狀態"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "설정 상태"
           }
         }
       }
@@ -6917,6 +6920,12 @@
             "value": "設定がキャンセルされました。"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "설정이 취소되었습니다."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -6933,12 +6942,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "設定已取消。"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "설정이 취소되었습니다."
           }
         }
       }
@@ -6958,6 +6961,12 @@
             "value": "Dockに表示"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dock에 표시"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -6974,12 +6983,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "在 Dock 中顯示"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dock에 표시"
           }
         }
       }
@@ -6999,6 +7002,12 @@
             "value": "メニューバーに表示"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "메뉴 바에 표시"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -7015,12 +7024,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "在選單列中顯示"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "메뉴 바에 표시"
           }
         }
       }
@@ -7040,6 +7043,12 @@
             "value": "Finderで表示"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finder에서 보기"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -7057,12 +7066,6 @@
             "state": "translated",
             "value": "在 Finder 中顯示"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Finder에서 보기"
-          }
         }
       }
     },
@@ -7078,6 +7081,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "さらに表示"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "더 보기"
           }
         },
         "zh-Hans": {
@@ -7097,12 +7106,6 @@
             "state": "translated",
             "value": "顯示更多"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "더 보기"
-          }
         }
       }
     },
@@ -7119,6 +7122,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "簡体字中国語"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "중국어(간체)"
           }
         },
         "zh-Hans": {
@@ -7138,12 +7147,6 @@
             "state": "translated",
             "value": "簡體中文"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "중국어(간체)"
-          }
         }
       }
     },
@@ -7159,6 +7162,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "状態"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "상태"
           }
         },
         "zh-Hans": {
@@ -7177,12 +7186,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "狀態"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "상태"
           }
         }
       }
@@ -7207,6 +7210,12 @@
             "value": "スタイル"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스타일"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -7223,12 +7232,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "風格"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "스타일"
           }
         }
       }
@@ -7248,6 +7251,12 @@
             "value": "システムデフォルト"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시스템 기본값"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -7264,12 +7273,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "系統預設"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "시스템 기본값"
           }
         }
       }
@@ -7289,6 +7292,12 @@
             "value": "API接続をテスト"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "API 연결 테스트"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -7305,12 +7314,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "測試 API 連線"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "API 연결 테스트"
           }
         }
       }
@@ -7330,6 +7333,12 @@
             "value": "テスト中..."
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "테스트 중..."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -7347,12 +7356,6 @@
             "state": "translated",
             "value": "測試中..."
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "테스트 중..."
-          }
         }
       }
     },
@@ -7368,6 +7371,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アプリはキャッシュされたアプリケーションの更新を監視し、更新が検出されるとカスタムアイコンを自動的に復元します。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱이 캐시된 응용 프로그램의 업데이트를 모니터링하고 업데이트가 감지되면 자동으로 사용자 지정 아이콘을 복원합니다."
           }
         },
         "zh-Hans": {
@@ -7387,12 +7396,6 @@
             "state": "translated",
             "value": "應用程式會監視你快取的應用程式是否有更新，並在偵測到更新時自動回復其自訂圖像。"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "앱이 캐시된 응용 프로그램의 업데이트를 모니터링하고 업데이트가 감지되면 자동으로 사용자 지정 아이콘을 복원합니다."
-          }
         }
       }
     },
@@ -7408,6 +7411,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "IconChanger CLIツールは、構成をインポートおよびエクスポートするためのコマンドラインアクセスを提供します。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IconChanger CLI 도구는 구성 가져오기 및 내보내기를 위한 명령줄 접근을 제공합니다."
           }
         },
         "zh-Hans": {
@@ -7427,12 +7436,6 @@
             "state": "translated",
             "value": "IconChanger CLI 工具提供指令行權限來輸入和輸出設定。"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "IconChanger CLI 도구는 구성 가져오기 및 내보내기를 위한 명령줄 접근을 제공합니다."
-          }
         }
       }
     },
@@ -7449,6 +7452,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "言語が変更されました。最適な体験のために、アプリケーションを再起動してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "언어가 변경되었습니다. 최상의 경험을 위해 앱을 다시 시작하세요."
           }
         },
         "zh-Hans": {
@@ -7468,12 +7477,6 @@
             "state": "translated",
             "value": "語言已更改。為獲得最佳體驗，請重新啟動應用程式。"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "언어가 변경되었습니다. 최상의 경험을 위해 앱을 다시 시작하세요."
-          }
         }
       }
     },
@@ -7489,6 +7492,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "この操作は取り消せません。アイコンを再度キャッシュするには再適用が必要です。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 작업은 실행 취소할 수 없습니다. 다시 캐시하려면 아이콘을 다시 적용해야 합니다."
           }
         },
         "zh-Hans": {
@@ -7508,12 +7517,6 @@
             "state": "translated",
             "value": "呢個操作冇得撤銷。需要重新套用圖像先可以再次快取。"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "이 작업은 실행 취소할 수 없습니다. 다시 캐시하려면 아이콘을 다시 적용해야 합니다."
-          }
         }
       }
     },
@@ -7529,6 +7532,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ のカスタムアイコンを削除し、元のアイコンに戻します。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@의 사용자 지정 아이콘을 제거하고 원래 아이콘을 복원합니다."
           }
         },
         "zh-Hans": {
@@ -7548,12 +7557,6 @@
             "state": "translated",
             "value": "呢個會移除自訂圖像並回復 %@ 嘅原始圖像。"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@의 사용자 지정 아이콘을 제거하고 원래 아이콘을 복원합니다."
-          }
         }
       }
     },
@@ -7570,6 +7573,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "繁体字中国語"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "중국어(번체)"
           }
         },
         "zh-Hans": {
@@ -7589,12 +7598,6 @@
             "state": "translated",
             "value": "繁體中文"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "중국어(번체)"
-          }
         }
       }
     },
@@ -7611,6 +7614,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "設定ファイルを保存できません: %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구성 파일을 저장할 수 없습니다: %@"
           }
         },
         "zh-Hans": {
@@ -7630,12 +7639,6 @@
             "state": "translated",
             "value": "無法儲存設定檔：%@"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "구성 파일을 저장할 수 없습니다: %@"
-          }
         }
       }
     },
@@ -7651,6 +7654,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アンインストール"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "제거"
           }
         },
         "zh-Hans": {
@@ -7670,12 +7679,6 @@
             "state": "translated",
             "value": "解除安裝"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "제거"
-          }
         }
       }
     },
@@ -7691,6 +7694,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "CLIツールをアンインストール"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CLI 도구 제거"
           }
         },
         "zh-Hans": {
@@ -7709,12 +7718,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "解除安裝 CLI 工具"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "CLI 도구 제거"
           }
         }
       }
@@ -7741,6 +7744,12 @@
             "value": "不明"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "알 수 없음"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -7757,12 +7766,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "未知"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "알 수 없음"
           }
         }
       }
@@ -7781,6 +7784,12 @@
             "value": "使用方法"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사용법"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -7797,12 +7806,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "用法"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "사용법"
           }
         }
       }
@@ -7821,6 +7824,12 @@
             "value": "使用情報"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사용 정보"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -7837,12 +7846,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "用量資料"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "사용 정보"
           }
         }
       }
@@ -7867,6 +7870,12 @@
             "value": "バージョン %@（%@）"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "버전 %@(%@)"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -7883,12 +7892,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "版本 %@（%@）"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "버전 %@(%@)"
           }
         }
       }
@@ -7908,6 +7911,12 @@
             "value": "表示が必要です"
           }
         },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "표시 필요"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -7925,12 +7934,6 @@
             "state": "translated",
             "value": "需要可見性"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "표시 필요"
-          }
         }
       }
     },
@@ -7946,6 +7949,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "/Applicationsへのアクセスが必要です"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "/Applications 접근이 필요합니다"
           }
         },
         "zh-Hans": {
@@ -7965,12 +7974,6 @@
             "state": "translated",
             "value": "我們需要取用 /Applications 的權限"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "/Applications 접근이 필요합니다"
-          }
         }
       }
     },
@@ -7987,6 +7990,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "より良い結果を得るためにエイリアス名を変更できます"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "더 나은 결과를 위해 별칭을 수정할 수 있습니다"
           }
         },
         "zh-Hans": {
@@ -8006,12 +8015,6 @@
             "state": "translated",
             "value": "你可以修改替身名稱以取得更好的結果"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "더 나은 결과를 위해 별칭을 수정할 수 있습니다"
-          }
         }
       }
     },
@@ -8027,6 +8030,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "CLI エクスポートコマンドを使用する前に、まずアプリから設定をエクスポートしてください。CLI でインポート後、アプリを再起動してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CLI 내보내기 명령을 사용하기 전에 먼저 앱에서 구성을 내보내야 합니다. CLI로 가져온 후 앱을 다시 시작하면 변경 사항을 확인할 수 있습니다."
           }
         },
         "zh-Hans": {
@@ -8046,12 +8055,6 @@
             "state": "translated",
             "value": "使用 CLI 匯出指令前，需先從應用程式中匯出設定。透過 CLI 匯入後，請重新啟動應用程式。"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "CLI 내보내기 명령을 사용하기 전에 먼저 앱에서 구성을 내보내야 합니다. CLI로 가져온 후 앱을 다시 시작하면 변경 사항을 확인할 수 있습니다."
-          }
         }
       }
     },
@@ -8068,6 +8071,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "macosicons.comからAPIキーを取得する必要があります"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macosicons.com에서 API 키를 발급받아야 합니다"
           }
         },
         "zh-Hans": {
@@ -8087,91 +8096,45 @@
             "state": "translated",
             "value": "你需要從 macosicons.com 取得 API 金鑰"
           }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "macosicons.com에서 API 키를 발급받아야 합니다"
-          }
         }
       }
     },
-    "Permission Required": {
+    "This app may be protected by macOS. Try closing the app first, or the app may not support icon changes.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "需要权限"
+            "value": "该应用可能受 macOS 保护。请尝试先关闭该应用，或者该应用可能不支持更改图标。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "需要權限"
+            "value": "該應用程式可能受 macOS 保護。請嘗試先關閉該應用程式，或者該應用程式可能不支援更改圖示。"
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "需要權限"
+            "value": "該應用程式可能受 macOS 保護。請嘗試先關閉該應用程式，或者該應用程式可能不支援更改圖示。"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "権限が必要です"
+            "value": "このアプリは macOS によって保護されている可能性があります。アプリを閉じてから再試行するか、このアプリはアイコンの変更に対応していない可能性があります。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "권한 필요"
+            "value": "이 앱은 macOS에 의해 보호되어 있을 수 있습니다. 앱을 먼저 종료하거나, 이 앱은 아이콘 변경을 지원하지 않을 수 있습니다."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Autorisation requise"
-          }
-        }
-      }
-    },
-    "IconChanger does not have permission to modify this app's icon. Please check your permission settings.": {
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "IconChanger 没有权限修改该应用的图标，请检查权限设置。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "IconChanger 沒有權限修改該應用程式的圖示，請檢查權限設定。"
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "IconChanger 沒有權限修改該應用程式的圖示，請檢查權限設定。"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "IconChanger にはこのアプリのアイコンを変更する権限がありません。権限設定を確認してください。"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "IconChanger에 이 앱의 아이콘을 수정할 권한이 없습니다. 권한 설정을 확인하세요."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "IconChanger n'a pas la permission de modifier l'icône de cette app. Veuillez vérifier vos réglages de permissions."
+            "value": "Cette app est peut-être protégée par macOS. Essayez de la fermer d'abord, ou elle ne prend peut-être pas en charge le changement d'icône."
           }
         }
       }
