@@ -8095,6 +8095,86 @@
           }
         }
       }
+    },
+    "Permission Required": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要权限"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要權限"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要權限"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "権限が必要です"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "권한 필요"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autorisation requise"
+          }
+        }
+      }
+    },
+    "IconChanger does not have permission to modify this app's icon. Please check your permission settings.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IconChanger 没有权限修改该应用的图标，请检查权限设置。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IconChanger 沒有權限修改該應用程式的圖示，請檢查權限設定。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IconChanger 沒有權限修改該應用程式的圖示，請檢查權限設定。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IconChanger にはこのアプリのアイコンを変更する権限がありません。権限設定を確認してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IconChanger에 이 앱의 아이콘을 수정할 권한이 없습니다. 권한 설정을 확인하세요."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IconChanger n'a pas la permission de modifier l'icône de cette app. Veuillez vérifier vos réglages de permissions."
+          }
+        }
+      }
     }
   },
   "version": "1.1"

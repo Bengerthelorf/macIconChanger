@@ -19,6 +19,7 @@ struct IconList: View {
     @State var setAlias: String?
     @State private var appToRestore: AppItem?
     @State private var restoreError: String?
+    @State private var isPermissionError = false
 
     var body: some View {
         NavigationView {
@@ -150,7 +151,9 @@ struct IconList: View {
                             do {
                                 try iconManager.removeIcon(from: app)
                             } catch {
-                                restoreError = error.localizedDescription
+                                let desc = error.localizedDescription
+                                isPermissionError = desc.contains("permission") || desc.contains("权限")
+                                restoreError = desc
                             }
                         }
                     }
@@ -158,13 +161,29 @@ struct IconList: View {
                 } message: {
                     Text("This will remove the custom icon and restore the original icon for \(appToRestore?.name ?? "").")
                 }
-                .alert("Restore Failed", isPresented: Binding(
-                    get: { restoreError != nil },
-                    set: { if !$0 { restoreError = nil } }
-                )) {
-                    Button("OK", role: .cancel) { }
+                .alert(
+                    isPermissionError
+                        ? NSLocalizedString("Permission Required", comment: "Alert title")
+                        : NSLocalizedString("Restore Failed", comment: "Alert title"),
+                    isPresented: Binding(
+                        get: { restoreError != nil },
+                        set: { if !$0 { restoreError = nil; isPermissionError = false } }
+                    )
+                ) {
+                    if isPermissionError {
+                        Button(NSLocalizedString("Configure Permissions", comment: "Alert button")) {
+                            iconManager.needsSetupCheck = true
+                        }
+                        Button("OK", role: .cancel) { }
+                    } else {
+                        Button("OK", role: .cancel) { }
+                    }
                 } message: {
-                    Text(restoreError ?? "")
+                    if isPermissionError {
+                        Text(NSLocalizedString("IconChanger does not have permission to modify this app's icon. Please check your permission settings.", comment: "Permission error message"))
+                    } else {
+                        Text(restoreError ?? "")
+                    }
                 }
     }
 
