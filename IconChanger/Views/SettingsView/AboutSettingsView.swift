@@ -40,7 +40,7 @@ struct AboutSettingsView: View {
                         .clipShape(Circle())
                         .overlay(Circle().stroke(.white, lineWidth: 2))
                         .shadow(radius: 2)
-                        .rotationEffect(.degrees(12))
+                        .rotationEffect(.degrees(20))
                         .offset(x: 6, y: 6)
                 }
             }
