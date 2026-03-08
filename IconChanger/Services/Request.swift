@@ -73,7 +73,7 @@ class MyQueryRequestController {
         request.httpMethod = "POST"
 
         // Get API key from UserDefaults
-        let apiKey = UserDefaults.standard.string(forKey: "apiKey") ?? ""
+        let apiKey = KeychainHelper.load(key: "apiKey") ?? ""
         if apiKey.isEmpty {
             logger.warning("API key not configured; search request may be rejected.")
         }
@@ -179,7 +179,7 @@ class MyQueryRequestController {
         request.httpMethod = "POST"
         
         // Get API key from UserDefaults - this is what we're actually testing
-        let apiKey = UserDefaults.standard.string(forKey: "apiKey") ?? ""
+        let apiKey = KeychainHelper.load(key: "apiKey") ?? ""
         if apiKey.isEmpty {
             throw NSError(domain: "IconChanger", code: 1002, userInfo: [NSLocalizedDescriptionKey: "API key not provided"])
         }
@@ -257,7 +257,7 @@ class MyQueryRequestController {
         request.httpMethod = "GET"
         
         // Add API key header
-        let apiKey = UserDefaults.standard.string(forKey: "apiKey") ?? ""
+        let apiKey = KeychainHelper.load(key: "apiKey") ?? ""
         if !apiKey.isEmpty {
             request.addValue(apiKey, forHTTPHeaderField: "x-api-key")
             logger.debug("Using API key for backup search.")

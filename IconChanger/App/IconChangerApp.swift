@@ -28,6 +28,7 @@ struct IconChangerApp: App {
         }
 
         updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
+        migrateAPIKeyToKeychain()
         setupDefaultAliasNames()
     }
 
@@ -95,6 +96,14 @@ struct IconChangerApp: App {
 
         Settings {
             SettingsView(updater: updaterController.updater)
+        }
+    }
+
+    private func migrateAPIKeyToKeychain() {
+        let defaults = UserDefaults.standard
+        if let key = defaults.string(forKey: "apiKey"), !key.isEmpty {
+            KeychainHelper.save(key: "apiKey", value: key)
+            defaults.removeObject(forKey: "apiKey")
         }
     }
 }

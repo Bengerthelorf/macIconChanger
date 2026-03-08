@@ -62,6 +62,7 @@
 		C6222E042F5B61260004A1D8 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = C6222E032F5B61260004A1D8 /* Localizable.xcstrings */; };
 		C66396BF2F0EAD0C006729FC /* AppItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C66396BE2F0EAD0C006729FC /* AppItem.swift */; };
 		C6E571DA2EA2319C00EC9E5E /* IconImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6E571D92EA2319C00EC9E5E /* IconImageLoader.swift */; };
+		BB11111111111111BBBBBBBB /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB22222222222222BBBBBBBB /* KeychainHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -144,6 +145,7 @@
 		C6222E032F5B61260004A1D8 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		C66396BE2F0EAD0C006729FC /* AppItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppItem.swift; sourceTree = "<group>"; };
 		C6E571D92EA2319C00EC9E5E /* IconImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconImageLoader.swift; sourceTree = "<group>"; };
+		BB22222222222222BBBBBBBB /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -336,6 +338,7 @@
 				900D1CF7281936C7007ABB12 /* FullDiskPermision.swift */,
 				6843168B503282547D31EC35 /* PermissionRequest.swift */,
 				9053434E286B2A6800237F98 /* AutoUpdater.swift */,
+				BB22222222222222BBBBBBBB /* KeychainHelper.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -524,6 +527,7 @@
 				68431D85DB8E44D55E7421B7 /* ApplicationAliasSettingsView.swift in Sources */,
 				684319BAF8AE3F8E503A8FCD /* ApplicationSettingsView.swift in Sources */,
 				68431AECAF55382A0674F142 /* APISettingsView.swift in Sources */,
+				BB11111111111111BBBBBBBB /* KeychainHelper.swift in Sources */,
 				68431A9559BEE5B0B6042265 /* ApplicationFolderSettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct APISettingsView: View {
-    @AppStorage("apiKey") var apiKey: String = ""
+    @State private var apiKey: String = KeychainHelper.load(key: "apiKey") ?? ""
     @State private var isTestingAPI = false
     @State private var testResult: String? = nil
     @State private var testSuccess = false
@@ -18,6 +18,9 @@ struct APISettingsView: View {
         Form {
             Section {
                 TextField(NSLocalizedString("API Key: ", comment: "API settings"), text: $apiKey)
+                    .onChange(of: apiKey) { newValue in
+                        KeychainHelper.save(key: "apiKey", value: newValue)
+                    }
             } header: {
                 Label(NSLocalizedString("API Key", comment: "Settings section"), systemImage: "key")
             } footer: {
