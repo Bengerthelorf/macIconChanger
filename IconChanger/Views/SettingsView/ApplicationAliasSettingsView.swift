@@ -30,8 +30,9 @@ struct ApplicationAliasSettingsView: View {
                     guard let selectedID = selectedAlias.first, let selectedIndex = aliasNames.firstIndex(where: { $0.id == selectedID }) else {
                         return
                     }
-                    aliasNames.remove(at: selectedIndex)
+                    let removed = aliasNames.remove(at: selectedIndex)
                     AliasNames.save(aliasNames)
+                    AliasName.trackRemoval(for: removed.appName)
                 }) {
                     Image(systemName: "minus")
                 }

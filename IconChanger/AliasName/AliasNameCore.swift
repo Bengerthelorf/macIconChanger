@@ -43,8 +43,10 @@ struct AliasName: Identifiable {
         var aliases = AliasNames.getAll()
         aliases.removeAll(where: { $0.appName == raw })
         AliasNames.save(aliases)
+        trackRemoval(for: raw)
+    }
 
-        // Track removal so setupDefaultAliasNames() won't re-add it
+    static func trackRemoval(for raw: String) {
         var removed = UserDefaults.standard.stringArray(forKey: "RemovedDefaultAliases") ?? []
         if !removed.contains(raw) {
             removed.append(raw)
