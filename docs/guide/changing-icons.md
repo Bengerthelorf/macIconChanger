@@ -9,7 +9,7 @@
 3. Use the **Style** dropdown to filter by style (e.g., Liquid Glass).
 4. Click an icon to apply it.
 
-<!-- ![Searching for icons](../public/images/search-icons.png) -->
+![Searching for icons](/images/search-icons.png)
 
 ### Choose a Local File
 
@@ -19,7 +19,7 @@ Click **Choose from the Local** (or press <kbd>Cmd</kbd>+<kbd>O</kbd>) to open a
 
 Drag an image file from Finder directly onto the app's icon area. A blue highlight will appear to confirm the drop zone.
 
-<!-- ![Drag and drop](../public/images/drag-drop.png) -->
+![Drag and drop](/images/drag-drop.png)
 
 ### Restore Default Icon
 

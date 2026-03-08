@@ -15,7 +15,7 @@
 
 首次启动时，IconChanger 会提示你完成一次性权限配置。这是更改应用图标所必需的。
 
-<!-- ![首次启动配置](../../public/images/setup-prompt.png) -->
+![首次启动配置](/images/setup-prompt.png)
 
 点击配置按钮并输入管理员密码。IconChanger 会自动配置所需权限（helper 脚本的 sudoers 规则）。
 
@@ -29,7 +29,7 @@
 2. 浏览 [macOSicons.com](https://macosicons.com/) 上的图标或选择本地图片。
 3. 点击图标即可应用。
 
-<!-- ![主界面](../../public/images/main-interface.png) -->
+![主界面](/images/main-interface.png)
 
 就这么简单！
 

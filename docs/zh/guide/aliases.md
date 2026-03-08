@@ -8,7 +8,7 @@
 2. 选择 **设置别名**。
 3. 输入便于搜索的名称（如 `Photoshop` 而不是 `Adobe Photoshop 2024`）。
 
-<!-- ![设置别名](../../public/images/set-alias.png) -->
+![设置别名](/images/set-alias.png)
 
 搜索图标时会使用别名进行搜索。
 
@@ -16,7 +16,7 @@
 
 在 **设置** > **应用** > **别名** 中查看和编辑所有别名。
 
-<!-- ![别名设置](../../public/images/alias-settings.png) -->
+![别名设置](/images/alias-settings.png)
 
 ## 内置别名
 

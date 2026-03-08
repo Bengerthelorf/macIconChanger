@@ -15,7 +15,7 @@
 
 On the first launch, IconChanger will prompt you to complete a one-time permission setup. This is required for the app to change application icons.
 
-<!-- ![First launch setup screen](../public/images/setup-prompt.png) -->
+![First launch setup screen](/images/setup-prompt.png)
 
 Click the setup button and enter your administrator password. IconChanger will automatically configure the necessary permissions (a sudoers rule for the helper script).
 
@@ -29,7 +29,7 @@ If the automatic setup fails, see [Initial Setup](./setup) for manual instructio
 2. Browse icons from [macOSicons.com](https://macosicons.com/) or choose a local image file.
 3. Click on an icon to apply it.
 
-<!-- ![Main interface](../public/images/main-interface.png) -->
+![Main interface](/images/main-interface.png)
 
 That's it! The app icon will be changed immediately.
 

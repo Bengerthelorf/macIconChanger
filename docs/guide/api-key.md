@@ -8,7 +8,7 @@ An API key from [macosicons.com](https://macosicons.com/) is required to search 
 2. Request an API key from your account settings.
 3. Copy the key.
 
-<!-- ![How to get an API key](../public/images/api-key.png) -->
+![How to get an API key](/images/api-key.png)
 
 ## Entering the Key
 
@@ -17,7 +17,7 @@ An API key from [macosicons.com](https://macosicons.com/) is required to search 
 3. Paste your API key in the **API Key** field.
 4. Click **Test Connection** to verify it works.
 
-<!-- ![API key settings](../public/images/api-key-settings.png) -->
+![API key settings](/images/api-key-settings.png)
 
 ## Using Without an API Key
 

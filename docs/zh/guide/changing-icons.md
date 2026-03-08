@@ -9,7 +9,7 @@
 3. 使用 **Style** 下拉菜单按风格筛选（如 Liquid Glass）。
 4. 点击图标即可应用。
 
-<!-- ![搜索图标](../../public/images/search-icons.png) -->
+![搜索图标](/images/search-icons.png)
 
 ### 选择本地文件
 
@@ -19,7 +19,7 @@
 
 直接从访达拖放图片文件到图标区域。拖放时会显示蓝色高亮确认拖放区域。
 
-<!-- ![拖放](../../public/images/drag-drop.png) -->
+![拖放](/images/drag-drop.png)
 
 ### 恢复默认图标
 

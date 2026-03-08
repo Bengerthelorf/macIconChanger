@@ -8,7 +8,7 @@ Some apps have names that don't match well with icon search queries. For example
 2. Select **Set the Alias**.
 3. Enter a search-friendly name (e.g., `Photoshop` instead of `Adobe Photoshop 2024`).
 
-<!-- ![Setting an alias](../public/images/set-alias.png) -->
+![Setting an alias](/images/set-alias.png)
 
 The app will now use the alias name when searching for icons on macOSicons.com.
 
@@ -16,7 +16,7 @@ The app will now use the alias name when searching for icons on macOSicons.com.
 
 View and edit all aliases in **Settings** > **Application** > **Alias Names**.
 
-<!-- ![Alias settings](../public/images/alias-settings.png) -->
+![Alias settings](/images/alias-settings.png)
 
 ## Built-in Aliases
 

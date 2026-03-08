@@ -8,7 +8,7 @@
 2. 在账号设置中申请 API 密钥。
 3. 复制密钥。
 
-<!-- ![获取 API 密钥](../../public/images/api-key.png) -->
+![获取 API 密钥](/images/api-key.png)
 
 ## 输入密钥
 
@@ -17,7 +17,7 @@
 3. 在 **API Key** 中粘贴密钥。
 4. 点击 **测试连接** 验证是否有效。
 
-<!-- ![API 密钥设置](../../public/images/api-key-settings.png) -->
+![API 密钥设置](/images/api-key-settings.png)
 
 ## 不使用 API 密钥
 
