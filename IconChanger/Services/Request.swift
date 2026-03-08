@@ -30,6 +30,7 @@ class MyQueryRequestController {
 
     private let session: URLSession
     private let logger: Logger
+    private let inflightLock = NSLock()
     private var inflightRequests: [String: Task<[IconRes], Error>] = [:]
 
     init(session: URLSession = MyQueryRequestController.makeSession()) {
@@ -56,23 +57,30 @@ class MyQueryRequestController {
     func sendRequest(_ query: String, style: IconStyle = .all) async throws -> [IconRes] {
         let key = "\(query)|\(style.displayName)"
 
+        inflightLock.lock()
         if let existing = inflightRequests[key] {
+            inflightLock.unlock()
             logger.debug("Deduplicating request for '\(query, privacy: .public)'")
             return try await existing.value
         }
 
-        let task = Task<[IconRes], Error> {
-            defer { inflightRequests.removeValue(forKey: key) }
+        let task = Task<[IconRes], Error> { [weak self] in
+            defer {
+                self?.inflightLock.lock()
+                self?.inflightRequests.removeValue(forKey: key)
+                self?.inflightLock.unlock()
+            }
 
-            let results = try await sendRequestToMeilisearch(query, style: style)
+            let results = try await self?.sendRequestToMeilisearch(query, style: style) ?? []
             if results.isEmpty {
-                logger.debug("Meilisearch returned no results for '\(query, privacy: .public)'. Trying backup API.")
-                return try await sendBackupRequest(query, style: style)
+                self?.logger.debug("Meilisearch returned no results for '\(query, privacy: .public)'. Trying backup API.")
+                return try await self?.sendBackupRequest(query, style: style) ?? []
             }
             return results
         }
 
         inflightRequests[key] = task
+        inflightLock.unlock()
         return try await task.value
     }
     
