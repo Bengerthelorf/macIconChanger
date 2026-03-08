@@ -23,6 +23,11 @@ class MyRequestController {
 class MyQueryRequestController {
     static let shared = MyQueryRequestController()
 
+    private static let apiBaseURL = "https://api.macosicons.com/api"
+    private static let searchHitsPerPage = 50
+    private static let testHitsPerPage = 10
+    private static let backupSearchLimit = 50
+
     private let session: URLSession
     private let logger: Logger
 
@@ -63,8 +68,8 @@ class MyQueryRequestController {
         logger.debug("Search '\(query, privacy: .public)' style=\(style.displayName, privacy: .public)")
 
         let session = self.session
-        let urlString = "https://api.macosicons.com/api/search"
-        
+        let urlString = "\(Self.apiBaseURL)/search"
+
         guard let URL = URL(string: urlString) else {
             logger.error("Invalid search URL.")
             return []
@@ -72,12 +77,12 @@ class MyQueryRequestController {
         var request = URLRequest(url: URL)
         request.httpMethod = "POST"
 
-        // Get API key from UserDefaults
+        // Get API key from Keychain
         let apiKey = KeychainHelper.load(key: "apiKey") ?? ""
         if apiKey.isEmpty {
             logger.warning("API key not configured; search request may be rejected.")
         }
-        
+
         // Headers
         if !apiKey.isEmpty {
             request.addValue(apiKey, forHTTPHeaderField: "x-api-key")
@@ -97,7 +102,7 @@ class MyQueryRequestController {
         let bodyObject: [String : Any] = [
             "query": query,
             "searchOptions": [
-                "hitsPerPage": 50,
+                "hitsPerPage": Self.searchHitsPerPage,
                 "page": 1,
                 "offset": 0,
                 "filters": filters,
@@ -170,15 +175,15 @@ class MyQueryRequestController {
 
         let session = self.session
         
-        let urlString = "https://api.macosicons.com/api/search"
+        let urlString = "\(Self.apiBaseURL)/search"
         guard let URL = URL(string: urlString) else {
             throw NSError(domain: "IconChanger", code: 1001, userInfo: [NSLocalizedDescriptionKey: "Invalid API endpoint URL"])
         }
-        
+
         var request = URLRequest(url: URL)
         request.httpMethod = "POST"
-        
-        // Get API key from UserDefaults - this is what we're actually testing
+
+        // Get API key from Keychain - this is what we're actually testing
         let apiKey = KeychainHelper.load(key: "apiKey") ?? ""
         if apiKey.isEmpty {
             throw NSError(domain: "IconChanger", code: 1002, userInfo: [NSLocalizedDescriptionKey: "API key not provided"])
@@ -193,7 +198,7 @@ class MyQueryRequestController {
         let bodyObject: [String: Any] = [
             "query": testQuery,
             "searchOptions": [
-                "hitsPerPage": 10,
+                "hitsPerPage": Self.testHitsPerPage,
                 "page": 1,
                 "sort": ["timeStamp:desc"]
             ]
@@ -246,7 +251,7 @@ class MyQueryRequestController {
         
         let session = self.session
         
-        let urlString = "https://api.macosicons.com/api/icons?q=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query)&limit=50"
+        let urlString = "\(Self.apiBaseURL)/icons?q=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query)&limit=\(Self.backupSearchLimit)"
         
         guard let url = URL(string: urlString) else {
             logger.error("Invalid backup search URL")

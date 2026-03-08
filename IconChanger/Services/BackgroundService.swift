@@ -16,6 +16,9 @@ class BackgroundService: ObservableObject {
     static let shared = BackgroundService()
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "BackgroundService")
 
+    private static let fetchCacheMaxAge: TimeInterval = 600
+    private static let fetchCacheCleanupInterval: TimeInterval = 900
+
     private var statusItem: NSStatusItem?
     private var statusMenu: NSMenu?
 
@@ -468,7 +471,7 @@ class BackgroundService: ObservableObject {
         }
 
         if IconFetchCacheManager.shared.getCacheCount() > 0 {
-            fetchCacheCleanupTimer = makeRepeatingTimer(interval: 900) { [weak self] in
+            fetchCacheCleanupTimer = makeRepeatingTimer(interval: Self.fetchCacheCleanupInterval) { [weak self] in
                 self?.cleanupFetchCache()
             }
         }
@@ -683,7 +686,6 @@ class BackgroundService: ObservableObject {
     // MARK: - Icon Fetch Cache Cleanup
 
     @objc func cleanupFetchCache() {
-        let maxAge: TimeInterval = 600
-        IconFetchCacheManager.shared.clearExpiredCache(olderThan: maxAge)
+        IconFetchCacheManager.shared.clearExpiredCache(olderThan: Self.fetchCacheMaxAge)
     }
 }
