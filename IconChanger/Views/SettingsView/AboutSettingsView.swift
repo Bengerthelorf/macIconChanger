@@ -26,10 +26,24 @@ struct AboutSettingsView: View {
         VStack(spacing: 16) {
             Spacer()
 
-            Image(nsImage: NSApp.applicationIconImage)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 96, height: 96)
+            ZStack(alignment: .bottomTrailing) {
+                Image(nsImage: NSApp.applicationIconImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 96, height: 96)
+
+                if let avatarImage {
+                    Image(nsImage: avatarImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 32, height: 32)
+                        .clipShape(Circle())
+                        .overlay(Circle().stroke(.white, lineWidth: 2))
+                        .shadow(radius: 2)
+                        .rotationEffect(.degrees(12))
+                        .offset(x: 6, y: 6)
+                }
+            }
 
             Text("IconChanger")
                 .font(.title.bold())
@@ -48,19 +62,10 @@ struct AboutSettingsView: View {
 
             Spacer()
 
-            HStack(spacing: 8) {
-                if let avatarImage {
-                    Image(nsImage: avatarImage)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 24, height: 24)
-                        .clipShape(Circle())
-                }
-                Text("Made by Bengerthelorf & contributors")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            .padding(.bottom, 8)
+            Text("Made by Bengerthelorf & contributors")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .padding(.bottom, 8)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .task {
