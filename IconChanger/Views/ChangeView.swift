@@ -40,6 +40,7 @@ struct ChangeView: View {
     @State private var currentLoadToken = UUID()
     @State private var showRestoreConfirm = false
     @State private var restoreError: String?
+    @State private var setIconError: String?
 
     var body: some View {
         GeometryReader { geometry in
@@ -168,7 +169,11 @@ struct ChangeView: View {
                     guard let url = url else { return }
                     defer { importedImageURL = nil }
                     if let nsimage = NSImage(contentsOf: url) {
-                        try? IconManager.shared.setImage(nsimage, app: setPath)
+                        do {
+                            try IconManager.shared.setImage(nsimage, app: setPath)
+                        } catch {
+                            setIconError = error.localizedDescription
+                        }
                     }
                 }
                 .padding(10)
@@ -206,6 +211,14 @@ struct ChangeView: View {
                     Button("OK", role: .cancel) { }
                 } message: {
                     Text(restoreError ?? "")
+                }
+                .alert("Failed to Set Icon", isPresented: Binding(
+                    get: { setIconError != nil },
+                    set: { if !$0 { setIconError = nil } }
+                )) {
+                    Button("OK", role: .cancel) { }
+                } message: {
+                    Text(setIconError ?? "")
                 }
     }
     
