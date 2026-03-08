@@ -65,30 +65,19 @@ struct CLISettingsView: View {
             Section {
                 DisclosureGroup("Usage Information", isExpanded: $showHelp) {
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("The IconChanger CLI tool provides command-line access to import and export configurations.")
+                        Text("The IconChanger CLI provides command-line access to manage app icons, aliases, and configurations.")
                             .foregroundColor(.secondary)
 
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Import a configuration:")
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                            Text("iconchanger import /path/to/config.json")
-                                .font(.system(.callout, design: .monospaced))
-                                .foregroundColor(.secondary)
-                                .textSelection(.enabled)
-                        }
+                        cliExample("Set a custom icon:", "iconchanger set-icon /Applications/App.app icon.png")
+                        cliExample("Remove a custom icon:", "iconchanger remove-icon /Applications/App.app")
+                        cliExample("Restore all cached icons:", "iconchanger restore")
+                        cliExample("Show status:", "iconchanger status")
+                        cliExample("List aliases & cached icons:", "iconchanger list")
+                        cliExample("Import a configuration:", "iconchanger import config.json")
+                        cliExample("Export a configuration:", "iconchanger export config.json")
+                        cliExample("Validate a config file:", "iconchanger validate config.json")
 
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Export a configuration:")
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                            Text("iconchanger export /path/to/save/config.json")
-                                .font(.system(.callout, design: .monospaced))
-                                .foregroundColor(.secondary)
-                                .textSelection(.enabled)
-                        }
-
-                        Text("You must first export a configuration from the app before using the CLI export command. After importing with CLI, restart the app to see changes.")
+                        Text("Run 'iconchanger --help' for full usage details.")
                             .font(.callout)
                             .foregroundColor(.secondary)
                     }
@@ -99,5 +88,17 @@ struct CLISettingsView: View {
             }
         }
         .formStyle(.grouped)
+    }
+
+    private func cliExample(_ title: String, _ command: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+            Text(command)
+                .font(.system(.callout, design: .monospaced))
+                .foregroundColor(.secondary)
+                .textSelection(.enabled)
+        }
     }
 }

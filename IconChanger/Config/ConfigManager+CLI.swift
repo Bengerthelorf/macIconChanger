@@ -8,49 +8,52 @@
 import Foundation
 
 extension ConfigManager {
-    func exportConfigurationForCLI() -> URL? {
-        if let exportUrl = exportConfiguration() {
-            let sharedConfigDir = getSharedConfigDirectory()
-            let latestExportFile = sharedConfigDir.appendingPathComponent("latest_export.json")
 
-            do {
-                let data = try Data(contentsOf: exportUrl)
-                try data.write(to: latestExportFile)
-                return exportUrl
-            } catch {
-                logger.error("Error saving for CLI: \(error.localizedDescription)")
-            }
+    static let sharedConfigDirectory: URL = {
+        let url = URL(fileURLWithPath: NSHomeDirectory())
+            .appendingPathComponent(".iconchanger/config", isDirectory: true)
+        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+        return url
+    }()
+
+    func exportConfigurationForCLI() -> URL? {
+        guard let exportUrl = exportConfiguration() else { return nil }
+
+        let latestExportFile = Self.sharedConfigDirectory.appendingPathComponent("latest_export.json")
+
+        do {
+            let data = try Data(contentsOf: exportUrl)
+            try data.write(to: latestExportFile, options: .atomic)
+            return exportUrl
+        } catch {
+            logger.error("Error saving for CLI: \(error.localizedDescription)")
+            return nil
         }
-        return nil
     }
 
     func checkForCLIImports() {
-        let sharedConfigDir = getSharedConfigDirectory()
-        let flagFile = sharedConfigDir.appendingPathComponent("pending_import")
-        let importedFile = sharedConfigDir.appendingPathComponent("imported_config.json")
+        let flagFile = Self.sharedConfigDirectory.appendingPathComponent("pending_import")
+        let importedFile = Self.sharedConfigDirectory.appendingPathComponent("imported_config.json")
 
-        if FileManager.default.fileExists(atPath: flagFile.path) &&
-           FileManager.default.fileExists(atPath: importedFile.path) {
-
-            do {
-                let result = importConfiguration(from: importedFile)
-                logger.info("CLI Import completed: \(result.aliases) aliases and \(result.icons) icons imported")
-
-                try FileManager.default.removeItem(at: flagFile)
-            } catch {
-                logger.error("Error processing CLI import: \(error.localizedDescription)")
-            }
-        }
-    }
-
-    private func getSharedConfigDirectory() -> URL {
-        let path = "\(NSHomeDirectory())/.iconchanger/config"
-        let url = URL(fileURLWithPath: path)
-
-        if !FileManager.default.fileExists(atPath: path) {
-            try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+        guard FileManager.default.fileExists(atPath: flagFile.path),
+              FileManager.default.fileExists(atPath: importedFile.path) else {
+            return
         }
 
-        return url
+        // Validate config before importing
+        do {
+            let data = try Data(contentsOf: importedFile)
+            _ = try JSONDecoder().decode(AppConfiguration.self, from: data)
+        } catch {
+            logger.error("CLI import file is invalid, removing flag: \(error.localizedDescription)")
+            try? FileManager.default.removeItem(at: flagFile)
+            return
+        }
+
+        let result = importConfiguration(from: importedFile)
+        logger.info("CLI Import completed: \(result.aliases) aliases and \(result.icons) icons imported")
+
+        try? FileManager.default.removeItem(at: flagFile)
+        try? FileManager.default.removeItem(at: importedFile)
     }
 }
