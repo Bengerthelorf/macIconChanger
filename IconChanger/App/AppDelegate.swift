@@ -18,7 +18,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             backgroundService.startBackgroundService()
         }
 
-        if backgroundService.shouldLaunchHidden {
+        if backgroundService.shouldLaunchHidden && isLaunchedAtLogin(notification) {
             DispatchQueue.main.async {
                 for window in NSApp.windows where window.canBecomeMain {
                     window.close()
@@ -28,6 +28,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }
+    }
+
+    private func isLaunchedAtLogin(_ notification: Notification) -> Bool {
+        guard let launchEvent = NSAppleEventManager.shared().currentAppleEvent else {
+            return false
+        }
+        return launchEvent.eventID == kAEOpenApplication
+            && launchEvent.paramDescriptor(forKeyword: keyAEPropData)?.enumCodeValue == keyAELaunchedAsLogInItem
     }
 
     func applicationWillTerminate(_ notification: Notification) {

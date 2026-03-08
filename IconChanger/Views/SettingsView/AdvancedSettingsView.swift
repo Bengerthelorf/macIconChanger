@@ -14,7 +14,9 @@ struct AdvancedSettingsView: View {
     @State private var confirmationMessage = ""
     @State private var confirmationTitle = ""
     @ObservedObject private var cliManager = CLIManager.shared
+    @ObservedObject private var languageManager = LanguageManager.shared
     @State private var showHelp = false
+    @State private var showRestartAlert = false
 
     private var aliasCount: Int {
         AliasNames.getAll().count
@@ -115,6 +117,26 @@ struct AdvancedSettingsView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
 
+            // MARK: - Language
+            Section {
+                Picker(NSLocalizedString("Language", comment: "Settings section title"), selection: Binding(
+                    get: { languageManager.currentLanguage },
+                    set: { newValue in
+                        languageManager.currentLanguage = newValue
+                        showRestartAlert = true
+                    }
+                )) {
+                    ForEach(AppLanguage.allCases) { language in
+                        Text(language.displayName).tag(language)
+                    }
+                }
+            } header: {
+                Label(NSLocalizedString("Language", comment: "Settings section title"), systemImage: "globe")
+            } footer: {
+                Label(NSLocalizedString("Changes will take full effect after restarting the app", comment: "Language settings instruction"), systemImage: "info.circle")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
             // MARK: - CLI
             Section {
                 LabeledContent {
@@ -164,6 +186,13 @@ struct AdvancedSettingsView: View {
             Alert(
                 title: Text(confirmationTitle),
                 message: Text(confirmationMessage),
+                dismissButton: .default(Text("OK"))
+            )
+        }
+        .alert(isPresented: $showRestartAlert) {
+            Alert(
+                title: Text(NSLocalizedString("Language Changed", comment: "Language alert title")),
+                message: Text(NSLocalizedString("The language has been changed. For the best experience, please restart the application.", comment: "Language alert message")),
                 dismissButton: .default(Text("OK"))
             )
         }

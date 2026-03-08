@@ -150,11 +150,6 @@ struct SettingsView: View {
                     Label("Advanced", systemImage: "gearshape.2")
                 }
 
-            LanguageSettingsView()
-                .tabItem {
-                    Label(NSLocalizedString("Language", comment: "Settings tab"), systemImage: "globe")
-                }
-
             AboutSettingsView(updater: updater)
                 .tabItem {
                     Label("About", systemImage: "info.circle")
