@@ -154,8 +154,7 @@ iconchanger import ~/dotfiles/iconchanger/config.json
 ## 致谢
 
 - [underthestars-zhy/IconChanger](https://github.com/underthestars-zhy/IconChanger) — 原始项目
-- [seril](https://github.com/seril) — Fork 版本，贡献了设置界面、别名系统和文件夹权限管理
-- [lcandy2](https://github.com/lcandy2) — 本项目基于其 Fork 版本开发
+- [lcandy2](https://github.com/lcandy2) — 贡献了设置界面、别名系统和文件夹权限管理，本项目基于其 Fork 版本开发
 - [macOSicons.com](https://macosicons.com/#/) — 图标数据库
 - [fileicon](https://github.com/mklement0/fileicon) — 图标操作工具
 - [Atom](https://github.com/atomtoto) — 贡献者

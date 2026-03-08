@@ -154,8 +154,7 @@ Report bugs via [GitHub Issues](https://github.com/Bengerthelorf/macIconChanger/
 ## Acknowledgements
 
 - [underthestars-zhy/IconChanger](https://github.com/underthestars-zhy/IconChanger) — Original project
-- [seril](https://github.com/seril) — Fork with settings UI, alias system, and folder permissions
-- [lcandy2](https://github.com/lcandy2) — Fork that this project is based on
+- [lcandy2](https://github.com/lcandy2) — Fork with settings UI, alias system, and folder permissions; this project is based on her work
 - [macOSicons.com](https://macosicons.com/#/) — Icon database
 - [fileicon](https://github.com/mklement0/fileicon) — Icon manipulation tool
 - [Atom](https://github.com/atomtoto) — Contributor
