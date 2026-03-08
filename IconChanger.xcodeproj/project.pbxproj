@@ -822,8 +822,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON";
 			requirement = {
-				branch = master;
-				kind = branch;
+				kind = exactVersion;
+				version = 5.0.2;
 			};
 		};
 		9083CCEA2867FDDD0093A1B2 /* XCRemoteSwiftPackageReference "LaunchPadManagerDBHelper" */ = {
