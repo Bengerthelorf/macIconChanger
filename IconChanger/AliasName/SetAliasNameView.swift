@@ -57,16 +57,19 @@ func setupDefaultAliasNames() {
         "PyCharm Community": "PyCharm",
     ]
 
+    let removedDefaults = UserDefaults.standard.stringArray(forKey: "RemovedDefaultAliases") ?? []
+
     if let data = UserDefaults.standard.data(forKey: "AliasName"),
        var storedAlias = try? JSONDecoder().decode([String: String].self, from: data) {
 
         for (key, value) in defaultAlias {
-            if storedAlias[key] == nil {
+            if storedAlias[key] == nil && !removedDefaults.contains(key) {
                 storedAlias[key] = value
             }
         }
         UserDefaults.standard.set(try? JSONEncoder().encode(storedAlias), forKey: "AliasName")
     } else {
-        UserDefaults.standard.set(try? JSONEncoder().encode(defaultAlias), forKey: "AliasName")
+        let filtered = defaultAlias.filter { !removedDefaults.contains($0.key) }
+        UserDefaults.standard.set(try? JSONEncoder().encode(filtered), forKey: "AliasName")
     }
 }
