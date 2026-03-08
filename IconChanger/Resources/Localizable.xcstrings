@@ -20924,6 +20924,9 @@
         }
       }
     },
+    "IconChanger Help" : {
+
+    },
     "iconchanger import /path/to/config.json" : {
       "extractionState" : "stale",
       "localizations" : {

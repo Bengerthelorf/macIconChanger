@@ -56,8 +56,6 @@
 		908A79092819840D00951B15 /* ChangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 908A79082819840D00951B15 /* ChangeView.swift */; };
 		908A790B281A128700951B15 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 908A790A281A128700951B15 /* Request.swift */; };
 		908A7927281A5A4A00951B15 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 908A7926281A5A4A00951B15 /* README.md */; };
-		908A792A281A5AE800951B15 /* Github-Iconchanger_bak.png in Resources */ = {isa = PBXBuildFile; fileRef = 908A7929281A5AE800951B15 /* Github-Iconchanger_bak.png */; };
-		908A792E281A771800951B15 /* Api.png in Resources */ = {isa = PBXBuildFile; fileRef = 908A792D281A771800951B15 /* Api.png */; };
 		90B57C1B286AA2B400EE52D3 /* URL+Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90B57C1A286AA2B400EE52D3 /* URL+Document.swift */; };
 		C6222E042F5B61260004A1D8 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = C6222E032F5B61260004A1D8 /* Localizable.xcstrings */; };
 		C66396BF2F0EAD0C006729FC /* AppItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C66396BE2F0EAD0C006729FC /* AppItem.swift */; };
@@ -123,7 +121,6 @@
 		900D1CF7281936C7007ABB12 /* FullDiskPermision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullDiskPermision.swift; sourceTree = "<group>"; };
 		900D1CF9281938D6007ABB12 /* IconList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconList.swift; sourceTree = "<group>"; };
 		9017B5F9294ED626005709C6 /* IconRes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconRes.swift; sourceTree = "<group>"; };
-		9017B6192951F090005709C6 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		9017B61D295282ED005709C6 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		9053434D286B2A2900237F98 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		9053434E286B2A6800237F98 /* AutoUpdater.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoUpdater.swift; sourceTree = "<group>"; };
@@ -138,8 +135,6 @@
 		908A79082819840D00951B15 /* ChangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeView.swift; sourceTree = "<group>"; };
 		908A790A281A128700951B15 /* Request.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
 		908A7926281A5A4A00951B15 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		908A7929281A5AE800951B15 /* Github-Iconchanger_bak.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Github-Iconchanger_bak.png"; sourceTree = "<group>"; };
-		908A792D281A771800951B15 /* Api.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Api.png; sourceTree = "<group>"; };
 		90B57C1A286AA2B400EE52D3 /* URL+Document.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Document.swift"; sourceTree = "<group>"; };
 		90B57C1E286AA62300EE52D3 /* IconChanger.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = IconChanger.entitlements; sourceTree = "<group>"; };
 		C6222E032F5B61260004A1D8 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
@@ -220,7 +215,6 @@
 			isa = PBXGroup;
 			children = (
 				9017B61D295282ED005709C6 /* LICENSE */,
-				908A7928281A5AE200951B15 /* Github */,
 				908A7926281A5A4A00951B15 /* README.md */,
 				907AC4F82954038600F9F0F9 /* README-zh.md */,
 				907AC5002955363800F9F0F9 /* README-fr.md */,
@@ -264,18 +258,8 @@
 			isa = PBXGroup;
 			children = (
 				2F13C0762D93267A00C645E9 /* AppKit.framework */,
-				9017B6192951F090005709C6 /* Cocoa.framework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		908A7928281A5AE200951B15 /* Github */ = {
-			isa = PBXGroup;
-			children = (
-				908A792D281A771800951B15 /* Api.png */,
-				908A7929281A5AE800951B15 /* Github-Iconchanger_bak.png */,
-			);
-			path = Github;
 			sourceTree = "<group>";
 		};
 		A10000012F0700000000AA01 /* App */ = {
@@ -434,11 +418,35 @@
 			knownRegions = (
 				en,
 				Base,
+				ar,
+				cs,
+				da,
+				de,
+				el,
+				es,
+				fi,
+				fr,
+				hi,
+				hu,
+				id,
+				it,
 				ja,
+				ko,
+				ms,
+				nb,
+				nl,
+				pl,
+				pt,
+				ro,
+				ru,
+				sv,
+				th,
+				tr,
+				uk,
+				vi,
+				"zh-HK",
 				"zh-Hans",
 				"zh-Hant",
-				fr,
-				"zh-HK",
 			);
 			mainGroup = 900D1CDC281934C7007ABB12;
 			packageReferences = (
@@ -462,7 +470,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				908A792A281A5AE800951B15 /* Github-Iconchanger_bak.png in Resources */,
 				90534352286C8BDA00237F98 /* fileicon in Resources */,
 				C6222E042F5B61260004A1D8 /* Localizable.xcstrings in Resources */,
 				9053438B287550C200237F98 /* helper.sh in Resources */,
@@ -470,7 +477,6 @@
 				900D1CF0281934C8007ABB12 /* Preview Assets.xcassets in Resources */,
 				908A7927281A5A4A00951B15 /* README.md in Resources */,
 				9017B61E295282ED005709C6 /* LICENSE in Resources */,
-				908A792E281A771800951B15 /* Api.png in Resources */,
 				907AC5012955363800F9F0F9 /* README-fr.md in Resources */,
 				900D1CED281934C8007ABB12 /* Assets.xcassets in Resources */,
 			);
