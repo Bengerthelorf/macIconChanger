@@ -456,14 +456,14 @@ class BackgroundService: ObservableObject {
                 initialDelay: delay,
                 repeatingInterval: intervalSeconds
             ) { [weak self] in
-                self?.checkScheduledRestore()
+                DispatchQueue.main.async { self?.checkScheduledRestore() }
             }
         }
 
         if enableAutoRestoreOnUpdate {
             let timeInterval = Double(autoRestoreCheckInterval * 60)
             updateCheckTimer = makeRepeatingTimer(interval: timeInterval) { [weak self] in
-                self?.checkForAppUpdates()
+                DispatchQueue.main.async { self?.checkForAppUpdates() }
             }
         }
 
