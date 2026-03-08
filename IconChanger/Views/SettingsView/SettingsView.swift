@@ -19,6 +19,24 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     case portuguese = "pt"
     case italian = "it"
     case russian = "ru"
+    case dutch = "nl"
+    case turkish = "tr"
+    case polish = "pl"
+    case arabic = "ar"
+    case thai = "th"
+    case vietnamese = "vi"
+    case indonesian = "id"
+    case ukrainian = "uk"
+    case swedish = "sv"
+    case danish = "da"
+    case norwegian = "nb"
+    case finnish = "fi"
+    case czech = "cs"
+    case hungarian = "hu"
+    case greek = "el"
+    case romanian = "ro"
+    case hindi = "hi"
+    case malay = "ms"
     case japanese = "ja"
     case korean = "ko"
     case chinese_simplified = "zh-Hans"
@@ -45,6 +63,42 @@ enum AppLanguage: String, CaseIterable, Identifiable {
             return NSLocalizedString("Italian", comment: "Language selection")
         case .russian:
             return NSLocalizedString("Russian", comment: "Language selection")
+        case .dutch:
+            return NSLocalizedString("Dutch", comment: "Language selection")
+        case .turkish:
+            return NSLocalizedString("Turkish", comment: "Language selection")
+        case .polish:
+            return NSLocalizedString("Polish", comment: "Language selection")
+        case .arabic:
+            return NSLocalizedString("Arabic", comment: "Language selection")
+        case .thai:
+            return NSLocalizedString("Thai", comment: "Language selection")
+        case .vietnamese:
+            return NSLocalizedString("Vietnamese", comment: "Language selection")
+        case .indonesian:
+            return NSLocalizedString("Indonesian", comment: "Language selection")
+        case .ukrainian:
+            return NSLocalizedString("Ukrainian", comment: "Language selection")
+        case .swedish:
+            return NSLocalizedString("Swedish", comment: "Language selection")
+        case .danish:
+            return NSLocalizedString("Danish", comment: "Language selection")
+        case .norwegian:
+            return NSLocalizedString("Norwegian", comment: "Language selection")
+        case .finnish:
+            return NSLocalizedString("Finnish", comment: "Language selection")
+        case .czech:
+            return NSLocalizedString("Czech", comment: "Language selection")
+        case .hungarian:
+            return NSLocalizedString("Hungarian", comment: "Language selection")
+        case .greek:
+            return NSLocalizedString("Greek", comment: "Language selection")
+        case .romanian:
+            return NSLocalizedString("Romanian", comment: "Language selection")
+        case .hindi:
+            return NSLocalizedString("Hindi", comment: "Language selection")
+        case .malay:
+            return NSLocalizedString("Malay", comment: "Language selection")
         case .japanese:
             return NSLocalizedString("Japanese", comment: "Language selection")
         case .korean:
