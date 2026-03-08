@@ -20,6 +20,22 @@ class MyRequestController {
     }
 }
 
+private actor RequestDeduplicator {
+    private var inflight: [String: Task<[IconRes], Error>] = [:]
+
+    func existing(for key: String) -> Task<[IconRes], Error>? {
+        inflight[key]
+    }
+
+    func store(_ task: Task<[IconRes], Error>, for key: String) {
+        inflight[key] = task
+    }
+
+    func remove(_ key: String) {
+        inflight.removeValue(forKey: key)
+    }
+}
+
 class MyQueryRequestController {
     static let shared = MyQueryRequestController()
 
@@ -30,8 +46,7 @@ class MyQueryRequestController {
 
     private let session: URLSession
     private let logger: Logger
-    private let inflightLock = NSLock()
-    private var inflightRequests: [String: Task<[IconRes], Error>] = [:]
+    private let dedup = RequestDeduplicator()
 
     init(session: URLSession = MyQueryRequestController.makeSession()) {
         self.session = session
@@ -57,30 +72,23 @@ class MyQueryRequestController {
     func sendRequest(_ query: String, style: IconStyle = .all) async throws -> [IconRes] {
         let key = "\(query)|\(style.displayName)"
 
-        inflightLock.lock()
-        if let existing = inflightRequests[key] {
-            inflightLock.unlock()
+        if let existing = await dedup.existing(for: key) {
             logger.debug("Deduplicating request for '\(query, privacy: .public)'")
             return try await existing.value
         }
 
-        let task = Task<[IconRes], Error> { [weak self] in
-            defer {
-                self?.inflightLock.lock()
-                self?.inflightRequests.removeValue(forKey: key)
-                self?.inflightLock.unlock()
-            }
-
-            let results = try await self?.sendRequestToMeilisearch(query, style: style) ?? []
+        let task = Task<[IconRes], Error> {
+            let results = try await sendRequestToMeilisearch(query, style: style)
             if results.isEmpty {
-                self?.logger.debug("Meilisearch returned no results for '\(query, privacy: .public)'. Trying backup API.")
-                return try await self?.sendBackupRequest(query, style: style) ?? []
+                logger.debug("Meilisearch returned no results for '\(query, privacy: .public)'. Trying backup API.")
+                return try await sendBackupRequest(query, style: style)
             }
             return results
         }
 
-        inflightRequests[key] = task
-        inflightLock.unlock()
+        await dedup.store(task, for: key)
+
+        defer { Task { await dedup.remove(key) } }
         return try await task.value
     }
     
