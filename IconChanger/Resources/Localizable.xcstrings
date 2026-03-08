@@ -7520,6 +7520,47 @@
         }
       }
     },
+    "This app may be protected by macOS. Try closing the app first, or the app may not support icon changes.": {
+      "comment": "Permission error explanation",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette app est peut-être protégée par macOS. Essayez de la fermer d'abord, ou elle ne prend peut-être pas en charge le changement d'icône."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このアプリは macOS によって保護されている可能性があります。アプリを閉じてから再試行するか、このアプリはアイコンの変更に対応していない可能性があります。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 앱은 macOS에 의해 보호되어 있을 수 있습니다. 앱을 먼저 종료하거나, 이 앱은 아이콘 변경을 지원하지 않을 수 있습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "该应用可能受 macOS 保护。请尝试先关闭该应用，或者该应用可能不支持更改图标。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "該應用程式可能受 macOS 保護。請嘗試先關閉該應用程式，或者該應用程式可能不支援更改圖示。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "該應用程式可能受 macOS 保護。請嘗試先關閉該應用程式，或者該應用程式可能不支援更改圖示。"
+          }
+        }
+      }
+    },
     "This will remove the custom icon and restore the original icon for %@.": {
       "localizations": {
         "fr": {
@@ -8099,42 +8140,242 @@
         }
       }
     },
-    "This app may be protected by macOS. Try closing the app first, or the app may not support icon changes.": {
+    "Launch at Login": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "该应用可能受 macOS 保护。请尝试先关闭该应用，或者该应用可能不支持更改图标。"
+            "value": "登录时启动"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "該應用程式可能受 macOS 保護。請嘗試先關閉該應用程式，或者該應用程式可能不支援更改圖示。"
+            "value": "登入時啟動"
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "該應用程式可能受 macOS 保護。請嘗試先關閉該應用程式，或者該應用程式可能不支援更改圖示。"
+            "value": "登入時啟動"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "このアプリは macOS によって保護されている可能性があります。アプリを閉じてから再試行するか、このアプリはアイコンの変更に対応していない可能性があります。"
+            "value": "ログイン時に起動"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "이 앱은 macOS에 의해 보호되어 있을 수 있습니다. 앱을 먼저 종료하거나, 이 앱은 아이콘 변경을 지원하지 않을 수 있습니다."
+            "value": "로그인 시 실행"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cette app est peut-être protégée par macOS. Essayez de la fermer d'abord, ou elle ne prend peut-être pas en charge le changement d'icône."
+            "value": "Lancer au démarrage"
+          }
+        }
+      }
+    },
+    "Launch Behavior": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "启动行为"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "啟動行為"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "啟動行為"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "起動時の動作"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "실행 동작"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comportement au lancement"
+          }
+        }
+      }
+    },
+    "Open Main Window": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开主窗口"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開啟主視窗"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開啟主視窗"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メインウィンドウを開く"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "메인 윈도우 열기"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir la fenêtre principale"
+          }
+        }
+      }
+    },
+    "Start Hidden": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "后台启动"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "背景啟動"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "背景啟動"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "バックグラウンドで起動"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "숨김 상태로 시작"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Démarrer en arrière-plan"
+          }
+        }
+      }
+    },
+    "Login": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "登录"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "登入"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "登入"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ログイン"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "로그인"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connexion"
+          }
+        }
+      }
+    },
+    "\"Start Hidden\" requires \"Run in Background\" to be enabled.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“后台启动”需要启用“在后台运行”。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“背景啟動”需要啟用“在背景執行”。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“背景啟動”需要啟用“在背景執行”。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「バックグラウンドで起動」するには「バックグラウンドで実行」を有効にする必要があります。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\"숨김 상태로 시작\"을 사용하려면 \"백그라운드에서 실행\"을 활성화해야 합니다."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« Démarrer en arrière-plan » nécessite l’activation de « Exécuter en arrière-plan »."
           }
         }
       }

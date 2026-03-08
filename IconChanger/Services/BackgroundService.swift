@@ -10,6 +10,7 @@ import SwiftUI
 import Combine
 import LaunchPadManagerDBHelper
 import UserNotifications
+import ServiceManagement
 import os
 
 class BackgroundService: ObservableObject {
@@ -21,6 +22,23 @@ class BackgroundService: ObservableObject {
 
     private var statusItem: NSStatusItem?
     private var statusMenu: NSMenu?
+
+    enum LaunchBehavior: Int, CaseIterable {
+        case openWindow = 0
+        case hidden = 1
+    }
+
+    @Published var launchAtLogin: Bool = false {
+        didSet {
+            updateLoginItem()
+        }
+    }
+
+    @Published var launchBehavior: LaunchBehavior = .openWindow {
+        didSet {
+            UserDefaults.standard.set(launchBehavior.rawValue, forKey: "launchBehavior")
+        }
+    }
 
     @Published var runInBackground: Bool {
         didSet {
@@ -159,6 +177,29 @@ class BackgroundService: ObservableObject {
         if let date = UserDefaults.standard.object(forKey: "lastUpdateCheck") as? Date {
             self.lastUpdateCheck = date
         }
+
+        if let raw = UserDefaults.standard.object(forKey: "launchBehavior") as? Int,
+           let behavior = LaunchBehavior(rawValue: raw) {
+            self.launchBehavior = behavior
+        }
+
+        self.launchAtLogin = (SMAppService.mainApp.status == .enabled)
+    }
+
+    private func updateLoginItem() {
+        do {
+            if launchAtLogin {
+                try SMAppService.mainApp.register()
+            } else {
+                try SMAppService.mainApp.unregister()
+            }
+        } catch {
+            logger.error("Failed to update login item: \(error.localizedDescription)")
+        }
+    }
+
+    var shouldLaunchHidden: Bool {
+        launchAtLogin && launchBehavior == .hidden && runInBackground
     }
 
     func startBackgroundService() {

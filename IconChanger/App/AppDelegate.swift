@@ -17,6 +17,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if backgroundService.runInBackground {
             backgroundService.startBackgroundService()
         }
+
+        if backgroundService.shouldLaunchHidden {
+            DispatchQueue.main.async {
+                for window in NSApp.windows where window.canBecomeMain {
+                    window.close()
+                }
+                if !self.backgroundService.showInDock {
+                    NSApp.setActivationPolicy(.accessory)
+                }
+            }
+        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {

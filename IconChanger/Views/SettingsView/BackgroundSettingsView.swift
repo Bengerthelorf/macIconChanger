@@ -39,6 +39,25 @@ struct BackgroundSettingsView: View {
     var body: some View {
         Form {
             Section {
+                Toggle("Launch at Login", isOn: $backgroundService.launchAtLogin)
+
+                if backgroundService.launchAtLogin {
+                    Picker("Launch Behavior", selection: $backgroundService.launchBehavior) {
+                        Text("Open Main Window").tag(BackgroundService.LaunchBehavior.openWindow)
+                        Text("Start Hidden").tag(BackgroundService.LaunchBehavior.hidden)
+                    }
+
+                    if backgroundService.launchBehavior == .hidden && !backgroundService.runInBackground {
+                        Label("\"Start Hidden\" requires \"Run in Background\" to be enabled.", systemImage: "exclamationmark.triangle")
+                            .font(.caption)
+                            .foregroundColor(.orange)
+                    }
+                }
+            } header: {
+                Label("Login", systemImage: "power")
+            }
+
+            Section {
                 Toggle("Run in Background", isOn: $backgroundService.runInBackground)
                     .onChange(of: backgroundService.runInBackground) { newValue in
                         if newValue {
