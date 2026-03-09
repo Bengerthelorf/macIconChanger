@@ -194,6 +194,7 @@ struct IconChangerCLI: ParsableCommand {
             ExportCommand.self,
             ValidateCommand.self,
             EscapeJailCommand.self,
+            RefreshDockCommand.self,
             CompletionsCommand.self,
         ]
     )
@@ -793,6 +794,24 @@ struct EscapeJailCommand: ParsableCommand {
         } else {
             print("✓ Escaped squircle jail for \(appName)")
         }
+    }
+}
+
+// MARK: - refresh-dock
+
+struct RefreshDockCommand: ParsableCommand {
+    static var configuration = CommandConfiguration(
+        commandName: "refresh-dock",
+        abstract: "Restart the Dock to refresh all icon displays"
+    )
+
+    func run() throws {
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: "/usr/bin/killall")
+        task.arguments = ["Dock"]
+        try task.run()
+        task.waitUntilExit()
+        print("✓ Dock restarted")
     }
 }
 

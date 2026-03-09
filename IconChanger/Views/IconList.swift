@@ -10,6 +10,23 @@
 import SwiftUI
 import LaunchPadManagerDBHelper
 
+enum AppFilter: String, CaseIterable, Identifiable {
+    case all = "All"
+    case dock = "Dock"
+    case customized = "Customized"
+    case notCustomized = "Not Customized"
+
+    var id: String { rawValue }
+}
+
+/// Holds the Dock layout: pinned apps (ordered) + running-only apps, with running state.
+struct DockLayout {
+    var pinnedPaths: [String] = []         // ordered pinned app paths
+    var runningPaths: Set<String> = []     // all currently running app paths
+    var runningOnlyOrdered: [String] = []  // running-but-not-pinned, in launch order
+    var allPaths: Set<String> = []         // union for filtering
+}
+
 struct IconList: View {
     @ObservedObject var iconManager = IconManager.shared
 
@@ -19,14 +36,34 @@ struct IconList: View {
     @State var setAlias: String?
     @State private var appToRestore: AppItem?
     @State private var restoreError: String?
+    @State private var appFilter: AppFilter = .all
+    @State private var dockLayout = DockLayout()
+
+    private var filteredApps: [AppItem] {
+        iconManager.apps.filter { app in
+            let matchesSearch = searchText.isEmpty || app.name.localizedStandardContains(searchText)
+            guard matchesSearch else { return false }
+
+            switch appFilter {
+            case .all:
+                return true
+            case .dock:
+                return dockLayout.allPaths.contains(app.url.universalPath())
+            case .customized:
+                return iconManager.hasCustomIcon(app: app)
+                    || IconCacheManager.shared.getIconCache(for: app.url.universalPath()) != nil
+            case .notCustomized:
+                return !iconManager.hasCustomIcon(app: app)
+                    && IconCacheManager.shared.getIconCache(for: app.url.universalPath()) == nil
+            }
+        }
+    }
 
     var body: some View {
         NavigationView {
             List(selection: $selectedApp) {
-                ForEach(iconManager.apps.filter { app in
-                    searchText.isEmpty || app.name.localizedStandardContains(searchText)
-                }, id: \.id) { app in
-                    NavigationLink(destination: ChangeView(setPath: app),
+                ForEach(filteredApps, id: \.id) { app in
+                    NavigationLink(destination: dockDetailView(for: app),
                             tag: app,
                             selection: $selectedApp) {
                         IconView(app: app, refreshTrigger: iconManager.iconRefreshTrigger)
@@ -82,8 +119,22 @@ struct IconList: View {
                     .listStyle(SidebarListStyle())
                     .frame(minWidth: 200, idealWidth: 300)
 
-            Text("Select an app to see its details")
-                    .foregroundColor(.secondary)
+            VStack {
+                if appFilter == .dock {
+                    DockPreviewBar(
+                        allApps: iconManager.apps,
+                        dockLayout: dockLayout,
+                        refreshTrigger: iconManager.iconRefreshTrigger,
+                        onSelectApp: { app in selectedApp = app }
+                    )
+                }
+                Spacer()
+                if appFilter != .dock {
+                    Text("Select an app to see its details")
+                        .foregroundColor(.secondary)
+                    Spacer()
+                }
+            }
         }
 
                 .sheet(item: $setAlias) {
@@ -91,6 +142,21 @@ struct IconList: View {
                 }
                 .searchable(text: $searchText)
                 .toolbar {
+                    ToolbarItem(placement: .automatic) {
+                        Picker("Filter", selection: $appFilter) {
+                            ForEach(AppFilter.allCases) { filter in
+                                Text(NSLocalizedString(filter.rawValue, comment: "App filter option"))
+                                    .tag(filter)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .onChange(of: appFilter) { newFilter in
+                            if newFilter == .dock {
+                                dockLayout = Self.loadDockLayout()
+                            }
+                        }
+                    }
+
                     ToolbarItem(placement: .automatic) {
                         Button {
                             iconManager.iconRefreshTrigger = UUID()
@@ -113,6 +179,12 @@ struct IconList: View {
                                 iconManager.needsSetupCheck = true
                             } label: {
                                 Label("Check Setup Status", systemImage: "stethoscope")
+                            }
+
+                            Button {
+                                Self.refreshDock()
+                            } label: {
+                                Label("Refresh Dock", systemImage: "dock.rectangle")
                             }
 
                             Divider()
@@ -177,6 +249,7 @@ struct IconList: View {
                 }
                 .onAppear {
                     iconManager.refresh()
+                    dockLayout = Self.loadDockLayout()
                 }
                 .onChange(of: iconManager.iconRefreshTrigger) { _ in
                     AppIconCache.shared.removeAll()
@@ -208,11 +281,75 @@ struct IconList: View {
                 }
     }
 
+    @ViewBuilder
+    private func dockDetailView(for app: AppItem) -> some View {
+        if appFilter == .dock {
+            VStack(spacing: 0) {
+                DockPreviewBar(
+                    allApps: iconManager.apps,
+                    dockLayout: dockLayout,
+                    refreshTrigger: iconManager.iconRefreshTrigger,
+                    onSelectApp: { selectedApp = $0 }
+                )
+                ChangeView(setPath: app)
+            }
+        } else {
+            ChangeView(setPath: app)
+        }
+    }
+
     static func friendlyErrorMessage(_ raw: String) -> String {
         if raw.contains("permission") || raw.contains("权限") {
             return NSLocalizedString("This app may be protected by macOS. Try closing the app first, or the app may not support icon changes.", comment: "Permission error explanation")
         }
         return raw
+    }
+
+    /// Reads the full Dock layout: pinned apps (ordered) + running apps.
+    static func loadDockLayout() -> DockLayout {
+        var layout = DockLayout()
+
+        // 1. Pinned (persistent) apps — ordered as they appear in Dock
+        let plistPath = NSHomeDirectory() + "/Library/Preferences/com.apple.dock.plist"
+        if let dict = NSDictionary(contentsOfFile: plistPath),
+           let persistentApps = dict["persistent-apps"] as? [[String: Any]] {
+            for app in persistentApps {
+                if let tileData = app["tile-data"] as? [String: Any],
+                   let fileData = tileData["file-data"] as? [String: Any],
+                   let urlString = fileData["_CFURLString"] as? String,
+                   let url = URL(string: urlString) {
+                    let path = url.scheme == "file" ? url.path : urlString
+                    let normalized = path.hasSuffix("/") ? String(path.dropLast()) : path
+                    layout.pinnedPaths.append(normalized)
+                }
+            }
+        }
+
+        // 2. Currently running GUI apps (ordered by runningApplications array ≈ launch order)
+        let pinnedSet = Set(layout.pinnedPaths)
+        for app in NSWorkspace.shared.runningApplications {
+            guard app.activationPolicy == .regular,
+                  let bundleURL = app.bundleURL else { continue }
+            let path = bundleURL.path
+            let normalized = path.hasSuffix("/") ? String(path.dropLast()) : path
+            layout.runningPaths.insert(normalized)
+            if !pinnedSet.contains(normalized) {
+                layout.runningOnlyOrdered.append(normalized)
+            }
+        }
+
+        // 3. Union for filtering
+        layout.allPaths = pinnedSet.union(layout.runningPaths)
+
+        return layout
+    }
+
+    /// Restarts the Dock process to force icon refresh.
+    static func refreshDock() {
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: "/usr/bin/killall")
+        task.arguments = ["Dock"]
+        try? task.run()
     }
 }
 
@@ -267,6 +404,156 @@ struct IconView: View {
 }
 
 
+
+// MARK: - Dock Preview
+
+struct DockPreviewBar: View {
+    let allApps: [AppItem]
+    let dockLayout: DockLayout
+    let refreshTrigger: UUID
+    var onSelectApp: ((AppItem) -> Void)?
+
+    private var appsByPath: [String: AppItem] {
+        Dictionary(allApps.map { ($0.url.universalPath(), $0) }, uniquingKeysWith: { first, _ in first })
+    }
+
+    /// Pinned apps in Dock order.
+    private var pinnedApps: [AppItem] {
+        dockLayout.pinnedPaths.compactMap { appsByPath[$0] }
+    }
+
+    /// Running apps that are NOT pinned, in launch order.
+    private var runningOnlyApps: [AppItem] {
+        dockLayout.runningOnlyOrdered.compactMap { appsByPath[$0] }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Dock Preview")
+                    .font(.headline)
+                Spacer()
+                Button {
+                    IconList.refreshDock()
+                } label: {
+                    Label("Refresh Dock", systemImage: "arrow.clockwise")
+                        .font(.caption)
+                }
+                .buttonStyle(.borderless)
+                .help("Restart the Dock to refresh all icons")
+            }
+
+            if pinnedApps.isEmpty && runningOnlyApps.isEmpty {
+                Text("No Dock apps found")
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding()
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 0) {
+                        // Pinned apps
+                        ForEach(pinnedApps) { app in
+                            DockPreviewIcon(
+                                app: app,
+                                refreshTrigger: refreshTrigger,
+                                isRunning: dockLayout.runningPaths.contains(app.url.universalPath())
+                            )
+                            .onTapGesture { onSelectApp?(app) }
+                            .padding(.horizontal, 6)
+                        }
+
+                        // Separator between pinned and running-only
+                        if !pinnedApps.isEmpty && !runningOnlyApps.isEmpty {
+                            RoundedRectangle(cornerRadius: 1)
+                                .fill(Color.secondary.opacity(0.3))
+                                .frame(width: 2, height: 48)
+                                .padding(.horizontal, 8)
+                        }
+
+                        // Running-only apps
+                        ForEach(runningOnlyApps) { app in
+                            DockPreviewIcon(
+                                app: app,
+                                refreshTrigger: refreshTrigger,
+                                isRunning: true
+                            )
+                            .onTapGesture { onSelectApp?(app) }
+                            .padding(.horizontal, 6)
+                        }
+                    }
+                    .padding(.horizontal, 4)
+                }
+            }
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(.bar)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(Color.secondary.opacity(0.2), lineWidth: 1)
+        )
+        .padding()
+    }
+}
+
+struct DockPreviewIcon: View {
+    let app: AppItem
+    let refreshTrigger: UUID
+    var isRunning: Bool = false
+    @State private var icon: NSImage?
+
+    private var hasCustom: Bool {
+        IconCacheManager.shared.getIconCache(for: app.url.universalPath()) != nil
+    }
+
+    var body: some View {
+        VStack(spacing: 2) {
+            ZStack(alignment: .bottomTrailing) {
+                Group {
+                    if let icon {
+                        Image(nsImage: icon)
+                            .resizable()
+                            .scaledToFit()
+                    } else {
+                        Image(nsImage: NSWorkspace.shared.icon(for: .applicationBundle))
+                            .resizable()
+                            .scaledToFit()
+                            .opacity(0.3)
+                    }
+                }
+                .frame(width: 48, height: 48)
+
+                if hasCustom {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 12))
+                        .foregroundColor(.green)
+                        .background(Circle().fill(.white).frame(width: 10, height: 10))
+                }
+            }
+
+            Text(app.name)
+                .font(.caption2)
+                .lineLimit(1)
+                .frame(width: 56)
+                .multilineTextAlignment(.center)
+
+            // Running indicator dot (like the real Dock)
+            Circle()
+                .fill(isRunning ? Color.primary.opacity(0.6) : Color.clear)
+                .frame(width: 4, height: 4)
+        }
+        .contentShape(Rectangle())
+        .onAppear { loadIcon() }
+        .onChange(of: refreshTrigger) { _ in loadIcon() }
+    }
+
+    private func loadIcon() {
+        let url = app.url
+        icon = NSWorkspace.shared.icon(forFile: url.path)
+    }
+}
 
 extension String: @retroactive Identifiable {
     public var id: String {
