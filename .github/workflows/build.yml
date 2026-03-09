@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Resolve packages
         run: xcodebuild -resolvePackageDependencies -project IconChanger.xcodeproj -scheme IconChanger
@@ -103,6 +105,24 @@ jobs:
           ED_SIG=$(echo "$SIGNATURE" | grep -o 'sparkle:edSignature="[^"]*"' | sed 's/sparkle:edSignature="//;s/"//')
           echo "ED_SIGNATURE=$ED_SIG" >> $GITHUB_ENV
 
+      - name: Generate changelog
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          echo "## What's Changed" > CHANGELOG.md
+          echo "" >> CHANGELOG.md
+
+          if [ -n "$PREVIOUS_TAG" ]; then
+            git log --pretty=format:"- %s" ${PREVIOUS_TAG}..HEAD -- ':!IconChanger/Resources/sparkle.xml' >> CHANGELOG.md
+            echo "" >> CHANGELOG.md
+            echo "" >> CHANGELOG.md
+            echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/${PREVIOUS_TAG}...${TAG}" >> CHANGELOG.md
+          else
+            git log --pretty=format:"- %s" >> CHANGELOG.md
+          fi
+
       - name: Update sparkle.xml
         if: startsWith(github.ref, 'refs/tags/')
         run: |
@@ -151,24 +171,6 @@ jobs:
           git add IconChanger/Resources/sparkle.xml
           git diff --cached --quiet && echo "No changes" || git commit -m "release: update appcast for ${GITHUB_REF#refs/tags/}"
           git push origin main
-
-      - name: Generate changelog
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          TAG=${GITHUB_REF#refs/tags/}
-          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-
-          echo "## What's Changed" > CHANGELOG.md
-          echo "" >> CHANGELOG.md
-
-          if [ -n "$PREVIOUS_TAG" ]; then
-            git log --pretty=format:"- %s" ${PREVIOUS_TAG}..HEAD -- ':!IconChanger/Resources/sparkle.xml' >> CHANGELOG.md
-            echo "" >> CHANGELOG.md
-            echo "" >> CHANGELOG.md
-            echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/${PREVIOUS_TAG}...${TAG}" >> CHANGELOG.md
-          else
-            git log --pretty=format:"- %s" >> CHANGELOG.md
-          fi
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
