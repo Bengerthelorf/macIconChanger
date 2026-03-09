@@ -14,7 +14,8 @@
 - **开机自启** — 登录时自动启动，可选择打开窗口或静默运行
 - **应用别名** — 为应用设置搜索别名，提高图标搜索命中率
 - **导入/导出** — 保存、分享和恢复图标配置
-- **CLI 工具** — 完整的命令行工具，支持 8 个命令
+- **逃出圆角矩形监狱** — 一键修复 macOS Tahoe 强制的圆角矩形图标
+- **CLI 工具** — 完整的命令行工具，支持 10 个命令
 - **多语言** — 支持 30 种语言
 
 ## 安装
@@ -60,6 +61,21 @@ iconchanger restore
 # 预览恢复操作
 iconchanger restore --dry-run --verbose
 ```
+
+### 逃出圆角矩形监狱（macOS Tahoe）
+
+```bash
+# 为 /Applications 下的所有应用逃出监狱
+iconchanger escape-jail
+
+# 预览操作
+iconchanger escape-jail --dry-run --verbose
+
+# 指定应用
+iconchanger escape-jail /Applications/Safari.app
+```
+
+也可以在界面中操作：右键应用 → **逃出圆角矩形监狱**，或使用 ⋯ 菜单 → **逃出圆角矩形监狱（所有应用）**。
 
 ### 应用别名
 

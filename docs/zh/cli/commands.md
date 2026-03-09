@@ -150,3 +150,63 @@ iconchanger validate <文件路径>
 ```bash
 iconchanger validate ~/Desktop/my-icons.json
 ```
+
+---
+
+### `escape-jail`
+
+逃出 macOS Tahoe 的圆角矩形监狱。通过将应用自身的图标重新设置为自定义图标，绕过系统的圆角矩形强制裁剪，保持原始图标形状。
+
+```bash
+iconchanger escape-jail [应用路径] [选项]
+```
+
+**参数：**
+- `应用路径` — （可选）指定 `.app` 包的路径。省略则处理 `/Applications` 下的所有应用。
+
+**选项：**
+- `--dry-run` — 预览将执行的操作，不做实际更改
+- `--verbose` — 显示详细输出
+
+**示例：**
+
+```bash
+# 为 /Applications 下的所有应用逃出监狱
+iconchanger escape-jail
+
+# 预览操作
+iconchanger escape-jail --dry-run --verbose
+
+# 为特定应用逃出监狱
+iconchanger escape-jail /Applications/Safari.app
+```
+
+::: warning
+自定义图标不支持 macOS Tahoe 的 Clear（透明）、Tinted（着色）或 Dark（深色）图标模式，它们保持为静态图片。
+:::
+
+---
+
+### `completions`
+
+生成 Shell 自动补全脚本。
+
+```bash
+iconchanger completions <shell类型>
+```
+
+**参数：**
+- `shell类型` — Shell 类型：`zsh`、`bash` 或 `fish`
+
+**示例：**
+
+```bash
+# Zsh（添加到 ~/.zshrc）
+source <(iconchanger completions zsh)
+
+# Bash（添加到 ~/.bashrc）
+source <(iconchanger completions bash)
+
+# Fish
+iconchanger completions fish > ~/.config/fish/completions/iconchanger.fish
+```

@@ -375,7 +375,105 @@ class IconManager: ObservableObject {
             URL(fileURLWithPath: $0)
         }
     }
-    
+
+    // MARK: - Squircle Jail Escape (macOS Tahoe)
+
+    /// Gets the primary bundled icon file URL for an app by reading CFBundleIconFile from Info.plist.
+    func getBundledIconURL(for app: AppItem) -> URL? {
+        let plistURL = app.url.appendingPathComponent("Contents").appendingPathComponent("Info.plist")
+        guard let plist = NSDictionary(contentsOf: plistURL) as? [String: Any] else { return nil }
+
+        guard var iconFileName = plist["CFBundleIconFile"] as? String else { return nil }
+        if !iconFileName.hasSuffix(".icns") {
+            iconFileName += ".icns"
+        }
+
+        let iconURL = app.url
+            .appendingPathComponent("Contents")
+            .appendingPathComponent("Resources")
+            .appendingPathComponent(iconFileName)
+
+        return FileManager.default.fileExists(atPath: iconURL.path) ? iconURL : nil
+    }
+
+    /// Checks if an app currently has a custom icon set (via extended attributes).
+    func hasCustomIcon(app: AppItem) -> Bool {
+        let appPath = app.url.universalPath()
+        let finderInfoName = "com.apple.FinderInfo"
+        var finderInfo = [UInt8](repeating: 0, count: 32)
+        let size = getxattr(appPath, finderInfoName, &finderInfo, 32, 0, 0)
+        return size > 0 && (finderInfo[8] & 0x04 != 0)
+    }
+
+    /// Escapes the squircle jail for a single app by re-applying its own bundled icon as a custom icon.
+    /// This bypasses macOS Tahoe's squircle enforcement because custom icons are not subject to it.
+    /// Uses the .icns file directly to preserve all icon resolutions.
+    func escapeSquircleJail(for app: AppItem) throws {
+        guard let iconURL = getBundledIconURL(for: app) else {
+            throw NSError(domain: "IconManager", code: 40,
+                          userInfo: [NSLocalizedDescriptionKey: "Could not find the bundled icon for \(app.name)."])
+        }
+
+        try ensureSetupCompleted()
+        // Pass the .icns file directly to fileicon to preserve all resolutions
+        try runHelperTool(appPath: app.url.universalPath(), imagePath: iconURL.path)
+
+        logger.log("Escaped squircle jail for \(app.name)")
+
+        Task { @MainActor in
+            AppIconCache.shared.remove(for: app.url)
+            self.iconRefreshTrigger = UUID()
+        }
+    }
+
+    /// Escapes the squircle jail for all apps that don't already have a custom icon.
+    /// Returns the count of apps processed and any failures.
+    func escapeSquircleJailAll() async throws -> (processed: Int, skipped: Int, failed: [(String, Error)]) {
+        try ensureSetupCompleted()
+
+        let currentApps: [AppItem] = await MainActor.run { apps }
+        let appList: [AppItem]
+        if currentApps.isEmpty {
+            let loaded = loadAppItems()
+            await MainActor.run { apps = loaded }
+            appList = loaded
+        } else {
+            appList = currentApps
+        }
+
+        var processed = 0
+        var skipped = 0
+        var failures: [(String, Error)] = []
+
+        for app in appList {
+            // Skip apps that already have custom icons set by the user (cached icons)
+            if IconCacheManager.shared.getIconCache(for: app.url.universalPath()) != nil {
+                skipped += 1
+                continue
+            }
+
+            // Skip apps that already have custom icons (but not cached by us)
+            if hasCustomIcon(app: app) {
+                skipped += 1
+                continue
+            }
+
+            guard getBundledIconURL(for: app) != nil else {
+                skipped += 1
+                continue
+            }
+
+            do {
+                try escapeSquircleJail(for: app)
+                processed += 1
+            } catch {
+                logger.error("Failed to escape squircle jail for \(app.name): \(error.localizedDescription)")
+                failures.append((app.name, error))
+            }
+        }
+
+        return (processed, skipped, failures)
+    }
 
     
     func getIcons(_ app: AppItem, style: IconStyle = .all) async throws -> [IconRes] {

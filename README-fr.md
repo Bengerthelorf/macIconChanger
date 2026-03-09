@@ -14,7 +14,8 @@ Une application macOS pour personnaliser les icônes de vos applications, avec u
 - **Lancement au démarrage** — Démarrage automatique avec comportement configurable (ouvrir la fenêtre ou rester caché)
 - **Alias d'applications** — Associez des noms de recherche alternatifs pour de meilleurs résultats
 - **Import/Export** — Sauvegardez, partagez et restaurez vos configurations d'icônes
-- **Outil CLI** — Interface en ligne de commande complète avec 8 commandes
+- **Évasion de la prison squircle** — Corrige les icônes squircle forcées de macOS Tahoe en un clic
+- **Outil CLI** — Interface en ligne de commande complète avec 10 commandes
 - **Localisation** — Disponible en 30 langues
 
 ## Installation
@@ -60,6 +61,21 @@ iconchanger restore
 # Aperçu de la restauration
 iconchanger restore --dry-run --verbose
 ```
+
+### Évasion de la prison squircle (macOS Tahoe)
+
+```bash
+# Échapper à la prison squircle pour toutes les apps
+iconchanger escape-jail
+
+# Aperçu de l'opération
+iconchanger escape-jail --dry-run --verbose
+
+# Application spécifique
+iconchanger escape-jail /Applications/Safari.app
+```
+
+Ou via l'interface : clic droit sur une app → **Escape Squircle Jail**, ou menu ⋯ → **Escape Squircle Jail (All Apps)**.
 
 ### Alias d'applications
 

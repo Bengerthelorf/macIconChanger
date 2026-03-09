@@ -61,6 +61,14 @@ struct IconList: View {
                                     appToRestore = app
                                 }
 
+                                Button("Escape Squircle Jail") {
+                                    do {
+                                        try iconManager.escapeSquircleJail(for: app)
+                                    } catch {
+                                        restoreError = error.localizedDescription
+                                    }
+                                }
+
                                 if let original = app.originalAppInfo {
                                     Button("Remove the Icon from the Launchpad") {
                                         do {
@@ -130,6 +138,37 @@ struct IconList: View {
                                 }
                             } label: {
                                 Label("Restore Cached Icons", systemImage: "arrow.clockwise")
+                            }
+
+                            Divider()
+
+                            Button {
+                                Task {
+                                    do {
+                                        let result = try await iconManager.escapeSquircleJailAll()
+                                        let alert = NSAlert()
+                                        alert.alertStyle = .informational
+                                        alert.addButton(withTitle: NSLocalizedString("OK", comment: "Alert button"))
+                                        if result.processed == 0 && result.failed.isEmpty {
+                                            alert.messageText = NSLocalizedString("No Apps to Process", comment: "Alert title")
+                                            alert.informativeText = NSLocalizedString("All apps already have custom icons or could not be processed.", comment: "Alert body")
+                                        } else {
+                                            alert.messageText = NSLocalizedString("Squircle Jail Escape Complete", comment: "Alert title")
+                                            let msg = String(format: NSLocalizedString("%d apps escaped, %d skipped, %d failed.", comment: "Escape jail result"), result.processed, result.skipped, result.failed.count)
+                                            alert.informativeText = msg
+                                        }
+                                        alert.runModal()
+                                    } catch {
+                                        let alert = NSAlert()
+                                        alert.messageText = NSLocalizedString("Escape Failed", comment: "Alert title")
+                                        alert.informativeText = error.localizedDescription
+                                        alert.alertStyle = .critical
+                                        alert.addButton(withTitle: NSLocalizedString("OK", comment: "Alert button"))
+                                        alert.runModal()
+                                    }
+                                }
+                            } label: {
+                                Label("Escape Squircle Jail (All Apps)", systemImage: "square.dashed")
                             }
                         } label: {
                             Image(systemName: "ellipsis.circle")

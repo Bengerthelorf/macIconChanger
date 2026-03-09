@@ -14,7 +14,8 @@ A macOS app to customize application icons with a clean GUI and a powerful CLI.
 - **Launch at Login** — Start at login with configurable behavior (open window or stay hidden)
 - **App Aliases** — Map alternative search names for better icon search results
 - **Import/Export** — Save, share, and restore your icon configurations
-- **CLI Tool** — Full-featured command-line interface with 8 commands
+- **Squircle Jail Escape** — Fix macOS Tahoe's forced squircle icons with one click
+- **CLI Tool** — Full-featured command-line interface with 10 commands
 - **Localization** — Available in 30 languages
 
 ## Installation
@@ -60,6 +61,21 @@ iconchanger restore
 # Restore with preview
 iconchanger restore --dry-run --verbose
 ```
+
+### Escape Squircle Jail (macOS Tahoe)
+
+```bash
+# Escape squircle jail for all apps in /Applications
+iconchanger escape-jail
+
+# Preview what would happen
+iconchanger escape-jail --dry-run --verbose
+
+# Specific app only
+iconchanger escape-jail /Applications/Safari.app
+```
+
+Or use the GUI: right-click any app → **Escape Squircle Jail**, or use the ⋯ menu → **Escape Squircle Jail (All Apps)**.
 
 ### App Aliases
 

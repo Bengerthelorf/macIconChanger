@@ -152,3 +152,63 @@ Checks JSON structure, required fields, and data integrity without making change
 ```bash
 iconchanger validate ~/Desktop/my-icons.json
 ```
+
+---
+
+### `escape-jail`
+
+Escape macOS Tahoe's squircle jail by re-applying bundled icons as custom icons. Custom icons bypass squircle enforcement, preserving the original icon shape.
+
+```bash
+iconchanger escape-jail [app-path] [options]
+```
+
+**Arguments:**
+- `app-path` — (Optional) Path to a specific `.app` bundle. If omitted, processes all apps in `/Applications`.
+
+**Options:**
+- `--dry-run` — Preview what would be done without making changes
+- `--verbose` — Show detailed output
+
+**Examples:**
+
+```bash
+# Escape jail for all apps in /Applications
+iconchanger escape-jail
+
+# Preview what would happen
+iconchanger escape-jail --dry-run --verbose
+
+# Escape jail for a specific app
+iconchanger escape-jail /Applications/Safari.app
+```
+
+::: warning
+Custom icons do not support macOS Tahoe's Clear, Tinted, or Dark icon modes. They remain as static bitmaps.
+:::
+
+---
+
+### `completions`
+
+Generate shell completion scripts for tab completion.
+
+```bash
+iconchanger completions <shell>
+```
+
+**Arguments:**
+- `shell` — Shell type: `zsh`, `bash`, or `fish`
+
+**Examples:**
+
+```bash
+# Zsh (add to ~/.zshrc)
+source <(iconchanger completions zsh)
+
+# Bash (add to ~/.bashrc)
+source <(iconchanger completions bash)
+
+# Fish
+iconchanger completions fish > ~/.config/fish/completions/iconchanger.fish
+```

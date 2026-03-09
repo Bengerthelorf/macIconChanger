@@ -183,7 +183,7 @@ struct IconChangerCLI: ParsableCommand {
     static var configuration = CommandConfiguration(
         commandName: "iconchanger",
         abstract: "Command-line interface for IconChanger — manage macOS app icons",
-        version: "2.0.0",
+        version: "2.1.0",
         subcommands: [
             StatusCommand.self,
             ListCommand.self,
@@ -193,6 +193,8 @@ struct IconChangerCLI: ParsableCommand {
             ImportCommand.self,
             ExportCommand.self,
             ValidateCommand.self,
+            EscapeJailCommand.self,
+            CompletionsCommand.self,
         ]
     )
 }
@@ -666,6 +668,173 @@ struct ValidateCommand: ParsableCommand {
             for w in warnings {
                 print("  ⚠ \(w)")
             }
+        }
+    }
+}
+
+// MARK: - escape-jail
+
+struct EscapeJailCommand: ParsableCommand {
+    static var configuration = CommandConfiguration(
+        commandName: "escape-jail",
+        abstract: "Escape macOS Tahoe squircle jail by re-applying bundled icons as custom icons"
+    )
+
+    @Argument(help: "Path to a specific .app bundle (omit to process all apps in /Applications)")
+    var appPath: String?
+
+    @Flag(name: .shortAndLong, help: "Show what would be done without making changes")
+    var dryRun = false
+
+    @Flag(name: .shortAndLong, help: "Show detailed output")
+    var verbose = false
+
+    func run() throws {
+        let fm = FileManager.default
+
+        // Check setup
+        guard fm.fileExists(atPath: helperScript.path),
+              fm.fileExists(atPath: fileicon.path) else {
+            throw CLIError.setupIncomplete("Helper files not found. Run the IconChanger app to complete setup first.")
+        }
+
+        if let appPath = appPath {
+            // Single app mode
+            let resolved = resolve(path: appPath)
+            guard fm.fileExists(atPath: resolved) else {
+                throw CLIError.fileNotFound("App not found: \(resolved)")
+            }
+            guard resolved.hasSuffix(".app") else {
+                throw ValidationError("Target must be an .app bundle: \(resolved)")
+            }
+
+            try processApp(atPath: resolved, dryRun: dryRun, verbose: verbose)
+        } else {
+            // Batch mode: scan /Applications
+            let appsDir = "/Applications"
+            guard let contents = try? fm.contentsOfDirectory(atPath: appsDir) else {
+                throw CLIError.fileNotFound("Cannot read /Applications")
+            }
+
+            let apps = contents.filter { $0.hasSuffix(".app") }.sorted()
+            var processed = 0
+            var skipped = 0
+            var failed = 0
+
+            for appName in apps {
+                let fullPath = "\(appsDir)/\(appName)"
+
+                // Check if already has custom icon
+                let finderInfoName = "com.apple.FinderInfo"
+                var finderInfo = [UInt8](repeating: 0, count: 32)
+                let size = getxattr(fullPath, finderInfoName, &finderInfo, 32, 0, 0)
+                if size > 0 && (finderInfo[8] & 0x04 != 0) {
+                    if verbose { print("  ⊘ \(appName) — already has custom icon") }
+                    skipped += 1
+                    continue
+                }
+
+                do {
+                    try processApp(atPath: fullPath, dryRun: dryRun, verbose: verbose)
+                    processed += 1
+                } catch {
+                    if verbose { print("  ✗ \(appName) — \(error.localizedDescription)") }
+                    failed += 1
+                }
+            }
+
+            print("")
+            if dryRun {
+                print("Dry run: \(processed) app(s) would escape jail, \(skipped) skipped, \(failed) failed")
+            } else {
+                print("\(processed) escaped, \(skipped) skipped, \(failed) failed")
+            }
+        }
+    }
+
+    private func processApp(atPath path: String, dryRun: Bool, verbose: Bool) throws {
+        let appURL = URL(fileURLWithPath: path)
+        let appName = appURL.deletingPathExtension().lastPathComponent
+
+        // Read Info.plist to find the bundled icon
+        let plistURL = appURL.appendingPathComponent("Contents").appendingPathComponent("Info.plist")
+        guard let plist = NSDictionary(contentsOf: plistURL) as? [String: Any] else {
+            throw CLIError.fileNotFound("Cannot read Info.plist for \(appName)")
+        }
+
+        guard var iconFileName = plist["CFBundleIconFile"] as? String else {
+            throw CLIError.fileNotFound("No CFBundleIconFile in \(appName)")
+        }
+        if !iconFileName.hasSuffix(".icns") {
+            iconFileName += ".icns"
+        }
+
+        let iconPath = appURL
+            .appendingPathComponent("Contents")
+            .appendingPathComponent("Resources")
+            .appendingPathComponent(iconFileName)
+            .path
+
+        guard FileManager.default.fileExists(atPath: iconPath) else {
+            throw CLIError.fileNotFound("Icon file not found: \(iconPath)")
+        }
+
+        if dryRun {
+            print("  → Would escape jail for \(appName)")
+            return
+        }
+
+        // Apply the app's own icon as a custom icon via fileicon
+        let command = "sudo -n '\(helperScript.path.shellEscaped)' '\(fileicon.path.shellEscaped)' '\(path.shellEscaped)' '\(iconPath.shellEscaped)'"
+        try shell(command)
+
+        if verbose {
+            print("  ✓ \(appName)")
+        } else {
+            print("✓ Escaped squircle jail for \(appName)")
+        }
+    }
+}
+
+// MARK: - completions
+
+struct CompletionsCommand: ParsableCommand {
+    static var configuration = CommandConfiguration(
+        commandName: "completions",
+        abstract: "Generate shell completion scripts",
+        discussion: """
+        Install completions for your shell:
+
+          # Zsh (add to ~/.zshrc)
+          source <(iconchanger completions zsh)
+
+          # Bash (add to ~/.bashrc)
+          source <(iconchanger completions bash)
+
+          # Fish (save to completions directory)
+          iconchanger completions fish > ~/.config/fish/completions/iconchanger.fish
+        """
+    )
+
+    @Argument(help: "Shell type: zsh, bash, or fish")
+    var shellName: String
+
+    func run() throws {
+        let shellLower = shellName.lowercased()
+        guard ["zsh", "bash", "fish"].contains(shellLower) else {
+            throw ValidationError("Unsupported shell '\(shellName)'. Use zsh, bash, or fish.")
+        }
+
+        let script = IconChangerCLI.completionScript(for: shellType(shellLower))
+        print(script)
+    }
+
+    private func shellType(_ name: String) -> CompletionShell {
+        switch name {
+        case "zsh": return .zsh
+        case "bash": return .bash
+        case "fish": return .fish
+        default: return .zsh
         }
     }
 }

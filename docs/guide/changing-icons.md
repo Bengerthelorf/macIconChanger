@@ -27,6 +27,28 @@ To restore an app's original icon:
 - Click the **Restore Default** button (or press <kbd>Cmd</kbd>+<kbd>Delete</kbd>)
 - Or right-click the app in the sidebar and select **Restore Default Icon**
 
+## Escape Squircle Jail (macOS Tahoe)
+
+macOS 26 Tahoe forces all app icons into a squircle (rounded square) shape. Apps with non-conforming icons get shrunk and placed on a gray squircle background.
+
+IconChanger can fix this by re-applying an app's own bundled icon as a custom icon, which bypasses macOS's squircle enforcement.
+
+### Per App
+
+Right-click an app in the sidebar and select **Escape Squircle Jail**.
+
+### All Apps at Once
+
+Click the **⋯** menu in the toolbar and select **Escape Squircle Jail (All Apps)**. This processes all apps that don't already have custom icons.
+
+::: tip
+Custom icons set this way do **not** support macOS Tahoe's Clear, Tinted, or Dark icon modes — they remain static. This is a system limitation.
+:::
+
+::: info
+Your background service will automatically re-apply icons after app updates, keeping them out of squircle jail.
+:::
+
 ## Icon Caching
 
 When you apply a custom icon, it is automatically cached. This means:
