@@ -7,6 +7,14 @@
 
 ## 安装
 
+### Homebrew（推荐）
+
+```bash
+brew install Bengerthelorf/tap/iconchanger
+```
+
+### 手动下载
+
 1. 从 [GitHub Releases](https://github.com/Bengerthelorf/macIconChanger/releases/latest) 下载最新 DMG。
 2. 打开 DMG，将 **IconChanger** 拖入应用程序文件夹。
 3. 启动 IconChanger。

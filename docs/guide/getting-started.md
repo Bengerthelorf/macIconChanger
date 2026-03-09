@@ -7,6 +7,14 @@
 
 ## Installation
 
+### Homebrew (Recommended)
+
+```bash
+brew install Bengerthelorf/tap/iconchanger
+```
+
+### Manual Download
+
 1. Download the latest DMG from [GitHub Releases](https://github.com/Bengerthelorf/macIconChanger/releases/latest).
 2. Open the DMG and drag **IconChanger** into your Applications folder.
 3. Launch IconChanger.

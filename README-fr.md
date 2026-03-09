@@ -19,7 +19,13 @@ Une application macOS pour personnaliser les icônes de vos applications, avec u
 
 ## Installation
 
-### Application
+### Homebrew
+
+```bash
+brew install Bengerthelorf/tap/iconchanger
+```
+
+### Téléchargement manuel
 
 1. Téléchargez le dernier DMG depuis [Releases](https://github.com/Bengerthelorf/macIconChanger/releases/latest).
 2. Glissez IconChanger dans votre dossier Applications.

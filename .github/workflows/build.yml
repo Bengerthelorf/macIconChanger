@@ -181,6 +181,51 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Update Homebrew Cask
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          TAG=${GITHUB_REF#refs/tags/}
+          DMG_URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/IconChanger.dmg"
+
+          SHA256=$(shasum -a 256 build/IconChanger.dmg | cut -d ' ' -f 1)
+
+          git clone https://x-access-token:${TAP_GITHUB_TOKEN}@github.com/Bengerthelorf/homebrew-tap.git /tmp/homebrew-tap
+          cd /tmp/homebrew-tap
+          mkdir -p Casks
+
+          cat > Casks/iconchanger.rb <<CASK
+          cask "iconchanger" do
+            version "${VERSION}"
+            sha256 "${SHA256}"
+
+            url "${DMG_URL}"
+            name "IconChanger"
+            desc "Customize macOS app icons"
+            homepage "https://github.com/Bengerthelorf/macIconChanger"
+
+            depends_on macos: ">= :ventura"
+
+            app "IconChanger.app"
+
+            zap trash: [
+              "~/Library/Preferences/com.zhuhaoyu.IconChanger.plist",
+              "~/.iconchanger",
+            ]
+          end
+          CASK
+
+          # Remove leading whitespace from heredoc
+          sed -i '' 's/^          //' Casks/iconchanger.rb
+
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add Casks/iconchanger.rb
+          git diff --cached --quiet && echo "No changes" || git commit -m "Update iconchanger to ${TAG}"
+          git push origin main
+
       - name: Cleanup keychain
         if: always() && startsWith(github.ref, 'refs/tags/')
         run: |
