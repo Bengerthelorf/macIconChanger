@@ -32,6 +32,11 @@ jobs:
         working-directory: docs
         run: npm install
 
+      - name: Copy sparkle.xml to public
+        run: |
+          mkdir -p docs/public/IconChanger/Resources
+          cp IconChanger/Resources/sparkle.xml docs/public/IconChanger/Resources/sparkle.xml
+
       - name: Build docs
         working-directory: docs
         run: npm run docs:build

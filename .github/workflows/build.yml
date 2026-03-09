@@ -172,6 +172,12 @@ jobs:
           git diff --cached --quiet && echo "No changes" || git commit -m "release: update appcast for ${GITHUB_REF#refs/tags/}"
           git push origin main
 
+      - name: Trigger docs redeploy
+        if: startsWith(github.ref, 'refs/tags/')
+        run: gh workflow run docs.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
