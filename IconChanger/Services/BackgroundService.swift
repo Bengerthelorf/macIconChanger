@@ -3,7 +3,6 @@
 //  IconChanger
 //
 //  Created by Bengerthelorf on 2025/03/23.
-//  Modified by CantonMonkey on 2025/10/11.
 //
 
 import SwiftUI

@@ -15,6 +15,7 @@ struct AdvancedSettingsView: View {
     @State private var confirmationTitle = ""
     @ObservedObject private var cliManager = CLIManager.shared
     @ObservedObject private var languageManager = LanguageManager.shared
+    @AppStorage("showCustomIconBadge") private var showCustomIconBadge = true
     @State private var showHelp = false
     @State private var showRestartAlert = false
 
@@ -115,6 +116,18 @@ struct AdvancedSettingsView: View {
                     Text("Import will only add new items, never replace or remove existing ones.")
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            // MARK: - Display
+            Section {
+                Toggle(isOn: $showCustomIconBadge) {
+                    Label(NSLocalizedString("Show Custom Icon Badge", comment: "Display setting"), systemImage: "checkmark.circle.fill")
+                }
+            } header: {
+                Label(NSLocalizedString("Display", comment: "Settings section"), systemImage: "eye")
+            } footer: {
+                Text(NSLocalizedString("Show a green checkmark badge on apps with custom icons in the sidebar.", comment: "Display setting description"))
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             // MARK: - Language

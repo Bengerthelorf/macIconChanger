@@ -3,9 +3,6 @@
 //  IconChanger
 //
 //  Created by 朱浩宇 on 2022/4/27.
-//  Modified by seril on 2023/7/25.
-//  Modified by Bengerthelorf on 2025/3/21.
-//  Modified by CantonMonkey on 2025/10/10.
 //
 
 import SwiftUI
@@ -51,7 +48,7 @@ struct ChangeView: View {
 
             ScrollView() {
                 VStack {
-                    let hasDuplicateName = iconManager.apps.filter { $0.name == setPath.name }.count > 1
+                    let hasDuplicateName = iconManager.apps.contains { $0.name == setPath.name && $0.id != setPath.id }
                     HStack(alignment: .firstTextBaseline, spacing: 6) {
                         Text(setPath.name)
                             .font(.title)

@@ -74,9 +74,7 @@ class IconFetchCacheManager {
 
     // MARK: - Initialization
 
-    private init() {
-//        print("📦 IconFetchCacheManager initialized")
-    }
+    private init() {}
 
     // MARK: - Cache Key Generation
 
@@ -119,7 +117,6 @@ class IconFetchCacheManager {
 
         guard var entry = cache[key] else {
             missCount += 1
-//            print("❌ IconFetchCache MISS: \(key)")
             return nil
         }
 
@@ -128,7 +125,6 @@ class IconFetchCacheManager {
         let now = Date()
         entry.lastAccessTime = now
         cache[key] = entry
-
 
         // Convert cached icons back to IconRes, filtering out any that fail validation
         let validIcons = entry.icons.compactMap { $0.toIconRes() }
@@ -176,7 +172,6 @@ class IconFetchCacheManager {
         }
 
         cache[key] = entry
-//        print("💾 IconFetchCache STORED: \(key) (\(icons.count) icons, total: \(cache.count))")
     }
 
     /// Evict the least recently used cache entry (by lastAccessTime)
@@ -187,7 +182,6 @@ class IconFetchCacheManager {
 
         cache.removeValue(forKey: lruKey)
         evictionCount += 1
-//        print("🗑️ IconFetchCache EVICTED (LRU): \(lruKey) (count: \(cache.count))")
     }
 
     /// Clear all cache entries
@@ -195,12 +189,10 @@ class IconFetchCacheManager {
         cacheLock.lock()
         defer { cacheLock.unlock() }
 
-        let count = cache.count
         cache.removeAll()
         hitCount = 0
         missCount = 0
         evictionCount = 0
-
     }
 
     /// Clear cache entries that haven't been accessed for longer than maxAge

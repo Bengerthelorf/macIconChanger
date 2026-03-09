@@ -3,7 +3,6 @@
 //  IconChangerCLI
 //
 //  Created by Zane on 3/26/25.
-//  Rewritten by Bengerthelorf on 2026/3/9.
 //
 
 import Foundation

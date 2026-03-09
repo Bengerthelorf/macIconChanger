@@ -3,8 +3,6 @@
 //  IconChanger
 //
 //  Created by 朱浩宇 on 2022/4/27.
-//  Modified by Bengerthelorf on 2025/3/21.
-//  Modified by CantonMonkey on 2025/10/10.
 //
 
 import SwiftUI
@@ -148,9 +146,7 @@ class IconManager: ObservableObject {
             logger.error("Error during ensureHelperFilesCopied: \(error.localizedDescription)")
         }
     }
-    
-    
-    
+
     private func copyIfNeeded(from sourcePath: String, to destPath: String, name: String) {
         let fm = FileManager.default
         if fm.fileExists(atPath: destPath) {
@@ -197,9 +193,7 @@ class IconManager: ObservableObject {
             return error
         }
     }
-    
 
-    
     private func ensureSetupCompleted() throws {
         ensureHelperFilesCopied()
         let status = checkSetupStatus()
@@ -475,7 +469,6 @@ class IconManager: ObservableObject {
         return (processed, skipped, failures)
     }
 
-    
     func getIcons(_ app: AppItem, style: IconStyle = .all) async throws -> [IconRes] {
         let appName = app.name
         let urlName = app.url.deletingPathExtension().lastPathComponent
@@ -662,8 +655,7 @@ class IconManager: ObservableObject {
 
         return output
     }
-    
-    
+
     func configureSudoers() throws {
         let helperPath = self.helperScriptURL.path
         let sudoersLine = "ALL ALL=(ALL) NOPASSWD: \(helperPath)"

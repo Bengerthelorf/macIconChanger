@@ -12,9 +12,13 @@ struct AppItem: Identifiable, Hashable {
     let name: String
     let url: URL
     let originalAppInfo: LaunchPadManagerDBHelper.AppInfo?
-    
-    var id: String {
-        return url.universalPath()
+    let id: String
+
+    init(name: String, url: URL, originalAppInfo: LaunchPadManagerDBHelper.AppInfo?) {
+        self.name = name
+        self.url = url
+        self.originalAppInfo = originalAppInfo
+        self.id = url.universalPath()
     }
     
     var displayPath: String {
