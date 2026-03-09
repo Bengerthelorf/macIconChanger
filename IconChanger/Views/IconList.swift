@@ -263,7 +263,6 @@ struct IconList: View {
                 .onAppear {
                     iconManager.refresh()
                     dockLayout = Self.loadDockLayout()
-                    recomputeCustomizedPaths()
                 }
                 .onChange(of: iconManager.iconRefreshTrigger) { _ in
                     AppIconCache.shared.removeAll()

@@ -73,13 +73,41 @@ struct AboutSettingsView: View {
         }
     }
 
+    private static let avatarURL = URL(string: "https://github.com/Bengerthelorf.png?size=64")!
+    private static var cacheFileURL: URL {
+        FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent(".iconchanger", isDirectory: true)
+            .appendingPathComponent("avatar_cache.png")
+    }
+
     private func loadAvatar() async {
-        guard let url = URL(string: "https://github.com/Bengerthelorf.png?size=48") else { return }
+        // 1. Show best available local image: disk cache > bundled fallback
+        let local = Self.loadCachedAvatar() ?? Self.loadBundledAvatar()
+        if let local {
+            await MainActor.run { avatarImage = local }
+        }
+
+        // 2. Try to fetch fresh avatar in background to update cache
         do {
-            let (data, _) = try await URLSession.shared.data(from: url)
-            if let image = NSImage(data: data) {
-                await MainActor.run { avatarImage = image }
-            }
+            let (data, response) = try await URLSession.shared.data(from: Self.avatarURL)
+            guard let httpResponse = response as? HTTPURLResponse,
+                  httpResponse.statusCode == 200,
+                  let image = NSImage(data: data) else { return }
+            try? data.write(to: Self.cacheFileURL, options: .atomic)
+            await MainActor.run { avatarImage = image }
         } catch {}
+    }
+
+    private static func loadCachedAvatar() -> NSImage? {
+        guard FileManager.default.fileExists(atPath: cacheFileURL.path),
+              let data = try? Data(contentsOf: cacheFileURL),
+              let image = NSImage(data: data) else { return nil }
+        return image
+    }
+
+    private static func loadBundledAvatar() -> NSImage? {
+        guard let url = Bundle.main.url(forResource: "avatar_bengerthelorf", withExtension: "png"),
+              let image = NSImage(contentsOf: url) else { return nil }
+        return image
     }
 }

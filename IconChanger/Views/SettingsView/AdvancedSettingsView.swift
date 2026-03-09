@@ -5,18 +5,43 @@
 
 import SwiftUI
 
+enum AppAppearance: String, CaseIterable, Identifiable {
+    case system = "system"
+    case light = "light"
+    case dark = "dark"
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .system: return NSLocalizedString("System", comment: "Appearance option")
+        case .light: return NSLocalizedString("Light", comment: "Appearance option")
+        case .dark: return NSLocalizedString("Dark", comment: "Appearance option")
+        }
+    }
+
+    var nsAppearance: NSAppearance? {
+        switch self {
+        case .system: return nil
+        case .light: return NSAppearance(named: .aqua)
+        case .dark: return NSAppearance(named: .darkAqua)
+        }
+    }
+
+    static func apply(_ appearance: AppAppearance) {
+        NSApp.appearance = appearance.nsAppearance
+    }
+}
+
 struct AdvancedSettingsView: View {
     @State private var apiKey: String = KeychainHelper.load(key: "apiKey") ?? ""
     @State private var isTestingAPI = false
     @State private var testResult: String? = nil
     @State private var testSuccess = false
-    @State private var showConfirmation = false
-    @State private var confirmationMessage = ""
-    @State private var confirmationTitle = ""
     @ObservedObject private var cliManager = CLIManager.shared
     @ObservedObject private var languageManager = LanguageManager.shared
     @AppStorage("showCustomIconBadge") private var showCustomIconBadge = true
-    @State private var showHelp = false
+    @AppStorage("appAppearance") private var appAppearance: String = AppAppearance.system.rawValue
     @State private var showRestartAlert = false
 
     private var aliasCount: Int {
@@ -120,6 +145,21 @@ struct AdvancedSettingsView: View {
 
             // MARK: - Display
             Section {
+                Picker(selection: Binding(
+                    get: { AppAppearance(rawValue: appAppearance) ?? .system },
+                    set: { newValue in
+                        appAppearance = newValue.rawValue
+                        AppAppearance.apply(newValue)
+                    }
+                )) {
+                    ForEach(AppAppearance.allCases) { option in
+                        Text(option.displayName).tag(option)
+                    }
+                } label: {
+                    Label(NSLocalizedString("Appearance", comment: "Display setting"), systemImage: "circle.lefthalf.filled")
+                }
+                .pickerStyle(.segmented)
+
                 Toggle(isOn: $showCustomIconBadge) {
                     Label(NSLocalizedString("Show Custom Icon Badge", comment: "Display setting"), systemImage: "checkmark.circle.fill")
                 }
@@ -195,13 +235,6 @@ struct AdvancedSettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .alert(isPresented: $showConfirmation) {
-            Alert(
-                title: Text(confirmationTitle),
-                message: Text(confirmationMessage),
-                dismissButton: .default(Text("OK"))
-            )
-        }
         .alert(isPresented: $showRestartAlert) {
             Alert(
                 title: Text(NSLocalizedString("Language Changed", comment: "Language alert title")),

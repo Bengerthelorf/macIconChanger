@@ -221,8 +221,8 @@ class BackgroundService: ObservableObject {
     }
 
     func stopBackgroundService() {
-        if statusItem != nil {
-            NSStatusBar.system.removeStatusItem(statusItem!)
+        if let item = statusItem {
+            NSStatusBar.system.removeStatusItem(item)
             statusItem = nil
         }
 
@@ -425,8 +425,8 @@ class BackgroundService: ObservableObject {
         if showInMenuBar {
             setupStatusBar()
         } else {
-            if statusItem != nil {
-                NSStatusBar.system.removeStatusItem(statusItem!)
+            if let item = statusItem {
+                NSStatusBar.system.removeStatusItem(item)
                 statusItem = nil
             }
 

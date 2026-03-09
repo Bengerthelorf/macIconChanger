@@ -40,6 +40,8 @@ struct IconChangerApp: App {
                 .onAppear {
                     cliManager.checkInstallation()
                     ConfigManager.shared.checkForCLIImports()
+                    let saved = AppAppearance(rawValue: UserDefaults.standard.string(forKey: "appAppearance") ?? "") ?? .system
+                    AppAppearance.apply(saved)
                 }
         }
         .commands {
