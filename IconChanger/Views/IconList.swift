@@ -417,6 +417,84 @@ struct IconView: View {
     }
 }
 
+// MARK: - Wallpaper Loader
+
+final class WallpaperLoader: ObservableObject {
+    static let shared = WallpaperLoader()
+    @Published var wallpaperImage: NSImage?
+
+    private var observers: [NSObjectProtocol] = []
+
+    private init() {
+        loadWallpaper()
+        observers.append(
+            NSWorkspace.shared.notificationCenter.addObserver(
+                forName: NSWorkspace.didActivateApplicationNotification,
+                object: nil, queue: .main
+            ) { [weak self] notification in
+                guard let app = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication,
+                      app.bundleIdentifier == Bundle.main.bundleIdentifier else { return }
+                self?.loadWallpaper()
+            }
+        )
+        observers.append(
+            NSWorkspace.shared.notificationCenter.addObserver(
+                forName: NSWorkspace.activeSpaceDidChangeNotification,
+                object: nil, queue: .main
+            ) { [weak self] _ in
+                self?.loadWallpaper()
+            }
+        )
+    }
+
+    deinit {
+        for observer in observers {
+            NSWorkspace.shared.notificationCenter.removeObserver(observer)
+        }
+    }
+
+    func loadWallpaper() {
+        // Strategy 1: Capture the actual desktop window pixels (handles tinted/dynamic wallpapers)
+        if let captured = Self.captureDesktopWindow() {
+            wallpaperImage = captured
+            return
+        }
+        // Strategy 2: Fall back to desktopImageURL
+        if let screen = NSScreen.main,
+           let url = NSWorkspace.shared.desktopImageURL(for: screen),
+           let image = NSImage(contentsOf: url) {
+            wallpaperImage = image
+            return
+        }
+        wallpaperImage = nil
+    }
+
+    /// Captures the actual rendered desktop by finding the Dock's desktop picture window.
+    private static func captureDesktopWindow() -> NSImage? {
+        guard let screen = NSScreen.main else { return nil }
+        guard let windowList = CGWindowListCopyWindowInfo([.optionOnScreenOnly], kCGNullWindowID) as? [[String: Any]] else { return nil }
+
+        for info in windowList {
+            let owner = info[kCGWindowOwnerName as String] as? String ?? ""
+            let layer = info[kCGWindowLayer as String] as? Int ?? 0
+
+            // The desktop picture window is owned by "Dock" at the desktop window level (very negative)
+            guard owner == "Dock", layer <= -2_000_000_000 else { continue }
+            guard let windowID = info[kCGWindowNumber as String] as? Int else { continue }
+
+            if let cgImage = CGWindowListCreateImage(
+                screen.frame,
+                .optionIncludingWindow,
+                CGWindowID(windowID),
+                [.bestResolution]
+            ) {
+                return NSImage(cgImage: cgImage, size: screen.frame.size)
+            }
+        }
+        return nil
+    }
+}
+
 // MARK: - Dock Preview
 
 struct DockPreviewBar: View {
@@ -424,6 +502,7 @@ struct DockPreviewBar: View {
     let dockLayout: DockLayout
     let refreshTrigger: UUID
     var onSelectApp: ((AppItem) -> Void)?
+    @ObservedObject private var wallpaperLoader = WallpaperLoader.shared
 
     private var resolvedApps: (pinned: [AppItem], runningOnly: [AppItem]) {
         let lookup = Dictionary(allApps.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
@@ -431,6 +510,24 @@ struct DockPreviewBar: View {
             pinned: dockLayout.pinnedPaths.compactMap { lookup[$0] },
             runningOnly: dockLayout.runningOnlyOrdered.compactMap { lookup[$0] }
         )
+    }
+
+    /// Wallpaper layer that maintains the screen's natural scale.
+    @ViewBuilder
+    private func wallpaperLayer(_ wallpaper: NSImage, blur: CGFloat) -> some View {
+        GeometryReader { geo in
+            let screenAspect = wallpaper.size.width / wallpaper.size.height
+            // Scale to fill width so the wallpaper pattern matches the desktop scale
+            let displayWidth = geo.size.width
+            let displayHeight = displayWidth / screenAspect
+            Image(nsImage: wallpaper)
+                .resizable()
+                .frame(width: displayWidth, height: displayHeight)
+                .blur(radius: blur)
+                // Show the center portion vertically
+                .frame(width: geo.size.width, height: geo.size.height)
+                .clipped()
+        }
     }
 
     var body: some View {
@@ -490,9 +587,36 @@ struct DockPreviewBar: View {
             }
         }
         .padding()
+        // Wallpaper background: clear image that gradually fades to transparent at edges
+        // Extends well beyond the bar into toolbar/sidebar areas, no hard clip
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(.bar)
+            GeometryReader { geo in
+                if let wallpaper = wallpaperLoader.wallpaperImage {
+                    let bleed: CGFloat = 80
+                    let barW = geo.size.width
+                    let barH = geo.size.height
+                    let totalW = barW + bleed * 2
+                    let totalH = barH + bleed * 2
+                    let screenAspect = wallpaper.size.width / wallpaper.size.height
+                    let imgW = totalW
+                    let imgH = imgW / screenAspect
+
+                    Image(nsImage: wallpaper)
+                        .resizable()
+                        .frame(width: imgW, height: imgH)
+                        .frame(width: totalW, height: totalH)
+                        .clipped()
+                        .mask(
+                            RoundedRectangle(cornerRadius: 12)
+                                .frame(width: barW, height: barH)
+                                .blur(radius: 40)
+                                .frame(width: totalW, height: totalH)
+                        )
+                        .position(x: barW / 2, y: barH / 2)
+                } else {
+                    RoundedRectangle(cornerRadius: 12).fill(.bar)
+                }
+            }
         )
         .overlay(
             RoundedRectangle(cornerRadius: 12)
