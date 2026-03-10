@@ -11,16 +11,14 @@ import os
 
 // MARK: - Codable IconRes Wrapper
 
-/// Codable version of IconRes for caching
 struct CachedIconRes: Codable {
     let appName: String
     let icnsUrl: URL
     let lowResPngUrl: URL
     let downloads: Int
 
-    /// Convert to IconRes (may return nil if validation fails)
     func toIconRes() -> IconRes? {
-        return IconRes(
+        IconRes(
             appName: appName,
             icnsUrl: icnsUrl,
             lowResPngUrl: lowResPngUrl,
@@ -28,9 +26,8 @@ struct CachedIconRes: Codable {
         )
     }
 
-    /// Create from IconRes
     static func from(_ iconRes: IconRes) -> CachedIconRes {
-        return CachedIconRes(
+        CachedIconRes(
             appName: iconRes.appName,
             icnsUrl: iconRes.icnsUrl,
             lowResPngUrl: iconRes.lowResPngUrl,
@@ -41,36 +38,29 @@ struct CachedIconRes: Codable {
 
 // MARK: - Cache Entry
 
-/// Cache entry for icon fetch results
 struct IconFetchCacheEntry: Codable {
     let cacheKey: String
     let icons: [CachedIconRes]
-    let timestamp: Date           // Creation time (for debugging/statistics)
-    var lastAccessTime: Date      // Last access time (for LRU eviction)
+    let timestamp: Date
+    var lastAccessTime: Date
 }
 
 // MARK: - Icon Fetch Cache Manager
 
-/// Manager for icon fetch results caching (in-memory, periodically cleared)
+/// Manages icon search result caching with optional disk persistence.
 class IconFetchCacheManager {
     static let shared = IconFetchCacheManager()
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "IconFetchCache")
 
     // MARK: - Properties
 
-    /// Maximum number of cache entries (prevent memory overflow)
     private let maxCacheEntries: Int = 200
-
-    /// In-memory cache storage (not persisted)
     private var cache: [String: IconFetchCacheEntry] = [:]
-
-    /// Lock for thread-safe operations
     private let cacheLock = NSLock()
 
-    /// Cache statistics
     private(set) var hitCount: Int = 0
     private(set) var missCount: Int = 0
-    private(set) var evictionCount: Int = 0  // Track evicted entries
+    private(set) var evictionCount: Int = 0
 
     // MARK: - Disk Persistence
 
@@ -92,7 +82,6 @@ class IconFetchCacheManager {
         return UserDefaults.standard.bool(forKey: Self.cacheAPIResultsKey)
     }
 
-    /// Persist the in-memory cache to disk (called outside the lock).
     func saveToDisk(force: Bool = false) {
         guard force || isPersistenceEnabled else { return }
         cacheLock.lock()
@@ -107,7 +96,6 @@ class IconFetchCacheManager {
         }
     }
 
-    /// Load persisted cache from disk into memory.
     private func loadFromDisk() {
         guard isPersistenceEnabled else { return }
         let url = Self.persistentCacheFileURL
@@ -127,7 +115,6 @@ class IconFetchCacheManager {
         }
     }
 
-    /// Delete the on-disk cache file.
     func deleteDiskCache() {
         try? FileManager.default.removeItem(at: Self.persistentCacheFileURL)
         logger.log("Deleted persistent icon fetch cache file")
@@ -141,7 +128,6 @@ class IconFetchCacheManager {
 
     // MARK: - Cache Key Generation
 
-    /// Generate cache key from app info and style
     private func generateCacheKey(
         appName: String,
         bundleName: String?,
@@ -161,7 +147,6 @@ class IconFetchCacheManager {
 
     // MARK: - Cache Operations
 
-    /// Get cached icons if available
     func getCachedIcons(
         appName: String,
         bundleName: String?,
@@ -189,10 +174,8 @@ class IconFetchCacheManager {
         entry.lastAccessTime = now
         cache[key] = entry
 
-        // Convert cached icons back to IconRes, filtering out any that fail validation
         let validIcons = entry.icons.compactMap { $0.toIconRes() }
 
-        // If all icons failed validation, log a warning
         if validIcons.isEmpty && !entry.icons.isEmpty {
             logger.warning("All cached icons failed validation for \(key)")
             return nil
@@ -201,7 +184,6 @@ class IconFetchCacheManager {
         return validIcons
     }
 
-    /// Cache icon fetch results
     func cacheIcons(
         _ icons: [IconRes],
         appName: String,
@@ -228,7 +210,6 @@ class IconFetchCacheManager {
             lastAccessTime: now
         )
 
-        // Check if we need to evict old entries
         if cache.count >= maxCacheEntries {
             evictOldestEntry()
         }
@@ -238,7 +219,6 @@ class IconFetchCacheManager {
         saveToDisk()
     }
 
-    /// Evict the least recently used cache entry (by lastAccessTime)
     private func evictOldestEntry() {
         guard let lruKey = cache.min(by: { $0.value.lastAccessTime < $1.value.lastAccessTime })?.key else {
             return
@@ -248,7 +228,6 @@ class IconFetchCacheManager {
         evictionCount += 1
     }
 
-    /// Clear all cache entries
     func clearAllCache() {
         cacheLock.lock()
         cache.removeAll()
@@ -259,8 +238,6 @@ class IconFetchCacheManager {
         saveToDisk()
     }
 
-    /// Clear cache entries that haven't been accessed for longer than maxAge
-    /// This implements true LRU behavior by checking lastAccessTime
     @discardableResult
     func clearExpiredCache(olderThan maxAge: TimeInterval) -> Int {
         cacheLock.lock()
@@ -281,14 +258,12 @@ class IconFetchCacheManager {
 
     // MARK: - Cache Statistics
 
-    /// Get cache count
     func getCacheCount() -> Int {
         cacheLock.lock()
         defer { cacheLock.unlock() }
         return cache.count
     }
 
-    /// Get cache statistics
     func getStatistics() -> (hits: Int, misses: Int, total: Int, hitRate: Double, evictions: Int) {
         cacheLock.lock()
         defer { cacheLock.unlock() }

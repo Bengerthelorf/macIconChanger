@@ -129,7 +129,6 @@ struct IconList: View {
                     .listStyle(SidebarListStyle())
                     .frame(minWidth: 200, idealWidth: 300)
 
-            // Detail pane — DockPreviewBar is persistent, not recreated per selection
             VStack(spacing: 0) {
                 if appFilter == .dock {
                     DockPreviewBar(
@@ -478,12 +477,10 @@ final class WallpaperLoader: ObservableObject {
     }
 
     func loadWallpaper() {
-        // Strategy 1: Capture the actual desktop window pixels (handles tinted/dynamic wallpapers)
         if let captured = Self.captureDesktopWindow() {
             wallpaperImage = captured
             return
         }
-        // Strategy 2: Fall back to desktopImageURL
         if let screen = NSScreen.main,
            let url = NSWorkspace.shared.desktopImageURL(for: screen),
            let image = NSImage(contentsOf: url) {
@@ -502,7 +499,6 @@ final class WallpaperLoader: ObservableObject {
             let owner = info[kCGWindowOwnerName as String] as? String ?? ""
             let layer = info[kCGWindowLayer as String] as? Int ?? 0
 
-            // The desktop picture window is owned by "Dock" at the desktop window level (very negative)
             guard owner == "Dock", layer <= -2_000_000_000 else { continue }
             guard let windowID = info[kCGWindowNumber as String] as? Int else { continue }
 
@@ -536,24 +532,6 @@ struct DockPreviewBar: View {
         )
     }
 
-    /// Wallpaper layer that maintains the screen's natural scale.
-    @ViewBuilder
-    private func wallpaperLayer(_ wallpaper: NSImage, blur: CGFloat) -> some View {
-        GeometryReader { geo in
-            let screenAspect = wallpaper.size.width / wallpaper.size.height
-            // Scale to fill width so the wallpaper pattern matches the desktop scale
-            let displayWidth = geo.size.width
-            let displayHeight = displayWidth / screenAspect
-            Image(nsImage: wallpaper)
-                .resizable()
-                .frame(width: displayWidth, height: displayHeight)
-                .blur(radius: blur)
-                // Show the center portion vertically
-                .frame(width: geo.size.width, height: geo.size.height)
-                .clipped()
-        }
-    }
-
     var body: some View {
         let apps = resolvedApps
         VStack(alignment: .leading, spacing: 12) {
@@ -577,7 +555,6 @@ struct DockPreviewBar: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding()
             } else {
-                // Dock-style pill container
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 0) {
                         ForEach(apps.pinned) { app in
@@ -615,8 +592,6 @@ struct DockPreviewBar: View {
             }
         }
         .padding()
-        // Wallpaper background: clear image that gradually fades to transparent at edges
-        // Extends well beyond the bar into toolbar/sidebar areas, no hard clip
         .background(
             GeometryReader { geo in
                 if let wallpaper = wallpaperLoader.wallpaperImage {

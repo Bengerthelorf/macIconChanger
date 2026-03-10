@@ -106,7 +106,6 @@ struct ChangeView: View {
                             .font(.headline)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        // Style selector
                         Picker("Style", selection: $selectedStyle) {
                             ForEach(IconStyle.allCases) { style in
                                 Text(style.displayName).tag(style)
