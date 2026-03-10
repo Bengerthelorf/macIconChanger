@@ -166,15 +166,14 @@ struct AdvancedSettingsView: View {
                 }
 
                 if #available(macOS 26, *) {
-                    VStack(alignment: .leading, spacing: 4) {
+                    Slider(value: $dockGlassIntensity, in: 0...1, step: 0.1) {
                         Label(NSLocalizedString("Dock Glass Intensity", comment: "Display setting"), systemImage: "cube.transparent")
-                        HStack(spacing: 8) {
-                            Image(systemName: "circle.dotted")
-                                .foregroundColor(.secondary)
-                            Slider(value: $dockGlassIntensity, in: 0...1, step: 0.1)
-                            Image(systemName: "cube.transparent.fill")
-                                .foregroundColor(.secondary)
-                        }
+                    } minimumValueLabel: {
+                        Image(systemName: "circle.dotted")
+                            .foregroundColor(.secondary)
+                    } maximumValueLabel: {
+                        Image(systemName: "cube.transparent.fill")
+                            .foregroundColor(.secondary)
                     }
                 }
             } header: {
