@@ -43,7 +43,7 @@ struct AdvancedSettingsView: View {
     @AppStorage("showCustomIconBadge") private var showCustomIconBadge = true
     @AppStorage("dockGlassIntensity") private var dockGlassIntensity: Double = 0.5
     @AppStorage("appAppearance") private var appAppearance: String = AppAppearance.system.rawValue
-    @AppStorage("cacheAPIResults") private var cacheAPIResults = false
+    @AppStorage("cacheAPIResults") private var cacheAPIResults = true
     @State private var showRestartAlert = false
     @State private var fetchCacheCount: Int = IconFetchCacheManager.shared.getCacheCount()
 

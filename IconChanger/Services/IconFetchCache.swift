@@ -82,8 +82,14 @@ class IconFetchCacheManager {
         return dir.appendingPathComponent("icon_fetch_cache.json")
     }
 
+    private static let cacheAPIResultsKey = "cacheAPIResults"
+
     private var isPersistenceEnabled: Bool {
-        UserDefaults.standard.bool(forKey: "cacheAPIResults")
+        // Default to true if never set by the user
+        if UserDefaults.standard.object(forKey: Self.cacheAPIResultsKey) == nil {
+            return true
+        }
+        return UserDefaults.standard.bool(forKey: Self.cacheAPIResultsKey)
     }
 
     /// Persist the in-memory cache to disk (called outside the lock).
