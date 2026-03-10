@@ -20,12 +20,14 @@ class MyRequestController {
 private actor RequestDeduplicator {
     private var inflight: [String: Task<[IconRes], Error>] = [:]
 
-    func existing(for key: String) -> Task<[IconRes], Error>? {
-        inflight[key]
-    }
-
-    func store(_ task: Task<[IconRes], Error>, for key: String) {
+    /// Atomically returns an existing task or stores a new one.
+    func deduplicate(for key: String, create: @Sendable () -> Task<[IconRes], Error>) -> (task: Task<[IconRes], Error>, isNew: Bool) {
+        if let existing = inflight[key] {
+            return (existing, false)
+        }
+        let task = create()
         inflight[key] = task
+        return (task, true)
     }
 
     func remove(_ key: String) {
@@ -69,23 +71,22 @@ class MyQueryRequestController {
     func sendRequest(_ query: String, style: IconStyle = .all) async throws -> [IconRes] {
         let key = "\(query)|\(style.displayName)"
 
-        if let existing = await dedup.existing(for: key) {
-            logger.debug("Deduplicating request for '\(query, privacy: .public)'")
-            return try await existing.value
-        }
-
-        let task = Task<[IconRes], Error> {
-            let results = try await sendRequestToMeilisearch(query, style: style)
-            if results.isEmpty {
-                logger.debug("Meilisearch returned no results for '\(query, privacy: .public)'. Trying backup API.")
-                return try await sendBackupRequest(query, style: style)
+        let (task, isNew) = await dedup.deduplicate(for: key) { [self] in
+            Task<[IconRes], Error> {
+                let results = try await self.sendRequestToMeilisearch(query, style: style)
+                if results.isEmpty {
+                    self.logger.debug("Meilisearch returned no results for '\(query, privacy: .public)'. Trying backup API.")
+                    return try await self.sendBackupRequest(query, style: style)
+                }
+                return results
             }
-            return results
         }
 
-        await dedup.store(task, for: key)
+        if !isNew {
+            logger.debug("Deduplicating request for '\(query, privacy: .public)'")
+        }
 
-        defer { Task { await dedup.remove(key) } }
+        defer { if isNew { Task { await dedup.remove(key) } } }
         return try await task.value
     }
     
