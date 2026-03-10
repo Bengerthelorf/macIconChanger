@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ApplicationFolderSettingsView: View {
-    @ObservedObject var folderPermission = FolderPermission.shared
+    @StateObject private var folderPermission = FolderPermission.shared
     @State private var selectedId: UUID?
 
     var body: some View {

@@ -38,8 +38,8 @@ struct AdvancedSettingsView: View {
     @State private var isTestingAPI = false
     @State private var testResult: String? = nil
     @State private var testSuccess = false
-    @ObservedObject private var cliManager = CLIManager.shared
-    @ObservedObject private var languageManager = LanguageManager.shared
+    @StateObject private var cliManager = CLIManager.shared
+    @StateObject private var languageManager = LanguageManager.shared
     @AppStorage("showCustomIconBadge") private var showCustomIconBadge = true
     @AppStorage("dockGlassIntensity") private var dockGlassIntensity: Double = 0.5
     @AppStorage("appAppearance") private var appAppearance: String = AppAppearance.system.rawValue

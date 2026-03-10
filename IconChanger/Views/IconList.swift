@@ -26,7 +26,7 @@ struct DockLayout: Equatable {
 }
 
 struct IconList: View {
-    @ObservedObject var iconManager = IconManager.shared
+    @StateObject private var iconManager = IconManager.shared
     @AppStorage("showCustomIconBadge") private var showCustomIconBadge = true
 
     @State var selectedApp: AppItem? = nil
@@ -526,7 +526,7 @@ struct DockPreviewBar: View {
     let dockLayout: DockLayout
     let refreshTrigger: UUID
     var onSelectApp: ((AppItem) -> Void)?
-    @ObservedObject private var wallpaperLoader = WallpaperLoader.shared
+    @StateObject private var wallpaperLoader = WallpaperLoader.shared
 
     private var resolvedApps: (pinned: [AppItem], runningOnly: [AppItem]) {
         let lookup = Dictionary(allApps.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })

@@ -24,7 +24,7 @@ struct ChangeView: View {
 
     @Environment(\.presentationMode) var presentationMode
 
-    @ObservedObject var iconManager = IconManager.shared
+    @StateObject private var iconManager = IconManager.shared
 
     @State var isExpanded: Bool = false
 

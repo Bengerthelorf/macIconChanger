@@ -9,7 +9,7 @@ import SwiftUI
 import UserNotifications
 
 struct BackgroundSettingsView: View {
-    @ObservedObject private var backgroundService = BackgroundService.shared
+    @StateObject private var backgroundService = BackgroundService.shared
 
     private let intervalOptions = [
         (1, "Every Hour"),

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CLISettingsView: View {
-    @ObservedObject private var cliManager = CLIManager.shared
+    @StateObject private var cliManager = CLIManager.shared
     @State private var showHelp = false
 
     var body: some View {

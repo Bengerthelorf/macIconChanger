@@ -149,7 +149,7 @@ class LanguageManager: ObservableObject {
 }
 
 struct LanguageSettingsView: View {
-    @ObservedObject private var languageManager = LanguageManager.shared
+    @StateObject private var languageManager = LanguageManager.shared
     @State private var showRestartAlert = false
 
     var body: some View {
