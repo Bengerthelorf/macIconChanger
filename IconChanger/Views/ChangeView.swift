@@ -208,6 +208,7 @@ struct ChangeView: View {
                 }
                 .onChange(of: iconManager.iconRefreshTrigger) { _ in
                     inIcons = iconManager.getIconInPath(setPath.url)
+                    triggerIconFetch(forceRefresh: true)
                 }
                 .onChange(of: iconManager.apps) { _ in
                     hasDuplicateName = iconManager.apps.contains { $0.name == setPath.name && $0.id != setPath.id }
@@ -297,7 +298,7 @@ struct ChangeView: View {
         }
     }
 
-    private func triggerIconFetch() {
+    private func triggerIconFetch(forceRefresh: Bool = false) {
         loadIconsTask?.cancel()
         let token = UUID()
         currentLoadToken = token
@@ -305,13 +306,14 @@ struct ChangeView: View {
         let appInfo = setPath
 
         loadIconsTask = Task {
-            await fetchIcons(for: appInfo, style: style, token: token)
+            await fetchIcons(for: appInfo, style: style, token: token, forceRefresh: forceRefresh)
         }
     }
 
     private func fetchIcons(for appInfo: AppItem,
                             style: IconStyle,
-                            token: UUID) async {
+                            token: UUID,
+                            forceRefresh: Bool = false) async {
         await MainActor.run {
             if currentLoadToken == token {
                 isLoadingIcons = true
@@ -319,7 +321,7 @@ struct ChangeView: View {
         }
 
         do {
-            let fetchedIcons = try await iconManager.getIcons(appInfo, style: style)
+            let fetchedIcons = try await iconManager.getIcons(appInfo, style: style, forceRefresh: forceRefresh)
 
             if Task.isCancelled {
                 await MainActor.run {

@@ -43,7 +43,9 @@ struct AdvancedSettingsView: View {
     @AppStorage("showCustomIconBadge") private var showCustomIconBadge = true
     @AppStorage("dockGlassIntensity") private var dockGlassIntensity: Double = 0.5
     @AppStorage("appAppearance") private var appAppearance: String = AppAppearance.system.rawValue
+    @AppStorage("cacheAPIResults") private var cacheAPIResults = false
     @State private var showRestartAlert = false
+    @State private var fetchCacheCount: Int = IconFetchCacheManager.shared.getCacheCount()
 
     private var aliasCount: Int {
         AliasNames.getAll().count
@@ -98,6 +100,43 @@ struct AdvancedSettingsView: View {
                 }
             } header: {
                 Label(NSLocalizedString("Connection Test", comment: "Settings section"), systemImage: "network")
+            }
+
+            // MARK: - Icon Search Cache
+            Section {
+                Toggle(isOn: $cacheAPIResults) {
+                    Label(NSLocalizedString("Cache API Results", comment: "Cache setting"), systemImage: "arrow.down.doc")
+                }
+                .onChange(of: cacheAPIResults) { newValue in
+                    if newValue {
+                        IconFetchCacheManager.shared.saveToDisk(force: true)
+                    } else {
+                        IconFetchCacheManager.shared.deleteDiskCache()
+                    }
+                    fetchCacheCount = IconFetchCacheManager.shared.getCacheCount()
+                }
+
+                LabeledContent {
+                    Text("\(fetchCacheCount)")
+                        .monospacedDigit()
+                        .foregroundColor(.secondary)
+                } label: {
+                    Label(NSLocalizedString("Cached Search Results", comment: "Cache setting"), systemImage: "magnifyingglass")
+                }
+
+                Button(role: .destructive) {
+                    IconFetchCacheManager.shared.clearAllCache()
+                    IconFetchCacheManager.shared.deleteDiskCache()
+                    fetchCacheCount = 0
+                } label: {
+                    Label(NSLocalizedString("Clear Icon Search Cache", comment: "Cache setting"), systemImage: "trash")
+                }
+                .disabled(fetchCacheCount == 0)
+            } header: {
+                Label(NSLocalizedString("Icon Search Cache", comment: "Settings section"), systemImage: "magnifyingglass")
+            } footer: {
+                Text(NSLocalizedString("When enabled, icon search results are saved to disk and persist across app restarts. Use the refresh button to fetch fresh results.", comment: "Cache setting description"))
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             // MARK: - Configuration
@@ -257,6 +296,7 @@ struct AdvancedSettingsView: View {
         }
         .onAppear {
             ConfigManager.shared.checkForCLIImports()
+            fetchCacheCount = IconFetchCacheManager.shared.getCacheCount()
         }
     }
 

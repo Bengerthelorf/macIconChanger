@@ -470,13 +470,14 @@ class IconManager: ObservableObject {
         return (processed, skipped, failures)
     }
 
-    func getIcons(_ app: AppItem, style: IconStyle = .all) async throws -> [IconRes] {
+    func getIcons(_ app: AppItem, style: IconStyle = .all, forceRefresh: Bool = false) async throws -> [IconRes] {
         let appName = app.name
         let urlName = app.url.deletingPathExtension().lastPathComponent
         let bundleName = try getAppBundleName(app)
         let aliasName = AliasName.getName(for: app.url.deletingPathExtension().lastPathComponent)
-        
-        if let cachedIcons = IconFetchCacheManager.shared.getCachedIcons(
+
+        if !forceRefresh,
+           let cachedIcons = IconFetchCacheManager.shared.getCachedIcons(
             appName: appName,
             bundleName: bundleName,
             aliasName: aliasName,
@@ -485,8 +486,12 @@ class IconManager: ObservableObject {
             logger.log("Using cached icon fetch results for \(appName)")
             return cachedIcons
         }
-        
-        logger.log("Cache miss, fetching icons from network for \(appName)")
+
+        if forceRefresh {
+            logger.log("Force refresh, fetching icons from network for \(appName)")
+        } else {
+            logger.log("Cache miss, fetching icons from network for \(appName)")
+        }
 
         let queryController = MyQueryRequestController.shared
         var orderedQueries: [String] = []

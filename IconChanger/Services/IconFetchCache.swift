@@ -42,7 +42,7 @@ struct CachedIconRes: Codable {
 // MARK: - Cache Entry
 
 /// Cache entry for icon fetch results
-struct IconFetchCacheEntry {
+struct IconFetchCacheEntry: Codable {
     let cacheKey: String
     let icons: [CachedIconRes]
     let timestamp: Date           // Creation time (for debugging/statistics)
@@ -72,9 +72,66 @@ class IconFetchCacheManager {
     private(set) var missCount: Int = 0
     private(set) var evictionCount: Int = 0  // Track evicted entries
 
+    // MARK: - Disk Persistence
+
+    private static var persistentCacheFileURL: URL {
+        let dir = URL(fileURLWithPath: "\(NSHomeDirectory())/.iconchanger")
+        if !FileManager.default.fileExists(atPath: dir.path) {
+            try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        }
+        return dir.appendingPathComponent("icon_fetch_cache.json")
+    }
+
+    private var isPersistenceEnabled: Bool {
+        UserDefaults.standard.bool(forKey: "cacheAPIResults")
+    }
+
+    /// Persist the in-memory cache to disk (called outside the lock).
+    func saveToDisk(force: Bool = false) {
+        guard force || isPersistenceEnabled else { return }
+        cacheLock.lock()
+        let snapshot = cache
+        cacheLock.unlock()
+
+        do {
+            let data = try JSONEncoder().encode(snapshot)
+            try data.write(to: Self.persistentCacheFileURL, options: .atomic)
+        } catch {
+            logger.error("Failed to persist icon fetch cache: \(error.localizedDescription)")
+        }
+    }
+
+    /// Load persisted cache from disk into memory.
+    private func loadFromDisk() {
+        guard isPersistenceEnabled else { return }
+        let url = Self.persistentCacheFileURL
+        guard FileManager.default.fileExists(atPath: url.path) else { return }
+
+        do {
+            let data = try Data(contentsOf: url)
+            let loaded = try JSONDecoder().decode([String: IconFetchCacheEntry].self, from: data)
+            cacheLock.lock()
+            for (key, entry) in loaded where cache[key] == nil {
+                cache[key] = entry
+            }
+            cacheLock.unlock()
+            logger.log("Loaded \(loaded.count) entries from persistent icon fetch cache")
+        } catch {
+            logger.error("Failed to load persistent icon fetch cache: \(error.localizedDescription)")
+        }
+    }
+
+    /// Delete the on-disk cache file.
+    func deleteDiskCache() {
+        try? FileManager.default.removeItem(at: Self.persistentCacheFileURL)
+        logger.log("Deleted persistent icon fetch cache file")
+    }
+
     // MARK: - Initialization
 
-    private init() {}
+    private init() {
+        loadFromDisk()
+    }
 
     // MARK: - Cache Key Generation
 
@@ -147,7 +204,6 @@ class IconFetchCacheManager {
         style: String
     ) {
         cacheLock.lock()
-        defer { cacheLock.unlock() }
 
         let key = generateCacheKey(
             appName: appName,
@@ -172,6 +228,8 @@ class IconFetchCacheManager {
         }
 
         cache[key] = entry
+        cacheLock.unlock()
+        saveToDisk()
     }
 
     /// Evict the least recently used cache entry (by lastAccessTime)
@@ -187,12 +245,12 @@ class IconFetchCacheManager {
     /// Clear all cache entries
     func clearAllCache() {
         cacheLock.lock()
-        defer { cacheLock.unlock() }
-
         cache.removeAll()
         hitCount = 0
         missCount = 0
         evictionCount = 0
+        cacheLock.unlock()
+        saveToDisk()
     }
 
     /// Clear cache entries that haven't been accessed for longer than maxAge
@@ -200,7 +258,6 @@ class IconFetchCacheManager {
     @discardableResult
     func clearExpiredCache(olderThan maxAge: TimeInterval) -> Int {
         cacheLock.lock()
-        defer { cacheLock.unlock() }
 
         let now = Date()
         let expiredKeys = cache.filter { entry in
@@ -210,7 +267,9 @@ class IconFetchCacheManager {
         for key in expiredKeys {
             cache.removeValue(forKey: key)
         }
+        cacheLock.unlock()
 
+        if !expiredKeys.isEmpty { saveToDisk() }
         return expiredKeys.count
     }
 
