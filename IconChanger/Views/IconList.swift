@@ -18,7 +18,7 @@ enum AppFilter: String, CaseIterable, Identifiable {
 }
 
 /// Holds the Dock layout: pinned apps (ordered) + running-only apps, with running state.
-struct DockLayout {
+struct DockLayout: Equatable {
     var pinnedPaths: [String] = []         // ordered pinned app paths
     var runningPaths: Set<String> = []     // all currently running app paths
     var runningOnlyOrdered: [String] = []  // running-but-not-pinned, in launch order
