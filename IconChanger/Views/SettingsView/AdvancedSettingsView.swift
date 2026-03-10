@@ -165,16 +165,16 @@ struct AdvancedSettingsView: View {
                     Label(NSLocalizedString("Show Custom Icon Badge", comment: "Display setting"), systemImage: "checkmark.circle.fill")
                 }
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Label(NSLocalizedString("Dock Glass Intensity", comment: "Display setting"), systemImage: "cube.transparent")
-                    HStack {
-                        Image(systemName: "circle.dotted")
-                            .foregroundColor(.secondary)
-                            .font(.caption)
-                        Slider(value: $dockGlassIntensity, in: 0...1, step: 0.1)
-                        Image(systemName: "cube.transparent.fill")
-                            .foregroundColor(.secondary)
-                            .font(.caption)
+                if #available(macOS 26, *) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Label(NSLocalizedString("Dock Glass Intensity", comment: "Display setting"), systemImage: "cube.transparent")
+                        HStack(spacing: 8) {
+                            Image(systemName: "circle.dotted")
+                                .foregroundColor(.secondary)
+                            Slider(value: $dockGlassIntensity, in: 0...1, step: 0.1)
+                            Image(systemName: "cube.transparent.fill")
+                                .foregroundColor(.secondary)
+                        }
                     }
                 }
             } header: {
