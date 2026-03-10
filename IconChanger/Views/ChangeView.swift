@@ -177,7 +177,13 @@ struct ChangeView: View {
                 }
                 .onChange(of: importedImageURL) { url in
                     guard let url = url else { return }
-                    defer { importedImageURL = nil }
+                    defer {
+                        // Clean up temp files we created during drag-drop
+                        if url.lastPathComponent.hasPrefix("dropped_icon_") {
+                            try? FileManager.default.removeItem(at: url)
+                        }
+                        importedImageURL = nil
+                    }
                     if let nsimage = NSImage(contentsOf: url) {
                         do {
                             try IconManager.shared.setImage(nsimage, app: setPath)
@@ -202,6 +208,9 @@ struct ChangeView: View {
                 }
                 .onChange(of: iconManager.iconRefreshTrigger) { _ in
                     inIcons = iconManager.getIconInPath(setPath.url)
+                }
+                .onChange(of: iconManager.apps) { _ in
+                    hasDuplicateName = iconManager.apps.contains { $0.name == setPath.name && $0.id != setPath.id }
                 }
                 .confirmationDialog("Restore Default Icon", isPresented: $showRestoreConfirm) {
                     Button("Restore", role: .destructive) {
