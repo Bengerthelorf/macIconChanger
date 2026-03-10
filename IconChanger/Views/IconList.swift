@@ -264,6 +264,7 @@ struct IconList: View {
                         }
                     }
                 }
+                .toolbarBackground(.hidden, for: .windowToolbar)
                 .onAppear {
                     iconManager.refresh()
                     dockLayout = Self.loadDockLayout()
@@ -592,7 +593,7 @@ struct DockPreviewBar: View {
         .background(
             GeometryReader { geo in
                 if let wallpaper = wallpaperLoader.wallpaperImage {
-                    let bleed: CGFloat = 80
+                    let bleed: CGFloat = 100
                     let barW = geo.size.width
                     let barH = geo.size.height
                     let totalW = barW + bleed * 2
