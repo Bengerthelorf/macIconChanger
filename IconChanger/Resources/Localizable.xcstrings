@@ -13235,6 +13235,9 @@
         }
       }
     },
+    "Dock Glass Intensity" : {
+      "comment" : "Display setting"
+    },
     "Dock Preview" : {
       "localizations" : {
         "ar" : {
