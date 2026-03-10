@@ -43,8 +43,9 @@ class IconCacheManager {
         }
     }
 
-    private func saveCache() {
-        if let encoded = try? JSONEncoder().encode(cachedIcons) {
+    /// Must be called outside the lock. Pass a snapshot of cachedIcons.
+    private func persistCache(_ snapshot: [String: IconCache]) {
+        if let encoded = try? JSONEncoder().encode(snapshot) {
             UserDefaults.standard.set(encoded, forKey: cacheKey)
         }
     }
@@ -66,8 +67,9 @@ class IconCacheManager {
 
         lock.lock()
         cachedIcons[appPath] = iconCache
-        saveCache()
+        let snapshot = cachedIcons
         lock.unlock()
+        persistCache(snapshot)
 
         return iconURL
     }
@@ -98,6 +100,7 @@ class IconCacheManager {
     }
 
     func updateTimestamp(for appPath: String, to date: Date = Date()) {
+        var snapshot: [String: IconCache]?
         lock.lock()
         if let existing = cachedIcons[appPath] {
             cachedIcons[appPath] = IconCache(
@@ -106,21 +109,24 @@ class IconCacheManager {
                 appName: existing.appName,
                 timestamp: date
             )
-            saveCache()
+            snapshot = cachedIcons
         }
         lock.unlock()
+        if let snapshot { persistCache(snapshot) }
     }
 
     func removeCachedIcon(for appPath: String) {
+        var snapshot: [String: IconCache]?
         lock.lock()
         if let cache = cachedIcons[appPath] {
             let iconURL = Self.cacheDirectory.appendingPathComponent(cache.iconFileName)
             try? FileManager.default.removeItem(at: iconURL)
 
             cachedIcons.removeValue(forKey: appPath)
-            saveCache()
+            snapshot = cachedIcons
         }
         lock.unlock()
+        if let snapshot { persistCache(snapshot) }
     }
 
     func clearCache() {
@@ -129,8 +135,9 @@ class IconCacheManager {
             Self.cacheDirectory.appendingPathComponent($0.iconFileName)
         }
         cachedIcons.removeAll()
-        saveCache()
+        let snapshot = cachedIcons
         lock.unlock()
+        persistCache(snapshot)
 
         for url in urlsToDelete {
             try? FileManager.default.removeItem(at: url)
@@ -140,8 +147,9 @@ class IconCacheManager {
     func addImportedCache(_ cache: IconCache) {
         lock.lock()
         cachedIcons[cache.appPath] = cache
-        saveCache()
+        let snapshot = cachedIcons
         lock.unlock()
+        persistCache(snapshot)
     }
 }
 
