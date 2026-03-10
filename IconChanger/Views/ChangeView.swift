@@ -39,6 +39,7 @@ struct ChangeView: View {
     @State private var restoreError: String?
     @State private var setIconError: String?
     @State private var isDragOver = false
+    @State private var hasDuplicateName = false
 
     var body: some View {
         GeometryReader { geometry in
@@ -48,7 +49,6 @@ struct ChangeView: View {
 
             ScrollView() {
                 VStack {
-                    let hasDuplicateName = iconManager.apps.contains { $0.name == setPath.name && $0.id != setPath.id }
                     HStack(alignment: .firstTextBaseline, spacing: 6) {
                         Text(setPath.name)
                             .font(.title)
@@ -189,6 +189,7 @@ struct ChangeView: View {
                 .padding(10)
                 .onAppear {
                     inIcons = iconManager.getIconInPath(setPath.url)
+                    hasDuplicateName = iconManager.apps.contains { $0.name == setPath.name && $0.id != setPath.id }
                 }
                 .task {
                     triggerIconFetch()
