@@ -76,9 +76,10 @@ class ConfigManager {
 
             var importedAliases = 0
             var existingAliases = AliasNames.getAll()
+            let existingNames = Set(existingAliases.map(\.appName))
 
             for alias in config.appAliases {
-                if !existingAliases.contains(where: { $0.appName == alias.appName }) {
+                if !existingNames.contains(alias.appName) {
                     existingAliases.append(AliasName(appName: alias.appName, aliasName: alias.aliasName))
                     importedAliases += 1
                 }

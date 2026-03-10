@@ -73,13 +73,10 @@ struct IconList: View {
         NavigationView {
             List(selection: $selectedApp) {
                 ForEach(filteredApps, id: \.id) { app in
-                    NavigationLink(destination: dockDetailView(for: app),
-                            tag: app,
-                            selection: $selectedApp) {
-                        IconView(app: app, refreshTrigger: iconManager.iconRefreshTrigger,
-                                 isCustomized: showCustomIconBadge && customizedPaths.contains(app.id))
-                    }
-                            .contextMenu {
+                    IconView(app: app, refreshTrigger: iconManager.iconRefreshTrigger,
+                             isCustomized: showCustomIconBadge && customizedPaths.contains(app.id))
+                        .tag(app)
+                        .contextMenu {
                                 Button("Copy the Name") {
                                     NSPasteboard.general.clearContents()
                                     NSPasteboard.general.setString(app.name, forType: .string)
@@ -132,7 +129,8 @@ struct IconList: View {
                     .listStyle(SidebarListStyle())
                     .frame(minWidth: 200, idealWidth: 300)
 
-            VStack {
+            // Detail pane — DockPreviewBar is persistent, not recreated per selection
+            VStack(spacing: 0) {
                 if appFilter == .dock {
                     DockPreviewBar(
                         allApps: iconManager.apps,
@@ -141,10 +139,16 @@ struct IconList: View {
                         onSelectApp: { app in selectedApp = app }
                     )
                 }
-                Spacer()
-                if appFilter != .dock {
-                    Text("Select an app to see its details")
-                        .foregroundColor(.secondary)
+
+                if let app = selectedApp {
+                    ChangeView(setPath: app)
+                        .id(app.id)
+                } else {
+                    Spacer()
+                    if appFilter != .dock {
+                        Text("Select an app to see its details")
+                            .foregroundColor(.secondary)
+                    }
                     Spacer()
                 }
             }
@@ -296,23 +300,6 @@ struct IconList: View {
                 } message: {
                     Text(IconList.friendlyErrorMessage(restoreError ?? ""))
                 }
-    }
-
-    @ViewBuilder
-    private func dockDetailView(for app: AppItem) -> some View {
-        if appFilter == .dock {
-            VStack(spacing: 0) {
-                DockPreviewBar(
-                    allApps: iconManager.apps,
-                    dockLayout: dockLayout,
-                    refreshTrigger: iconManager.iconRefreshTrigger,
-                    onSelectApp: { selectedApp = $0 }
-                )
-                ChangeView(setPath: app)
-            }
-        } else {
-            ChangeView(setPath: app)
-        }
     }
 
     static func friendlyErrorMessage(_ raw: String) -> String {

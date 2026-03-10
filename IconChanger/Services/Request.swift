@@ -177,9 +177,9 @@ class MyQueryRequestController {
                 }
             }
             
+            let normalizedQuery = query.lowercased().replace(target: " ", withString: "")
             let filteredRes = res.filter {
-                // TODO: Improve it (remove (),':) Photoshop (Beta) -> Photoshop Beta
-                $0.appName.lowercased().replace(target: " ", withString: "").contains(query.lowercased().replace(target: " ", withString: ""))
+                $0.appName.lowercased().replace(target: " ", withString: "").contains(normalizedQuery)
             }
             logger.debug("Returning \(filteredRes.count) icons after filtering for '\(query, privacy: .public)'")
             

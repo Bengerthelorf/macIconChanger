@@ -322,9 +322,10 @@ class IconManager: ObservableObject {
                 let appPath = cache.appPath
                 let iconURL = IconCacheManager.cacheDirectory.appendingPathComponent(cache.iconFileName)
 
-                if FileManager.default.fileExists(atPath: appPath) &&
-                    FileManager.default.fileExists(atPath: iconURL.path) {
+                let appExists = FileManager.default.fileExists(atPath: appPath)
+                let iconExists = FileManager.default.fileExists(atPath: iconURL.path)
 
+                if appExists && iconExists {
                     if let image = NSImage(contentsOf: iconURL) {
                         if let appInfo = appMap[appPath] {
                             try await setIconWithoutCaching(image, app: appInfo)
@@ -337,10 +338,10 @@ class IconManager: ObservableObject {
                         IconCacheManager.shared.removeCachedIcon(for: appPath)
                         throw RestoreError.iconFileNotFound(cache.appName)
                     }
-                } else if !FileManager.default.fileExists(atPath: appPath) {
+                } else if !appExists {
                     logger.warning("App at path \(appPath) no longer exists, removing cache for \(cache.appName).")
                     IconCacheManager.shared.removeCachedIcon(for: appPath)
-                } else if !FileManager.default.fileExists(atPath: iconURL.path) {
+                } else {
                     logger.warning("Icon file \(cache.iconFileName) missing for \(cache.appName), removing cache.")
                     IconCacheManager.shared.removeCachedIcon(for: appPath)
                 }
