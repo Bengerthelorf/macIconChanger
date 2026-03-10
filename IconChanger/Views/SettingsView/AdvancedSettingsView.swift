@@ -41,6 +41,7 @@ struct AdvancedSettingsView: View {
     @ObservedObject private var cliManager = CLIManager.shared
     @ObservedObject private var languageManager = LanguageManager.shared
     @AppStorage("showCustomIconBadge") private var showCustomIconBadge = true
+    @AppStorage("dockGlassIntensity") private var dockGlassIntensity: Double = 0.5
     @AppStorage("appAppearance") private var appAppearance: String = AppAppearance.system.rawValue
     @State private var showRestartAlert = false
 
@@ -162,6 +163,19 @@ struct AdvancedSettingsView: View {
 
                 Toggle(isOn: $showCustomIconBadge) {
                     Label(NSLocalizedString("Show Custom Icon Badge", comment: "Display setting"), systemImage: "checkmark.circle.fill")
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Label(NSLocalizedString("Dock Glass Intensity", comment: "Display setting"), systemImage: "cube.transparent")
+                    HStack {
+                        Image(systemName: "circle.dotted")
+                            .foregroundColor(.secondary)
+                            .font(.caption)
+                        Slider(value: $dockGlassIntensity, in: 0...1, step: 0.1)
+                        Image(systemName: "cube.transparent.fill")
+                            .foregroundColor(.secondary)
+                            .font(.caption)
+                    }
                 }
             } header: {
                 Label(NSLocalizedString("Display", comment: "Settings section"), systemImage: "eye")

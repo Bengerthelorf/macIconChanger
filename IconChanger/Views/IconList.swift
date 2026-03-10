@@ -418,6 +418,29 @@ struct IconView: View {
     }
 }
 
+// MARK: - Dock Glass Effect
+
+/// Applies Liquid Glass on macOS 26+, falls back to ultraThinMaterial on older versions.
+struct DockGlassModifier: ViewModifier {
+    @AppStorage("dockGlassIntensity") private var intensity: Double = 0.5
+
+    private let shape = RoundedRectangle(cornerRadius: 22, style: .continuous)
+
+    func body(content: Content) -> some View {
+        if #available(macOS 26, *) {
+            content
+                .glassEffect(
+                    .regular.tint(Color.white.opacity(intensity * 0.6)),
+                    in: shape
+                )
+        } else {
+            content
+                .background(shape.fill(.ultraThinMaterial))
+                .overlay(shape.strokeBorder(Color.white.opacity(0.2), lineWidth: 0.5))
+        }
+    }
+}
+
 // MARK: - Wallpaper Loader
 
 final class WallpaperLoader: ObservableObject {
@@ -554,6 +577,7 @@ struct DockPreviewBar: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding()
             } else {
+                // Dock-style pill container
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 0) {
                         ForEach(apps.pinned) { app in
@@ -583,8 +607,11 @@ struct DockPreviewBar: View {
                             .padding(.horizontal, 6)
                         }
                     }
-                    .padding(.horizontal, 4)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
                 }
+                .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                .modifier(DockGlassModifier())
             }
         }
         .padding()
@@ -593,7 +620,7 @@ struct DockPreviewBar: View {
         .background(
             GeometryReader { geo in
                 if let wallpaper = wallpaperLoader.wallpaperImage {
-                    let bleed: CGFloat = 100
+                    let bleed: CGFloat = 50
                     let barW = geo.size.width
                     let barH = geo.size.height
                     let totalW = barW + bleed * 2
@@ -610,18 +637,12 @@ struct DockPreviewBar: View {
                         .mask(
                             RoundedRectangle(cornerRadius: 12)
                                 .frame(width: barW, height: barH)
-                                .blur(radius: 40)
+                                .blur(radius: 24)
                                 .frame(width: totalW, height: totalH)
                         )
                         .position(x: barW / 2, y: barH / 2)
-                } else {
-                    RoundedRectangle(cornerRadius: 12).fill(.bar)
                 }
             }
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(Color.secondary.opacity(0.2), lineWidth: 1)
         )
         .padding()
     }
