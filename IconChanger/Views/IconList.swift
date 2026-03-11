@@ -41,7 +41,7 @@ struct IconList: View {
     @State private var customizedPaths: Set<String> = []
 
     private var shouldShowDockPreview: Bool {
-        dockPreviewMode == "always" || appFilter == .dock
+        appFilter != .folders && (dockPreviewMode == "always" || appFilter == .dock)
     }
 
     private var availableFilters: [AppFilter] {
@@ -190,6 +190,8 @@ struct IconList: View {
                         allApps: iconManager.apps,
                         dockLayout: dockLayout,
                         refreshTrigger: iconManager.iconRefreshTrigger,
+                        appFilter: appFilter,
+                        customizedPaths: customizedPaths,
                         onSelectApp: { app in selectedApp = app }
                     )
                 }
@@ -608,14 +610,27 @@ struct DockPreviewBar: View {
     let allApps: [AppItem]
     let dockLayout: DockLayout
     let refreshTrigger: UUID
+    var appFilter: AppFilter = .all
+    var customizedPaths: Set<String> = []
     var onSelectApp: ((AppItem) -> Void)?
     @StateObject private var wallpaperLoader = WallpaperLoader.shared
+
+    private func shouldShow(_ app: AppItem) -> Bool {
+        switch appFilter {
+        case .customized:
+            return customizedPaths.contains(app.id)
+        case .notCustomized:
+            return !customizedPaths.contains(app.id)
+        default:
+            return true
+        }
+    }
 
     private var resolvedApps: (pinned: [AppItem], runningOnly: [AppItem]) {
         let lookup = Dictionary(allApps.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         return (
-            pinned: dockLayout.pinnedPaths.compactMap { lookup[$0] },
-            runningOnly: dockLayout.runningOnlyOrdered.compactMap { lookup[$0] }
+            pinned: dockLayout.pinnedPaths.compactMap { lookup[$0] }.filter { shouldShow($0) },
+            runningOnly: dockLayout.runningOnlyOrdered.compactMap { lookup[$0] }.filter { shouldShow($0) }
         )
     }
 
@@ -760,13 +775,18 @@ struct DockPreviewIcon: View {
     private func loadIcon() async {
         let url = app.url
         let appId = app.id
-        let (loaded, cached) = await Task.detached(priority: .userInitiated) {
-            let img = NSWorkspace.shared.icon(forFile: url.path)
-            let isCached = IconCacheManager.shared.getIconCache(for: appId) != nil
-            return (img, isCached)
+        if let cached = AppIconCache.shared.cachedIcon(for: url) {
+            icon = cached
+            hasCustom = IconCacheManager.shared.getIconCache(for: appId) != nil
+            return
+        }
+        let (loaded, isCached) = await Task.detached(priority: .userInitiated) {
+            let img = AppIconCache.shared.icon(for: url)
+            let cached = IconCacheManager.shared.getIconCache(for: appId) != nil
+            return (img, cached)
         }.value
         icon = loaded
-        hasCustom = cached
+        hasCustom = isCached
     }
 }
 
