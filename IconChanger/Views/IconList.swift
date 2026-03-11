@@ -11,6 +11,7 @@ enum AppFilter: String, CaseIterable, Identifiable {
     case dock = "Dock"
     case customized = "Customized"
     case notCustomized = "Not Customized"
+    case folders = "Folders"
 
     var id: String { rawValue }
 }
@@ -25,6 +26,7 @@ struct DockLayout: Equatable {
 
 struct IconList: View {
     @StateObject private var iconManager = IconManager.shared
+    @StateObject private var folderManager = FolderManager.shared
     @AppStorage("showCustomIconBadge") private var showCustomIconBadge = true
     @AppStorage("dockPreviewMode") private var dockPreviewMode: String = "dockOnly"
 
@@ -50,7 +52,13 @@ struct IconList: View {
     }
 
     private var filteredApps: [AppItem] {
-        iconManager.apps.filter { app in
+        if appFilter == .folders {
+            return folderManager.folders.filter { folder in
+                searchText.isEmpty || folder.name.localizedStandardContains(searchText)
+            }
+        }
+
+        return iconManager.apps.filter { app in
             let matchesSearch = searchText.isEmpty || app.name.localizedStandardContains(searchText)
             guard matchesSearch else { return false }
 
@@ -63,6 +71,8 @@ struct IconList: View {
                 return customizedPaths.contains(app.id)
             case .notCustomized:
                 return !customizedPaths.contains(app.id)
+            case .folders:
+                return false // handled above
             }
         }
     }
@@ -82,11 +92,45 @@ struct IconList: View {
     var body: some View {
         NavigationView {
             List(selection: $selectedApp) {
+                if appFilter == .folders {
+                    Button {
+                        folderManager.addFolderViaPanel()
+                    } label: {
+                        Label("Add Folder", systemImage: "plus.circle")
+                    }
+                    .buttonStyle(.borderless)
+                    .padding(.vertical, 4)
+                }
+
                 ForEach(filteredApps, id: \.id) { app in
                     IconView(app: app, refreshTrigger: iconManager.iconRefreshTrigger,
-                             isCustomized: showCustomIconBadge && customizedPaths.contains(app.id))
+                             isCustomized: showCustomIconBadge && customizedPaths.contains(app.id),
+                             isFolder: appFilter == .folders)
                         .tag(app)
                         .contextMenu {
+                            if appFilter == .folders {
+                                Button("Copy the Name") {
+                                    NSPasteboard.general.clearContents()
+                                    NSPasteboard.general.setString(app.name, forType: .string)
+                                }
+
+                                Button("Show in Finder") {
+                                    NSWorkspace.shared.activateFileViewerSelecting([app.url])
+                                }
+
+                                Button("Restore Default Icon") {
+                                    appToRestore = app
+                                }
+
+                                Divider()
+
+                                Button("Remove Folder", role: .destructive) {
+                                    if selectedApp?.id == app.id {
+                                        selectedApp = nil
+                                    }
+                                    folderManager.removeFolder(at: app.id)
+                                }
+                            } else {
                                 Button("Copy the Name") {
                                     NSPasteboard.general.clearContents()
                                     NSPasteboard.general.setString(app.name, forType: .string)
@@ -133,6 +177,7 @@ struct IconList: View {
                                         }
                                     }
                                 }
+                            }
                     }
                 }
             }
@@ -154,8 +199,22 @@ struct IconList: View {
                         .id(app.id)
                 } else {
                     Spacer()
-                    if !shouldShowDockPreview {
-                        Text("Select an app to see its details")
+                    if appFilter == .folders && folderManager.folders.isEmpty {
+                        VStack(spacing: 12) {
+                            Image(systemName: "folder.badge.plus")
+                                .font(.system(size: 40))
+                                .foregroundColor(.secondary)
+                            Text("No folders added yet")
+                                .font(.title3)
+                                .foregroundColor(.secondary)
+                            Button("Add Folder") {
+                                folderManager.addFolderViaPanel()
+                            }
+                        }
+                    } else if !shouldShowDockPreview {
+                        Text(appFilter == .folders
+                             ? "Select a folder to customize its icon"
+                             : "Select an app to see its details")
                             .foregroundColor(.secondary)
                     }
                     Spacer()
@@ -383,6 +442,7 @@ struct IconView: View {
     let app: AppItem
     let refreshTrigger: UUID
     var isCustomized: Bool = false
+    var isFolder: Bool = false
     @State private var icon: NSImage?
 
     var body: some View {
@@ -394,7 +454,9 @@ struct IconView: View {
                             .resizable()
                             .scaledToFit()
                     } else {
-                        Image(nsImage: NSWorkspace.shared.icon(for: .applicationBundle))
+                        Image(nsImage: isFolder
+                              ? NSWorkspace.shared.icon(for: .folder)
+                              : NSWorkspace.shared.icon(for: .applicationBundle))
                             .resizable()
                             .scaledToFit()
                             .opacity(0.3)
@@ -433,7 +495,10 @@ struct IconView: View {
         }
         let url = app.url
         let loaded = await Task.detached(priority: .userInitiated) {
-            AppIconCache.shared.icon(for: url)
+            if isFolder {
+                return NSWorkspace.shared.icon(forFile: url.path)
+            }
+            return AppIconCache.shared.icon(for: url)
         }.value
         icon = loaded
     }

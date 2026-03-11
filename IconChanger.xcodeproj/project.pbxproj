@@ -62,6 +62,7 @@
 		A20000010311000100000002 /* IconFavoriteManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010311000200000002 /* IconFavoriteManager.swift */; };
 		A20000010311000100000003 /* FavoriteImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010311000200000003 /* FavoriteImageView.swift */; };
 		A20000010311000100000004 /* HistoryImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010311000200000004 /* HistoryImageView.swift */; };
+		A20000010311000100000005 /* FolderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010311000200000005 /* FolderManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -143,6 +144,7 @@
 		A20000010311000200000002 /* IconFavoriteManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconFavoriteManager.swift; sourceTree = "<group>"; };
 		A20000010311000200000003 /* FavoriteImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteImageView.swift; sourceTree = "<group>"; };
 		A20000010311000200000004 /* HistoryImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryImageView.swift; sourceTree = "<group>"; };
+		A20000010311000200000005 /* FolderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -286,6 +288,7 @@
 				908A790A281A128700951B15 /* Request.swift */,
 				A20000010311000200000001 /* IconHistoryManager.swift */,
 				A20000010311000200000002 /* IconFavoriteManager.swift */,
+				A20000010311000200000005 /* FolderManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -531,6 +534,7 @@
 				A20000010311000100000002 /* IconFavoriteManager.swift in Sources */,
 				A20000010311000100000003 /* FavoriteImageView.swift in Sources */,
 				A20000010311000100000004 /* HistoryImageView.swift in Sources */,
+				A20000010311000100000005 /* FolderManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
