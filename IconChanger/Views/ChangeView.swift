@@ -38,6 +38,7 @@ struct ChangeView: View {
     @State private var setIconError: String?
     @State private var isDragOver = false
     @State private var hasDuplicateName = false
+    @State private var fetchError: String? = nil
     @State private var appFavorites: [FavoriteIcon] = []
     @State private var appHistory: [IconHistoryEntry] = []
     @State private var isHistoryExpanded = false
@@ -159,6 +160,23 @@ struct ChangeView: View {
                             Spacer()
                             ProgressView()
                                 .progressViewStyle(AppStoreProgressViewStyle())
+                            Spacer()
+                        }
+                    } else if let error = fetchError {
+                        VStack(spacing: 8) {
+                            Spacer()
+                            Image(systemName: "exclamationmark.triangle")
+                                .font(.largeTitle)
+                                .foregroundColor(.orange)
+                            Text(error)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
+                            Button(NSLocalizedString("Retry", comment: "Retry button")) {
+                                triggerIconFetch(forceRefresh: true)
+                            }
+                            .padding(.top, 4)
                             Spacer()
                         }
                     } else if validIcons.isEmpty {
@@ -410,6 +428,7 @@ struct ChangeView: View {
         await MainActor.run {
             if currentLoadToken == token {
                 isLoadingIcons = true
+                fetchError = nil
             }
         }
 
@@ -431,6 +450,7 @@ struct ChangeView: View {
                 totalIconsCount = fetchedIcons.count
                 successIconsCount = fetchedIcons.count
                 validIcons = fetchedIcons
+                fetchError = nil
                 isLoadingIcons = false
             }
         } catch is CancellationError {
@@ -442,6 +462,11 @@ struct ChangeView: View {
         } catch {
             await MainActor.run {
                 if currentLoadToken == token {
+                    fetchError = error.localizedDescription
+                    icons = []
+                    validIcons = []
+                    totalIconsCount = 0
+                    successIconsCount = 0
                     isLoadingIcons = false
                 }
             }

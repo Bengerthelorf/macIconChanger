@@ -41,6 +41,9 @@ struct AdvancedSettingsView: View {
     @StateObject private var cliManager = CLIManager.shared
     @AppStorage("cacheAPIResults") private var cacheAPIResults = true
     @State private var fetchCacheCount: Int = IconFetchCacheManager.shared.getCacheCount()
+    @AppStorage("apiRetryCount") private var apiRetryCount = 0
+    @AppStorage("apiTimeoutSeconds") private var apiTimeoutSeconds: Double = 15.0
+    @AppStorage("apiMonthlyLimit") private var apiMonthlyLimit = 50
 
     private var aliasCount: Int {
         AliasNames.getAll().count
@@ -95,6 +98,58 @@ struct AdvancedSettingsView: View {
                 }
             } header: {
                 Label(NSLocalizedString("Connection Test", comment: "Settings section"), systemImage: "network")
+            }
+
+            // MARK: - API Settings
+            Section {
+                Picker(NSLocalizedString("Retry Count", comment: "API setting"), selection: $apiRetryCount) {
+                    Text(NSLocalizedString("No Retry", comment: "Retry option")).tag(0)
+                    Text("1").tag(1)
+                    Text("2").tag(2)
+                    Text("3").tag(3)
+                }
+
+                HStack {
+                    Text(NSLocalizedString("Timeout", comment: "API setting"))
+                    Spacer()
+                    TextField("", value: $apiTimeoutSeconds, format: .number)
+                        .frame(width: 60)
+                        .multilineTextAlignment(.trailing)
+                    Text(NSLocalizedString("seconds", comment: "Timeout unit"))
+                        .foregroundColor(.secondary)
+                }
+
+                HStack {
+                    Text(NSLocalizedString("Monthly Limit", comment: "API setting"))
+                    Spacer()
+                    TextField("", value: $apiMonthlyLimit, format: .number)
+                        .frame(width: 60)
+                        .multilineTextAlignment(.trailing)
+                    Text(NSLocalizedString("queries", comment: "Limit unit"))
+                        .foregroundColor(.secondary)
+                }
+
+                LabeledContent {
+                    HStack(spacing: 4) {
+                        Text("\(APIUsageTracker.shared.currentCount)/\(APIUsageTracker.shared.monthlyLimit)")
+                            .monospacedDigit()
+                        Text("(\(APIUsageTracker.shared.remaining) " + NSLocalizedString("remaining", comment: "API usage") + ")")
+                            .foregroundColor(APIUsageTracker.shared.remaining > 10 ? .secondary : .orange)
+                    }
+                } label: {
+                    Label(NSLocalizedString("Monthly Usage", comment: "API setting"), systemImage: "chart.bar")
+                }
+
+                Button(role: .destructive) {
+                    APIUsageTracker.shared.resetCount()
+                } label: {
+                    Label(NSLocalizedString("Reset Usage Counter", comment: "API setting"), systemImage: "arrow.counterclockwise")
+                }
+            } header: {
+                Label(NSLocalizedString("API Settings", comment: "Settings section"), systemImage: "gearshape")
+            } footer: {
+                Text(NSLocalizedString("Retry count controls how many times a failed request is retried. Timeout applies to each individual request attempt.", comment: "API settings description"))
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             // MARK: - Icon Search Cache

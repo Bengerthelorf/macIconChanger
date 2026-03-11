@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "\"Start Hidden\" requires \"Run in Background\" to be enabled." : {
       "localizations" : {
         "ar" : {
@@ -1249,6 +1252,9 @@
         }
       }
     },
+    "1" : {
+
+    },
     "1. A dialog will appear requesting access to /Applications" : {
       "localizations" : {
         "ar" : {
@@ -1427,6 +1433,9 @@
         }
       }
     },
+    "2" : {
+
+    },
     "2. Please choose /Applications and click OK" : {
       "localizations" : {
         "ar" : {
@@ -1604,6 +1613,9 @@
           }
         }
       }
+    },
+    "3" : {
+
     },
     "3. If no dialog appears, you might need to grant access manually in System Settings > Privacy & Security > Files and Folders" : {
       "localizations" : {
@@ -2139,6 +2151,9 @@
           }
         }
       }
+    },
+    "Add Folder" : {
+
     },
     "Add to Favorites" : {
 
@@ -3930,6 +3945,17 @@
         }
       }
     },
+    "API error (HTTP %d): %@" : {
+      "comment" : "API HTTP error",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "API error (HTTP %1$d): %2$@"
+          }
+        }
+      }
+    },
     "API Key" : {
       "comment" : "Settings section",
       "localizations" : {
@@ -4109,6 +4135,9 @@
         }
       }
     },
+    "API key not configured. Add your macosicons.com API key in Settings." : {
+      "comment" : "API key missing error"
+    },
     "API Key: " : {
       "comment" : "API settings",
       "localizations" : {
@@ -4287,6 +4316,9 @@
           }
         }
       }
+    },
+    "API Settings" : {
+      "comment" : "Settings section"
     },
     "API test failed: %@" : {
       "comment" : "API testing error",
@@ -31192,6 +31224,26 @@
         }
       }
     },
+    "Monthly API query limit reached (%d/%d). Resets on the 1st of next month." : {
+      "comment" : "API rate limit error",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Monthly API query limit reached (%1$d/%2$d). Resets on the 1st of next month."
+          }
+        }
+      }
+    },
+    "Monthly Limit" : {
+      "comment" : "API setting"
+    },
+    "Monthly Usage" : {
+      "comment" : "API setting"
+    },
+    "Network error: %@" : {
+      "comment" : "Network error"
+    },
     "Next Restore" : {
       "localizations" : {
         "ar" : {
@@ -31905,6 +31957,9 @@
         }
       }
     },
+    "No folders added yet" : {
+
+    },
     "No Icon" : {
       "comment" : "(No comment)",
       "localizations" : {
@@ -32263,6 +32318,9 @@
         }
       }
     },
+    "No icons found for this search." : {
+      "comment" : "API no results"
+    },
     "No new items were found to import" : {
       "comment" : "Notification body",
       "localizations" : {
@@ -32441,6 +32499,9 @@
           }
         }
       }
+    },
+    "No Retry" : {
+      "comment" : "Retry option"
     },
     "Norwegian" : {
       "comment" : "Language selection",
@@ -34772,6 +34833,9 @@
         }
       }
     },
+    "queries" : {
+      "comment" : "Limit unit"
+    },
     "Quit" : {
       "comment" : "Menu item",
       "localizations" : {
@@ -35497,6 +35561,12 @@
         }
       }
     },
+    "remaining" : {
+      "comment" : "API usage"
+    },
+    "Remove Folder" : {
+
+    },
     "Remove from Cache" : {
       "localizations" : {
         "ar" : {
@@ -36215,6 +36285,12 @@
           }
         }
       }
+    },
+    "Request timed out. Check your network connection or increase the timeout in Settings." : {
+      "comment" : "API timeout error"
+    },
+    "Reset Usage Counter" : {
+      "comment" : "API setting"
     },
     "Restart the Dock to refresh all icons" : {
 
@@ -38714,6 +38790,15 @@
         }
       }
     },
+    "Retry" : {
+      "comment" : "Retry button"
+    },
+    "Retry Count" : {
+      "comment" : "API setting"
+    },
+    "Retry count controls how many times a failed request is retried. Timeout applies to each individual request attempt." : {
+      "comment" : "API settings description"
+    },
     "Retry Setup Check" : {
       "localizations" : {
         "ar" : {
@@ -39968,6 +40053,12 @@
         }
       }
     },
+    "seconds" : {
+      "comment" : "Timeout unit"
+    },
+    "Select a folder to customize its icon" : {
+
+    },
     "Select an app to see its details" : {
       "localizations" : {
         "ar" : {
@@ -40145,6 +40236,9 @@
           }
         }
       }
+    },
+    "Select folders to customize their icons" : {
+      "comment" : "Folder picker message"
     },
     "Service Status" : {
       "localizations" : {
@@ -42306,6 +42400,9 @@
           }
         }
       }
+    },
+    "Show in Finder" : {
+
     },
     "Show in Menu Bar" : {
       "comment" : "Menu item",
@@ -46076,6 +46173,12 @@
           }
         }
       }
+    },
+    "Timeout" : {
+      "comment" : "API setting"
+    },
+    "Too many requests. The API server is rate-limiting you. Try again later." : {
+      "comment" : "API 429 error"
     },
     "Traditional Chinese" : {
       "comment" : "Language selection",

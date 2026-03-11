@@ -33,6 +33,103 @@ private actor RequestDeduplicator {
     }
 }
 
+// MARK: - API Error Types
+
+enum APIError: Error, LocalizedError {
+    case rateLimitExceeded(used: Int, limit: Int)
+    case requestTimeout
+    case apiKeyMissing
+    case httpError(statusCode: Int, message: String)
+    case noResults
+    case networkError(String)
+
+    var isNonRetryable: Bool {
+        switch self {
+        case .rateLimitExceeded, .apiKeyMissing:
+            return true
+        default:
+            return false
+        }
+    }
+
+    var errorDescription: String? {
+        switch self {
+        case .rateLimitExceeded(let used, let limit):
+            return String(format: NSLocalizedString("Monthly API query limit reached (%d/%d). Resets on the 1st of next month.", comment: "API rate limit error"), used, limit)
+        case .requestTimeout:
+            return NSLocalizedString("Request timed out. Check your network connection or increase the timeout in Settings.", comment: "API timeout error")
+        case .apiKeyMissing:
+            return NSLocalizedString("API key not configured. Add your macosicons.com API key in Settings.", comment: "API key missing error")
+        case .httpError(let statusCode, let message):
+            if statusCode == 429 {
+                return NSLocalizedString("Too many requests. The API server is rate-limiting you. Try again later.", comment: "API 429 error")
+            }
+            return String(format: NSLocalizedString("API error (HTTP %d): %@", comment: "API HTTP error"), statusCode, message)
+        case .noResults:
+            return NSLocalizedString("No icons found for this search.", comment: "API no results")
+        case .networkError(let message):
+            return String(format: NSLocalizedString("Network error: %@", comment: "Network error"), message)
+        }
+    }
+}
+
+// MARK: - API Usage Tracker
+
+class APIUsageTracker {
+    static let shared = APIUsageTracker()
+
+    private let countKey = "com.iconchanger.apiQueryCount"
+    private let resetDateKey = "com.iconchanger.apiQueryResetDate"
+    private let lock = NSLock()
+
+    var currentCount: Int {
+        lock.lock()
+        defer { lock.unlock() }
+        resetIfNewMonth()
+        return UserDefaults.standard.integer(forKey: countKey)
+    }
+
+    var monthlyLimit: Int {
+        let stored = UserDefaults.standard.integer(forKey: "apiMonthlyLimit")
+        return stored > 0 ? stored : 50
+    }
+
+    var remaining: Int {
+        max(0, monthlyLimit - currentCount)
+    }
+
+    func canMakeRequest() -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        resetIfNewMonth()
+        return UserDefaults.standard.integer(forKey: countKey) < monthlyLimit
+    }
+
+    func recordRequest() {
+        lock.lock()
+        resetIfNewMonth()
+        let current = UserDefaults.standard.integer(forKey: countKey)
+        UserDefaults.standard.set(current + 1, forKey: countKey)
+        lock.unlock()
+    }
+
+    func resetCount() {
+        lock.lock()
+        UserDefaults.standard.set(0, forKey: countKey)
+        UserDefaults.standard.set(Date(), forKey: resetDateKey)
+        lock.unlock()
+    }
+
+    private func resetIfNewMonth() {
+        let lastReset = UserDefaults.standard.object(forKey: resetDateKey) as? Date ?? Date.distantPast
+        let calendar = Calendar.current
+        if !calendar.isDate(lastReset, equalTo: Date(), toGranularity: .month) {
+            UserDefaults.standard.set(0, forKey: countKey)
+            UserDefaults.standard.set(Date(), forKey: resetDateKey)
+        }
+    }
+}
+
 class MyQueryRequestController {
     static let shared = MyQueryRequestController()
 
@@ -45,18 +142,29 @@ class MyQueryRequestController {
     private let logger: Logger
     private let dedup = RequestDeduplicator()
 
-    init(session: URLSession = MyQueryRequestController.makeSession()) {
-        self.session = session
+    private var retryCount: Int {
+        UserDefaults.standard.integer(forKey: "apiRetryCount")
+    }
+
+    private var timeoutSeconds: Double {
+        let stored = UserDefaults.standard.double(forKey: "apiTimeoutSeconds")
+        return stored > 0 ? stored : 15.0
+    }
+
+    init(session: URLSession? = nil) {
+        self.session = session ?? MyQueryRequestController.makeSession()
         self.logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "IconChanger", category: "Network")
     }
 
     private static func makeSession() -> URLSession {
+        let timeout = UserDefaults.standard.double(forKey: "apiTimeoutSeconds")
+        let effectiveTimeout = timeout > 0 ? timeout : 15.0
+
         let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 15.0
-        configuration.timeoutIntervalForResource = 30.0
+        configuration.timeoutIntervalForRequest = effectiveTimeout
+        configuration.timeoutIntervalForResource = effectiveTimeout * 2
         configuration.httpMaximumConnectionsPerHost = 4
         configuration.requestCachePolicy = .reloadRevalidatingCacheData
-        // API responses are small JSON; keep a modest cache.
         configuration.urlCache = URLCache(
             memoryCapacity: 5 * 1024 * 1024,
             diskCapacity: 30 * 1024 * 1024,
@@ -67,16 +175,42 @@ class MyQueryRequestController {
     }
 
     func sendRequest(_ query: String, style: IconStyle = .all) async throws -> [IconRes] {
+        // Check rate limit before making any request
+        guard APIUsageTracker.shared.canMakeRequest() else {
+            throw APIError.rateLimitExceeded(
+                used: APIUsageTracker.shared.currentCount,
+                limit: APIUsageTracker.shared.monthlyLimit
+            )
+        }
+
         let key = "\(query)|\(style.displayName)"
 
         let (task, isNew) = await dedup.deduplicate(for: key) { [self] in
             Task<[IconRes], Error> {
-                let results = try await self.sendRequestToMeilisearch(query, style: style)
-                if results.isEmpty {
-                    self.logger.debug("Meilisearch returned no results for '\(query, privacy: .public)'. Trying backup API.")
-                    return try await self.sendBackupRequest(query, style: style)
+                let maxAttempts = max(1, self.retryCount + 1)
+                var lastError: Error?
+
+                for attempt in 1...maxAttempts {
+                    do {
+                        let results = try await self.sendRequestToMeilisearch(query, style: style)
+                        if results.isEmpty {
+                            self.logger.debug("Meilisearch returned no results for '\(query, privacy: .public)'. Trying backup API.")
+                            return try await self.sendBackupRequest(query, style: style)
+                        }
+                        return results
+                    } catch is CancellationError {
+                        throw CancellationError()
+                    } catch let error as APIError where error.isNonRetryable {
+                        throw error
+                    } catch {
+                        lastError = error
+                        if attempt < maxAttempts {
+                            self.logger.debug("Attempt \(attempt) failed for '\(query, privacy: .public)': \(error.localizedDescription, privacy: .public). Retrying...")
+                            try await Task.sleep(nanoseconds: UInt64(attempt) * 500_000_000)
+                        }
+                    }
                 }
-                return results
+                throw lastError ?? APIError.networkError("Unknown error")
             }
         }
 
@@ -85,7 +219,10 @@ class MyQueryRequestController {
         }
 
         defer { if isNew { Task { await dedup.remove(key) } } }
-        return try await task.value
+
+        let results = try await task.value
+        APIUsageTracker.shared.recordRequest()
+        return results
     }
     
     private func sendRequestToMeilisearch(_ query: String, style: IconStyle) async throws -> [IconRes] {
@@ -97,7 +234,7 @@ class MyQueryRequestController {
 
         guard let URL = URL(string: urlString) else {
             logger.error("Invalid search URL.")
-            return []
+            throw APIError.networkError("Invalid search URL")
         }
         var request = URLRequest(url: URL)
         request.httpMethod = "POST"
@@ -140,33 +277,32 @@ class MyQueryRequestController {
             request.httpBody = jsonData
         } catch {
             logger.error("Failed to encode search request body: \(error.localizedDescription, privacy: .public)")
-            return []
+            throw APIError.networkError("Failed to encode request: \(error.localizedDescription)")
         }
 
         do {
             let (data, response) = try await session.data(for: request)
-            
+
             guard let httpResponse = response as? HTTPURLResponse else {
                 logger.error("Search response was not HTTP.")
-                return []
+                throw APIError.networkError("Invalid response from server")
             }
 
             if httpResponse.statusCode != 200 {
-                if let errorStr = String(data: data, encoding: .utf8) {
-                    logger.error("Search request failed: \(errorStr, privacy: .public)")
-                }
-                return []
+                let errorStr = String(data: data, encoding: .utf8) ?? "Unknown error"
+                logger.error("Search request failed (\(httpResponse.statusCode)): \(errorStr, privacy: .public)")
+                throw APIError.httpError(statusCode: httpResponse.statusCode, message: errorStr)
             }
-            
+
             let json = try JSON(data: data)
-            
+
             // Check if the response has expected structure
             if json["hits"].exists() {
                 logger.debug("Received \(json["hits"].arrayValue.count) hits for '\(query, privacy: .public)'")
             } else {
                 logger.warning("Search response missing 'hits' for '\(query, privacy: .public)'")
             }
-            
+
             let res = json["hits"].arrayValue.compactMap { hit in
                 if let lowResPngUrl = hit["lowResPngUrl"].url, let icnsUrl = hit["icnsUrl"].url {
                     return IconRes(appName: hit["appName"].stringValue, icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: hit["downloads"].intValue)
@@ -175,22 +311,26 @@ class MyQueryRequestController {
                     return nil
                 }
             }
-            
+
             let normalizedQuery = query.lowercased().replace(target: " ", withString: "")
             let filteredRes = res.filter {
                 $0.appName.lowercased().replace(target: " ", withString: "").contains(normalizedQuery)
             }
             logger.debug("Returning \(filteredRes.count) icons after filtering for '\(query, privacy: .public)'")
-            
+
             return filteredRes.sorted { res1, res2 in
                 res1.downloads > res2.downloads
             }
+        } catch let error as APIError {
+            throw error
         } catch {
             logger.error("Search request error: \(error.localizedDescription, privacy: .public)")
-            if let nsError = error as NSError? {
-                logger.debug("Search error details domain=\(nsError.domain, privacy: .public) code=\(nsError.code, privacy: .public)")
+            let nsError = error as NSError
+            logger.debug("Search error details domain=\(nsError.domain, privacy: .public) code=\(nsError.code, privacy: .public)")
+            if nsError.code == NSURLErrorTimedOut {
+                throw APIError.requestTimeout
             }
-            return []
+            throw APIError.networkError(error.localizedDescription)
         }
     }
     
@@ -280,7 +420,7 @@ class MyQueryRequestController {
         
         guard let url = URL(string: urlString) else {
             logger.error("Invalid backup search URL")
-            return []
+            throw APIError.networkError("Invalid backup search URL")
         }
         
         var request = URLRequest(url: url)
@@ -298,48 +438,42 @@ class MyQueryRequestController {
         
         do {
             let (data, response) = try await session.data(for: request)
-            
+
             guard let httpResponse = response as? HTTPURLResponse else {
                 logger.error("Backup search response was not HTTP.")
-                return []
+                throw APIError.networkError("Invalid response from backup server")
             }
-            
+
             if httpResponse.statusCode != 200 {
-                if let errorStr = String(data: data, encoding: .utf8) {
-                    logger.error("Backup search failed: \(errorStr, privacy: .public)")
-                }
-                return []
+                let errorStr = String(data: data, encoding: .utf8) ?? "Unknown error"
+                logger.error("Backup search failed (\(httpResponse.statusCode)): \(errorStr, privacy: .public)")
+                throw APIError.httpError(statusCode: httpResponse.statusCode, message: errorStr)
             }
-            
-            // Try to parse the response data
-            do {
-                let json = try JSON(data: data)
-                
-                // Check different response structures
-                var icons: [IconRes] = []
-                
-                if let results = extractIconsFromJSON(json) {
-                    icons = results
-                } else {
-                    logger.warning("Backup search could not extract icon data.")
-                    // Try to create some simple icon data so the application can continue
-                    // This is only as a last resort
-                    if let directData = json.array?.first {
-                        // Print all available keys for better understanding of the response format
-                        if let jsonObj = directData.dictionary {
-                            logger.debug("Backup search response keys: \(jsonObj.keys.joined(separator: ", "), privacy: .public)")
-                        }
+
+            let json = try JSON(data: data)
+
+            var icons: [IconRes] = []
+
+            if let results = extractIconsFromJSON(json) {
+                icons = results
+            } else {
+                logger.warning("Backup search could not extract icon data.")
+                if let directData = json.array?.first {
+                    if let jsonObj = directData.dictionary {
+                        logger.debug("Backup search response keys: \(jsonObj.keys.joined(separator: ", "), privacy: .public)")
                     }
                 }
-                return icons.sorted { $0.downloads > $1.downloads }
-            } catch {
-                logger.error("Backup search JSON parsing error: \(error.localizedDescription, privacy: .public)")
-                return []
             }
-            
+            return icons.sorted { $0.downloads > $1.downloads }
+        } catch let error as APIError {
+            throw error
         } catch {
             logger.error("Backup search request failed: \(error.localizedDescription, privacy: .public)")
-            return []
+            let nsError = error as NSError
+            if nsError.code == NSURLErrorTimedOut {
+                throw APIError.requestTimeout
+            }
+            throw APIError.networkError(error.localizedDescription)
         }
     }
     
