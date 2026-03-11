@@ -206,6 +206,11 @@ struct SettingsView: View {
                     Label("Background", systemImage: "clock.arrow.circlepath")
                 }
 
+            DisplaySettingsView()
+                .tabItem {
+                    Label("Display", systemImage: "eye")
+                }
+
             AdvancedSettingsView()
                 .tabItem {
                     Label("Advanced", systemImage: "gearshape.2")

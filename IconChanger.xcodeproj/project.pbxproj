@@ -11,6 +11,7 @@
 		2F13C0772D93267B00C645E9 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F13C0762D93267A00C645E9 /* AppKit.framework */; };
 		2F13C07E2D932CB800C645E9 /* CLISettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F13C07D2D932CB800C645E9 /* CLISettingView.swift */; };
 		376160D092C6FA629ED2C69D /* AdvancedSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEB5BAFAAD3719C791F75836 /* AdvancedSettingsView.swift */; };
+		A1B2C3D4E5F60718A9B0C1D3 /* DisplaySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718A9B0C1D2 /* DisplaySettingsView.swift */; };
 		98D43EF2688D11B308487318 /* AboutSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E72D958354FAE1A7C1859454 /* AboutSettingsView.swift */; };
 		2F13C0832D932EDD00C645E9 /* IconChangerCLI in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2F13C06C2D9325B100C645E9 /* IconChangerCLI */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		2F4A9A1D2D92543A00F4FA81 /* ConfigSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F4A9A1C2D92543A00F4FA81 /* ConfigSettingsView.swift */; };
@@ -91,6 +92,7 @@
 		2F13C0762D93267A00C645E9 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		2F13C07D2D932CB800C645E9 /* CLISettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLISettingView.swift; sourceTree = "<group>"; };
 		AEB5BAFAAD3719C791F75836 /* AdvancedSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718A9B0C1D2 /* DisplaySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplaySettingsView.swift; sourceTree = "<group>"; };
 		E72D958354FAE1A7C1859454 /* AboutSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutSettingsView.swift; sourceTree = "<group>"; };
 		2F4A9A1C2D92543A00F4FA81 /* ConfigSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigSettingsView.swift; sourceTree = "<group>"; };
 		2FC1315F2D8F7D7D00F60B19 /* CachedIconsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedIconsView.swift; sourceTree = "<group>"; };
@@ -208,6 +210,7 @@
 				2F4A9A1C2D92543A00F4FA81 /* ConfigSettingsView.swift */,
 				2F13C07D2D932CB800C645E9 /* CLISettingView.swift */,
 				AEB5BAFAAD3719C791F75836 /* AdvancedSettingsView.swift */,
+				A1B2C3D4E5F60718A9B0C1D2 /* DisplaySettingsView.swift */,
 				E72D958354FAE1A7C1859454 /* AboutSettingsView.swift */,
 			);
 			path = SettingsView;
@@ -528,6 +531,7 @@
 				684313DDC8758B6A23980300 /* PermissionRequest.swift in Sources */,
 				2F13C07E2D932CB800C645E9 /* CLISettingView.swift in Sources */,
 				376160D092C6FA629ED2C69D /* AdvancedSettingsView.swift in Sources */,
+				A1B2C3D4E5F60718A9B0C1D3 /* DisplaySettingsView.swift in Sources */,
 				98D43EF2688D11B308487318 /* AboutSettingsView.swift in Sources */,
 				C66396BF2F0EAD0C006729FC /* AppItem.swift in Sources */,
 				684319A985908FD7F396A2B9 /* SettingsView.swift in Sources */,

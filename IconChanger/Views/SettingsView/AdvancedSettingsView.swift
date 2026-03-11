@@ -39,12 +39,7 @@ struct AdvancedSettingsView: View {
     @State private var testResult: String? = nil
     @State private var testSuccess = false
     @StateObject private var cliManager = CLIManager.shared
-    @StateObject private var languageManager = LanguageManager.shared
-    @AppStorage("showCustomIconBadge") private var showCustomIconBadge = true
-    @AppStorage("dockGlassIntensity") private var dockGlassIntensity: Double = 0.5
-    @AppStorage("appAppearance") private var appAppearance: String = AppAppearance.system.rawValue
     @AppStorage("cacheAPIResults") private var cacheAPIResults = true
-    @State private var showRestartAlert = false
     @State private var fetchCacheCount: Int = IconFetchCacheManager.shared.getCacheCount()
 
     private var aliasCount: Int {
@@ -183,65 +178,6 @@ struct AdvancedSettingsView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            // MARK: - Display
-            Section {
-                Picker(selection: Binding(
-                    get: { AppAppearance(rawValue: appAppearance) ?? .system },
-                    set: { newValue in
-                        appAppearance = newValue.rawValue
-                        AppAppearance.apply(newValue)
-                    }
-                )) {
-                    ForEach(AppAppearance.allCases) { option in
-                        Text(option.displayName).tag(option)
-                    }
-                } label: {
-                    Label(NSLocalizedString("Appearance", comment: "Display setting"), systemImage: "circle.lefthalf.filled")
-                }
-                .pickerStyle(.segmented)
-
-                Toggle(isOn: $showCustomIconBadge) {
-                    Label(NSLocalizedString("Show Custom Icon Badge", comment: "Display setting"), systemImage: "checkmark.circle.fill")
-                }
-
-                if #available(macOS 26, *) {
-                    Slider(value: $dockGlassIntensity, in: 0...1, step: 0.1) {
-                        Label(NSLocalizedString("Dock Glass Intensity", comment: "Display setting"), systemImage: "cube.transparent")
-                    } minimumValueLabel: {
-                        Image(systemName: "circle.dotted")
-                            .foregroundColor(.secondary)
-                    } maximumValueLabel: {
-                        Image(systemName: "cube.transparent.fill")
-                            .foregroundColor(.secondary)
-                    }
-                }
-            } header: {
-                Label(NSLocalizedString("Display", comment: "Settings section"), systemImage: "eye")
-            } footer: {
-                Text(NSLocalizedString("Show a green checkmark badge on apps with custom icons in the sidebar.", comment: "Display setting description"))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-
-            // MARK: - Language
-            Section {
-                Picker(NSLocalizedString("Language", comment: "Settings section title"), selection: Binding(
-                    get: { languageManager.currentLanguage },
-                    set: { newValue in
-                        languageManager.currentLanguage = newValue
-                        showRestartAlert = true
-                    }
-                )) {
-                    ForEach(AppLanguage.allCases) { language in
-                        Text(language.displayName).tag(language)
-                    }
-                }
-            } header: {
-                Label(NSLocalizedString("Language", comment: "Settings section title"), systemImage: "globe")
-            } footer: {
-                Label(NSLocalizedString("Changes will take full effect after restarting the app", comment: "Language settings instruction"), systemImage: "info.circle")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-
             // MARK: - CLI
             Section {
                 LabeledContent {
@@ -287,13 +223,6 @@ struct AdvancedSettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .alert(isPresented: $showRestartAlert) {
-            Alert(
-                title: Text(NSLocalizedString("Language Changed", comment: "Language alert title")),
-                message: Text(NSLocalizedString("The language has been changed. For the best experience, please restart the application.", comment: "Language alert message")),
-                dismissButton: .default(Text("OK"))
-            )
-        }
         .onAppear {
             ConfigManager.shared.checkForCLIImports()
             fetchCacheCount = IconFetchCacheManager.shared.getCacheCount()

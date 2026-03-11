@@ -28,6 +28,7 @@ struct DockLayout: Equatable {
 struct IconList: View {
     @StateObject private var iconManager = IconManager.shared
     @AppStorage("showCustomIconBadge") private var showCustomIconBadge = true
+    @AppStorage("dockPreviewMode") private var dockPreviewMode: String = "dockOnly"
 
     @State var selectedApp: AppItem? = nil
 
@@ -38,6 +39,17 @@ struct IconList: View {
     @State private var appFilter: AppFilter = .all
     @State private var dockLayout = DockLayout()
     @State private var customizedPaths: Set<String> = []
+
+    private var shouldShowDockPreview: Bool {
+        dockPreviewMode == "always" || appFilter == .dock
+    }
+
+    private var availableFilters: [AppFilter] {
+        if dockPreviewMode == "always" {
+            return AppFilter.allCases.filter { $0 != .dock }
+        }
+        return AppFilter.allCases.map { $0 }
+    }
 
     private var filteredApps: [AppItem] {
         iconManager.apps.filter { app in
@@ -130,7 +142,7 @@ struct IconList: View {
                     .frame(minWidth: 200, idealWidth: 300)
 
             VStack(spacing: 0) {
-                if appFilter == .dock {
+                if shouldShowDockPreview {
                     DockPreviewBar(
                         allApps: iconManager.apps,
                         dockLayout: dockLayout,
@@ -144,7 +156,7 @@ struct IconList: View {
                         .id(app.id)
                 } else {
                     Spacer()
-                    if appFilter != .dock {
+                    if !shouldShowDockPreview {
                         Text("Select an app to see its details")
                             .foregroundColor(.secondary)
                     }
@@ -160,15 +172,20 @@ struct IconList: View {
                 .toolbar {
                     ToolbarItem(placement: .automatic) {
                         Picker("Filter", selection: $appFilter) {
-                            ForEach(AppFilter.allCases) { filter in
+                            ForEach(availableFilters) { filter in
                                 Text(NSLocalizedString(filter.rawValue, comment: "App filter option"))
                                     .tag(filter)
                             }
                         }
                         .pickerStyle(.menu)
                         .onChange(of: appFilter) { newFilter in
-                            if newFilter == .dock {
+                            if newFilter == .dock || dockPreviewMode == "always" {
                                 dockLayout = Self.loadDockLayout()
+                            }
+                        }
+                        .onChange(of: dockPreviewMode) { _ in
+                            if appFilter == .dock && dockPreviewMode == "always" {
+                                appFilter = .all
                             }
                         }
                     }
@@ -266,7 +283,14 @@ struct IconList: View {
                 .toolbarBackground(.hidden, for: .windowToolbar)
                 .onAppear {
                     iconManager.refresh()
-                    dockLayout = Self.loadDockLayout()
+                    if shouldShowDockPreview || appFilter == .dock {
+                        dockLayout = Self.loadDockLayout()
+                    }
+                }
+                .onChange(of: dockPreviewMode) { newMode in
+                    if newMode == "always" {
+                        dockLayout = Self.loadDockLayout()
+                    }
                 }
                 .onChange(of: iconManager.iconRefreshTrigger) { _ in
                     AppIconCache.shared.removeAll()
