@@ -62,7 +62,6 @@
 		C66396BF2F0EAD0C006729FC /* AppItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C66396BE2F0EAD0C006729FC /* AppItem.swift */; };
 		C6E571DA2EA2319C00EC9E5E /* IconImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6E571D92EA2319C00EC9E5E /* IconImageLoader.swift */; };
 		9E409D184D0BFA7ACC289C3A /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 322513C7E4692CC3A6193007 /* KeychainHelper.swift */; };
-		23996A7562524CD19C73A177 /* avatar_bengerthelorf.png in Resources */ = {isa = PBXBuildFile; fileRef = 0B623AF61ECF448489903434 /* avatar_bengerthelorf.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -144,7 +143,6 @@
 		C66396BE2F0EAD0C006729FC /* AppItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppItem.swift; sourceTree = "<group>"; };
 		C6E571D92EA2319C00EC9E5E /* IconImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconImageLoader.swift; sourceTree = "<group>"; };
 		322513C7E4692CC3A6193007 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
-		0B623AF61ECF448489903434 /* avatar_bengerthelorf.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = avatar_bengerthelorf.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -341,7 +339,6 @@
 				9053438A287534C300237F98 /* helper.sh */,
 				90534350286B441900237F98 /* sparkle.xml */,
 				C6222E032F5B61260004A1D8 /* Localizable.xcstrings */,
-				0B623AF61ECF448489903434 /* avatar_bengerthelorf.png */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -485,7 +482,6 @@
 				9017B61E295282ED005709C6 /* LICENSE in Resources */,
 				907AC5012955363800F9F0F9 /* README-fr.md in Resources */,
 				900D1CED281934C8007ABB12 /* Assets.xcassets in Resources */,
-				23996A7562524CD19C73A177 /* avatar_bengerthelorf.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -9,6 +9,8 @@ import Sparkle
 struct AboutSettingsView: View {
     private let updater: SPUUpdater
     @State private var avatarImage: NSImage?
+    @State private var fetchTask: Task<Void, Never>?
+    private static var memoryCache: NSImage?
 
     init(updater: SPUUpdater) {
         self.updater = updater
@@ -68,46 +70,76 @@ struct AboutSettingsView: View {
                 .padding(.bottom, 8)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .task {
-            await loadAvatar()
+        .onAppear {
+            loadAvatar()
+        }
+        .onDisappear {
+            fetchTask?.cancel()
+            fetchTask = nil
         }
     }
 
-    private static let avatarURL = URL(string: "https://github.com/Bengerthelorf.png?size=64")!
-    private static var cacheFileURL: URL {
-        FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent(".iconchanger", isDirectory: true)
-            .appendingPathComponent("avatar_cache.png")
-    }
+    // MARK: - Avatar Caching (memory + disk + bundled asset)
 
-    private func loadAvatar() async {
-        // 1. Show best available local image: disk cache > bundled fallback
-        let local = Self.loadCachedAvatar() ?? Self.loadBundledAvatar()
-        if let local {
-            await MainActor.run { avatarImage = local }
+    private static let avatarCacheURL: URL = {
+        let cacheDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+            .appendingPathComponent(Bundle.main.bundleIdentifier ?? "com.zhuhaoyu.IconChanger", isDirectory: true)
+        try? FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
+        return cacheDir.appendingPathComponent("avatar.png")
+    }()
+
+    private static let cacheMaxAge: TimeInterval = 86400 // 24 hours
+
+    private func loadAvatar() {
+        // 1. Memory cache (instant)
+        if let cached = Self.memoryCache {
+            avatarImage = cached
+            if Self.isDiskCacheStale {
+                fetchTask = Task { await fetchAndCacheAvatar() }
+            }
+            return
         }
 
-        // 2. Try to fetch fresh avatar in background to update cache
+        // 2. Disk cache
+        let cacheURL = Self.avatarCacheURL
+        if FileManager.default.fileExists(atPath: cacheURL.path),
+           let data = try? Data(contentsOf: cacheURL),
+           let image = NSImage(data: data) {
+            Self.memoryCache = image
+            avatarImage = image
+            if Self.isDiskCacheStale {
+                fetchTask = Task { await fetchAndCacheAvatar() }
+            }
+            return
+        }
+
+        // 3. Bundled fallback from Assets.xcassets
+        if let bundled = NSImage(named: "AuthorAvatar") {
+            avatarImage = bundled
+        }
+
+        // 4. Network fetch
+        fetchTask = Task { await fetchAndCacheAvatar() }
+    }
+
+    private static var isDiskCacheStale: Bool {
+        guard let attrs = try? FileManager.default.attributesOfItem(atPath: avatarCacheURL.path),
+              let modified = attrs[.modificationDate] as? Date else {
+            return true
+        }
+        return Date().timeIntervalSince(modified) >= cacheMaxAge
+    }
+
+    private func fetchAndCacheAvatar() async {
+        guard let url = URL(string: "https://github.com/Bengerthelorf.png?size=64") else { return }
         do {
-            let (data, response) = try await URLSession.shared.data(from: Self.avatarURL)
-            guard let httpResponse = response as? HTTPURLResponse,
-                  httpResponse.statusCode == 200,
-                  let image = NSImage(data: data) else { return }
-            try? data.write(to: Self.cacheFileURL, options: .atomic)
-            await MainActor.run { avatarImage = image }
+            let (data, _) = try await URLSession.shared.data(from: url)
+            try Task.checkCancellation()
+            if let image = NSImage(data: data) {
+                Self.memoryCache = image
+                try? data.write(to: Self.avatarCacheURL, options: .atomic)
+                avatarImage = image
+            }
         } catch {}
-    }
-
-    private static func loadCachedAvatar() -> NSImage? {
-        guard FileManager.default.fileExists(atPath: cacheFileURL.path),
-              let data = try? Data(contentsOf: cacheFileURL),
-              let image = NSImage(data: data) else { return nil }
-        return image
-    }
-
-    private static func loadBundledAvatar() -> NSImage? {
-        guard let url = Bundle.main.url(forResource: "avatar_bengerthelorf", withExtension: "png"),
-              let image = NSImage(contentsOf: url) else { return nil }
-        return image
     }
 }
