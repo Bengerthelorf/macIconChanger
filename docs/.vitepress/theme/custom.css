@@ -22,6 +22,11 @@ html[dir='rtl'] .VPHero .actions {
   justify-content: flex-end;
 }
 
+html[dir='rtl'] .VPFlyout .menu {
+  right: auto;
+  left: 0;
+}
+
 @media (min-width: 960px) {
   .VPHero .main {
     display: flex;
