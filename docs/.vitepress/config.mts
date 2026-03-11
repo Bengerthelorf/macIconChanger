@@ -1039,7 +1039,7 @@ export default defineConfig({
       },
     },
     'zh-HK': {
-      label: '繁體中文（香港）',
+      label: '粵語繁體',
       lang: 'zh-HK',
       themeConfig: {
         nav: [
@@ -1115,7 +1115,7 @@ export default defineConfig({
       },
     },
     'zh-Hant': {
-      label: '繁體中文',
+      label: '正體中文',
       lang: 'zh-Hant',
       themeConfig: {
         nav: [
