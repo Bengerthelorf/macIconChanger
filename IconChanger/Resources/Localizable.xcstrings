@@ -3587,6 +3587,9 @@
         }
       }
     },
+    "API call limit exceeded. Try again next month or contact macosicons.com for a higher quota." : {
+      "comment" : "API 429 error"
+    },
     "API connection established but no results returned." : {
       "comment" : "API testing result",
       "localizations" : {
@@ -27458,6 +27461,9 @@
         }
       }
     },
+    "Invalid or expired API key. Check your key in Settings." : {
+      "comment" : "API auth error"
+    },
     "Italian" : {
       "comment" : "Language selection",
       "localizations" : {
@@ -32321,6 +32327,9 @@
     "No icons found for this search." : {
       "comment" : "API no results"
     },
+    "No internet connection." : {
+      "comment" : "No internet error"
+    },
     "No new items were found to import" : {
       "comment" : "Notification body",
       "localizations" : {
@@ -36288,6 +36297,9 @@
     },
     "Request timed out. Check your network connection or increase the timeout in Settings." : {
       "comment" : "API timeout error"
+    },
+    "Request timed out. Check your network connection." : {
+      "comment" : "Timeout error"
     },
     "Reset Usage Counter" : {
       "comment" : "API setting"
@@ -45638,6 +45650,9 @@
           }
         }
       }
+    },
+    "The macosicons.com server is temporarily unavailable. Try again later." : {
+      "comment" : "API server error"
     },
     "This action cannot be undone. You will need to re-apply icons to cache them again." : {
       "localizations" : {

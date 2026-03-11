@@ -8,6 +8,7 @@ import SwiftUI
 struct DisplaySettingsView: View {
     @AppStorage("showCustomIconBadge") private var showCustomIconBadge = true
     @AppStorage("dockGlassIntensity") private var dockGlassIntensity: Double = 0.5
+    @AppStorage("dockPreviewWallpaper") private var dockPreviewWallpaper = true
     @AppStorage("dockPreviewMode") private var dockPreviewMode: String = "dockOnly"
     @AppStorage("appAppearance") private var appAppearance: String = AppAppearance.system.rawValue
     @StateObject private var languageManager = LanguageManager.shared
@@ -49,6 +50,10 @@ struct DisplaySettingsView: View {
                     Text(NSLocalizedString("Always", comment: "Dock preview option")).tag("always")
                 } label: {
                     Label(NSLocalizedString("Dock Preview", comment: "Display setting"), systemImage: "dock.rectangle")
+                }
+
+                Toggle(isOn: $dockPreviewWallpaper) {
+                    Label(NSLocalizedString("Show Wallpaper Background", comment: "Display setting"), systemImage: "photo")
                 }
 
                 if #available(macOS 26, *) {

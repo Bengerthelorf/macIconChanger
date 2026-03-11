@@ -29,6 +29,7 @@ struct IconList: View {
     @StateObject private var folderManager = FolderManager.shared
     @AppStorage("showCustomIconBadge") private var showCustomIconBadge = true
     @AppStorage("dockPreviewMode") private var dockPreviewMode: String = "dockOnly"
+    @AppStorage("dockPreviewWallpaper") private var dockPreviewWallpaper = true
 
     @State var selectedApp: AppItem? = nil
 
@@ -39,6 +40,7 @@ struct IconList: View {
     @State private var appFilter: AppFilter = .all
     @State private var dockLayout = DockLayout()
     @State private var customizedPaths: Set<String> = []
+    @State private var dockBarHeight: CGFloat = 0
 
     private var shouldShowDockPreview: Bool {
         appFilter != .folders && (dockPreviewMode == "always" || appFilter == .dock)
@@ -90,7 +92,7 @@ struct IconList: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationSplitView(columnVisibility: .constant(.all)) {
             List(selection: $selectedApp) {
                 if appFilter == .folders {
                     Button {
@@ -181,48 +183,65 @@ struct IconList: View {
                     }
                 }
             }
-                    .listStyle(SidebarListStyle())
+                    .listStyle(.sidebar)
                     .frame(minWidth: 200, idealWidth: 300)
-
-            VStack(spacing: 0) {
-                if shouldShowDockPreview {
-                    DockPreviewBar(
-                        allApps: iconManager.apps,
-                        dockLayout: dockLayout,
-                        refreshTrigger: iconManager.iconRefreshTrigger,
-                        appFilter: appFilter,
-                        customizedPaths: customizedPaths,
-                        onSelectApp: { app in selectedApp = app }
-                    )
+                    .modifier(HideSidebarToggle())
+        } detail: {
+            ZStack(alignment: .top) {
+                // Wallpaper layer — ignores safe area, stays fixed when sidebar toggles
+                if shouldShowDockPreview, dockPreviewWallpaper, dockBarHeight > 0 {
+                    DockPreviewWallpaper(barHeight: dockBarHeight)
+                        .ignoresSafeArea(edges: .leading)
                 }
 
-                if let app = selectedApp {
-                    ChangeView(setPath: app)
-                        .id(app.id)
-                } else {
-                    Spacer()
-                    if appFilter == .folders && folderManager.folders.isEmpty {
-                        VStack(spacing: 12) {
-                            Image(systemName: "folder.badge.plus")
-                                .font(.system(size: 40))
-                                .foregroundColor(.secondary)
-                            Text("No folders added yet")
-                                .font(.title3)
-                                .foregroundColor(.secondary)
-                            Button("Add Folder") {
-                                folderManager.addFolderViaPanel()
+                // Content layer — respects safe area, moves with sidebar
+                VStack(spacing: 0) {
+                    if shouldShowDockPreview {
+                        DockPreviewBar(
+                            allApps: iconManager.apps,
+                            dockLayout: dockLayout,
+                            refreshTrigger: iconManager.iconRefreshTrigger,
+                            appFilter: appFilter,
+                            customizedPaths: customizedPaths,
+                            onSelectApp: { app in selectedApp = app }
+                        )
+                        .background(
+                            GeometryReader { geo in
+                                Color.clear.preference(key: DockBarHeightKey.self, value: geo.size.height)
                             }
-                        }
-                    } else if !shouldShowDockPreview {
-                        Text(appFilter == .folders
-                             ? "Select a folder to customize its icon"
-                             : "Select an app to see its details")
-                            .foregroundColor(.secondary)
+                        )
                     }
-                    Spacer()
+
+                    if let app = selectedApp {
+                        ChangeView(setPath: app)
+                            .id(app.id)
+                    } else {
+                        Spacer()
+                        if appFilter == .folders && folderManager.folders.isEmpty {
+                            VStack(spacing: 12) {
+                                Image(systemName: "folder.badge.plus")
+                                    .font(.system(size: 40))
+                                    .foregroundColor(.secondary)
+                                Text("No folders added yet")
+                                    .font(.title3)
+                                    .foregroundColor(.secondary)
+                                Button("Add Folder") {
+                                    folderManager.addFolderViaPanel()
+                                }
+                            }
+                        } else if !shouldShowDockPreview {
+                            Text(appFilter == .folders
+                                 ? "Select a folder to customize its icon"
+                                 : "Select an app to see its details")
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                    }
                 }
             }
+            .onPreferenceChange(DockBarHeightKey.self) { dockBarHeight = $0 }
         }
+        .navigationSplitViewStyle(.prominentDetail)
 
                 .sheet(item: $setAlias) {
                     SetAliasNameView(raw: $0, lastText: AliasName.getName(for: $0) ?? "")
@@ -508,6 +527,16 @@ struct IconView: View {
 
 // MARK: - Dock Glass Effect
 
+struct HideSidebarToggle: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(macOS 14.0, *) {
+            content.toolbar(removing: .sidebarToggle)
+        } else {
+            content
+        }
+    }
+}
+
 /// Applies Liquid Glass on macOS 26+, falls back to ultraThinMaterial on older versions.
 struct DockGlassModifier: ViewModifier {
     @AppStorage("dockGlassIntensity") private var intensity: Double = 0.5
@@ -606,6 +635,50 @@ final class WallpaperLoader: ObservableObject {
 
 // MARK: - Dock Preview
 
+struct DockBarHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
+struct DockPreviewWallpaper: View {
+    let barHeight: CGFloat
+    @StateObject private var wallpaperLoader = WallpaperLoader.shared
+
+    var body: some View {
+        GeometryReader { geo in
+            if let wallpaper = wallpaperLoader.wallpaperImage {
+                let bleed: CGFloat = 50
+                let fullW = geo.size.width
+                let safeLeading = geo.safeAreaInsets.leading
+                let detailW = fullW - safeLeading
+                let totalW = fullW + bleed * 2
+                let totalH = barHeight + bleed * 2
+                let screenAspect = wallpaper.size.width / wallpaper.size.height
+                let imgW = totalW
+                let imgH = imgW / screenAspect
+
+                Image(nsImage: wallpaper)
+                    .resizable()
+                    .frame(width: imgW, height: imgH)
+                    .frame(width: totalW, height: totalH)
+                    .clipped()
+                    .mask(
+                        RoundedRectangle(cornerRadius: 12)
+                            .frame(width: detailW, height: barHeight)
+                            .blur(radius: 30)
+                            .frame(width: totalW, height: totalH)
+                            .offset(x: safeLeading / 2)
+                    )
+                    .position(x: fullW / 2, y: barHeight / 2)
+            }
+        }
+        .frame(height: barHeight)
+        .allowsHitTesting(false)
+    }
+}
+
 struct DockPreviewBar: View {
     let allApps: [AppItem]
     let dockLayout: DockLayout
@@ -613,7 +686,6 @@ struct DockPreviewBar: View {
     var appFilter: AppFilter = .all
     var customizedPaths: Set<String> = []
     var onSelectApp: ((AppItem) -> Void)?
-    @StateObject private var wallpaperLoader = WallpaperLoader.shared
 
     private func shouldShow(_ app: AppItem) -> Bool {
         switch appFilter {
@@ -694,33 +766,6 @@ struct DockPreviewBar: View {
             }
         }
         .padding()
-        .background(
-            GeometryReader { geo in
-                if let wallpaper = wallpaperLoader.wallpaperImage {
-                    let bleed: CGFloat = 80
-                    let barW = geo.size.width
-                    let barH = geo.size.height
-                    let totalW = barW + bleed * 2
-                    let totalH = barH + bleed * 2
-                    let screenAspect = wallpaper.size.width / wallpaper.size.height
-                    let imgW = totalW
-                    let imgH = imgW / screenAspect
-
-                    Image(nsImage: wallpaper)
-                        .resizable()
-                        .frame(width: imgW, height: imgH)
-                        .frame(width: totalW, height: totalH)
-                        .clipped()
-                        .mask(
-                            RoundedRectangle(cornerRadius: 12)
-                                .frame(width: barW, height: barH)
-                                .blur(radius: 36)
-                                .frame(width: totalW, height: totalH)
-                        )
-                        .position(x: barW / 2, y: barH / 2)
-                }
-            }
-        )
         .padding()
     }
 }
