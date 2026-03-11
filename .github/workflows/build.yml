@@ -182,29 +182,31 @@ jobs:
           except Exception:
               pass
 
+          desc_block = ""
           if changelog_html:
-              desc_block = f"""
-                      <description>
-                          <![CDATA[
-                      <h2>Version {version}</h2>
-                      <ul>
-  {changelog_html}
-                      </ul>
-                          ]]>
-                      </description>"""
-          else:
-              desc_block = ""
+              desc_block = (
+                  "\n                    <description>\n"
+                  "                        <![CDATA[\n"
+                  "                    <h2>Version " + version + "</h2>\n"
+                  "                    <ul>\n"
+                  + changelog_html + "\n"
+                  "                    </ul>\n"
+                  "                        ]]>\n"
+                  "                    </description>"
+              )
 
-          item = f"""        <item>
-                      <title>Version {version}</title>
-                      <link>https://github.com/{repo}</link>
-                      <sparkle:version>{build}</sparkle:version>
-                      <sparkle:shortVersionString>{version}</sparkle:shortVersionString>
-                      <pubDate>{pubdate}</pubDate>
-                      <enclosure url="{download_url}"
-                      sparkle:edSignature="{ed_sig}" length="{dmg_size}"
-                      type="application/octet-stream"/>{desc_block}
-                  </item>"""
+          item = (
+              "        <item>\n"
+              "                    <title>Version " + version + "</title>\n"
+              "                    <link>https://github.com/" + repo + "</link>\n"
+              "                    <sparkle:version>" + build + "</sparkle:version>\n"
+              "                    <sparkle:shortVersionString>" + version + "</sparkle:shortVersionString>\n"
+              "                    <pubDate>" + pubdate + "</pubDate>\n"
+              "                    <enclosure url=\"" + download_url + "\"\n"
+              "                    sparkle:edSignature=\"" + ed_sig + "\" length=\"" + dmg_size + "\"\n"
+              "                    type=\"application/octet-stream\"/>" + desc_block + "\n"
+              "                </item>"
+          )
 
           xml = open("IconChanger/Resources/sparkle.xml").read()
           # Remove existing entries for this version to avoid duplicates on re-release
