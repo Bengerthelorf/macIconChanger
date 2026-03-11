@@ -1,0 +1,8 @@
+:root {
+  --vp-home-hero-image-filter: none;
+}
+
+.VPHero .VPImage {
+  max-width: 256px !important;
+  max-height: 256px !important;
+}
