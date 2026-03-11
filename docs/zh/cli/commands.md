@@ -31,6 +31,8 @@ iconchanger status
 iconchanger list
 ```
 
+显示所有已配置别名和所有缓存图标条目的表格。
+
 ---
 
 ### `set-icon`
