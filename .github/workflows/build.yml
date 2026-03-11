@@ -127,7 +127,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         run: |
           VERSION=${GITHUB_REF#refs/tags/v}
-          BUILD_NUMBER=$(echo "$VERSION" | tr -d '.')
+          BUILD_NUMBER=$(echo "$VERSION" | tr -d '.' | tr '-' '')
           TAG=${GITHUB_REF#refs/tags/}
           PUBDATE=$(date -u "+%a, %d %b %Y %H:%M:%S +0000")
           DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/IconChanger.dmg"

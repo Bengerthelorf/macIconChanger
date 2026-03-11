@@ -6,12 +6,36 @@
         <item>
             <title>Version 1.4.2-1</title>
             <link>https://github.com/Bengerthelorf/macIconChanger</link>
-            <sparkle:version>142-1</sparkle:version>
+            <sparkle:version>1421</sparkle:version>
             <sparkle:shortVersionString>1.4.2-1</sparkle:shortVersionString>
             <pubDate>Wed, 11 Mar 2026 08:17:36 +0000</pubDate>
             <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.2-1/IconChanger.dmg"
             sparkle:edSignature="y3vsIT3Pbcj+FrGlYI+BoYV0RDN+690dQwyk430Tt5cih97uFdZyQTPGz0AHTDMI6Fv9vGj7dGE6ojgCpvAoAQ==" length="5230892"
             type="application/octet-stream"/>
+            <description>
+                <![CDATA[
+                <h2>Version 1.4.2-1 — Hotfix</h2>
+                <p>Fixes raw JSON error messages being displayed to users.</p>
+                <ul>
+                    <li><strong>Fixed:</strong> 404 responses now show "No Icons Found" instead of a raw JSON error</li>
+                    <li><strong>Fixed:</strong> API errors display clean messages instead of dumping JSON response bodies</li>
+                    <li><strong>Fixed:</strong> Connection test shows clear messages for 429, 401/403, and 5xx errors</li>
+                </ul>
+                <h2>Version 1.4.2</h2>
+                <ul>
+                    <li><strong>New:</strong> Icon Favorites — right-click any icon to save it to favorites</li>
+                    <li><strong>New:</strong> Icon History — view past icon changes for each app</li>
+                    <li><strong>New:</strong> Folder Icon Customization — add folders and change their icons</li>
+                    <li><strong>New:</strong> API Rate Limiting — monthly usage tracking with configurable limits</li>
+                    <li><strong>New:</strong> Configurable retry count and request timeout in Settings</li>
+                    <li><strong>New:</strong> Distinct error messages for different API failure modes</li>
+                    <li><strong>Fixed:</strong> Dock Preview hidden for Folders filter, filters apply correctly</li>
+                    <li><strong>Fixed:</strong> Dock Preview icons refresh consistently with sidebar</li>
+                    <li><strong>Fixed:</strong> Infinite spinner for folders in Local icons section</li>
+                    <li><strong>Docs:</strong> 30 language translations on the documentation site</li>
+                </ul>
+                ]]>
+            </description>
         </item>
         <item>
             <title>Version 1.4.2</title>
@@ -22,6 +46,23 @@
             <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.2/IconChanger.dmg"
             sparkle:edSignature="jqMMMvmr6d2B8mxVWcFHhA4tI6lO329wPFygKTgBNfrMaRl5uKLr19DmQXDiS1GgfRsAknL9mwa/e8LgdOapAQ==" length="5226333"
             type="application/octet-stream"/>
+            <description>
+                <![CDATA[
+                <h2>Version 1.4.2</h2>
+                <ul>
+                    <li><strong>New:</strong> Icon Favorites — right-click any icon to save it to favorites</li>
+                    <li><strong>New:</strong> Icon History — view past icon changes for each app</li>
+                    <li><strong>New:</strong> Folder Icon Customization — add folders and change their icons</li>
+                    <li><strong>New:</strong> API Rate Limiting — monthly usage tracking with configurable limits</li>
+                    <li><strong>New:</strong> Configurable retry count and request timeout in Settings</li>
+                    <li><strong>New:</strong> Distinct error messages for different API failure modes</li>
+                    <li><strong>Fixed:</strong> Dock Preview hidden for Folders filter, filters apply correctly</li>
+                    <li><strong>Fixed:</strong> Dock Preview icons refresh consistently with sidebar</li>
+                    <li><strong>Fixed:</strong> Infinite spinner for folders in Local icons section</li>
+                    <li><strong>Docs:</strong> 30 language translations on the documentation site</li>
+                </ul>
+                ]]>
+            </description>
         </item>
         <item>
             <title>Version 1.4.1</title>
@@ -32,6 +73,17 @@
             <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.1/IconChanger.dmg"
             sparkle:edSignature="7RDWMokSlKqS6b46ZZMd07W1LJH8bE3aME3STb6/S9PDNOIplVSurzUFYu5NCaXO+HeZrriJYLk9/f5rx+PCBQ==" length="7384126"
             type="application/octet-stream"/>
+            <description>
+                <![CDATA[
+                <h2>Version 1.4.1</h2>
+                <ul>
+                    <li><strong>New:</strong> Persistent API result caching with settings toggle</li>
+                    <li><strong>Perf:</strong> Race condition fix in request deduplication</li>
+                    <li><strong>Perf:</strong> StateObject, Equatable, and caching optimizations</li>
+                    <li><strong>Fixed:</strong> Drag temp file cleanup and duplicate name refresh</li>
+                </ul>
+                ]]>
+            </description>
         </item>
         <item>
             <title>Version 1.4.0</title>
@@ -42,6 +94,16 @@
             <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.0/IconChanger.dmg"
             sparkle:edSignature="afv1FIOjKg1XbrUvIO4ABieAZRNZQFAX3miZ8EOhWdfGbdax2kmHx5iDb8XZ8s8EKzmzHr92Mpae5cLrDr/fBw==" length="7353842"
             type="application/octet-stream"/>
+            <description>
+                <![CDATA[
+                <h2>Version 1.4.0</h2>
+                <ul>
+                    <li><strong>New:</strong> Liquid Glass dock frame with adjustable intensity slider</li>
+                    <li><strong>New:</strong> Transparent toolbar and extended wallpaper bleed effect</li>
+                    <li><strong>Fixed:</strong> Persistent DockPreviewBar and performance optimizations</li>
+                </ul>
+                ]]>
+            </description>
         </item>
         <item>
             <title>Version 1.3.5</title>
