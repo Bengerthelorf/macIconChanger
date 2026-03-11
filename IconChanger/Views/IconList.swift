@@ -697,7 +697,7 @@ struct DockPreviewBar: View {
         .background(
             GeometryReader { geo in
                 if let wallpaper = wallpaperLoader.wallpaperImage {
-                    let bleed: CGFloat = 50
+                    let bleed: CGFloat = 80
                     let barW = geo.size.width
                     let barH = geo.size.height
                     let totalW = barW + bleed * 2
@@ -714,7 +714,7 @@ struct DockPreviewBar: View {
                         .mask(
                             RoundedRectangle(cornerRadius: 12)
                                 .frame(width: barW, height: barH)
-                                .blur(radius: 24)
+                                .blur(radius: 36)
                                 .frame(width: totalW, height: totalH)
                         )
                         .position(x: barW / 2, y: barH / 2)
