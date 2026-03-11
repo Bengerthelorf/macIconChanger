@@ -12,6 +12,16 @@
   text-wrap: balance;
 }
 
+html[dir='rtl'] .VPHero .name,
+html[dir='rtl'] .VPHero .text,
+html[dir='rtl'] .VPHero .tagline {
+  text-align: right;
+}
+
+html[dir='rtl'] .VPHero .actions {
+  justify-content: flex-end;
+}
+
 @media (min-width: 960px) {
   .VPHero .main {
     display: flex;
