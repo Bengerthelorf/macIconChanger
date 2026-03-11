@@ -6,3 +6,18 @@
   max-width: 520px !important;
   max-height: 520px !important;
 }
+
+@media (min-width: 960px) {
+  .VPHero .main {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .VPHero .main > :is(.name, .text, .tagline) {
+    flex-basis: 100%;
+  }
+
+  .VPHero .main > .actions {
+    flex-shrink: 0;
+  }
+}

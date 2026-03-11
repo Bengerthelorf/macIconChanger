@@ -26,8 +26,14 @@ function copy() {
 <style scoped>
 .brew-install {
   display: flex;
-  justify-content: center;
-  padding-top: 12px;
+  align-items: center;
+  padding-top: 24px;
+}
+
+@media (max-width: 959px) {
+  .brew-install {
+    justify-content: center;
+  }
 }
 
 .brew-install-inner {
