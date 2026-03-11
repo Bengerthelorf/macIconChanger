@@ -278,6 +278,270 @@ export default defineConfig({
         },
       },
     },
+    tr: {
+      label: 'Türkçe',
+      lang: 'tr',
+      themeConfig: {
+        nav: [
+          { text: 'Rehber', link: '/tr/guide/getting-started' },
+          { text: 'CLI', link: '/tr/cli/' },
+          {
+            text: 'İndir',
+            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
+          },
+        ],
+        sidebar: {
+          '/tr/guide/': [
+            {
+              text: 'Başlangıç',
+              items: [
+                { text: 'Hızlı Başlangıç', link: '/tr/guide/getting-started' },
+                { text: 'İlk Kurulum', link: '/tr/guide/setup' },
+                { text: 'API Anahtarı', link: '/tr/guide/api-key' },
+              ],
+            },
+            {
+              text: 'Kullanım',
+              items: [
+                { text: 'Simge Değiştirme', link: '/tr/guide/changing-icons' },
+                { text: 'Uygulama Takma Adları', link: '/tr/guide/aliases' },
+                { text: 'Arka Plan Hizmeti', link: '/tr/guide/background-service' },
+                { text: 'İçe ve Dışa Aktarma', link: '/tr/guide/import-export' },
+              ],
+            },
+          ],
+          '/tr/cli/': [
+            {
+              text: 'Komut Satırı Aracı',
+              items: [
+                { text: 'Kurulum', link: '/tr/cli/' },
+                { text: 'Komut Referansı', link: '/tr/cli/commands' },
+              ],
+            },
+          ],
+        },
+      },
+    },
+    pl: {
+      label: 'Polski',
+      lang: 'pl',
+      themeConfig: {
+        nav: [
+          { text: 'Przewodnik', link: '/pl/guide/getting-started' },
+          { text: 'CLI', link: '/pl/cli/' },
+          {
+            text: 'Pobierz',
+            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
+          },
+        ],
+        sidebar: {
+          '/pl/guide/': [
+            {
+              text: 'Pierwsze kroki',
+              items: [
+                { text: 'Szybki start', link: '/pl/guide/getting-started' },
+                { text: 'Konfiguracja początkowa', link: '/pl/guide/setup' },
+                { text: 'Klucz API', link: '/pl/guide/api-key' },
+              ],
+            },
+            {
+              text: 'Użytkowanie',
+              items: [
+                { text: 'Zmiana ikon', link: '/pl/guide/changing-icons' },
+                { text: 'Aliasy aplikacji', link: '/pl/guide/aliases' },
+                { text: 'Usługa w tle', link: '/pl/guide/background-service' },
+                { text: 'Import i eksport', link: '/pl/guide/import-export' },
+              ],
+            },
+          ],
+          '/pl/cli/': [
+            {
+              text: 'Narzędzie wiersza poleceń',
+              items: [
+                { text: 'Instalacja', link: '/pl/cli/' },
+                { text: 'Referencja poleceń', link: '/pl/cli/commands' },
+              ],
+            },
+          ],
+        },
+      },
+    },
+    nl: {
+      label: 'Nederlands',
+      lang: 'nl',
+      themeConfig: {
+        nav: [
+          { text: 'Handleiding', link: '/nl/guide/getting-started' },
+          { text: 'CLI', link: '/nl/cli/' },
+          {
+            text: 'Downloaden',
+            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
+          },
+        ],
+        sidebar: {
+          '/nl/guide/': [
+            {
+              text: 'Aan de slag',
+              items: [
+                { text: 'Snelstart', link: '/nl/guide/getting-started' },
+                { text: 'Eerste configuratie', link: '/nl/guide/setup' },
+                { text: 'API-sleutel', link: '/nl/guide/api-key' },
+              ],
+            },
+            {
+              text: 'Gebruik',
+              items: [
+                { text: 'Iconen wijzigen', link: '/nl/guide/changing-icons' },
+                { text: 'App-aliassen', link: '/nl/guide/aliases' },
+                { text: 'Achtergronddienst', link: '/nl/guide/background-service' },
+                { text: 'Importeren en exporteren', link: '/nl/guide/import-export' },
+              ],
+            },
+          ],
+          '/nl/cli/': [
+            {
+              text: 'Opdrachtregelhulpmiddel',
+              items: [
+                { text: 'Installatie', link: '/nl/cli/' },
+                { text: 'Opdrachtreferentie', link: '/nl/cli/commands' },
+              ],
+            },
+          ],
+        },
+      },
+    },
+    sv: {
+      label: 'Svenska',
+      lang: 'sv',
+      themeConfig: {
+        nav: [
+          { text: 'Guide', link: '/sv/guide/getting-started' },
+          { text: 'CLI', link: '/sv/cli/' },
+          {
+            text: 'Ladda ner',
+            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
+          },
+        ],
+        sidebar: {
+          '/sv/guide/': [
+            {
+              text: 'Kom igång',
+              items: [
+                { text: 'Snabbstart', link: '/sv/guide/getting-started' },
+                { text: 'Första konfigurationen', link: '/sv/guide/setup' },
+                { text: 'API-nyckel', link: '/sv/guide/api-key' },
+              ],
+            },
+            {
+              text: 'Användning',
+              items: [
+                { text: 'Ändra ikoner', link: '/sv/guide/changing-icons' },
+                { text: 'App-alias', link: '/sv/guide/aliases' },
+                { text: 'Bakgrundstjänst', link: '/sv/guide/background-service' },
+                { text: 'Import och export', link: '/sv/guide/import-export' },
+              ],
+            },
+          ],
+          '/sv/cli/': [
+            {
+              text: 'Kommandoradsverktyg',
+              items: [
+                { text: 'Installation', link: '/sv/cli/' },
+                { text: 'Kommandoreferens', link: '/sv/cli/commands' },
+              ],
+            },
+          ],
+        },
+      },
+    },
+    da: {
+      label: 'Dansk',
+      lang: 'da',
+      themeConfig: {
+        nav: [
+          { text: 'Guide', link: '/da/guide/getting-started' },
+          { text: 'CLI', link: '/da/cli/' },
+          {
+            text: 'Download',
+            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
+          },
+        ],
+        sidebar: {
+          '/da/guide/': [
+            {
+              text: 'Kom i gang',
+              items: [
+                { text: 'Hurtig start', link: '/da/guide/getting-started' },
+                { text: 'Indledende opsætning', link: '/da/guide/setup' },
+                { text: 'API-nøgle', link: '/da/guide/api-key' },
+              ],
+            },
+            {
+              text: 'Brug',
+              items: [
+                { text: 'Skift ikoner', link: '/da/guide/changing-icons' },
+                { text: 'App-aliasser', link: '/da/guide/aliases' },
+                { text: 'Baggrundstjeneste', link: '/da/guide/background-service' },
+                { text: 'Import og eksport', link: '/da/guide/import-export' },
+              ],
+            },
+          ],
+          '/da/cli/': [
+            {
+              text: 'Kommandolinjeværktøj',
+              items: [
+                { text: 'Installation', link: '/da/cli/' },
+                { text: 'Kommandoreference', link: '/da/cli/commands' },
+              ],
+            },
+          ],
+        },
+      },
+    },
+    fi: {
+      label: 'Suomi',
+      lang: 'fi',
+      themeConfig: {
+        nav: [
+          { text: 'Opas', link: '/fi/guide/getting-started' },
+          { text: 'CLI', link: '/fi/cli/' },
+          {
+            text: 'Lataa',
+            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
+          },
+        ],
+        sidebar: {
+          '/fi/guide/': [
+            {
+              text: 'Aloitus',
+              items: [
+                { text: 'Pikaopas', link: '/fi/guide/getting-started' },
+                { text: 'Alkumääritys', link: '/fi/guide/setup' },
+                { text: 'API-avain', link: '/fi/guide/api-key' },
+              ],
+            },
+            {
+              text: 'Käyttö',
+              items: [
+                { text: 'Kuvakkeiden vaihtaminen', link: '/fi/guide/changing-icons' },
+                { text: 'Sovellusten aliakset', link: '/fi/guide/aliases' },
+                { text: 'Taustapalvelu', link: '/fi/guide/background-service' },
+                { text: 'Tuonti ja vienti', link: '/fi/guide/import-export' },
+              ],
+            },
+          ],
+          '/fi/cli/': [
+            {
+              text: 'Komentorivityökalu',
+              items: [
+                { text: 'Asennus', link: '/fi/cli/' },
+                { text: 'Komentojen viite', link: '/fi/cli/commands' },
+              ],
+            },
+          ],
+        },
+      },
+    },
     it: {
       label: 'Italiano',
       lang: 'it',
