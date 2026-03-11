@@ -4,6 +4,28 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.4.2-2</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>2026031101</sparkle:version>
+                    <sparkle:shortVersionString>1.4.2-2</sparkle:shortVersionString>
+                    <pubDate>Wed, 11 Mar 2026 08:52:52 +0000</pubDate>
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.2-2/IconChanger.dmg"
+                    sparkle:edSignature="UoAfrikJwb/Niy7KE0DRZudMXf8YQAtOTuBm95LX+dmVvJ0EZXLcsBF+nfxeT88qbeNpl+mPKJIyqXwbRMyOAg==" length="5230533"
+                    type="application/octet-stream"/>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.4.2-2</h2>
+                    <ul>
+                        <li><strong>New:</strong> increase Dock Preview wallpaper bleed area</li>
+                        <li><strong>Fixed:</strong> use Xcode CURRENT_PROJECT_VERSION for Sparkle build numbers</li>
+                        <li><strong>Fixed:</strong> YAML indentation in build.yml breaking workflow parse</li>
+                        <li>ci: auto-generate Sparkle release notes from changelog</li>
+                        <li><strong>Fixed:</strong> Sparkle update detection and missing release notes</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
             <title>Version 1.4.2-1</title>
             <link>https://github.com/Bengerthelorf/macIconChanger</link>
             <sparkle:version>2026031100</sparkle:version>
