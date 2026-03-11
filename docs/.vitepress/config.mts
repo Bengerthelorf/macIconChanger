@@ -134,474 +134,6 @@ export default defineConfig({
         },
       },
     },
-    ar: {
-      label: 'العربية',
-      lang: 'ar',
-      themeConfig: {
-        nav: [
-          { text: 'الدليل', link: '/ar/guide/getting-started' },
-          { text: 'CLI', link: '/ar/cli/' },
-          {
-            text: 'تحميل',
-            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
-          },
-        ],
-        sidebar: {
-          '/ar/guide/': [
-            {
-              text: 'البداية',
-              items: [
-                { text: 'البدء السريع', link: '/ar/guide/getting-started' },
-                { text: 'الإعداد الأولي', link: '/ar/guide/setup' },
-                { text: 'مفتاح API', link: '/ar/guide/api-key' },
-              ],
-            },
-            {
-              text: 'الاستخدام',
-              items: [
-                { text: 'تغيير الأيقونات', link: '/ar/guide/changing-icons' },
-                { text: 'أسماء بديلة للتطبيقات', link: '/ar/guide/aliases' },
-                { text: 'الخدمة الخلفية', link: '/ar/guide/background-service' },
-                { text: 'الاستيراد والتصدير', link: '/ar/guide/import-export' },
-              ],
-            },
-          ],
-          '/ar/cli/': [
-            {
-              text: 'أداة سطر الأوامر',
-              items: [
-                { text: 'التثبيت', link: '/ar/cli/' },
-                { text: 'مرجع الأوامر', link: '/ar/cli/commands' },
-              ],
-            },
-          ],
-        },
-      },
-    },
-    cs: {
-      label: 'Čeština',
-      lang: 'cs',
-      themeConfig: {
-        nav: [
-          { text: 'Průvodce', link: '/cs/guide/getting-started' },
-          { text: 'CLI', link: '/cs/cli/' },
-          { text: 'Stáhnout', link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest' },
-        ],
-        sidebar: {
-          '/cs/guide/': [
-            { text: 'Začínáme', items: [
-              { text: 'Rychlý start', link: '/cs/guide/getting-started' },
-              { text: 'Počáteční nastavení', link: '/cs/guide/setup' },
-              { text: 'API klíč', link: '/cs/guide/api-key' },
-            ]},
-            { text: 'Použití', items: [
-              { text: 'Změna ikon', link: '/cs/guide/changing-icons' },
-              { text: 'Aliasy aplikací', link: '/cs/guide/aliases' },
-              { text: 'Služba na pozadí', link: '/cs/guide/background-service' },
-              { text: 'Import a export', link: '/cs/guide/import-export' },
-            ]},
-          ],
-          '/cs/cli/': [
-            { text: 'Příkazový řádek', items: [
-              { text: 'Instalace', link: '/cs/cli/' },
-              { text: 'Reference příkazů', link: '/cs/cli/commands' },
-            ]},
-          ],
-        },
-      },
-    },
-    da: {
-      label: 'Dansk',
-      lang: 'da',
-      themeConfig: {
-        nav: [
-          { text: 'Guide', link: '/da/guide/getting-started' },
-          { text: 'CLI', link: '/da/cli/' },
-          {
-            text: 'Download',
-            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
-          },
-        ],
-        sidebar: {
-          '/da/guide/': [
-            {
-              text: 'Kom i gang',
-              items: [
-                { text: 'Hurtig start', link: '/da/guide/getting-started' },
-                { text: 'Indledende opsætning', link: '/da/guide/setup' },
-                { text: 'API-nøgle', link: '/da/guide/api-key' },
-              ],
-            },
-            {
-              text: 'Brug',
-              items: [
-                { text: 'Skift ikoner', link: '/da/guide/changing-icons' },
-                { text: 'App-aliasser', link: '/da/guide/aliases' },
-                { text: 'Baggrundstjeneste', link: '/da/guide/background-service' },
-                { text: 'Import og eksport', link: '/da/guide/import-export' },
-              ],
-            },
-          ],
-          '/da/cli/': [
-            {
-              text: 'Kommandolinjeværktøj',
-              items: [
-                { text: 'Installation', link: '/da/cli/' },
-                { text: 'Kommandoreference', link: '/da/cli/commands' },
-              ],
-            },
-          ],
-        },
-      },
-    },
-    nl: {
-      label: 'Nederlands',
-      lang: 'nl',
-      themeConfig: {
-        nav: [
-          { text: 'Handleiding', link: '/nl/guide/getting-started' },
-          { text: 'CLI', link: '/nl/cli/' },
-          {
-            text: 'Downloaden',
-            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
-          },
-        ],
-        sidebar: {
-          '/nl/guide/': [
-            {
-              text: 'Aan de slag',
-              items: [
-                { text: 'Snelstart', link: '/nl/guide/getting-started' },
-                { text: 'Eerste configuratie', link: '/nl/guide/setup' },
-                { text: 'API-sleutel', link: '/nl/guide/api-key' },
-              ],
-            },
-            {
-              text: 'Gebruik',
-              items: [
-                { text: 'Iconen wijzigen', link: '/nl/guide/changing-icons' },
-                { text: 'App-aliassen', link: '/nl/guide/aliases' },
-                { text: 'Achtergronddienst', link: '/nl/guide/background-service' },
-                { text: 'Importeren en exporteren', link: '/nl/guide/import-export' },
-              ],
-            },
-          ],
-          '/nl/cli/': [
-            {
-              text: 'Opdrachtregelhulpmiddel',
-              items: [
-                { text: 'Installatie', link: '/nl/cli/' },
-                { text: 'Opdrachtreferentie', link: '/nl/cli/commands' },
-              ],
-            },
-          ],
-        },
-      },
-    },
-    fi: {
-      label: 'Suomi',
-      lang: 'fi',
-      themeConfig: {
-        nav: [
-          { text: 'Opas', link: '/fi/guide/getting-started' },
-          { text: 'CLI', link: '/fi/cli/' },
-          {
-            text: 'Lataa',
-            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
-          },
-        ],
-        sidebar: {
-          '/fi/guide/': [
-            {
-              text: 'Aloitus',
-              items: [
-                { text: 'Pikaopas', link: '/fi/guide/getting-started' },
-                { text: 'Alkumääritys', link: '/fi/guide/setup' },
-                { text: 'API-avain', link: '/fi/guide/api-key' },
-              ],
-            },
-            {
-              text: 'Käyttö',
-              items: [
-                { text: 'Kuvakkeiden vaihtaminen', link: '/fi/guide/changing-icons' },
-                { text: 'Sovellusten aliakset', link: '/fi/guide/aliases' },
-                { text: 'Taustapalvelu', link: '/fi/guide/background-service' },
-                { text: 'Tuonti ja vienti', link: '/fi/guide/import-export' },
-              ],
-            },
-          ],
-          '/fi/cli/': [
-            {
-              text: 'Komentorivityökalu',
-              items: [
-                { text: 'Asennus', link: '/fi/cli/' },
-                { text: 'Komentojen viite', link: '/fi/cli/commands' },
-              ],
-            },
-          ],
-        },
-      },
-    },
-    fr: {
-      label: 'Français',
-      lang: 'fr',
-      themeConfig: {
-        nav: [
-          { text: 'Guide', link: '/fr/guide/getting-started' },
-          { text: 'CLI', link: '/fr/cli/' },
-          {
-            text: 'Télécharger',
-            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
-          },
-        ],
-        sidebar: {
-          '/fr/guide/': [
-            {
-              text: 'Prise en main',
-              items: [
-                { text: 'Démarrage rapide', link: '/fr/guide/getting-started' },
-                { text: 'Configuration initiale', link: '/fr/guide/setup' },
-                { text: 'Clé API', link: '/fr/guide/api-key' },
-              ],
-            },
-            {
-              text: 'Utilisation',
-              items: [
-                { text: 'Changer les icônes', link: '/fr/guide/changing-icons' },
-                { text: 'Alias d\'applications', link: '/fr/guide/aliases' },
-                { text: 'Service d\'arrière-plan', link: '/fr/guide/background-service' },
-                { text: 'Import et export', link: '/fr/guide/import-export' },
-              ],
-            },
-          ],
-          '/fr/cli/': [
-            {
-              text: 'Outil en ligne de commande',
-              items: [
-                { text: 'Installation', link: '/fr/cli/' },
-                { text: 'Référence des commandes', link: '/fr/cli/commands' },
-              ],
-            },
-          ],
-        },
-      },
-    },
-    de: {
-      label: 'Deutsch',
-      lang: 'de',
-      themeConfig: {
-        nav: [
-          { text: 'Anleitung', link: '/de/guide/getting-started' },
-          { text: 'CLI', link: '/de/cli/' },
-          {
-            text: 'Herunterladen',
-            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
-          },
-        ],
-        sidebar: {
-          '/de/guide/': [
-            {
-              text: 'Erste Schritte',
-              items: [
-                { text: 'Schnellstart', link: '/de/guide/getting-started' },
-                { text: 'Ersteinrichtung', link: '/de/guide/setup' },
-                { text: 'API-Schlüssel', link: '/de/guide/api-key' },
-              ],
-            },
-            {
-              text: 'Verwendung',
-              items: [
-                { text: 'Symbole ändern', link: '/de/guide/changing-icons' },
-                { text: 'App-Aliasse', link: '/de/guide/aliases' },
-                { text: 'Hintergrunddienst', link: '/de/guide/background-service' },
-                { text: 'Import & Export', link: '/de/guide/import-export' },
-              ],
-            },
-          ],
-          '/de/cli/': [
-            {
-              text: 'Kommandozeilen-Werkzeug',
-              items: [
-                { text: 'Installation', link: '/de/cli/' },
-                { text: 'Befehlsreferenz', link: '/de/cli/commands' },
-              ],
-            },
-          ],
-        },
-      },
-    },
-    el: {
-      label: 'Ελληνικά',
-      lang: 'el',
-      themeConfig: {
-        nav: [
-          { text: 'Οδηγός', link: '/el/guide/getting-started' },
-          { text: 'CLI', link: '/el/cli/' },
-          { text: 'Λήψη', link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest' },
-        ],
-        sidebar: {
-          '/el/guide/': [
-            { text: 'Ξεκινώντας', items: [
-              { text: 'Γρήγορη εκκίνηση', link: '/el/guide/getting-started' },
-              { text: 'Αρχική ρύθμιση', link: '/el/guide/setup' },
-              { text: 'Κλειδί API', link: '/el/guide/api-key' },
-            ]},
-            { text: 'Χρήση', items: [
-              { text: 'Αλλαγή εικονιδίων', link: '/el/guide/changing-icons' },
-              { text: 'Ψευδώνυμα εφαρμογών', link: '/el/guide/aliases' },
-              { text: 'Υπηρεσία παρασκηνίου', link: '/el/guide/background-service' },
-              { text: 'Εισαγωγή και εξαγωγή', link: '/el/guide/import-export' },
-            ]},
-          ],
-          '/el/cli/': [
-            { text: 'Εργαλείο γραμμής εντολών', items: [
-              { text: 'Εγκατάσταση', link: '/el/cli/' },
-              { text: 'Αναφορά εντολών', link: '/el/cli/commands' },
-            ]},
-          ],
-        },
-      },
-    },
-    hi: {
-      label: 'हिन्दी',
-      lang: 'hi',
-      themeConfig: {
-        nav: [
-          { text: 'गाइड', link: '/hi/guide/getting-started' },
-          { text: 'CLI', link: '/hi/cli/' },
-          { text: 'डाउनलोड', link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest' },
-        ],
-        sidebar: {
-          '/hi/guide/': [
-            { text: 'शुरुआत', items: [
-              { text: 'त्वरित शुरुआत', link: '/hi/guide/getting-started' },
-              { text: 'प्रारंभिक सेटअप', link: '/hi/guide/setup' },
-              { text: 'API कुंजी', link: '/hi/guide/api-key' },
-            ]},
-            { text: 'उपयोग', items: [
-              { text: 'आइकन बदलना', link: '/hi/guide/changing-icons' },
-              { text: 'ऐप उपनाम', link: '/hi/guide/aliases' },
-              { text: 'बैकग्राउंड सेवा', link: '/hi/guide/background-service' },
-              { text: 'आयात और निर्यात', link: '/hi/guide/import-export' },
-            ]},
-          ],
-          '/hi/cli/': [
-            { text: 'कमांड लाइन टूल', items: [
-              { text: 'इंस्टॉलेशन', link: '/hi/cli/' },
-              { text: 'कमांड संदर्भ', link: '/hi/cli/commands' },
-            ]},
-          ],
-        },
-      },
-    },
-    hu: {
-      label: 'Magyar',
-      lang: 'hu',
-      themeConfig: {
-        nav: [
-          { text: 'Útmutató', link: '/hu/guide/getting-started' },
-          { text: 'CLI', link: '/hu/cli/' },
-          { text: 'Letöltés', link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest' },
-        ],
-        sidebar: {
-          '/hu/guide/': [
-            { text: 'Első lépések', items: [
-              { text: 'Gyors indulás', link: '/hu/guide/getting-started' },
-              { text: 'Kezdeti beállítás', link: '/hu/guide/setup' },
-              { text: 'API-kulcs', link: '/hu/guide/api-key' },
-            ]},
-            { text: 'Használat', items: [
-              { text: 'Ikonok módosítása', link: '/hu/guide/changing-icons' },
-              { text: 'Alkalmazás-álnevek', link: '/hu/guide/aliases' },
-              { text: 'Háttérszolgáltatás', link: '/hu/guide/background-service' },
-              { text: 'Importálás és exportálás', link: '/hu/guide/import-export' },
-            ]},
-          ],
-          '/hu/cli/': [
-            { text: 'Parancssori eszköz', items: [
-              { text: 'Telepítés', link: '/hu/cli/' },
-              { text: 'Parancsreferencia', link: '/hu/cli/commands' },
-            ]},
-          ],
-        },
-      },
-    },
-    id: {
-      label: 'Bahasa Indonesia',
-      lang: 'id',
-      themeConfig: {
-        nav: [
-          { text: 'Panduan', link: '/id/guide/getting-started' },
-          { text: 'CLI', link: '/id/cli/' },
-          { text: 'Unduh', link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest' },
-        ],
-        sidebar: {
-          '/id/guide/': [
-            { text: 'Memulai', items: [
-              { text: 'Panduan Cepat', link: '/id/guide/getting-started' },
-              { text: 'Pengaturan Awal', link: '/id/guide/setup' },
-              { text: 'Kunci API', link: '/id/guide/api-key' },
-            ]},
-            { text: 'Penggunaan', items: [
-              { text: 'Mengubah Ikon', link: '/id/guide/changing-icons' },
-              { text: 'Alias Aplikasi', link: '/id/guide/aliases' },
-              { text: 'Layanan Latar Belakang', link: '/id/guide/background-service' },
-              { text: 'Impor & Ekspor', link: '/id/guide/import-export' },
-            ]},
-          ],
-          '/id/cli/': [
-            { text: 'Alat Baris Perintah', items: [
-              { text: 'Instalasi', link: '/id/cli/' },
-              { text: 'Referensi Perintah', link: '/id/cli/commands' },
-            ]},
-          ],
-        },
-      },
-    },
-    it: {
-      label: 'Italiano',
-      lang: 'it',
-      themeConfig: {
-        nav: [
-          { text: 'Guida', link: '/it/guide/getting-started' },
-          { text: 'CLI', link: '/it/cli/' },
-          {
-            text: 'Scarica',
-            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
-          },
-        ],
-        sidebar: {
-          '/it/guide/': [
-            {
-              text: 'Primi passi',
-              items: [
-                { text: 'Guida rapida', link: '/it/guide/getting-started' },
-                { text: 'Configurazione iniziale', link: '/it/guide/setup' },
-                { text: 'Chiave API', link: '/it/guide/api-key' },
-              ],
-            },
-            {
-              text: 'Utilizzo',
-              items: [
-                { text: 'Cambiare le icone', link: '/it/guide/changing-icons' },
-                { text: 'Alias delle app', link: '/it/guide/aliases' },
-                { text: 'Servizio in background', link: '/it/guide/background-service' },
-                { text: 'Importazione ed esportazione', link: '/it/guide/import-export' },
-              ],
-            },
-          ],
-          '/it/cli/': [
-            {
-              text: 'Strumento da riga di comando',
-              items: [
-                { text: 'Installazione', link: '/it/cli/' },
-                { text: 'Riferimento dei comandi', link: '/it/cli/commands' },
-              ],
-            },
-          ],
-        },
-      },
-    },
     ja: {
       label: '日本語',
       lang: 'ja',
@@ -690,6 +222,38 @@ export default defineConfig({
         },
       },
     },
+    id: {
+      label: 'Bahasa Indonesia',
+      lang: 'id',
+      themeConfig: {
+        nav: [
+          { text: 'Panduan', link: '/id/guide/getting-started' },
+          { text: 'CLI', link: '/id/cli/' },
+          { text: 'Unduh', link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest' },
+        ],
+        sidebar: {
+          '/id/guide/': [
+            { text: 'Memulai', items: [
+              { text: 'Panduan Cepat', link: '/id/guide/getting-started' },
+              { text: 'Pengaturan Awal', link: '/id/guide/setup' },
+              { text: 'Kunci API', link: '/id/guide/api-key' },
+            ]},
+            { text: 'Penggunaan', items: [
+              { text: 'Mengubah Ikon', link: '/id/guide/changing-icons' },
+              { text: 'Alias Aplikasi', link: '/id/guide/aliases' },
+              { text: 'Layanan Latar Belakang', link: '/id/guide/background-service' },
+              { text: 'Impor & Ekspor', link: '/id/guide/import-export' },
+            ]},
+          ],
+          '/id/cli/': [
+            { text: 'Alat Baris Perintah', items: [
+              { text: 'Instalasi', link: '/id/cli/' },
+              { text: 'Referensi Perintah', link: '/id/cli/commands' },
+            ]},
+          ],
+        },
+      },
+    },
     ms: {
       label: 'Bahasa Melayu',
       lang: 'ms',
@@ -718,6 +282,302 @@ export default defineConfig({
               { text: 'Pemasangan', link: '/ms/cli/' },
               { text: 'Rujukan Perintah', link: '/ms/cli/commands' },
             ]},
+          ],
+        },
+      },
+    },
+    da: {
+      label: 'Dansk',
+      lang: 'da',
+      themeConfig: {
+        nav: [
+          { text: 'Guide', link: '/da/guide/getting-started' },
+          { text: 'CLI', link: '/da/cli/' },
+          {
+            text: 'Download',
+            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
+          },
+        ],
+        sidebar: {
+          '/da/guide/': [
+            {
+              text: 'Kom i gang',
+              items: [
+                { text: 'Hurtig start', link: '/da/guide/getting-started' },
+                { text: 'Indledende opsætning', link: '/da/guide/setup' },
+                { text: 'API-nøgle', link: '/da/guide/api-key' },
+              ],
+            },
+            {
+              text: 'Brug',
+              items: [
+                { text: 'Skift ikoner', link: '/da/guide/changing-icons' },
+                { text: 'App-aliasser', link: '/da/guide/aliases' },
+                { text: 'Baggrundstjeneste', link: '/da/guide/background-service' },
+                { text: 'Import og eksport', link: '/da/guide/import-export' },
+              ],
+            },
+          ],
+          '/da/cli/': [
+            {
+              text: 'Kommandolinjeværktøj',
+              items: [
+                { text: 'Installation', link: '/da/cli/' },
+                { text: 'Kommandoreference', link: '/da/cli/commands' },
+              ],
+            },
+          ],
+        },
+      },
+    },
+    de: {
+      label: 'Deutsch',
+      lang: 'de',
+      themeConfig: {
+        nav: [
+          { text: 'Anleitung', link: '/de/guide/getting-started' },
+          { text: 'CLI', link: '/de/cli/' },
+          {
+            text: 'Herunterladen',
+            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
+          },
+        ],
+        sidebar: {
+          '/de/guide/': [
+            {
+              text: 'Erste Schritte',
+              items: [
+                { text: 'Schnellstart', link: '/de/guide/getting-started' },
+                { text: 'Ersteinrichtung', link: '/de/guide/setup' },
+                { text: 'API-Schlüssel', link: '/de/guide/api-key' },
+              ],
+            },
+            {
+              text: 'Verwendung',
+              items: [
+                { text: 'Symbole ändern', link: '/de/guide/changing-icons' },
+                { text: 'App-Aliasse', link: '/de/guide/aliases' },
+                { text: 'Hintergrunddienst', link: '/de/guide/background-service' },
+                { text: 'Import & Export', link: '/de/guide/import-export' },
+              ],
+            },
+          ],
+          '/de/cli/': [
+            {
+              text: 'Kommandozeilen-Werkzeug',
+              items: [
+                { text: 'Installation', link: '/de/cli/' },
+                { text: 'Befehlsreferenz', link: '/de/cli/commands' },
+              ],
+            },
+          ],
+        },
+      },
+    },
+    es: {
+      label: 'Español',
+      lang: 'es',
+      themeConfig: {
+        nav: [
+          { text: 'Guía', link: '/es/guide/getting-started' },
+          { text: 'CLI', link: '/es/cli/' },
+          {
+            text: 'Descargar',
+            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
+          },
+        ],
+        sidebar: {
+          '/es/guide/': [
+            {
+              text: 'Primeros pasos',
+              items: [
+                { text: 'Inicio rápido', link: '/es/guide/getting-started' },
+                { text: 'Configuración inicial', link: '/es/guide/setup' },
+                { text: 'Clave API', link: '/es/guide/api-key' },
+              ],
+            },
+            {
+              text: 'Uso',
+              items: [
+                { text: 'Cambiar iconos', link: '/es/guide/changing-icons' },
+                { text: 'Alias de aplicaciones', link: '/es/guide/aliases' },
+                { text: 'Servicio en segundo plano', link: '/es/guide/background-service' },
+                { text: 'Importar y exportar', link: '/es/guide/import-export' },
+              ],
+            },
+          ],
+          '/es/cli/': [
+            {
+              text: 'Herramienta de línea de comandos',
+              items: [
+                { text: 'Instalación', link: '/es/cli/' },
+                { text: 'Referencia de comandos', link: '/es/cli/commands' },
+              ],
+            },
+          ],
+        },
+      },
+    },
+    fr: {
+      label: 'Français',
+      lang: 'fr',
+      themeConfig: {
+        nav: [
+          { text: 'Guide', link: '/fr/guide/getting-started' },
+          { text: 'CLI', link: '/fr/cli/' },
+          {
+            text: 'Télécharger',
+            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
+          },
+        ],
+        sidebar: {
+          '/fr/guide/': [
+            {
+              text: 'Prise en main',
+              items: [
+                { text: 'Démarrage rapide', link: '/fr/guide/getting-started' },
+                { text: 'Configuration initiale', link: '/fr/guide/setup' },
+                { text: 'Clé API', link: '/fr/guide/api-key' },
+              ],
+            },
+            {
+              text: 'Utilisation',
+              items: [
+                { text: 'Changer les icônes', link: '/fr/guide/changing-icons' },
+                { text: 'Alias d\'applications', link: '/fr/guide/aliases' },
+                { text: 'Service d\'arrière-plan', link: '/fr/guide/background-service' },
+                { text: 'Import et export', link: '/fr/guide/import-export' },
+              ],
+            },
+          ],
+          '/fr/cli/': [
+            {
+              text: 'Outil en ligne de commande',
+              items: [
+                { text: 'Installation', link: '/fr/cli/' },
+                { text: 'Référence des commandes', link: '/fr/cli/commands' },
+              ],
+            },
+          ],
+        },
+      },
+    },
+    it: {
+      label: 'Italiano',
+      lang: 'it',
+      themeConfig: {
+        nav: [
+          { text: 'Guida', link: '/it/guide/getting-started' },
+          { text: 'CLI', link: '/it/cli/' },
+          {
+            text: 'Scarica',
+            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
+          },
+        ],
+        sidebar: {
+          '/it/guide/': [
+            {
+              text: 'Primi passi',
+              items: [
+                { text: 'Guida rapida', link: '/it/guide/getting-started' },
+                { text: 'Configurazione iniziale', link: '/it/guide/setup' },
+                { text: 'Chiave API', link: '/it/guide/api-key' },
+              ],
+            },
+            {
+              text: 'Utilizzo',
+              items: [
+                { text: 'Cambiare le icone', link: '/it/guide/changing-icons' },
+                { text: 'Alias delle app', link: '/it/guide/aliases' },
+                { text: 'Servizio in background', link: '/it/guide/background-service' },
+                { text: 'Importazione ed esportazione', link: '/it/guide/import-export' },
+              ],
+            },
+          ],
+          '/it/cli/': [
+            {
+              text: 'Strumento da riga di comando',
+              items: [
+                { text: 'Installazione', link: '/it/cli/' },
+                { text: 'Riferimento dei comandi', link: '/it/cli/commands' },
+              ],
+            },
+          ],
+        },
+      },
+    },
+    hu: {
+      label: 'Magyar',
+      lang: 'hu',
+      themeConfig: {
+        nav: [
+          { text: 'Útmutató', link: '/hu/guide/getting-started' },
+          { text: 'CLI', link: '/hu/cli/' },
+          { text: 'Letöltés', link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest' },
+        ],
+        sidebar: {
+          '/hu/guide/': [
+            { text: 'Első lépések', items: [
+              { text: 'Gyors indulás', link: '/hu/guide/getting-started' },
+              { text: 'Kezdeti beállítás', link: '/hu/guide/setup' },
+              { text: 'API-kulcs', link: '/hu/guide/api-key' },
+            ]},
+            { text: 'Használat', items: [
+              { text: 'Ikonok módosítása', link: '/hu/guide/changing-icons' },
+              { text: 'Alkalmazás-álnevek', link: '/hu/guide/aliases' },
+              { text: 'Háttérszolgáltatás', link: '/hu/guide/background-service' },
+              { text: 'Importálás és exportálás', link: '/hu/guide/import-export' },
+            ]},
+          ],
+          '/hu/cli/': [
+            { text: 'Parancssori eszköz', items: [
+              { text: 'Telepítés', link: '/hu/cli/' },
+              { text: 'Parancsreferencia', link: '/hu/cli/commands' },
+            ]},
+          ],
+        },
+      },
+    },
+    nl: {
+      label: 'Nederlands',
+      lang: 'nl',
+      themeConfig: {
+        nav: [
+          { text: 'Handleiding', link: '/nl/guide/getting-started' },
+          { text: 'CLI', link: '/nl/cli/' },
+          {
+            text: 'Downloaden',
+            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
+          },
+        ],
+        sidebar: {
+          '/nl/guide/': [
+            {
+              text: 'Aan de slag',
+              items: [
+                { text: 'Snelstart', link: '/nl/guide/getting-started' },
+                { text: 'Eerste configuratie', link: '/nl/guide/setup' },
+                { text: 'API-sleutel', link: '/nl/guide/api-key' },
+              ],
+            },
+            {
+              text: 'Gebruik',
+              items: [
+                { text: 'Iconen wijzigen', link: '/nl/guide/changing-icons' },
+                { text: 'App-aliassen', link: '/nl/guide/aliases' },
+                { text: 'Achtergronddienst', link: '/nl/guide/background-service' },
+                { text: 'Importeren en exporteren', link: '/nl/guide/import-export' },
+              ],
+            },
+          ],
+          '/nl/cli/': [
+            {
+              text: 'Opdrachtregelhulpmiddel',
+              items: [
+                { text: 'Installatie', link: '/nl/cli/' },
+                { text: 'Opdrachtreferentie', link: '/nl/cli/commands' },
+              ],
+            },
           ],
         },
       },
@@ -874,88 +734,44 @@ export default defineConfig({
         },
       },
     },
-    ru: {
-      label: 'Русский',
-      lang: 'ru',
+    fi: {
+      label: 'Suomi',
+      lang: 'fi',
       themeConfig: {
         nav: [
-          { text: 'Руководство', link: '/ru/guide/getting-started' },
-          { text: 'CLI', link: '/ru/cli/' },
+          { text: 'Opas', link: '/fi/guide/getting-started' },
+          { text: 'CLI', link: '/fi/cli/' },
           {
-            text: 'Скачать',
+            text: 'Lataa',
             link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
           },
         ],
         sidebar: {
-          '/ru/guide/': [
+          '/fi/guide/': [
             {
-              text: 'Начало работы',
+              text: 'Aloitus',
               items: [
-                { text: 'Быстрый старт', link: '/ru/guide/getting-started' },
-                { text: 'Первоначальная настройка', link: '/ru/guide/setup' },
-                { text: 'API-ключ', link: '/ru/guide/api-key' },
+                { text: 'Pikaopas', link: '/fi/guide/getting-started' },
+                { text: 'Alkumääritys', link: '/fi/guide/setup' },
+                { text: 'API-avain', link: '/fi/guide/api-key' },
               ],
             },
             {
-              text: 'Использование',
+              text: 'Käyttö',
               items: [
-                { text: 'Изменение иконок', link: '/ru/guide/changing-icons' },
-                { text: 'Псевдонимы приложений', link: '/ru/guide/aliases' },
-                { text: 'Фоновый сервис', link: '/ru/guide/background-service' },
-                { text: 'Импорт и экспорт', link: '/ru/guide/import-export' },
-              ],
-            },
-          ],
-          '/ru/cli/': [
-            {
-              text: 'Командная строка',
-              items: [
-                { text: 'Установка', link: '/ru/cli/' },
-                { text: 'Справочник команд', link: '/ru/cli/commands' },
+                { text: 'Kuvakkeiden vaihtaminen', link: '/fi/guide/changing-icons' },
+                { text: 'Sovellusten aliakset', link: '/fi/guide/aliases' },
+                { text: 'Taustapalvelu', link: '/fi/guide/background-service' },
+                { text: 'Tuonti ja vienti', link: '/fi/guide/import-export' },
               ],
             },
           ],
-        },
-      },
-    },
-    es: {
-      label: 'Español',
-      lang: 'es',
-      themeConfig: {
-        nav: [
-          { text: 'Guía', link: '/es/guide/getting-started' },
-          { text: 'CLI', link: '/es/cli/' },
-          {
-            text: 'Descargar',
-            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
-          },
-        ],
-        sidebar: {
-          '/es/guide/': [
+          '/fi/cli/': [
             {
-              text: 'Primeros pasos',
+              text: 'Komentorivityökalu',
               items: [
-                { text: 'Inicio rápido', link: '/es/guide/getting-started' },
-                { text: 'Configuración inicial', link: '/es/guide/setup' },
-                { text: 'Clave API', link: '/es/guide/api-key' },
-              ],
-            },
-            {
-              text: 'Uso',
-              items: [
-                { text: 'Cambiar iconos', link: '/es/guide/changing-icons' },
-                { text: 'Alias de aplicaciones', link: '/es/guide/aliases' },
-                { text: 'Servicio en segundo plano', link: '/es/guide/background-service' },
-                { text: 'Importar y exportar', link: '/es/guide/import-export' },
-              ],
-            },
-          ],
-          '/es/cli/': [
-            {
-              text: 'Herramienta de línea de comandos',
-              items: [
-                { text: 'Instalación', link: '/es/cli/' },
-                { text: 'Referencia de comandos', link: '/es/cli/commands' },
+                { text: 'Asennus', link: '/fi/cli/' },
+                { text: 'Komentojen viite', link: '/fi/cli/commands' },
               ],
             },
           ],
@@ -1006,34 +822,46 @@ export default defineConfig({
         },
       },
     },
-    th: {
-      label: 'ไทย',
-      lang: 'th',
+    vi: {
+      label: 'Tiếng Việt',
+      lang: 'vi',
       themeConfig: {
         nav: [
-          { text: 'คู่มือ', link: '/th/guide/getting-started' },
-          { text: 'CLI', link: '/th/cli/' },
-          { text: 'ดาวน์โหลด', link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest' },
+          { text: 'Hướng dẫn', link: '/vi/guide/getting-started' },
+          { text: 'CLI', link: '/vi/cli/' },
+          {
+            text: 'Tải xuống',
+            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
+          },
         ],
         sidebar: {
-          '/th/guide/': [
-            { text: 'เริ่มต้น', items: [
-              { text: 'เริ่มต้นอย่างรวดเร็ว', link: '/th/guide/getting-started' },
-              { text: 'การตั้งค่าเริ่มต้น', link: '/th/guide/setup' },
-              { text: 'คีย์ API', link: '/th/guide/api-key' },
-            ]},
-            { text: 'การใช้งาน', items: [
-              { text: 'เปลี่ยนไอคอน', link: '/th/guide/changing-icons' },
-              { text: 'นามแฝงแอป', link: '/th/guide/aliases' },
-              { text: 'บริการพื้นหลัง', link: '/th/guide/background-service' },
-              { text: 'นำเข้าและส่งออก', link: '/th/guide/import-export' },
-            ]},
+          '/vi/guide/': [
+            {
+              text: 'Bắt đầu',
+              items: [
+                { text: 'Bắt đầu nhanh', link: '/vi/guide/getting-started' },
+                { text: 'Thiết lập ban đầu', link: '/vi/guide/setup' },
+                { text: 'Khóa API', link: '/vi/guide/api-key' },
+              ],
+            },
+            {
+              text: 'Sử dụng',
+              items: [
+                { text: 'Thay đổi biểu tượng', link: '/vi/guide/changing-icons' },
+                { text: 'Bí danh ứng dụng', link: '/vi/guide/aliases' },
+                { text: 'Dịch vụ nền', link: '/vi/guide/background-service' },
+                { text: 'Nhập & Xuất', link: '/vi/guide/import-export' },
+              ],
+            },
           ],
-          '/th/cli/': [
-            { text: 'เครื่องมือบรรทัดคำสั่ง', items: [
-              { text: 'การติดตั้ง', link: '/th/cli/' },
-              { text: 'อ้างอิงคำสั่ง', link: '/th/cli/commands' },
-            ]},
+          '/vi/cli/': [
+            {
+              text: 'Công cụ dòng lệnh',
+              items: [
+                { text: 'Cài đặt', link: '/vi/cli/' },
+                { text: 'Tham chiếu lệnh', link: '/vi/cli/commands' },
+              ],
+            },
           ],
         },
       },
@@ -1082,6 +910,114 @@ export default defineConfig({
         },
       },
     },
+    cs: {
+      label: 'Čeština',
+      lang: 'cs',
+      themeConfig: {
+        nav: [
+          { text: 'Průvodce', link: '/cs/guide/getting-started' },
+          { text: 'CLI', link: '/cs/cli/' },
+          { text: 'Stáhnout', link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest' },
+        ],
+        sidebar: {
+          '/cs/guide/': [
+            { text: 'Začínáme', items: [
+              { text: 'Rychlý start', link: '/cs/guide/getting-started' },
+              { text: 'Počáteční nastavení', link: '/cs/guide/setup' },
+              { text: 'API klíč', link: '/cs/guide/api-key' },
+            ]},
+            { text: 'Použití', items: [
+              { text: 'Změna ikon', link: '/cs/guide/changing-icons' },
+              { text: 'Aliasy aplikací', link: '/cs/guide/aliases' },
+              { text: 'Služba na pozadí', link: '/cs/guide/background-service' },
+              { text: 'Import a export', link: '/cs/guide/import-export' },
+            ]},
+          ],
+          '/cs/cli/': [
+            { text: 'Příkazový řádek', items: [
+              { text: 'Instalace', link: '/cs/cli/' },
+              { text: 'Reference příkazů', link: '/cs/cli/commands' },
+            ]},
+          ],
+        },
+      },
+    },
+    el: {
+      label: 'Ελληνικά',
+      lang: 'el',
+      themeConfig: {
+        nav: [
+          { text: 'Οδηγός', link: '/el/guide/getting-started' },
+          { text: 'CLI', link: '/el/cli/' },
+          { text: 'Λήψη', link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest' },
+        ],
+        sidebar: {
+          '/el/guide/': [
+            { text: 'Ξεκινώντας', items: [
+              { text: 'Γρήγορη εκκίνηση', link: '/el/guide/getting-started' },
+              { text: 'Αρχική ρύθμιση', link: '/el/guide/setup' },
+              { text: 'Κλειδί API', link: '/el/guide/api-key' },
+            ]},
+            { text: 'Χρήση', items: [
+              { text: 'Αλλαγή εικονιδίων', link: '/el/guide/changing-icons' },
+              { text: 'Ψευδώνυμα εφαρμογών', link: '/el/guide/aliases' },
+              { text: 'Υπηρεσία παρασκηνίου', link: '/el/guide/background-service' },
+              { text: 'Εισαγωγή και εξαγωγή', link: '/el/guide/import-export' },
+            ]},
+          ],
+          '/el/cli/': [
+            { text: 'Εργαλείο γραμμής εντολών', items: [
+              { text: 'Εγκατάσταση', link: '/el/cli/' },
+              { text: 'Αναφορά εντολών', link: '/el/cli/commands' },
+            ]},
+          ],
+        },
+      },
+    },
+    ru: {
+      label: 'Русский',
+      lang: 'ru',
+      themeConfig: {
+        nav: [
+          { text: 'Руководство', link: '/ru/guide/getting-started' },
+          { text: 'CLI', link: '/ru/cli/' },
+          {
+            text: 'Скачать',
+            link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
+          },
+        ],
+        sidebar: {
+          '/ru/guide/': [
+            {
+              text: 'Начало работы',
+              items: [
+                { text: 'Быстрый старт', link: '/ru/guide/getting-started' },
+                { text: 'Первоначальная настройка', link: '/ru/guide/setup' },
+                { text: 'API-ключ', link: '/ru/guide/api-key' },
+              ],
+            },
+            {
+              text: 'Использование',
+              items: [
+                { text: 'Изменение иконок', link: '/ru/guide/changing-icons' },
+                { text: 'Псевдонимы приложений', link: '/ru/guide/aliases' },
+                { text: 'Фоновый сервис', link: '/ru/guide/background-service' },
+                { text: 'Импорт и экспорт', link: '/ru/guide/import-export' },
+              ],
+            },
+          ],
+          '/ru/cli/': [
+            {
+              text: 'Командная строка',
+              items: [
+                { text: 'Установка', link: '/ru/cli/' },
+                { text: 'Справочник команд', link: '/ru/cli/commands' },
+              ],
+            },
+          ],
+        },
+      },
+    },
     uk: {
       label: 'Українська',
       lang: 'uk',
@@ -1114,46 +1050,110 @@ export default defineConfig({
         },
       },
     },
-    vi: {
-      label: 'Tiếng Việt',
-      lang: 'vi',
+    ar: {
+      label: 'العربية',
+      lang: 'ar',
       themeConfig: {
         nav: [
-          { text: 'Hướng dẫn', link: '/vi/guide/getting-started' },
-          { text: 'CLI', link: '/vi/cli/' },
+          { text: 'الدليل', link: '/ar/guide/getting-started' },
+          { text: 'CLI', link: '/ar/cli/' },
           {
-            text: 'Tải xuống',
+            text: 'تحميل',
             link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest',
           },
         ],
         sidebar: {
-          '/vi/guide/': [
+          '/ar/guide/': [
             {
-              text: 'Bắt đầu',
+              text: 'البداية',
               items: [
-                { text: 'Bắt đầu nhanh', link: '/vi/guide/getting-started' },
-                { text: 'Thiết lập ban đầu', link: '/vi/guide/setup' },
-                { text: 'Khóa API', link: '/vi/guide/api-key' },
+                { text: 'البدء السريع', link: '/ar/guide/getting-started' },
+                { text: 'الإعداد الأولي', link: '/ar/guide/setup' },
+                { text: 'مفتاح API', link: '/ar/guide/api-key' },
               ],
             },
             {
-              text: 'Sử dụng',
+              text: 'الاستخدام',
               items: [
-                { text: 'Thay đổi biểu tượng', link: '/vi/guide/changing-icons' },
-                { text: 'Bí danh ứng dụng', link: '/vi/guide/aliases' },
-                { text: 'Dịch vụ nền', link: '/vi/guide/background-service' },
-                { text: 'Nhập & Xuất', link: '/vi/guide/import-export' },
+                { text: 'تغيير الأيقونات', link: '/ar/guide/changing-icons' },
+                { text: 'أسماء بديلة للتطبيقات', link: '/ar/guide/aliases' },
+                { text: 'الخدمة الخلفية', link: '/ar/guide/background-service' },
+                { text: 'الاستيراد والتصدير', link: '/ar/guide/import-export' },
               ],
             },
           ],
-          '/vi/cli/': [
+          '/ar/cli/': [
             {
-              text: 'Công cụ dòng lệnh',
+              text: 'أداة سطر الأوامر',
               items: [
-                { text: 'Cài đặt', link: '/vi/cli/' },
-                { text: 'Tham chiếu lệnh', link: '/vi/cli/commands' },
+                { text: 'التثبيت', link: '/ar/cli/' },
+                { text: 'مرجع الأوامر', link: '/ar/cli/commands' },
               ],
             },
+          ],
+        },
+      },
+    },
+    hi: {
+      label: 'हिन्दी',
+      lang: 'hi',
+      themeConfig: {
+        nav: [
+          { text: 'गाइड', link: '/hi/guide/getting-started' },
+          { text: 'CLI', link: '/hi/cli/' },
+          { text: 'डाउनलोड', link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest' },
+        ],
+        sidebar: {
+          '/hi/guide/': [
+            { text: 'शुरुआत', items: [
+              { text: 'त्वरित शुरुआत', link: '/hi/guide/getting-started' },
+              { text: 'प्रारंभिक सेटअप', link: '/hi/guide/setup' },
+              { text: 'API कुंजी', link: '/hi/guide/api-key' },
+            ]},
+            { text: 'उपयोग', items: [
+              { text: 'आइकन बदलना', link: '/hi/guide/changing-icons' },
+              { text: 'ऐप उपनाम', link: '/hi/guide/aliases' },
+              { text: 'बैकग्राउंड सेवा', link: '/hi/guide/background-service' },
+              { text: 'आयात और निर्यात', link: '/hi/guide/import-export' },
+            ]},
+          ],
+          '/hi/cli/': [
+            { text: 'कमांड लाइन टूल', items: [
+              { text: 'इंस्टॉलेशन', link: '/hi/cli/' },
+              { text: 'कमांड संदर्भ', link: '/hi/cli/commands' },
+            ]},
+          ],
+        },
+      },
+    },
+    th: {
+      label: 'ไทย',
+      lang: 'th',
+      themeConfig: {
+        nav: [
+          { text: 'คู่มือ', link: '/th/guide/getting-started' },
+          { text: 'CLI', link: '/th/cli/' },
+          { text: 'ดาวน์โหลด', link: 'https://github.com/Bengerthelorf/macIconChanger/releases/latest' },
+        ],
+        sidebar: {
+          '/th/guide/': [
+            { text: 'เริ่มต้น', items: [
+              { text: 'เริ่มต้นอย่างรวดเร็ว', link: '/th/guide/getting-started' },
+              { text: 'การตั้งค่าเริ่มต้น', link: '/th/guide/setup' },
+              { text: 'คีย์ API', link: '/th/guide/api-key' },
+            ]},
+            { text: 'การใช้งาน', items: [
+              { text: 'เปลี่ยนไอคอน', link: '/th/guide/changing-icons' },
+              { text: 'นามแฝงแอป', link: '/th/guide/aliases' },
+              { text: 'บริการพื้นหลัง', link: '/th/guide/background-service' },
+              { text: 'นำเข้าและส่งออก', link: '/th/guide/import-export' },
+            ]},
+          ],
+          '/th/cli/': [
+            { text: 'เครื่องมือบรรทัดคำสั่ง', items: [
+              { text: 'การติดตั้ง', link: '/th/cli/' },
+              { text: 'อ้างอิงคำสั่ง', link: '/th/cli/commands' },
+            ]},
           ],
         },
       },
