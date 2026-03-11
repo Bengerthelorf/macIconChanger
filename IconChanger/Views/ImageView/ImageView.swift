@@ -2,8 +2,6 @@
 //  ImageView.swift
 //  IconChanger
 //
-//  Created by 朱浩宇 on 2022/4/28.
-//
 
 import SwiftUI
 import LaunchPadManagerDBHelper
@@ -16,8 +14,20 @@ struct ImageView: View {
     
     var onStatusUpdate: ((Bool) -> Void)? = nil
 
+    var onFavorite: ((NSImage) -> Void)? = nil
+
     var body: some View {
         ImageViewCore(nsimage: $preview, setPath: setPath, isLoading: $isLoading)
+            .contextMenu {
+                Button {
+                    if let image = preview {
+                        onFavorite?(image)
+                    }
+                } label: {
+                    Label("Add to Favorites", systemImage: "star")
+                }
+                .disabled(preview == nil)
+            }
             .task(id: icon.id) {
                 do {
                     isLoading = true

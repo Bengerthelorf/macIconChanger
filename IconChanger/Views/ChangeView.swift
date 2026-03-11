@@ -2,8 +2,6 @@
 //  ChangeView.swift
 //  IconChanger
 //
-//  Created by 朱浩宇 on 2022/4/27.
-//
 
 import SwiftUI
 import UniformTypeIdentifiers
@@ -40,6 +38,9 @@ struct ChangeView: View {
     @State private var setIconError: String?
     @State private var isDragOver = false
     @State private var hasDuplicateName = false
+    @State private var appFavorites: [FavoriteIcon] = []
+    @State private var appHistory: [IconHistoryEntry] = []
+    @State private var isHistoryExpanded = false
 
     var body: some View {
         GeometryReader { geometry in
@@ -49,6 +50,7 @@ struct ChangeView: View {
 
             ScrollView() {
                 VStack {
+                    // MARK: - Header
                     HStack(alignment: .firstTextBaseline, spacing: 6) {
                         Text(setPath.name)
                             .font(.title)
@@ -67,6 +69,29 @@ struct ChangeView: View {
                         .help("Restore the original app icon")
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
+
+                    // MARK: - Favorites
+                    if !appFavorites.isEmpty {
+                        HStack {
+                            Label("Favorites", systemImage: "star.fill")
+                                .font(.headline)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+
+                        LazyVGrid(columns: columns, alignment: .leading) {
+                            ForEach(appFavorites) { fav in
+                                FavoriteImageView(favorite: fav, setPath: setPath) {
+                                    IconFavoriteManager.shared.removeFavorite(fav)
+                                    refreshFavorites()
+                                }
+                                .frame(width: imageSize, height: imageSize)
+                            }
+                        }
+
+                        Divider().padding(.vertical, 10)
+                    }
+
+                    // MARK: - Local
                     HStack {
                         Text("Local")
                                 .font(.headline)
@@ -83,8 +108,10 @@ struct ChangeView: View {
                     } else {
                         LazyVGrid(columns: columns, alignment: .leading) {
                             ForEach(inIcons.prefix(isExpanded ? inIcons.count : numberOfColumns), id: \.self) { icon in
-                                LocalImageView(url: icon, setPath: setPath)
-                                        .frame(width: imageSize, height: imageSize)
+                                LocalImageView(url: icon, setPath: setPath) { image in
+                                    addToFavorites(image: image, source: "Local")
+                                }
+                                .frame(width: imageSize, height: imageSize)
                             }
                         }
                         if !isExpanded && inIcons.count > numberOfColumns {
@@ -101,11 +128,12 @@ struct ChangeView: View {
                     Divider().padding(.top, 10)
                             .padding(.bottom, 10)
 
+                    // MARK: - macOSicons.com
                     HStack {
                         Text("macOSicons.com")
                             .font(.headline)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                        
+
                         Picker("Style", selection: $selectedStyle) {
                             ForEach(IconStyle.allCases) { style in
                                 Text(style.displayName).tag(style)
@@ -115,7 +143,7 @@ struct ChangeView: View {
                         .onChange(of: selectedStyle) { _ in
                             triggerIconFetch()
                         }
-                        
+
                         if !isLoadingIcons && successIconsCount > 0 {
                             HStack(spacing: 4) {
                                 Text("\(successIconsCount)/\(totalIconsCount)")
@@ -154,9 +182,52 @@ struct ChangeView: View {
                                 ForEach(validIcons) { icon in
                                     ImageView(icon: icon, setPath: setPath, onStatusUpdate: { isValid in
                                         updateIconStatus(icon: icon, isValid: isValid)
+                                    }, onFavorite: { image in
+                                        addToFavorites(image: image, source: "macOSicons.com")
                                     })
                                     .frame(width: imageSize, height: imageSize)
                                 }
+                            }
+                        }
+                    }
+
+                    // MARK: - History
+                    if !appHistory.isEmpty {
+                        Divider().padding(.vertical, 10)
+
+                        HStack {
+                            Label("History", systemImage: "clock")
+                                .font(.headline)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Button(role: .destructive) {
+                                IconHistoryManager.shared.clearHistory(for: setPath.url.universalPath())
+                                refreshHistory()
+                            } label: {
+                                Text("Clear")
+                                    .font(.caption)
+                            }
+                            .buttonStyle(.borderless)
+                        }
+
+                        LazyVGrid(columns: columns, alignment: .leading) {
+                            ForEach(appHistory.prefix(isHistoryExpanded ? appHistory.count : numberOfColumns)) { entry in
+                                HistoryImageView(entry: entry, setPath: setPath, onFavorite: { image in
+                                    addToFavorites(image: image, source: "History")
+                                }, onRemove: {
+                                    IconHistoryManager.shared.removeEntry(entry)
+                                    refreshHistory()
+                                })
+                                .frame(width: imageSize, height: imageSize)
+                            }
+                        }
+
+                        if !isHistoryExpanded && appHistory.count > numberOfColumns {
+                            Button(action: {
+                                isHistoryExpanded = true
+                            }) {
+                                Text("Show More")
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
                             }
                         }
                     }
@@ -195,6 +266,8 @@ struct ChangeView: View {
                 .onAppear {
                     inIcons = iconManager.getIconInPath(setPath.url)
                     hasDuplicateName = iconManager.apps.contains { $0.name == setPath.name && $0.id != setPath.id }
+                    refreshFavorites()
+                    refreshHistory()
                 }
                 .task {
                     triggerIconFetch()
@@ -208,6 +281,8 @@ struct ChangeView: View {
                 .onChange(of: iconManager.iconRefreshTrigger) { _ in
                     inIcons = iconManager.getIconInPath(setPath.url)
                     triggerIconFetch(forceRefresh: true)
+                    refreshFavorites()
+                    refreshHistory()
                 }
                 .onChange(of: iconManager.apps) { _ in
                     hasDuplicateName = iconManager.apps.contains { $0.name == setPath.name && $0.id != setPath.id }
@@ -242,6 +317,23 @@ struct ChangeView: View {
                 }
     }
     
+    private func refreshFavorites() {
+        appFavorites = IconFavoriteManager.shared.getAppFavorites(for: setPath.url.universalPath())
+    }
+
+    private func refreshHistory() {
+        appHistory = IconHistoryManager.shared.getHistory(for: setPath.url.universalPath())
+    }
+
+    private func addToFavorites(image: NSImage, source: String) {
+        _ = IconFavoriteManager.shared.addFavorite(
+            image: image,
+            sourceName: source,
+            appPath: setPath.url.universalPath()
+        )
+        refreshFavorites()
+    }
+
     private func handleDrop(providers: [NSItemProvider]) -> Bool {
         guard let provider = providers.first else { return false }
 

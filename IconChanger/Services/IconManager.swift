@@ -2,8 +2,6 @@
 //  IconManager.swift
 //  IconChanger
 //
-//  Created by 朱浩宇 on 2022/4/27.
-//
 
 import SwiftUI
 import SwiftyJSON
@@ -280,6 +278,9 @@ class IconManager: ObservableObject {
 
         try ensureSetupCompleted()
         try applyIcon(image, to: app)
+
+        // Record in history
+        IconHistoryManager.shared.addEntry(image: image, for: app.url.universalPath(), appName: app.name)
 
         Task { @MainActor in
             AppIconCache.shared.remove(for: app.url)

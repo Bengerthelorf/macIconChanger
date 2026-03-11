@@ -2,8 +2,6 @@
 //  LocalImageView.swift
 //  IconChanger
 //
-//  Created by 朱浩宇 on 2022/12/18.
-//
 
 import SwiftUI
 import LaunchPadManagerDBHelper
@@ -15,8 +13,20 @@ struct LocalImageView: View {
     @State var nsimage: NSImage?
     @State var isLoading: Bool = true
 
+    var onFavorite: ((NSImage) -> Void)? = nil
+
     var body: some View {
         ImageViewCore(nsimage: $nsimage, setPath: setPath, isLoading: $isLoading)
+            .contextMenu {
+                Button {
+                    if let image = nsimage {
+                        onFavorite?(image)
+                    }
+                } label: {
+                    Label("Add to Favorites", systemImage: "star")
+                }
+                .disabled(nsimage == nil)
+            }
             .task(id: url) {
                 do {
                     isLoading = true
