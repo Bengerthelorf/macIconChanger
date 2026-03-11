@@ -2,8 +2,6 @@
 //  CLIManager.swift
 //  IconChanger
 //
-//  Created by Zane on 3/26/25.
-//
 
 import SwiftUI
 import Foundation

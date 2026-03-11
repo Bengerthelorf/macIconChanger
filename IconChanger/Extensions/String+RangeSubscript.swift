@@ -2,8 +2,6 @@
 //  String+RangeSubscript.swift
 //  Endless (FileProvider iOS)
 //
-//  Created by 朱浩宇 on 2022/1/10.
-//
 
 import Foundation
 

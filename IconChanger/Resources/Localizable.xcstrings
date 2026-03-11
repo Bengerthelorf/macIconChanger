@@ -1962,6 +1962,7 @@
       }
     },
     "Actions" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -2138,6 +2139,9 @@
           }
         }
       }
+    },
+    "Add to Favorites" : {
+
     },
     "Advanced" : {
       "localizations" : {
@@ -9663,6 +9667,9 @@
         }
       }
     },
+    "Clear" : {
+
+    },
     "Clear All Cache" : {
       "localizations" : {
         "ar" : {
@@ -10027,6 +10034,7 @@
       }
     },
     "Command line configuration is available with the 'iconchanger' tool." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -11992,6 +12000,7 @@
       }
     },
     "Current Configuration" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -20595,6 +20604,9 @@
         }
       }
     },
+    "Favorites" : {
+
+    },
     "Filter" : {
 
     },
@@ -22402,6 +22414,9 @@
           }
         }
       }
+    },
+    "History" : {
+
     },
     "hours" : {
       "localizations" : {
@@ -26877,6 +26892,7 @@
       }
     },
     "Installation Path" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -35659,6 +35675,12 @@
         }
       }
     },
+    "Remove from Favorites" : {
+
+    },
+    "Remove from History" : {
+
+    },
     "Remove Selected" : {
       "localizations" : {
         "ar" : {
@@ -39048,9 +39070,6 @@
           }
         }
       }
-    },
-    "Run 'iconchanger --help' for full usage details." : {
-
     },
     "Run in Background" : {
       "localizations" : {
@@ -45165,9 +45184,6 @@
         }
       }
     },
-    "The IconChanger CLI provides command-line access to manage app icons, aliases, and configurations." : {
-
-    },
     "The IconChanger CLI tool provides command-line access to import and export configurations." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -47320,6 +47336,7 @@
       }
     },
     "Usage" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -47498,6 +47515,7 @@
       }
     },
     "Usage Information" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

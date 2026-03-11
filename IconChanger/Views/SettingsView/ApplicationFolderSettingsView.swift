@@ -2,8 +2,6 @@
 //  ApplicationFolderSettingsView.swift
 //  IconChanger
 //
-//  Created by seril on 7/25/23.
-//
 
 import SwiftUI
 

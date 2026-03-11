@@ -2,8 +2,6 @@
 //  IconImageLoader.swift
 //  IconChanger
 //
-//  Created by Snaix on 10/17/25.
-//
 
 import Foundation
 @preconcurrency import AppKit

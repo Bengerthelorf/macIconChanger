@@ -2,8 +2,6 @@
 //  ConfigManager+CLI.swift
 //  IconChanger
 //
-//  Created by Zane on 3/26/25.
-//
 
 import Foundation
 

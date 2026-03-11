@@ -2,8 +2,6 @@
 //  AppItem.swift
 //  IconChanger
 //
-//  Created by Antigravity on 2026/01/01.
-//
 
 import Foundation
 import LaunchPadManagerDBHelper

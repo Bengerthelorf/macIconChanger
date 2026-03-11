@@ -2,8 +2,6 @@
 //  AutoUpdater.swift
 //  SetAppX
 //
-//  Created by 朱浩宇 on 2021/3/14.
-//
 
 import SwiftUI
 import Sparkle

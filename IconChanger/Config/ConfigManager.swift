@@ -2,8 +2,6 @@
 //  ConfigManager.swift
 //  IconChanger
 //
-//  Created by Bengerthelorf on 2025/03/25.
-//
 
 import Foundation
 import SwiftyJSON

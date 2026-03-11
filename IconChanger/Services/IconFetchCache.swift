@@ -2,8 +2,6 @@
 //  IconFetchCache.swift
 //  IconChanger
 //
-//  Created by CantonMonkey on 2025/10/11.
-//
 
 import Foundation
 import AppKit

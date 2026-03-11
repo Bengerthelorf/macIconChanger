@@ -2,8 +2,6 @@
 //  SetAliasNameView.swift
 //  IconChanger
 //
-//  Created by 朱浩宇 on 2022/6/27.
-//
 
 import SwiftUI
 
