@@ -1053,6 +1053,7 @@ export default defineConfig({
     ar: {
       label: 'العربية',
       lang: 'ar',
+      dir: 'rtl',
       themeConfig: {
         nav: [
           { text: 'الدليل', link: '/ar/guide/getting-started' },
