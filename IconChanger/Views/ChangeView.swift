@@ -41,6 +41,7 @@ struct ChangeView: View {
     @State private var appFavorites: [FavoriteIcon] = []
     @State private var appHistory: [IconHistoryEntry] = []
     @State private var isHistoryExpanded = false
+    @State private var hasLoadedLocalIcons = false
 
     var body: some View {
         GeometryReader { geometry in
@@ -102,10 +103,10 @@ struct ChangeView: View {
                         .keyboardShortcut("o", modifiers: .command)
                     }
 
-                    if inIcons.isEmpty {
+                    if inIcons.isEmpty && !hasLoadedLocalIcons {
                         ProgressView()
                                 .progressViewStyle(AppStoreProgressViewStyle())
-                    } else {
+                    } else if !inIcons.isEmpty {
                         LazyVGrid(columns: columns, alignment: .leading) {
                             ForEach(inIcons.prefix(isExpanded ? inIcons.count : numberOfColumns), id: \.self) { icon in
                                 LocalImageView(url: icon, setPath: setPath) { image in
@@ -265,6 +266,7 @@ struct ChangeView: View {
                 .padding(10)
                 .onAppear {
                     inIcons = iconManager.getIconInPath(setPath.url)
+                    hasLoadedLocalIcons = true
                     hasDuplicateName = iconManager.apps.contains { $0.name == setPath.name && $0.id != setPath.id }
                     refreshFavorites()
                     refreshHistory()
