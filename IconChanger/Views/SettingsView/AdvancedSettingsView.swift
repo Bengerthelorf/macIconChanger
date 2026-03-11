@@ -310,15 +310,50 @@ struct AdvancedSettingsView: View {
     }
 
     private func extractErrorMessage(from error: Error) -> String {
-        let errorDescription = error.localizedDescription
+        let nsError = error as NSError
+        let code = nsError.code
 
-        if errorDescription.contains("API error:") {
-            if let messageStart = errorDescription.range(of: "\"message\":\""),
-               let messageEnd = errorDescription.range(of: "\"}", options: [], range: messageStart.upperBound..<errorDescription.endIndex) {
-                return String(errorDescription[messageStart.upperBound..<messageEnd.lowerBound])
+        // Handle known HTTP status codes with clean messages
+        if code == 429 {
+            return NSLocalizedString("API call limit exceeded. Try again next month or contact macosicons.com for a higher quota.", comment: "API 429 error")
+        }
+        if code == 401 || code == 403 {
+            return NSLocalizedString("Invalid or expired API key. Check your key in Settings.", comment: "API auth error")
+        }
+        if code == 500 || code == 502 || code == 503 {
+            return NSLocalizedString("The macosicons.com server is temporarily unavailable. Try again later.", comment: "API server error")
+        }
+
+        // For NSURLError codes
+        if nsError.domain == NSURLErrorDomain {
+            if code == NSURLErrorTimedOut {
+                return NSLocalizedString("Request timed out. Check your network connection.", comment: "Timeout error")
+            }
+            if code == NSURLErrorNotConnectedToInternet {
+                return NSLocalizedString("No internet connection.", comment: "No internet error")
             }
         }
 
-        return errorDescription
+        // Try to extract "message" field from JSON in the error description
+        let desc = error.localizedDescription
+        if let data = desc.data(using: .utf8),
+           let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+           let message = json["message"] as? String {
+            return message
+        }
+        if desc.contains("\"message\"") {
+            if let msgStart = desc.range(of: "\"message\":"),
+               let quoteStart = desc.range(of: "\"", range: msgStart.upperBound..<desc.endIndex),
+               let quoteEnd = desc.range(of: "\"", range: quoteStart.upperBound..<desc.endIndex) {
+                return String(desc[quoteStart.upperBound..<quoteEnd.lowerBound])
+            }
+        }
+
+        // Strip "API error: " prefix if present, to avoid showing raw JSON
+        if desc.hasPrefix("API error: ") {
+            return String(desc.dropFirst("API error: ".count).prefix(80))
+        }
+
+        return desc
     }
 }

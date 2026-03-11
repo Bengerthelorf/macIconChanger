@@ -289,9 +289,9 @@ class MyQueryRequestController {
             }
 
             if httpResponse.statusCode != 200 {
-                let errorStr = String(data: data, encoding: .utf8) ?? "Unknown error"
-                logger.error("Search request failed (\(httpResponse.statusCode)): \(errorStr, privacy: .public)")
-                throw APIError.httpError(statusCode: httpResponse.statusCode, message: errorStr)
+                let errorMsg = Self.extractAPIMessage(from: data) ?? "HTTP \(httpResponse.statusCode)"
+                logger.error("Search request failed (\(httpResponse.statusCode)): \(errorMsg, privacy: .public)")
+                throw APIError.httpError(statusCode: httpResponse.statusCode, message: errorMsg)
             }
 
             let json = try JSON(data: data)
@@ -383,14 +383,9 @@ class MyQueryRequestController {
         
         // Check if the status code indicates success
         if httpResponse.statusCode != 200 {
-            // Try to extract error message from response
-            if let errorStr = String(data: data, encoding: .utf8) {
-                throw NSError(domain: "IconChanger", code: httpResponse.statusCode,
-                              userInfo: [NSLocalizedDescriptionKey: "API error: \(errorStr)"])
-            } else {
-                throw NSError(domain: "IconChanger", code: httpResponse.statusCode,
-                              userInfo: [NSLocalizedDescriptionKey: "API returned status code \(httpResponse.statusCode)"])
-            }
+            let message = Self.extractAPIMessage(from: data) ?? "HTTP \(httpResponse.statusCode)"
+            throw NSError(domain: "IconChanger", code: httpResponse.statusCode,
+                          userInfo: [NSLocalizedDescriptionKey: message])
         }
         
         // Parse the response
@@ -444,10 +439,15 @@ class MyQueryRequestController {
                 throw APIError.networkError("Invalid response from backup server")
             }
 
+            if httpResponse.statusCode == 404 {
+                logger.debug("Backup search returned 404 for '\(query, privacy: .public)' — no results.")
+                return []
+            }
+
             if httpResponse.statusCode != 200 {
-                let errorStr = String(data: data, encoding: .utf8) ?? "Unknown error"
-                logger.error("Backup search failed (\(httpResponse.statusCode)): \(errorStr, privacy: .public)")
-                throw APIError.httpError(statusCode: httpResponse.statusCode, message: errorStr)
+                let errorMsg = Self.extractAPIMessage(from: data) ?? "HTTP \(httpResponse.statusCode)"
+                logger.error("Backup search failed (\(httpResponse.statusCode)): \(errorMsg, privacy: .public)")
+                throw APIError.httpError(statusCode: httpResponse.statusCode, message: errorMsg)
             }
 
             let json = try JSON(data: data)
@@ -538,6 +538,12 @@ class MyQueryRequestController {
         }
         
         return results.isEmpty ? nil : results
+    }
+
+    /// Extract a clean "message" string from a JSON API error response body.
+    private static func extractAPIMessage(from data: Data) -> String? {
+        guard let json = try? JSON(data: data) else { return nil }
+        return json["message"].string ?? json["statusMessage"].string
     }
 
     func queryMix(_ query: String) -> String {
