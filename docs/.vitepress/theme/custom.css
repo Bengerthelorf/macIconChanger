@@ -7,6 +7,10 @@
   max-height: 520px !important;
 }
 
+.VPHero .text {
+  text-wrap: balance;
+}
+
 @media (min-width: 960px) {
   .VPHero .main {
     display: flex;
