@@ -7,6 +7,7 @@ import SwiftUI
 import SwiftyJSON
 import LaunchPadManagerDBHelper
 import os
+import CommonCrypto
 
 enum SetupStatus {
     case completed
@@ -26,11 +27,11 @@ class IconManager: ObservableObject {
 
     private var refreshTask: Task<Void, Never>?
 
+    /// Root-owned directory — prevents user-level tampering of privileged helpers.
     var helperDirectoryURL: URL {
-        FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent(".iconchanger", isDirectory: true)
+        URL(fileURLWithPath: "/usr/local/lib/iconchanger", isDirectory: true)
     }
-    
+
     var helperScriptURL: URL {
         helperDirectoryURL.appendingPathComponent("helper.sh")
     }
@@ -39,6 +40,36 @@ class IconManager: ObservableObject {
         helperDirectoryURL.appendingPathComponent("fileicon")
     }
     
+    private static let auditDateFormatter: ISO8601DateFormatter = {
+        let f = ISO8601DateFormatter()
+        return f
+    }()
+
+    private static let auditLogURL: URL = {
+        let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        let dir = appSupport.appendingPathComponent("IconChanger")
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir.appendingPathComponent("audit.log")
+    }()
+
+    private func auditLog(operation: String, appName: String, appPath: String, detail: String = "") {
+        let timestamp = Self.auditDateFormatter.string(from: Date())
+        let user = NSUserName()
+        let entry = "[\(timestamp)] user=\(user) op=\(operation) app=\"\(appName)\" path=\"\(appPath)\"\(detail.isEmpty ? "" : " \(detail)")\n"
+        logger.log("AUDIT: \(entry.trimmingCharacters(in: .newlines))")
+        if let data = entry.data(using: .utf8) {
+            if FileManager.default.fileExists(atPath: Self.auditLogURL.path) {
+                if let handle = try? FileHandle(forWritingTo: Self.auditLogURL) {
+                    handle.seekToEndOfFile()
+                    handle.write(data)
+                    handle.closeFile()
+                }
+            } else {
+                try? data.write(to: Self.auditLogURL)
+            }
+        }
+    }
+
     init() {
         refresh()
     }
@@ -115,51 +146,101 @@ class IconManager: ObservableObject {
     }
     
     func ensureHelperFilesCopied() {
-        let helperDir = helperDirectoryURL.path
+        guard let fileiconBundlePath = Bundle.main.path(forResource: "fileicon", ofType: nil) else {
+            logger.error("Cannot find 'fileicon' in bundle.")
+            return
+        }
+        guard let helperBundlePath = Bundle.main.path(forResource: "helper", ofType: "sh") else {
+            logger.error("Cannot find 'helper.sh' in bundle.")
+            return
+        }
+
+        let helperDir   = helperDirectoryURL.path
+        let fileiconDst = fileiconURL.path
+        let helperDst   = helperScriptURL.path
+
+        if verifyHelperIntegrity() {
+            logger.debug("Helper files are up to date, skipping install.")
+            return
+        }
+
+        let esc = { (s: String) -> String in s.shellEscaped }
+        let commands = [
+            "mkdir -p '\(esc(helperDir))'",
+            "cp '\(esc(fileiconBundlePath))' '\(esc(fileiconDst))'",
+            "cp '\(esc(helperBundlePath))' '\(esc(helperDst))'",
+            "chown root:wheel '\(esc(helperDir))' '\(esc(fileiconDst))' '\(esc(helperDst))'",
+            "chmod 755 '\(esc(helperDir))' '\(esc(fileiconDst))' '\(esc(helperDst))'"
+        ].joined(separator: " && ")
+
+        let escaped = commands
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\"", with: "\\\"")
+        let appleScript = "do shell script \"\(escaped)\" with administrator privileges"
+
+        logger.log("Installing helper files to \(helperDir) via osascript...")
+
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
+        task.arguments = ["-e", appleScript]
+        task.standardOutput = Pipe()
+        let errPipe = Pipe()
+        task.standardError = errPipe
 
         do {
-            if !FileManager.default.fileExists(atPath: helperDir) {
-                try FileManager.default.createDirectory(at: helperDirectoryURL, withIntermediateDirectories: true, attributes: nil)
-            }
-            
-            guard let fileiconBundlePath = Bundle.main.path(forResource: "fileicon", ofType: nil) else {
-                logger.error("Cannot find 'fileicon' in bundle.")
-                return
-            }
-            guard let helperBundlePath = Bundle.main.path(forResource: "helper", ofType: "sh") else {
-                logger.error("Cannot find 'helper.sh' in bundle.")
-                return
-            }
-            
-            let fileiconDestPath = fileiconURL.path
-            let helperDestPath = helperScriptURL.path
-
-            copyIfNeeded(from: fileiconBundlePath, to: fileiconDestPath, name: "fileicon")
-            _ = try? Self.safeShell("chmod u+x '\(fileiconDestPath.shellEscaped)'")
-
-            copyIfNeeded(from: helperBundlePath, to: helperDestPath, name: "helper.sh")
-            _ = try? Self.safeShell("chmod u+x '\(helperDestPath.shellEscaped)'")
-            
+            try task.run()
+            task.waitUntilExit()
         } catch {
-            logger.error("Error during ensureHelperFilesCopied: \(error.localizedDescription)")
+            logger.error("Failed to launch osascript for helper install: \(error.localizedDescription)")
+            return
+        }
+
+        if task.terminationStatus != 0 {
+            let errMsg = String(data: errPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
+            logger.error("Helper file install failed (status \(task.terminationStatus)): \(errMsg)")
+        } else {
+            logger.log("Helper files installed successfully at \(helperDir).")
         }
     }
 
-    private func copyIfNeeded(from sourcePath: String, to destPath: String, name: String) {
-        let fm = FileManager.default
-        if fm.fileExists(atPath: destPath) {
-            if let sourceData = fm.contents(atPath: sourcePath),
-               let destData = fm.contents(atPath: destPath),
-               sourceData == destData {
-                return
-            }
-            try? fm.removeItem(atPath: destPath)
+    private func sha256(of path: String) -> String? {
+        guard let data = FileManager.default.contents(atPath: path) else { return nil }
+        var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
+        data.withUnsafeBytes { buffer in
+            _ = CC_SHA256(buffer.baseAddress, CC_LONG(data.count), &hash)
         }
-        do {
-            try fm.copyItem(atPath: sourcePath, toPath: destPath)
-        } catch {
-            logger.error("Failed to copy '\(name)': \(error.localizedDescription)")
+        return hash.map { String(format: "%02x", $0) }.joined()
+    }
+
+    private func verifyHelperIntegrity() -> Bool {
+        guard let bundledFileicon = Bundle.main.path(forResource: "fileicon", ofType: nil),
+              let bundledHelper = Bundle.main.path(forResource: "helper", ofType: "sh") else {
+            logger.error("Cannot find bundled helper files for integrity check.")
+            return false
         }
+
+        let installedFileicon = fileiconURL.path
+        let installedHelper = helperScriptURL.path
+
+        guard let bundledFileiconHash = sha256(of: bundledFileicon),
+              let installedFileiconHash = sha256(of: installedFileicon),
+              let bundledHelperHash = sha256(of: bundledHelper),
+              let installedHelperHash = sha256(of: installedHelper) else {
+            logger.error("Failed to compute hash for helper file integrity check.")
+            return false
+        }
+
+        if bundledFileiconHash != installedFileiconHash {
+            logger.error("SECURITY: Installed fileicon hash mismatch! Expected \(bundledFileiconHash), got \(installedFileiconHash)")
+            return false
+        }
+        if bundledHelperHash != installedHelperHash {
+            logger.error("SECURITY: Installed helper.sh hash mismatch! Expected \(bundledHelperHash), got \(installedHelperHash)")
+            return false
+        }
+
+        logger.debug("Helper file integrity verified.")
+        return true
     }
 
     enum ImageSaveError: Error, LocalizedError {
@@ -194,6 +275,18 @@ class IconManager: ObservableObject {
 
     private func ensureSetupCompleted() throws {
         ensureHelperFilesCopied()
+
+        if !verifyHelperIntegrity() {
+            logger.error("SECURITY: Helper integrity mismatch — re-installing from bundle.")
+            ensureHelperFilesCopied()
+            guard verifyHelperIntegrity() else {
+                throw NSError(domain: "IconManager", code: 12,
+                              userInfo: [NSLocalizedDescriptionKey: NSLocalizedString(
+                                "Helper files could not be verified after re-installation. Please reinstall the application.",
+                                comment: "Integrity check failure after re-install")])
+            }
+        }
+
         let status = checkSetupStatus()
         guard case .completed = status else {
             logger.error("Setup incomplete: \(String(describing: status))")
@@ -267,6 +360,7 @@ class IconManager: ObservableObject {
             self.iconRefreshTrigger = UUID()
         }
 
+        auditLog(operation: "remove_icon", appName: app.name, appPath: appPath)
         logger.log("Icon restored to default for \(app.name)")
     }
 
@@ -278,6 +372,8 @@ class IconManager: ObservableObject {
 
         try ensureSetupCompleted()
         try applyIcon(image, to: app)
+
+        auditLog(operation: "set_icon", appName: app.name, appPath: app.url.universalPath())
 
         // Record in history
         IconHistoryManager.shared.addEntry(image: image, for: app.url.universalPath(), appName: app.name)
@@ -359,17 +455,29 @@ class IconManager: ObservableObject {
     }
     
     func getIconInPath(_ url: URL) -> [URL] {
-        let url = url.appendingPathComponent("Contents").appendingPathComponent("Resources")
-        let file = (try? FileManager.default.contentsOfDirectory(atPath: url.path)) ?? [String]()
-        return file.filter {
-            $0.contains(".icns")
+        let resourcesURL = url.appendingPathComponent("Contents").appendingPathComponent("Resources")
+        let files = (try? FileManager.default.contentsOfDirectory(atPath: resourcesURL.path)) ?? [String]()
+        let icnsFiles = files.filter { $0.hasSuffix(".icns") }
+
+        let plistURL = url.appendingPathComponent("Contents").appendingPathComponent("Info.plist")
+        var primaryIconName: String? = nil
+        if let plist = NSDictionary(contentsOf: plistURL) as? [String: Any] {
+            if var iconFile = plist["CFBundleIconFile"] as? String {
+                if !iconFile.hasSuffix(".icns") {
+                    iconFile += ".icns"
+                }
+                primaryIconName = iconFile
+            }
         }
-        .map {
-            url.appendingPathComponent($0).path
+
+        let sorted = icnsFiles.sorted { a, b in
+            let aIsPrimary = (a == primaryIconName)
+            let bIsPrimary = (b == primaryIconName)
+            if aIsPrimary != bIsPrimary { return aIsPrimary }
+            return a.localizedStandardCompare(b) == .orderedAscending
         }
-        .map {
-            URL(fileURLWithPath: $0)
-        }
+
+        return sorted.map { resourcesURL.appendingPathComponent($0) }
     }
 
     // MARK: - Squircle Jail Escape (macOS Tahoe)
@@ -414,6 +522,7 @@ class IconManager: ObservableObject {
         // Pass the .icns file directly to fileicon to preserve all resolutions
         try runHelperTool(appPath: app.url.universalPath(), imagePath: iconURL.path)
 
+        auditLog(operation: "escape_squircle", appName: app.name, appPath: app.url.universalPath())
         logger.log("Escaped squircle jail for \(app.name)")
 
         Task { @MainActor in
@@ -550,26 +659,59 @@ class IconManager: ObservableObject {
     func runHelperTool(appPath: String, imagePath: String) throws {
         let helperToolPath = self.helperScriptURL.path
         let fileiconPath = self.fileiconURL.path
-        
-        let command = "sudo -n '\(helperToolPath.shellEscaped)' '\(fileiconPath.shellEscaped)' '\(appPath.shellEscaped)' '\(imagePath.shellEscaped)'"
-        logger.debug("Executing: \(command)")
 
-        let output: String
-        do {
-            output = try Self.safeShell(command, timeout: 15.0)
-        } catch let error as ShellError {
-            switch error {
-            case .commandFailed(let status, let errOutput):
-                throw NSError(domain: "IconManager", code: 10, userInfo: [NSLocalizedDescriptionKey: "Helper tool failed (status: \(status)): \(errOutput)"])
-            case .timeout:
-                throw NSError(domain: "IconManager", code: 14, userInfo: [NSLocalizedDescriptionKey: "Helper tool timed out"])
-            case .taskCreationFailed:
-                throw NSError(domain: "IconManager", code: 15, userInfo: [NSLocalizedDescriptionKey: "Failed to start helper tool process"])
-            }
+        let task = Process()
+        let outPipe = Pipe()
+        let errPipe = Pipe()
+
+        task.executableURL = URL(fileURLWithPath: "/usr/bin/sudo")
+        task.arguments = ["-n", helperToolPath, fileiconPath, appPath, imagePath]
+        task.standardOutput = outPipe
+        task.standardError = errPipe
+        task.standardInput = nil
+
+        logger.debug("Executing: sudo -n \(helperToolPath) \(fileiconPath) \(appPath) \(imagePath)")
+
+        let semaphore = DispatchSemaphore(value: 0)
+        var timedOut = false
+
+        task.terminationHandler = { _ in
+            semaphore.signal()
         }
 
-        if output.lowercased().contains("incorrect password") || output.lowercased().contains("try again") {
-            throw NSError(domain: "IconManager", code: 16, userInfo: [NSLocalizedDescriptionKey: "Helper tool unexpectedly asked for a password: \(output)"])
+        do {
+            try task.run()
+        } catch {
+            throw NSError(domain: "IconManager", code: 15,
+                          userInfo: [NSLocalizedDescriptionKey: "Failed to start helper tool process: \(error.localizedDescription)"])
+        }
+
+        let waitResult = semaphore.wait(timeout: .now() + 15.0)
+        if waitResult == .timedOut {
+            timedOut = true
+            task.terminate()
+        }
+
+        let outputData = outPipe.fileHandleForReading.readDataToEndOfFile()
+        let errorData = errPipe.fileHandleForReading.readDataToEndOfFile()
+        let output = String(data: outputData, encoding: .utf8) ?? ""
+        let errorOutput = String(data: errorData, encoding: .utf8) ?? ""
+
+        if timedOut {
+            throw NSError(domain: "IconManager", code: 14,
+                          userInfo: [NSLocalizedDescriptionKey: "Helper tool timed out"])
+        }
+
+        if task.terminationStatus != 0 {
+            let combined = "Stdout:\n\(output)\nStderr:\n\(errorOutput)".trimmingCharacters(in: .whitespacesAndNewlines)
+            throw NSError(domain: "IconManager", code: 10,
+                          userInfo: [NSLocalizedDescriptionKey: "Helper tool failed (status: \(task.terminationStatus)): \(combined.isEmpty ? "No output" : combined)"])
+        }
+
+        let combinedLower = (output + errorOutput).lowercased()
+        if combinedLower.contains("incorrect password") || combinedLower.contains("try again") {
+            throw NSError(domain: "IconManager", code: 16,
+                          userInfo: [NSLocalizedDescriptionKey: "Helper tool unexpectedly asked for a password: \(output)\(errorOutput)"])
         }
     }
     
@@ -665,14 +807,16 @@ class IconManager: ObservableObject {
 
     func configureSudoers() throws {
         let helperPath = self.helperScriptURL.path
-        let sudoersLine = "ALL ALL=(ALL) NOPASSWD: \(helperPath)"
+        let username = NSUserName()
+        let sudoersLine = "\(username) ALL=(ALL) NOPASSWD: \(helperPath)"
         let sudoersFile = "/etc/sudoers.d/iconchanger"
-        let tmpFile = "/tmp/iconchanger_sudoers_\(ProcessInfo.processInfo.processIdentifier)"
 
         let commands = [
-            "echo '\(sudoersLine.shellEscaped)' > '\(tmpFile.shellEscaped)'",
-            "visudo -c -f '\(tmpFile.shellEscaped)'",
-            "mv '\(tmpFile.shellEscaped)' '\(sudoersFile.shellEscaped)'",
+            "TMPFILE=$(mktemp /tmp/iconchanger_sudoers.XXXXXX)",
+            "trap 'rm -f \"$TMPFILE\"' EXIT",
+            "echo '\(sudoersLine.shellEscaped)' > \"$TMPFILE\"",
+            "visudo -c -f \"$TMPFILE\"",
+            "mv \"$TMPFILE\" '\(sudoersFile.shellEscaped)'",
             "chmod 0440 '\(sudoersFile.shellEscaped)'",
             "chown root:wheel '\(sudoersFile.shellEscaped)'"
         ].joined(separator: " && ")
@@ -693,9 +837,6 @@ class IconManager: ObservableObject {
         let errorOutput = String(data: errorPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
 
         if task.terminationStatus != 0 {
-            // Clean up temp file on failure
-            try? FileManager.default.removeItem(atPath: tmpFile)
-
             if errorOutput.contains("User canceled") || errorOutput.contains("-128") {
                 logger.log("User canceled the admin password dialog.")
                 throw NSError(domain: "IconManager", code: 20,
@@ -728,7 +869,6 @@ class IconManager: ObservableObject {
         
         let helperPath = self.helperScriptURL.path
         let escapedHelperPathForGrep = helperPath.replacingOccurrences(of: " ", with: "[[:space:]]")
-
         let grepPattern = "NOPASSWD:[[:space:]]*\(escapedHelperPathForGrep)"
 
         let checkCommand = "sudo -n -l | grep -q -E '\(grepPattern.shellEscaped)'"
