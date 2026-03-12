@@ -10,7 +10,9 @@ import UserNotifications
 import ServiceManagement
 import os
 
-class BackgroundService: ObservableObject {
+/// @unchecked Sendable: BackgroundService is accessed from the main thread (via @StateObject)
+/// and timer callbacks dispatch back to main. The weak self captures in timer handlers are safe.
+class BackgroundService: ObservableObject, @unchecked Sendable {
     static let shared = BackgroundService()
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "BackgroundService")
 

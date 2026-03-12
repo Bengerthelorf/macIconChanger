@@ -609,6 +609,10 @@ final class WallpaperLoader: ObservableObject {
     }
 
     /// Captures the actual rendered desktop by finding the Dock's desktop picture window.
+    /// Note: Uses CGWindowListCreateImage which is deprecated in macOS 14 in favor of
+    /// ScreenCaptureKit. However, ScreenCaptureKit requires Screen Recording permission
+    /// and is async, making it a non-trivial migration. This fallback is retained for
+    /// compatibility and will gracefully fall back to the desktop image URL if it fails.
     private static func captureDesktopWindow() -> NSImage? {
         guard let screen = NSScreen.main else { return nil }
         guard let windowList = CGWindowListCopyWindowInfo([.optionOnScreenOnly], kCGNullWindowID) as? [[String: Any]] else { return nil }
@@ -620,16 +624,22 @@ final class WallpaperLoader: ObservableObject {
             guard owner == "Dock", layer <= -2_000_000_000 else { continue }
             guard let windowID = info[kCGWindowNumber as String] as? Int else { continue }
 
-            if let cgImage = CGWindowListCreateImage(
-                screen.frame,
-                .optionIncludingWindow,
-                CGWindowID(windowID),
-                [.bestResolution]
-            ) {
+            if let cgImage = Self.captureWindow(windowID: CGWindowID(windowID), frame: screen.frame) {
                 return NSImage(cgImage: cgImage, size: screen.frame.size)
             }
         }
         return nil
+    }
+
+    /// Wrapper to isolate the deprecated CGWindowListCreateImage call.
+    @available(macOS, deprecated: 14.0, message: "Migrate to ScreenCaptureKit when minimum deployment target is macOS 14+")
+    private static func captureWindow(windowID: CGWindowID, frame: CGRect) -> CGImage? {
+        CGWindowListCreateImage(
+            frame,
+            .optionIncludingWindow,
+            windowID,
+            [.bestResolution]
+        )
     }
 }
 
