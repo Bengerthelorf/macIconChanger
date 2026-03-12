@@ -5,7 +5,8 @@ hero:
   text: Personalizeaza pictogramele aplicatiilor macOS
   tagline: Schimba pictograma oricarei aplicatii de pe Mac — cu o interfata grafica eleganta, un CLI puternic si restaurare automata in fundal.
   image:
-    src: /images/hero-screenshot.jpeg
+    light: /images/hero-screenshot-light.png
+    dark: /images/hero-screenshot-dark.png
     alt: IconChanger
   actions:
     - theme: brand

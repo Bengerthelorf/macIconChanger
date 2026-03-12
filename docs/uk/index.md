@@ -5,7 +5,8 @@ hero:
   text: Налаштування іконок програм macOS
   tagline: Змінюйте будь-яку іконку програми на вашому Mac — за допомогою зручного інтерфейсу, потужного CLI та автоматичного фонового відновлення.
   image:
-    src: /images/hero-screenshot.jpeg
+    light: /images/hero-screenshot-light.png
+    dark: /images/hero-screenshot-dark.png
     alt: IconChanger
   actions:
     - theme: brand

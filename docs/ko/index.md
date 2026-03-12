@@ -5,7 +5,8 @@ hero:
   text: macOS 앱 아이콘 커스터마이징
   tagline: 아름다운 GUI, 강력한 CLI, 자동 백그라운드 복원 기능으로 Mac의 모든 앱 아이콘을 자유롭게 변경하세요.
   image:
-    src: /images/hero-screenshot.jpeg
+    light: /images/hero-screenshot-light.png
+    dark: /images/hero-screenshot-dark.png
     alt: IconChanger
   actions:
     - theme: brand

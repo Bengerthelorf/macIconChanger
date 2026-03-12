@@ -5,7 +5,8 @@ hero:
   text: macOS アプリアイコンをカスタマイズ
   tagline: 美しい GUI、強力な CLI、自動バックグラウンド復元で、Mac 上のあらゆるアプリアイコンを自由に変更できます。
   image:
-    src: /images/hero-screenshot.jpeg
+    light: /images/hero-screenshot-light.png
+    dark: /images/hero-screenshot-dark.png
     alt: IconChanger
   actions:
     - theme: brand

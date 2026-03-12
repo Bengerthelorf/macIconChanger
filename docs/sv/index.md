@@ -5,7 +5,8 @@ hero:
   text: Anpassa appikoner i macOS
   tagline: Byt ikon på vilken app som helst på din Mac — med ett snyggt GUI, kraftfullt CLI och automatisk ikonåterställning i bakgrunden.
   image:
-    src: /images/hero-screenshot.jpeg
+    light: /images/hero-screenshot-light.png
+    dark: /images/hero-screenshot-dark.png
     alt: IconChanger
   actions:
     - theme: brand

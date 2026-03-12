@@ -5,7 +5,8 @@ hero:
   text: Kustomisasi Ikon Aplikasi macOS
   tagline: Ubah ikon aplikasi apa pun di Mac Anda — dengan GUI yang indah, CLI yang powerful, dan pemulihan otomatis di latar belakang.
   image:
-    src: /images/hero-screenshot.jpeg
+    light: /images/hero-screenshot-light.png
+    dark: /images/hero-screenshot-dark.png
     alt: IconChanger
   actions:
     - theme: brand

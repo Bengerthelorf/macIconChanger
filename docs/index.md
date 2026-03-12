@@ -5,7 +5,8 @@ hero:
   text: Customize macOS App Icons
   tagline: Change any app icon on your Mac — with a beautiful GUI, powerful CLI, and automatic background restoration.
   image:
-    src: /images/hero-screenshot.jpeg
+    light: /images/hero-screenshot-light.png
+    dark: /images/hero-screenshot-dark.png
     alt: IconChanger
   actions:
     - theme: brand

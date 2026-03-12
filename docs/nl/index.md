@@ -5,7 +5,8 @@ hero:
   text: macOS-apppictogrammen aanpassen
   tagline: Verander elk apppictogram op je Mac — met een mooie GUI, krachtige CLI en automatisch herstel op de achtergrond.
   image:
-    src: /images/hero-screenshot.jpeg
+    light: /images/hero-screenshot-light.png
+    dark: /images/hero-screenshot-dark.png
     alt: IconChanger
   actions:
     - theme: brand

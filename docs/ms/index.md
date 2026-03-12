@@ -5,7 +5,8 @@ hero:
   text: Sesuaikan Ikon Aplikasi macOS
   tagline: Tukar mana-mana ikon aplikasi pada Mac anda — dengan GUI yang cantik, CLI yang berkuasa, dan pemulihan latar belakang automatik.
   image:
-    src: /images/hero-screenshot.jpeg
+    light: /images/hero-screenshot-light.png
+    dark: /images/hero-screenshot-dark.png
     alt: IconChanger
   actions:
     - theme: brand

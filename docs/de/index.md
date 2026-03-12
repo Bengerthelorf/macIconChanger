@@ -5,7 +5,8 @@ hero:
   text: macOS-App-Symbole anpassen
   tagline: Jedes App-Symbol auf Ihrem Mac ändern — mit einer eleganten GUI, leistungsstarkem CLI und automatischer Hintergrund-Wiederherstellung.
   image:
-    src: /images/hero-screenshot.jpeg
+    light: /images/hero-screenshot-light.png
+    dark: /images/hero-screenshot-dark.png
     alt: IconChanger
   actions:
     - theme: brand

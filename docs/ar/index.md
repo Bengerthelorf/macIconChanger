@@ -5,7 +5,8 @@ hero:
   text: تخصيص أيقونات تطبيقات macOS
   tagline: غيّر أيقونة أي تطبيق على جهاز Mac الخاص بك — بواجهة رسومية أنيقة، وأداة سطر أوامر قوية، واستعادة تلقائية في الخلفية.
   image:
-    src: /images/hero-screenshot.jpeg
+    light: /images/hero-screenshot-light.png
+    dark: /images/hero-screenshot-dark.png
     alt: IconChanger
   actions:
     - theme: brand

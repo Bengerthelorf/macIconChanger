@@ -5,7 +5,8 @@ hero:
   text: Personalizza le icone delle app su macOS
   tagline: Cambia qualsiasi icona delle app sul tuo Mac — con un'interfaccia grafica elegante, un potente CLI e il ripristino automatico in background.
   image:
-    src: /images/hero-screenshot.jpeg
+    light: /images/hero-screenshot-light.png
+    dark: /images/hero-screenshot-dark.png
     alt: IconChanger
   actions:
     - theme: brand

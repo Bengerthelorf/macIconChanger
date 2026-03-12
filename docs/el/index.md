@@ -5,7 +5,8 @@ hero:
   text: Προσαρμογή εικονιδίων εφαρμογών macOS
   tagline: Αλλάξτε οποιοδήποτε εικονίδιο εφαρμογής στο Mac σας — με μια όμορφη γραφική διεπαφή, ισχυρό CLI και αυτόματη επαναφορά στο παρασκήνιο.
   image:
-    src: /images/hero-screenshot.jpeg
+    light: /images/hero-screenshot-light.png
+    dark: /images/hero-screenshot-dark.png
     alt: IconChanger
   actions:
     - theme: brand

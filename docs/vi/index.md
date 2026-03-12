@@ -5,7 +5,8 @@ hero:
   text: Tùy chỉnh biểu tượng ứng dụng macOS
   tagline: Thay đổi biểu tượng bất kỳ ứng dụng nào trên Mac — với giao diện đẹp mắt, CLI mạnh mẽ và tự động khôi phục trong nền.
   image:
-    src: /images/hero-screenshot.jpeg
+    light: /images/hero-screenshot-light.png
+    dark: /images/hero-screenshot-dark.png
     alt: IconChanger
   actions:
     - theme: brand

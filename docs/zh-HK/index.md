@@ -5,7 +5,8 @@ hero:
   text: 自訂 macOS 應用程式圖示
   tagline: 透過精美的界面、強大的命令列和自動背景還原，輕鬆更改 Mac 上任何應用程式的圖示。
   image:
-    src: /images/hero-screenshot.jpeg
+    light: /images/hero-screenshot-light.png
+    dark: /images/hero-screenshot-dark.png
     alt: IconChanger
   actions:
     - theme: brand

@@ -5,7 +5,8 @@ hero:
   text: macOS alkalmazásikonok testreszabása
   tagline: Bármely alkalmazás ikonját megváltoztathatod a Mac-eden — gyönyörű grafikus felülettel, hatékony parancssori eszközzel és automatikus háttérben történő visszaállítással.
   image:
-    src: /images/hero-screenshot.jpeg
+    light: /images/hero-screenshot-light.png
+    dark: /images/hero-screenshot-dark.png
     alt: IconChanger
   actions:
     - theme: brand

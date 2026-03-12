@@ -5,7 +5,8 @@ hero:
   text: Přizpůsobte si ikony aplikací v macOS
   tagline: Změňte ikonu jakékoliv aplikace na Macu — s elegantním grafickým rozhraním, výkonným CLI a automatickou obnovou na pozadí.
   image:
-    src: /images/hero-screenshot.jpeg
+    light: /images/hero-screenshot-light.png
+    dark: /images/hero-screenshot-dark.png
     alt: IconChanger
   actions:
     - theme: brand

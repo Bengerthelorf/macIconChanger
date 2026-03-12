@@ -5,7 +5,8 @@ hero:
   text: 自定义 macOS 应用图标
   tagline: 通过精美的界面、强大的命令行和自动后台恢复，轻松更改 Mac 上任何应用的图标。
   image:
-    src: /images/hero-screenshot.jpeg
+    light: /images/hero-screenshot-light.png
+    dark: /images/hero-screenshot-dark.png
     alt: IconChanger
   actions:
     - theme: brand

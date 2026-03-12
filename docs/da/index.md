@@ -5,7 +5,8 @@ hero:
   text: Tilpas macOS-appikoner
   tagline: Skift ikonet for enhver app på din Mac — med en smuk grafisk brugerflade, kraftfuld CLI og automatisk gendannelse i baggrunden.
   image:
-    src: /images/hero-screenshot.jpeg
+    light: /images/hero-screenshot-light.png
+    dark: /images/hero-screenshot-dark.png
     alt: IconChanger
   actions:
     - theme: brand

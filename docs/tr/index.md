@@ -5,7 +5,8 @@ hero:
   text: macOS Uygulama Simgelerini Özelleştirin
   tagline: Güzel bir arayüz, güçlü bir CLI ve otomatik arka plan geri yükleme ile Mac'inizdeki herhangi bir uygulama simgesini değiştirin.
   image:
-    src: /images/hero-screenshot.jpeg
+    light: /images/hero-screenshot-light.png
+    dark: /images/hero-screenshot-dark.png
     alt: IconChanger
   actions:
     - theme: brand

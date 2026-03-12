@@ -5,7 +5,8 @@ hero:
   text: macOS ऐप आइकन कस्टमाइज़ करें
   tagline: अपने Mac पर किसी भी ऐप का आइकन बदलें — सुंदर GUI, शक्तिशाली CLI, और स्वचालित बैकग्राउंड रिस्टोरेशन के साथ।
   image:
-    src: /images/hero-screenshot.jpeg
+    light: /images/hero-screenshot-light.png
+    dark: /images/hero-screenshot-dark.png
     alt: IconChanger
   actions:
     - theme: brand
