@@ -27,7 +27,6 @@ class IconManager: ObservableObject {
 
     private var refreshTask: Task<Void, Never>?
 
-    /// Root-owned directory — prevents user-level tampering of privileged helpers.
     var helperDirectoryURL: URL {
         URL(fileURLWithPath: "/usr/local/lib/iconchanger", isDirectory: true)
     }
@@ -200,6 +199,20 @@ class IconManager: ObservableObject {
             logger.error("Helper file install failed (status \(task.terminationStatus)): \(errMsg)")
         } else {
             logger.log("Helper files installed successfully at \(helperDir).")
+            cleanupLegacyHelperFiles()
+        }
+    }
+
+    private func cleanupLegacyHelperFiles() {
+        let fm = FileManager.default
+        let legacyDir = fm.homeDirectoryForCurrentUser.appendingPathComponent(".iconchanger", isDirectory: true)
+        let legacyFiles = ["helper.sh", "fileicon"]
+        for file in legacyFiles {
+            let path = legacyDir.appendingPathComponent(file).path
+            if fm.fileExists(atPath: path) {
+                try? fm.removeItem(atPath: path)
+                logger.log("Removed legacy helper file: \(path)")
+            }
         }
     }
 
