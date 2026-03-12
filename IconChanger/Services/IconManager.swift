@@ -276,13 +276,6 @@ class IconManager: ObservableObject {
     private func ensureSetupCompleted() throws {
         ensureHelperFilesCopied()
 
-        guard verifyHelperIntegrity() else {
-            throw NSError(domain: "IconManager", code: 12,
-                          userInfo: [NSLocalizedDescriptionKey: NSLocalizedString(
-                            "Helper files could not be verified. Please reinstall the application.",
-                            comment: "Integrity check failure")])
-        }
-
         let status = checkSetupStatus()
         guard case .completed = status else {
             logger.error("Setup incomplete: \(String(describing: status))")
