@@ -455,17 +455,29 @@ class IconManager: ObservableObject {
     }
     
     func getIconInPath(_ url: URL) -> [URL] {
-        let url = url.appendingPathComponent("Contents").appendingPathComponent("Resources")
-        let file = (try? FileManager.default.contentsOfDirectory(atPath: url.path)) ?? [String]()
-        return file.filter {
-            $0.contains(".icns")
+        let resourcesURL = url.appendingPathComponent("Contents").appendingPathComponent("Resources")
+        let files = (try? FileManager.default.contentsOfDirectory(atPath: resourcesURL.path)) ?? [String]()
+        let icnsFiles = files.filter { $0.hasSuffix(".icns") }
+
+        let plistURL = url.appendingPathComponent("Contents").appendingPathComponent("Info.plist")
+        var primaryIconName: String? = nil
+        if let plist = NSDictionary(contentsOf: plistURL) as? [String: Any] {
+            if var iconFile = plist["CFBundleIconFile"] as? String {
+                if !iconFile.hasSuffix(".icns") {
+                    iconFile += ".icns"
+                }
+                primaryIconName = iconFile
+            }
         }
-        .map {
-            url.appendingPathComponent($0).path
+
+        let sorted = icnsFiles.sorted { a, b in
+            let aIsPrimary = (a == primaryIconName)
+            let bIsPrimary = (b == primaryIconName)
+            if aIsPrimary != bIsPrimary { return aIsPrimary }
+            return a.localizedStandardCompare(b) == .orderedAscending
         }
-        .map {
-            URL(fileURLWithPath: $0)
-        }
+
+        return sorted.map { resourcesURL.appendingPathComponent($0) }
     }
 
     // MARK: - Squircle Jail Escape (macOS Tahoe)
