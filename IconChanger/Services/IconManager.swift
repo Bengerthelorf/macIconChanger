@@ -276,15 +276,11 @@ class IconManager: ObservableObject {
     private func ensureSetupCompleted() throws {
         ensureHelperFilesCopied()
 
-        if !verifyHelperIntegrity() {
-            logger.error("SECURITY: Helper integrity mismatch — re-installing from bundle.")
-            ensureHelperFilesCopied()
-            guard verifyHelperIntegrity() else {
-                throw NSError(domain: "IconManager", code: 12,
-                              userInfo: [NSLocalizedDescriptionKey: NSLocalizedString(
-                                "Helper files could not be verified after re-installation. Please reinstall the application.",
-                                comment: "Integrity check failure after re-install")])
-            }
+        guard verifyHelperIntegrity() else {
+            throw NSError(domain: "IconManager", code: 12,
+                          userInfo: [NSLocalizedDescriptionKey: NSLocalizedString(
+                            "Helper files could not be verified. Please reinstall the application.",
+                            comment: "Integrity check failure")])
         }
 
         let status = checkSetupStatus()

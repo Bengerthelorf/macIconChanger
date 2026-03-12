@@ -21902,6 +21902,9 @@
         }
       }
     },
+    "Helper files could not be verified. Please reinstall the application." : {
+      "comment" : "Integrity check failure"
+    },
     "Helper Files Missing" : {
       "localizations" : {
         "ar" : {
@@ -22110,7 +22113,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die folgenden erforderlichen Hilfsdateien konnten nicht gefunden oder kopiert werden:\n\n%@\n\nStellen Sie sicher, dass die App Schreibrechte für ihr Support-Verzeichnis (~/.iconchanger) hat, und versuchen Sie, die Anwendung neu zu starten."
+            "value" : "Die folgenden erforderlichen Hilfsdateien konnten nicht gefunden werden:\n\n%@\n\nBitte starten Sie die Anwendung neu oder installieren Sie sie erneut."
           }
         },
         "el" : {
@@ -22122,13 +22125,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The following required helper files could not be found or copied:\n\n%@\n\nPlease ensure the app has permissions to write to its support directory (~/.iconchanger) and try restarting the application."
+            "value" : "The following required helper files could not be found:\n\n%@\n\nPlease try restarting the application or reinstalling it."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Los siguientes archivos auxiliares requeridos no se pudieron encontrar o copiar:\n\n%@\n\nAsegúrese de que la aplicación tiene permisos para escribir en su directorio de soporte (~/.iconchanger) e intente reiniciar la aplicación."
+            "value" : "No se pudieron encontrar los siguientes archivos auxiliares requeridos:\n\n%@\n\nIntente reiniciar la aplicación o reinstalarla."
           }
         },
         "fi" : {
@@ -22140,7 +22143,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les fichiers d'aide requis suivants n'ont pas pu être trouvés ou copiés :\n\n%@\n\nVeuillez vous assurer que l'application dispose des autorisations d'écriture pour son répertoire de support (~/.iconchanger) et essayez de redémarrer l'application."
+            "value" : "Les fichiers d'aide requis suivants n'ont pas pu être trouvés :\n\n%@\n\nVeuillez redémarrer l'application ou la réinstaller."
           }
         },
         "hi" : {
@@ -22164,13 +22167,13 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "I seguenti file di supporto necessari non sono stati trovati o copiati:\n\n%@\n\nAssicurati che l'app abbia i permessi per scrivere nella sua directory di supporto (~/.iconchanger) e prova a riavviare l'applicazione."
+            "value" : "I seguenti file di supporto necessari non sono stati trovati:\n\n%@\n\nProva a riavviare l'applicazione o a reinstallarla."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "以下の必要なヘルパーファイルが見つからないか、コピーできませんでした：\n\n%@\n\nアプリケーションがそのサポートディレクトリ（~/.iconchanger）への書き込み権限を持っていることを確認し、アプリケーションを再起動してみてください。"
+            "value" : "以下の必要なヘルパーファイルが見つかりませんでした：\n\n%@\n\nアプリケーションを再起動するか、再インストールしてください。"
           }
         },
         "ko" : {
@@ -22206,7 +22209,7 @@
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Os seguintes arquivos auxiliares necessários não puderam ser encontrados ou copiados:\n\n%@\n\nCertifique-se de que o aplicativo tem permissões para escrever em seu diretório de suporte (~/.iconchanger) e tente reiniciar o aplicativo."
+            "value" : "Os seguintes arquivos auxiliares necessários não puderam ser encontrados:\n\n%@\n\nTente reiniciar o aplicativo ou reinstalá-lo."
           }
         },
         "ro" : {
@@ -22218,7 +22221,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Следующие необходимые вспомогательные файлы не найдены или не скопированы:\n\n%@\n\nУбедитесь, что приложение имеет разрешение на запись в свой каталог поддержки (~/.iconchanger) и попробуйте перезапустить приложение."
+            "value" : "Следующие необходимые вспомогательные файлы не найдены:\n\n%@\n\nПопробуйте перезапустить приложение или переустановить его."
           }
         },
         "sv" : {
@@ -22254,19 +22257,19 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "无法找到或复制以下所需的辅助文件：\n\n%@\n\n请确保应用程序具有写入其支持目录 (~/.iconchanger) 的权限，并尝试重新启动应用程序。"
+            "value" : "无法找到以下所需的辅助文件：\n\n%@\n\n请尝试重新启动应用程序或重新安装。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "無法找到或複製下列所需的輔助檔案：\n\n%@\n\n請確保應用程式對其支援目錄 (~/.iconchanger) 具有寫入權限，並嘗試重新啟動應用程式。"
+            "value" : "無法找到下列所需的輔助檔案：\n\n%@\n\n請嘗試重新啟動應用程式或重新安裝。"
           }
         },
         "zh-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "無法找到或複製下列所需的輔助檔案：\n\n%@\n\n請確保應用程式對其支援目錄 (~/.iconchanger) 具有寫入權限，並嘗試重新啟動應用程式。"
+            "value" : "無法找到下列所需的輔助檔案：\n\n%@\n\n請嘗試重新啟動應用程式或重新安裝。"
           }
         }
       }
