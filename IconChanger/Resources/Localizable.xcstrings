@@ -21902,9 +21902,6 @@
         }
       }
     },
-    "Helper files could not be verified. Please reinstall the application." : {
-      "comment" : "Integrity check failure"
-    },
     "Helper Files Missing" : {
       "localizations" : {
         "ar" : {

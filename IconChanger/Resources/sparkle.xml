@@ -4,6 +4,39 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.4.3</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>2026031200</sparkle:version>
+                    <sparkle:shortVersionString>1.4.3</sparkle:shortVersionString>
+                    <pubDate></pubDate>
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.3/IconChanger.dmg"
+                    sparkle:edSignature="" length="0"
+                    type="application/octet-stream"/>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.4.3</h2>
+                    <h3>New Features</h3>
+                    <ul>
+                        <li><strong>New:</strong> Dock Preview wallpaper now bleeds under the sidebar with a toggle setting</li>
+                        <li><strong>New:</strong> Adjustable wallpaper Spread and Blur sliders in Display Settings</li>
+                        <li><strong>New:</strong> Alias name support for folder icons</li>
+                    </ul>
+                    <h3>Security</h3>
+                    <ul>
+                        <li><strong>Security:</strong> Helper files moved to root-owned <code>/usr/local/lib/iconchanger/</code> — an admin password prompt will appear on first use after this update</li>
+                        <li><strong>Security:</strong> Sudoers permission scoped to current user only</li>
+                        <li><strong>Security:</strong> Eliminated shell injection risk in helper tool execution</li>
+                        <li><strong>Security:</strong> Helper script input validation and SHA-256 integrity verification</li>
+                    </ul>
+                    <h3>Bug Fixes</h3>
+                    <ul>
+                        <li><strong>Fixed:</strong> Primary app icon now correctly sorted first in Local icon list</li>
+                        <li><strong>Fixed:</strong> Legacy helper files automatically cleaned up after migration</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
                     <title>Version 1.4.2-2</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>2026031101</sparkle:version>

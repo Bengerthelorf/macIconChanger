@@ -120,6 +120,10 @@ struct IconList: View {
                                     NSWorkspace.shared.activateFileViewerSelecting([app.url])
                                 }
 
+                                Button("Set the Alias") {
+                                    setAlias = app.url.lastPathComponent
+                                }
+
                                 Button("Restore Default Icon") {
                                     appToRestore = app
                                 }

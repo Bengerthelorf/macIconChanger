@@ -209,17 +209,46 @@ jobs:
           )
 
           xml = open("IconChanger/Resources/sparkle.xml").read()
-          # Remove existing entries for this version to avoid duplicates on re-release
-          xml = re.sub(
-              r'\s*<item>\s*<title>Version ' + re.escape(version) + r'</title>.*?</item>',
-              '', xml, flags=re.DOTALL
+
+          # If a manually-written entry for this version already exists, only update
+          # the enclosure (signature + size) and leave the description untouched.
+          existing = re.search(
+              r'<item>\s*<title>Version ' + re.escape(version) + r'</title>.*?</item>',
+              xml, flags=re.DOTALL
           )
-          marker = '<title>IconChanger</title>'
-          idx = xml.find(marker)
-          if idx == -1:
-              sys.exit('marker not found')
-          insert_pos = xml.index('\n', idx) + 1
-          xml = xml[:insert_pos] + item + '\n' + xml[insert_pos:]
+          if existing:
+              updated_item = existing.group(0)
+              updated_item = re.sub(
+                  r'sparkle:edSignature="[^"]*"',
+                  f'sparkle:edSignature="{ed_sig}"',
+                  updated_item
+              )
+              updated_item = re.sub(
+                  r'length="[^"]*"',
+                  f'length="{dmg_size}"',
+                  updated_item
+              )
+              updated_item = re.sub(
+                  r'<sparkle:version>[^<]*</sparkle:version>',
+                  f'<sparkle:version>{build}</sparkle:version>',
+                  updated_item
+              )
+              updated_item = re.sub(
+                  r'<pubDate>[^<]*</pubDate>',
+                  f'<pubDate>{pubdate}</pubDate>',
+                  updated_item
+              )
+              xml = xml[:existing.start()] + updated_item + xml[existing.end():]
+              print(f"Found existing entry for {version}, updated enclosure only.")
+          else:
+              marker = '<title>IconChanger</title>'
+              idx = xml.find(marker)
+              if idx == -1:
+                  sys.exit('marker not found')
+              insert_pos = xml.index('\n', idx) + 1
+              xml = xml[:insert_pos] + item + '\n' + xml[insert_pos:]
+              print(f"No existing entry for {version}, generated new item.")
+
           open("IconChanger/Resources/sparkle.xml", "w").write(xml)
           PYEOF
 
