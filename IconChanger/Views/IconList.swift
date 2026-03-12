@@ -645,11 +645,14 @@ struct DockBarHeightKey: PreferenceKey {
 struct DockPreviewWallpaper: View {
     let barHeight: CGFloat
     @StateObject private var wallpaperLoader = WallpaperLoader.shared
+    @AppStorage("wallpaperBleed") private var wallpaperBleed: Double = 60
+    @AppStorage("wallpaperBlur") private var wallpaperBlur: Double = 28
 
     var body: some View {
         GeometryReader { geo in
             if let wallpaper = wallpaperLoader.wallpaperImage {
-                let bleed: CGFloat = 50
+                let blur = CGFloat(max(wallpaperBlur, 28))
+                let bleed = CGFloat(max(wallpaperBleed, 50, blur * 2))
                 let fullW = geo.size.width
                 let safeLeading = geo.safeAreaInsets.leading
                 let detailW = fullW - safeLeading
@@ -667,7 +670,7 @@ struct DockPreviewWallpaper: View {
                     .mask(
                         RoundedRectangle(cornerRadius: 12)
                             .frame(width: detailW, height: barHeight)
-                            .blur(radius: 30)
+                            .blur(radius: blur)
                             .frame(width: totalW, height: totalH)
                             .offset(x: safeLeading / 2)
                     )

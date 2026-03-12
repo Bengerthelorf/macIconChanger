@@ -42952,6 +42952,9 @@
         }
       }
     },
+    "Show Wallpaper Background" : {
+      "comment" : "Display setting"
+    },
     "Simplified Chinese" : {
       "comment" : "Language selection",
       "localizations" : {
@@ -48352,6 +48355,12 @@
           }
         }
       }
+    },
+    "Wallpaper Blur" : {
+      "comment" : "Display setting"
+    },
+    "Wallpaper Spread" : {
+      "comment" : "Display setting"
     },
     "We Need Access to /Applications" : {
       "localizations" : {

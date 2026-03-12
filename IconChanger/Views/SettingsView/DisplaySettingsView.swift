@@ -9,6 +9,8 @@ struct DisplaySettingsView: View {
     @AppStorage("showCustomIconBadge") private var showCustomIconBadge = true
     @AppStorage("dockGlassIntensity") private var dockGlassIntensity: Double = 0.5
     @AppStorage("dockPreviewWallpaper") private var dockPreviewWallpaper = true
+    @AppStorage("wallpaperBleed") private var wallpaperBleed: Double = 60
+    @AppStorage("wallpaperBlur") private var wallpaperBlur: Double = 28
     @AppStorage("dockPreviewMode") private var dockPreviewMode: String = "dockOnly"
     @AppStorage("appAppearance") private var appAppearance: String = AppAppearance.system.rawValue
     @StateObject private var languageManager = LanguageManager.shared
@@ -54,6 +56,28 @@ struct DisplaySettingsView: View {
 
                 Toggle(isOn: $dockPreviewWallpaper) {
                     Label(NSLocalizedString("Show Wallpaper Background", comment: "Display setting"), systemImage: "photo")
+                }
+
+                if dockPreviewWallpaper {
+                    Slider(value: $wallpaperBleed, in: 50...120, step: 5) {
+                        Label(NSLocalizedString("Wallpaper Spread", comment: "Display setting"), systemImage: "arrow.up.left.and.arrow.down.right")
+                    } minimumValueLabel: {
+                        Image(systemName: "arrow.down.right.and.arrow.up.left")
+                            .foregroundColor(.secondary)
+                    } maximumValueLabel: {
+                        Image(systemName: "arrow.up.left.and.arrow.down.right")
+                            .foregroundColor(.secondary)
+                    }
+
+                    Slider(value: $wallpaperBlur, in: 28...40, step: 2) {
+                        Label(NSLocalizedString("Wallpaper Blur", comment: "Display setting"), systemImage: "aqi.medium")
+                    } minimumValueLabel: {
+                        Image(systemName: "circle")
+                            .foregroundColor(.secondary)
+                    } maximumValueLabel: {
+                        Image(systemName: "aqi.medium")
+                            .foregroundColor(.secondary)
+                    }
                 }
 
                 if #available(macOS 26, *) {
