@@ -27,6 +27,15 @@ html[dir='rtl'] .VPFlyout .menu {
   left: 0;
 }
 
+html[dir='rtl'] .VPNavBarTitle .logo {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+html[dir='rtl'] .VPNavBarTitle {
+  margin-left: 16px;
+}
+
 @media (min-width: 960px) {
   .VPHero .main {
     display: flex;
