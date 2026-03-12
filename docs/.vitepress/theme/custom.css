@@ -3,7 +3,7 @@
 }
 
 .VPHero .VPImage {
-  max-width: 520px !important;
+  max-width: min(520px, 100%) !important;
   max-height: 520px !important;
 }
 
