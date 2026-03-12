@@ -8,7 +8,16 @@ IconChanger needs administrator privileges to change application icons. On first
 2. Click the **Setup** button when prompted.
 3. Enter your administrator password.
 
-The app will create a helper script at `~/.iconchanger/helper.sh` and configure a sudoers rule so it can run without a password prompt each time.
+The app will install a helper script to `/usr/local/lib/iconchanger/` (owned by `root:wheel`) and configure a scoped sudoers rule so it can run without a password prompt each time.
+
+## Security
+
+IconChanger uses several security measures to protect the helper pipeline:
+
+- **Root-owned helper directory** — The helper files live in `/usr/local/lib/iconchanger/` with `root:wheel` ownership, preventing unprivileged modification.
+- **SHA-256 integrity verification** — The helper script is verified against a known hash before every execution.
+- **Scoped sudoers rule** — The sudoers entry only grants passwordless access to the specific helper script, not arbitrary commands.
+- **Audit logging** — All icon operations are logged with timestamps for traceability.
 
 ## Manual Setup
 
@@ -18,16 +27,14 @@ If automatic setup fails, you can configure it manually:
 2. Run:
 
 ```bash
-sudo visudo
+sudo visudo -f /etc/sudoers.d/iconchanger
 ```
 
-3. Add the following line at the end:
+3. Add the following line:
 
 ```
-ALL ALL=(ALL) NOPASSWD: /Users/<your-username>/.iconchanger/helper.sh
+ALL ALL=(ALL) NOPASSWD: /usr/local/lib/iconchanger/helper.sh
 ```
-
-Replace `<your-username>` with your actual macOS username.
 
 ## Verifying Setup
 

@@ -8,7 +8,16 @@ IconChanger memerlukan hak akses administrator untuk mengubah ikon aplikasi. Pad
 2. Klik tombol **Setup** saat diminta.
 3. Masukkan kata sandi administrator Anda.
 
-Aplikasi akan membuat skrip helper di `~/.iconchanger/helper.sh` dan mengonfigurasi aturan sudoers agar dapat berjalan tanpa meminta kata sandi setiap kali.
+Aplikasi akan menginstal skrip helper ke `/usr/local/lib/iconchanger/` (dimiliki oleh `root:wheel`) dan mengonfigurasi aturan sudoers terbatas agar dapat berjalan tanpa meminta kata sandi setiap kali.
+
+## Keamanan
+
+IconChanger menggunakan beberapa langkah keamanan untuk melindungi pipeline helper:
+
+- **Direktori helper milik root** — File helper berada di `/usr/local/lib/iconchanger/` dengan kepemilikan `root:wheel`, mencegah modifikasi yang tidak berwenang.
+- **Verifikasi integritas SHA-256** — Skrip helper diverifikasi terhadap hash yang diketahui sebelum setiap eksekusi.
+- **Aturan sudoers terbatas** — Entri sudoers hanya memberikan akses tanpa kata sandi ke skrip helper tertentu, bukan perintah sembarang.
+- **Pencatatan audit** — Semua operasi ikon dicatat dengan stempel waktu untuk ketertelusuran.
 
 ## Pengaturan Manual
 
@@ -18,16 +27,14 @@ Jika pengaturan otomatis gagal, Anda dapat mengonfigurasinya secara manual:
 2. Jalankan:
 
 ```bash
-sudo visudo
+sudo visudo -f /etc/sudoers.d/iconchanger
 ```
 
-3. Tambahkan baris berikut di bagian akhir:
+3. Tambahkan baris berikut:
 
 ```
-ALL ALL=(ALL) NOPASSWD: /Users/<nama-pengguna-anda>/.iconchanger/helper.sh
+ALL ALL=(ALL) NOPASSWD: /usr/local/lib/iconchanger/helper.sh
 ```
-
-Ganti `<nama-pengguna-anda>` dengan nama pengguna macOS Anda yang sebenarnya.
 
 ## Memverifikasi Pengaturan
 

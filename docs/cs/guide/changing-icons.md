@@ -49,6 +49,16 @@ Vlastní ikony nastavené tímto způsobem **nepodporují** režimy Clear, Tinte
 Služba na pozadí automaticky znovu aplikuje ikony po aktualizacích aplikací a udrží je mimo squircle vězení.
 :::
 
+## Ikony složek
+
+Můžete také přizpůsobit ikony složek. Přidejte složky přes **Settings** > **Application** > **Application Folders**, nebo klikněte na tlačítko **+** v sekci složek postranního panelu.
+
+Po přidání se složka zobrazí v postranním panelu stejně jako aplikace. Můžete vyhledávat ikony, přetahovat obrázky nebo vybírat lokální soubory — stejný postup jako při změně ikon aplikací.
+
+::: tip
+Názvy složek jako „go" nebo „Downloads" nemusí na macOSicons.com vracet dobré výsledky vyhledávání. Použijte [aliasy](./aliases) pro nastavení vyhledávacího názvu (např. nastavte alias „Documents" na „folder").
+:::
+
 ## Ukládání ikon do mezipaměti
 
 Při aplikování vlastní ikony se tato automaticky uloží do mezipaměti. To znamená:

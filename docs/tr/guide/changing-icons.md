@@ -49,6 +49,16 @@ Bu yöntemle ayarlanan özel simgeler, macOS Tahoe'nun Clear, Tinted veya Dark s
 Arka plan hizmetiniz, uygulama güncellemelerinden sonra simgeleri otomatik olarak yeniden uygulayarak squircle hapisten çıkmış hallerini korur.
 :::
 
+## Klasör Simgeleri
+
+Klasör simgelerini de özelleştirebilirsiniz. **Settings** > **Application** > **Application Folders** üzerinden klasör ekleyin veya kenar çubuğunun klasör bölümündeki **+** düğmesine tıklayın.
+
+Bir klasör eklendikten sonra, uygulamalar gibi kenar çubuğunda görünür. Simge arayabilir, görsel sürükleyip bırakabilir veya yerel dosya seçebilirsiniz — uygulama simgelerini değiştirmekle aynı iş akışı.
+
+::: tip
+"go" veya "Downloads" gibi klasör adları macOSicons.com'da iyi arama sonuçları vermeyebilir. Daha arama dostu bir ad belirlemek için [takma adları](./aliases) kullanın (ör. "Documents" için takma adı "folder" olarak ayarlayın).
+:::
+
 ## Simge Önbellekleme
 
 Özel bir simge uyguladığınızda, otomatik olarak önbelleğe alınır. Bu şu anlama gelir:

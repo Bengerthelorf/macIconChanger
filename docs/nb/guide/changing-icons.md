@@ -49,6 +49,16 @@ Egendefinerte ikoner satt på denne måten støtter **ikke** macOS Tahoe sine Cl
 Bakgrunnstjenesten din vil automatisk bruke ikoner på nytt etter appoppdateringer, og holder dem utenfor squircle jail.
 :::
 
+## Mappeikoner
+
+Du kan også tilpasse mappeikoner. Legg til mapper via **Settings** > **Application** > **Application Folders**, eller klikk på **+**-knappen i sidefeltets mappeseksjon.
+
+Når en mappe er lagt til, vises den i sidefeltet akkurat som apper. Du kan søke etter ikoner, dra og slippe bilder eller velge lokale filer — samme arbeidsflyt som for å endre appikoner.
+
+::: tip
+Mappenavn som "go" eller "Downloads" gir kanskje ikke gode søkeresultater fra macOSicons.com. Bruk [aliaser](./aliases) for å sette et mer søkevennlig navn (f.eks. sett alias "Documents" til "folder").
+:::
+
 ## Ikonbufring
 
 Når du bruker et egendefinert ikon, blir det automatisk bufret. Dette betyr:

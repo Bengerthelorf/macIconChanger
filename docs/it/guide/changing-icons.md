@@ -49,6 +49,16 @@ Le icone personalizzate impostate in questo modo **non** supportano le modalità
 Il servizio in background riapplicherà automaticamente le icone dopo gli aggiornamenti delle app, mantenendole fuori dallo squircle jail.
 :::
 
+## Icone delle cartelle
+
+Potete anche personalizzare le icone delle cartelle. Aggiungete cartelle tramite **Settings** > **Application** > **Application Folders**, oppure fate clic sul pulsante **+** nella sezione cartelle della barra laterale.
+
+Una volta aggiunta una cartella, questa appare nella barra laterale come le app. Potete cercare icone, trascinare immagini o scegliere file locali — lo stesso flusso di lavoro utilizzato per cambiare le icone delle app.
+
+::: tip
+Nomi di cartelle come "go" o "Downloads" potrebbero non restituire buoni risultati di ricerca su macOSicons.com. Utilizzate gli [alias](./aliases) per impostare un nome più adatto alla ricerca (ad es., impostare l'alias di "Documents" su "folder").
+:::
+
 ## Cache delle icone
 
 Quando applicate un'icona personalizzata, questa viene automaticamente memorizzata nella cache. Ciò significa che:

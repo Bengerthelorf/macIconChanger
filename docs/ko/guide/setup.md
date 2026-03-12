@@ -8,7 +8,16 @@ IconChanger가 앱 아이콘을 변경하려면 관리자 권한이 필요합니
 2. 메시지가 표시되면 **설정** 버튼을 클릭합니다.
 3. 관리자 비밀번호를 입력합니다.
 
-앱이 `~/.iconchanger/helper.sh`에 헬퍼 스크립트를 생성하고, 매번 비밀번호를 입력하지 않아도 실행할 수 있도록 sudoers 규칙을 구성합니다.
+앱이 `/usr/local/lib/iconchanger/`(`root:wheel` 소유)에 헬퍼 스크립트를 설치하고, 매번 비밀번호를 입력하지 않아도 실행할 수 있도록 범위 지정된 sudoers 규칙을 구성합니다.
+
+## 보안
+
+IconChanger는 헬퍼 파이프라인을 보호하기 위해 여러 보안 조치를 사용합니다:
+
+- **Root 소유 헬퍼 디렉토리** — 헬퍼 파일은 `root:wheel` 소유의 `/usr/local/lib/iconchanger/`에 위치하여, 비특권 사용자의 수정을 방지합니다.
+- **SHA-256 무결성 검증** — 헬퍼 스크립트는 매 실행 전에 알려진 해시값으로 검증됩니다.
+- **범위 지정된 sudoers 규칙** — sudoers 항목은 임의의 명령이 아닌 특정 헬퍼 스크립트에 대해서만 비밀번호 없는 접근을 허용합니다.
+- **감사 로깅** — 모든 아이콘 작업은 추적 가능하도록 타임스탬프와 함께 기록됩니다.
 
 ## 수동 설정
 
@@ -18,16 +27,14 @@ IconChanger가 앱 아이콘을 변경하려면 관리자 권한이 필요합니
 2. 다음 명령어를 실행합니다:
 
 ```bash
-sudo visudo
+sudo visudo -f /etc/sudoers.d/iconchanger
 ```
 
-3. 파일 끝에 다음 줄을 추가합니다:
+3. 다음 줄을 추가합니다:
 
 ```
-ALL ALL=(ALL) NOPASSWD: /Users/<your-username>/.iconchanger/helper.sh
+ALL ALL=(ALL) NOPASSWD: /usr/local/lib/iconchanger/helper.sh
 ```
-
-`<your-username>`을 실제 macOS 사용자 이름으로 교체하세요.
 
 ## 설정 확인
 

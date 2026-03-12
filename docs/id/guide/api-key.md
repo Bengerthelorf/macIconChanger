@@ -26,6 +26,22 @@ Anda masih dapat mengubah ikon aplikasi tanpa kunci API dengan cara:
 - Menggunakan file gambar lokal (klik **Choose from the Local** atau seret & lepas gambar)
 - Menggunakan ikon yang sudah termasuk dalam aplikasi itu sendiri (ditampilkan di bagian "Local")
 
+## Pengaturan API Lanjutan
+
+Di **Settings** > **Advanced** > **API Settings**, Anda dapat menyesuaikan perilaku API:
+
+| Pengaturan | Default | Deskripsi |
+|---|---|---|
+| **Retry Count** | 0 (tanpa percobaan ulang) | Berapa kali mencoba ulang permintaan yang gagal (0–3) |
+| **Timeout** | 15 detik | Batas waktu untuk setiap percobaan permintaan |
+| **Monthly Limit** | 50 | Kueri API maksimum per bulan |
+
+Penghitung **Monthly Usage** menampilkan penggunaan Anda saat ini. Penghitung ini direset otomatis pada tanggal 1 setiap bulan, atau Anda dapat meresetnya secara manual.
+
+### Cache Pencarian Ikon
+
+Aktifkan **Cache API Results** untuk menyimpan hasil pencarian ke disk. Hasil yang di-cache tetap tersimpan setelah aplikasi di-restart, sehingga mengurangi penggunaan API. Gunakan tombol segarkan saat menjelajahi ikon untuk mengambil hasil terbaru.
+
 ## Pemecahan Masalah
 
 Jika pengujian API gagal:

@@ -24,6 +24,10 @@ IconChanger incluye algunos alias integrados para aplicaciones comunes:
 - `PyCharm Professional Edition` → `PyCharm`
 - `Discord PTB` → `Discord`
 
+## Alias de carpetas
+
+Los alias tambien funcionan para carpetas. Haga clic derecho en una carpeta en la barra lateral y seleccione **Set the Alias** para asignar un nombre mas adecuado para la busqueda. Esto es especialmente util para carpetas con nombres cortos o genericos (por ejemplo, establecer el alias de "go" como "folder" o "development").
+
 ## Consejos
 
 - Mantenga los nombres de alias cortos y genericos para obtener mejores resultados de busqueda.

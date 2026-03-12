@@ -49,6 +49,16 @@ Az így beállított egyedi ikonok **nem** támogatják a macOS Tahoe Clear, Tin
 A háttérszolgáltatásod automatikusan újraalkalmazza az ikonokat az alkalmazásfrissítések után, így azok nem kerülnek vissza a squircle börtönbe.
 :::
 
+## Mappaikonok
+
+Mappaikonokat is testreszabhatsz. Adj hozzá mappákat a **Settings** > **Application** > **Application Folders** menüpontban, vagy kattints a **+** gombra az oldalsáv mappaszekciójában.
+
+Miután egy mappa hozzáadásra került, úgy jelenik meg az oldalsávban, mint az alkalmazások. Kereshetsz ikonokat, húzhatod és ejtheted a képeket, vagy választhatsz helyi fájlokat — ugyanaz a munkafolyamat, mint az alkalmazásikonok módosításánál.
+
+::: tip
+Az olyan mappanevek, mint a „go" vagy „Downloads", nem feltétlenül adnak jó keresési eredményeket a macOSicons.com oldalon. Használj [álneveket](./aliases) egy keresésbarátabb név beállításához (pl. a „Documents" álneve legyen „folder").
+:::
+
 ## Ikon-gyorsítótárazás
 
 Amikor egyedi ikont alkalmazol, az automatikusan gyorsítótárazásra kerül. Ez azt jelenti, hogy:

@@ -49,6 +49,16 @@ Aangepaste pictogrammen die op deze manier zijn ingesteld, ondersteunen **niet**
 Je achtergronddienst past pictogrammen automatisch opnieuw toe na app-updates, zodat ze buiten de squircle jail blijven.
 :::
 
+## Mappictogrammen
+
+Je kunt ook mappictogrammen aanpassen. Voeg mappen toe via **Settings** > **Application** > **Application Folders**, of klik op de knop **+** in het mapgedeelte van de zijbalk.
+
+Zodra een map is toegevoegd, verschijnt deze in de zijbalk net als apps. Je kunt pictogrammen zoeken, afbeeldingen slepen en neerzetten, of lokale bestanden kiezen — dezelfde workflow als bij het wijzigen van apppictogrammen.
+
+::: tip
+Mapnamen zoals "go" of "Downloads" leveren mogelijk geen goede zoekresultaten op van macOSicons.com. Gebruik [aliassen](./aliases) om een zoekvriendelijkere naam in te stellen (bijv. alias "Documents" naar "folder").
+:::
+
 ## Pictogramcache
 
 Wanneer je een aangepast pictogram toepast, wordt het automatisch gecachet. Dit betekent:

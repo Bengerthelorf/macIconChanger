@@ -8,7 +8,16 @@ IconChanger heeft beheerdersbevoegdheden nodig om apppictogrammen te wijzigen. B
 2. Klik op de knop **Setup** wanneer daarom wordt gevraagd.
 3. Voer je beheerderswachtwoord in.
 
-De app maakt een hulpscript aan op `~/.iconchanger/helper.sh` en configureert een sudoers-regel zodat het zonder wachtwoordprompt kan worden uitgevoerd.
+De app installeert een hulpscript in `/usr/local/lib/iconchanger/` (eigendom van `root:wheel`) en configureert een afgebakende sudoers-regel zodat het zonder wachtwoordprompt kan worden uitgevoerd.
+
+## Beveiliging
+
+IconChanger gebruikt meerdere beveiligingsmaatregelen om de hulppipeline te beschermen:
+
+- **Root-eigendom hulpmap** — De hulpbestanden bevinden zich in `/usr/local/lib/iconchanger/` met `root:wheel`-eigendom, waardoor onbevoegde wijzigingen worden voorkomen.
+- **SHA-256 integriteitsverificatie** — Het hulpscript wordt voor elke uitvoering geverifieerd aan de hand van een bekende hash.
+- **Afgebakende sudoers-regel** — De sudoers-vermelding verleent alleen wachtwoordloze toegang tot het specifieke hulpscript, niet tot willekeurige commando's.
+- **Auditlogboek** — Alle pictogramoperaties worden geregistreerd met tijdstempels voor traceerbaarheid.
 
 ## Handmatige configuratie
 
@@ -18,16 +27,14 @@ Als de automatische configuratie mislukt, kun je het handmatig instellen:
 2. Voer uit:
 
 ```bash
-sudo visudo
+sudo visudo -f /etc/sudoers.d/iconchanger
 ```
 
-3. Voeg de volgende regel toe aan het einde:
+3. Voeg de volgende regel toe:
 
 ```
-ALL ALL=(ALL) NOPASSWD: /Users/<jouw-gebruikersnaam>/.iconchanger/helper.sh
+ALL ALL=(ALL) NOPASSWD: /usr/local/lib/iconchanger/helper.sh
 ```
-
-Vervang `<jouw-gebruikersnaam>` door je werkelijke macOS-gebruikersnaam.
 
 ## Configuratie verifiëren
 

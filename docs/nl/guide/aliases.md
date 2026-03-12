@@ -24,6 +24,10 @@ IconChanger bevat een aantal ingebouwde aliassen voor veelgebruikte apps:
 - `PyCharm Professional Edition` → `PyCharm`
 - `Discord PTB` → `Discord`
 
+## Mapaliassen
+
+Aliassen werken ook voor mappen. Klik met de rechtermuisknop op een map in de zijbalk en selecteer **Set the Alias** om een zoekvriendelijkere naam toe te wijzen. Dit is vooral handig voor mappen met korte of generieke namen (bijv. alias "go" naar "folder" of "development").
+
 ## Tips
 
 - Houd aliasnamen kort en generiek voor betere zoekresultaten.

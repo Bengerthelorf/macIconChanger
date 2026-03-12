@@ -49,6 +49,16 @@ Tällä tavalla asetetut mukautetut kuvakkeet **eivät** tue macOS Tahoen Clear-
 Taustapalvelusi asettaa kuvakkeet automaattisesti uudelleen sovellusten päivitysten jälkeen, pitäen ne poissa squircle-vankilasta.
 :::
 
+## Kansioiden kuvakkeet
+
+Voit myös mukauttaa kansioiden kuvakkeita. Lisää kansioita kohdasta **Settings** > **Application** > **Application Folders** tai napsauta **+**-painiketta sivupalkin kansioosiossa.
+
+Kun kansio on lisätty, se näkyy sivupalkissa kuten sovellukset. Voit etsiä kuvakkeita, vetää ja pudottaa kuvia tai valita paikallisia tiedostoja — sama työnkulku kuin sovellusten kuvakkeiden vaihtamisessa.
+
+::: tip
+Kansioiden nimet kuten "go" tai "Downloads" eivät välttämättä anna hyviä hakutuloksia macOSicons.com-sivustolla. Käytä [aliaksia](./aliases) asettaaksesi hakuystävällisemmän nimen (esim. aseta "Documents"-kansion aliakseksi "folder").
+:::
+
 ## Kuvakkeiden välimuisti
 
 Kun otat mukautetun kuvakkeen käyttöön, se tallennetaan automaattisesti välimuistiin. Tämä tarkoittaa:

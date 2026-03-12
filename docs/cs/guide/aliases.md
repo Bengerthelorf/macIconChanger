@@ -24,6 +24,10 @@ IconChanger obsahuje několik vestavěných aliasů pro běžné aplikace:
 - `PyCharm Professional Edition` → `PyCharm`
 - `Discord PTB` → `Discord`
 
+## Aliasy složek
+
+Aliasy fungují také pro složky. Klikněte pravým tlačítkem na složku v postranním panelu a vyberte **Set the Alias** pro přiřazení vyhledávacího názvu. To je zvláště užitečné pro složky s krátkými nebo obecnými názvy (např. nastavte alias „go" na „folder" nebo „development").
+
 ## Tipy
 
 - Pro lepší výsledky vyhledávání používejte krátké a obecné názvy aliasů.

@@ -8,7 +8,16 @@ IconChanger are nevoie de privilegii de administrator pentru a schimba pictogram
 2. Apasa butonul **Setup** cand esti solicitat.
 3. Introdu parola de administrator.
 
-Aplicatia va crea un script ajutator la `~/.iconchanger/helper.sh` si va configura o regula sudoers pentru ca acesta sa poata rula fara a solicita parola de fiecare data.
+Aplicatia va instala un script ajutator in `/usr/local/lib/iconchanger/` (detinut de `root:wheel`) si va configura o regula sudoers delimitata pentru ca acesta sa poata rula fara a solicita parola de fiecare data.
+
+## Securitate
+
+IconChanger utilizeaza mai multe masuri de securitate pentru a proteja pipeline-ul ajutator:
+
+- **Director ajutator detinut de root** — Fisierele ajutatoare se afla in `/usr/local/lib/iconchanger/` cu proprietatea `root:wheel`, prevenind modificarile neprivilegiate.
+- **Verificarea integritatii SHA-256** — Scriptul ajutator este verificat fata de un hash cunoscut inaintea fiecarei executii.
+- **Regula sudoers delimitata** — Intrarea sudoers acorda acces fara parola doar scriptului ajutator specific, nu comenzilor arbitrare.
+- **Jurnal de audit** — Toate operatiunile cu pictograme sunt inregistrate cu marcaje de timp pentru trasabilitate.
 
 ## Configurare manuala
 
@@ -18,16 +27,14 @@ Daca configurarea automata esueaza, poti realiza configurarea manual:
 2. Ruleaza:
 
 ```bash
-sudo visudo
+sudo visudo -f /etc/sudoers.d/iconchanger
 ```
 
-3. Adauga urmatoarea linie la sfarsit:
+3. Adauga urmatoarea linie:
 
 ```
-ALL ALL=(ALL) NOPASSWD: /Users/<numele-tau-de-utilizator>/.iconchanger/helper.sh
+ALL ALL=(ALL) NOPASSWD: /usr/local/lib/iconchanger/helper.sh
 ```
-
-Inlocuieste `<numele-tau-de-utilizator>` cu numele tau real de utilizator macOS.
 
 ## Verificarea configurarii
 

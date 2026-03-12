@@ -49,6 +49,16 @@ Benutzerdefinierte Symbole, die auf diese Weise gesetzt werden, unterstützen **
 Ihr Hintergrunddienst wendet Symbole nach App-Updates automatisch erneut an und hält sie vom Squircle-Zwang frei.
 :::
 
+## Ordnersymbole
+
+Sie können auch Ordnersymbole anpassen. Fügen Sie Ordner über **Einstellungen** > **Application** > **Application Folders** hinzu, oder klicken Sie auf die Schaltfläche **+** im Ordnerbereich der Seitenleiste.
+
+Sobald ein Ordner hinzugefügt wurde, erscheint er in der Seitenleiste wie eine App. Sie können nach Symbolen suchen, Bilder per Drag & Drop hinzufügen oder lokale Dateien auswählen — der gleiche Workflow wie beim Ändern von App-Symbolen.
+
+::: tip
+Ordnernamen wie „go" oder „Downloads" liefern auf macOSicons.com möglicherweise keine guten Suchergebnisse. Verwenden Sie [Aliasse](./aliases), um einen suchfreundlicheren Namen festzulegen (z. B. „Documents" als Alias „folder" festlegen).
+:::
+
 ## Symbol-Caching
 
 Wenn Sie ein benutzerdefiniertes Symbol anwenden, wird es automatisch zwischengespeichert. Das bedeutet:

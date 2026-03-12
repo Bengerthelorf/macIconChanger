@@ -8,7 +8,16 @@ IconChanger benötigt Administratorrechte, um Anwendungssymbole zu ändern. Beim
 2. Klicken Sie auf die Schaltfläche **Setup**, wenn Sie dazu aufgefordert werden.
 3. Geben Sie Ihr Administratorpasswort ein.
 
-Die App erstellt ein Hilfsskript unter `~/.iconchanger/helper.sh` und konfiguriert eine sudoers-Regel, damit es ohne wiederholte Passworteingabe ausgeführt werden kann.
+Die App installiert ein Hilfsskript unter `/usr/local/lib/iconchanger/` (Eigentümer: `root:wheel`) und konfiguriert eine eingeschränkte sudoers-Regel, damit es ohne wiederholte Passworteingabe ausgeführt werden kann.
+
+## Sicherheit
+
+IconChanger verwendet mehrere Sicherheitsmaßnahmen zum Schutz der Hilfspipeline:
+
+- **Root-eigenes Hilfsverzeichnis** — Die Hilfsdateien befinden sich in `/usr/local/lib/iconchanger/` mit `root:wheel`-Eigentümerschaft, wodurch unprivilegierte Änderungen verhindert werden.
+- **SHA-256-Integritätsprüfung** — Das Hilfsskript wird vor jeder Ausführung gegen einen bekannten Hash überprüft.
+- **Eingeschränkte sudoers-Regel** — Der sudoers-Eintrag gewährt nur passwortlosen Zugriff auf das spezifische Hilfsskript, nicht auf beliebige Befehle.
+- **Audit-Protokollierung** — Alle Symboloperationen werden mit Zeitstempeln für die Nachverfolgbarkeit protokolliert.
 
 ## Manuelle Einrichtung
 
@@ -18,16 +27,14 @@ Falls die automatische Einrichtung fehlschlägt, können Sie die Konfiguration m
 2. Führen Sie folgenden Befehl aus:
 
 ```bash
-sudo visudo
+sudo visudo -f /etc/sudoers.d/iconchanger
 ```
 
-3. Fügen Sie die folgende Zeile am Ende hinzu:
+3. Fügen Sie die folgende Zeile hinzu:
 
 ```
-ALL ALL=(ALL) NOPASSWD: /Users/<ihr-benutzername>/.iconchanger/helper.sh
+ALL ALL=(ALL) NOPASSWD: /usr/local/lib/iconchanger/helper.sh
 ```
-
-Ersetzen Sie `<ihr-benutzername>` durch Ihren tatsächlichen macOS-Benutzernamen.
 
 ## Einrichtung überprüfen
 

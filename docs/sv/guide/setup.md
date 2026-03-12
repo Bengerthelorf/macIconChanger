@@ -8,7 +8,16 @@ IconChanger behöver administratörsbehörighet för att byta appikoner. Vid fö
 2. Klicka på knappen **Setup** när du uppmanas.
 3. Ange ditt administratörslösenord.
 
-Appen skapar ett hjälpskript på `~/.iconchanger/helper.sh` och konfigurerar en sudoers-regel så att det kan köras utan lösenordsfråga varje gång.
+Appen installerar ett hjälpskript i `/usr/local/lib/iconchanger/` (ägt av `root:wheel`) och konfigurerar en avgränsad sudoers-regel så att det kan köras utan lösenordsfråga varje gång.
+
+## Säkerhet
+
+IconChanger använder flera säkerhetsåtgärder för att skydda hjälppipelinen:
+
+- **Root-ägd hjälpkatalog** — Hjälpfilerna finns i `/usr/local/lib/iconchanger/` med `root:wheel`-ägande, vilket förhindrar oprivilegierade ändringar.
+- **SHA-256 integritetsverifiering** — Hjälpskriptet verifieras mot en känd hash före varje körning.
+- **Avgränsad sudoers-regel** — Sudoers-posten ger bara lösenordsfri åtkomst till det specifika hjälpskriptet, inte godtyckliga kommandon.
+- **Granskningsloggning** — Alla ikonoperationer loggas med tidsstämplar för spårbarhet.
 
 ## Manuell konfiguration
 
@@ -18,16 +27,14 @@ Om den automatiska konfigurationen misslyckas kan du konfigurera det manuellt:
 2. Kör:
 
 ```bash
-sudo visudo
+sudo visudo -f /etc/sudoers.d/iconchanger
 ```
 
-3. Lägg till följande rad i slutet:
+3. Lägg till följande rad:
 
 ```
-ALL ALL=(ALL) NOPASSWD: /Users/<ditt-användarnamn>/.iconchanger/helper.sh
+ALL ALL=(ALL) NOPASSWD: /usr/local/lib/iconchanger/helper.sh
 ```
-
-Ersätt `<ditt-användarnamn>` med ditt faktiska macOS-användarnamn.
 
 ## Verifiera konfigurationen
 

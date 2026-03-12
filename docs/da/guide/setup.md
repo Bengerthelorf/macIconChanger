@@ -8,7 +8,16 @@ IconChanger har brug for administratorrettigheder for at ændre applikationsikon
 2. Klik på **Setup**-knappen, når du bliver bedt om det.
 3. Indtast din administratoradgangskode.
 
-Appen opretter et hjælpescript på `~/.iconchanger/helper.sh` og konfigurerer en sudoers-regel, så det kan køre uden adgangskodeprompt hver gang.
+Appen installerer et hjælpescript i `/usr/local/lib/iconchanger/` (ejet af `root:wheel`) og konfigurerer en afgrænset sudoers-regel, så det kan køre uden adgangskodeprompt hver gang.
+
+## Sikkerhed
+
+IconChanger bruger flere sikkerhedsforanstaltninger til at beskytte hjælpepipelinen:
+
+- **Root-ejet hjælpemappe** — Hjælpefilerne ligger i `/usr/local/lib/iconchanger/` med `root:wheel`-ejerskab, hvilket forhindrer uprivilegerede ændringer.
+- **SHA-256 integritetsverificering** — Hjælpescriptet verificeres mod en kendt hash før hver kørsel.
+- **Afgrænset sudoers-regel** — Sudoers-posten giver kun adgangskode-fri adgang til det specifikke hjælpescript, ikke vilkårlige kommandoer.
+- **Revisionslogning** — Alle ikonoperationer logges med tidsstempler for sporbarhed.
 
 ## Manuel opsætning
 
@@ -18,16 +27,14 @@ Hvis den automatiske opsætning fejler, kan du konfigurere det manuelt:
 2. Kør:
 
 ```bash
-sudo visudo
+sudo visudo -f /etc/sudoers.d/iconchanger
 ```
 
-3. Tilføj følgende linje til sidst:
+3. Tilføj følgende linje:
 
 ```
-ALL ALL=(ALL) NOPASSWD: /Users/<dit-brugernavn>/.iconchanger/helper.sh
+ALL ALL=(ALL) NOPASSWD: /usr/local/lib/iconchanger/helper.sh
 ```
-
-Erstat `<dit-brugernavn>` med dit faktiske macOS-brugernavn.
 
 ## Bekræft opsætningen
 

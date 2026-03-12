@@ -49,6 +49,16 @@ Custom icons set this way do **not** support macOS Tahoe's Clear, Tinted, or Dar
 Your background service will automatically re-apply icons after app updates, keeping them out of squircle jail.
 :::
 
+## Folder Icons
+
+You can also customize folder icons. Add folders via **Settings** > **Application** > **Application Folders**, or click the **+** button in the sidebar's folder section.
+
+Once a folder is added, it appears in the sidebar just like apps. You can search for icons, drag & drop images, or choose local files — the same workflow as changing app icons.
+
+::: tip
+Folder names like "go" or "Downloads" may not return great search results from macOSicons.com. Use [aliases](./aliases) to set a more search-friendly name (e.g., alias "Documents" to "folder").
+:::
+
 ## Icon Caching
 
 When you apply a custom icon, it is automatically cached. This means:

@@ -49,6 +49,16 @@ Los iconos personalizados establecidos de esta manera **no** admiten los modos C
 Su servicio en segundo plano reaplicara automaticamente los iconos despues de las actualizaciones de aplicaciones, manteniendolos fuera de la jaula squircle.
 :::
 
+## Iconos de carpetas
+
+Tambien puede personalizar los iconos de carpetas. Agregue carpetas a traves de **Settings** > **Application** > **Application Folders**, o haga clic en el boton **+** en la seccion de carpetas de la barra lateral.
+
+Una vez agregada una carpeta, aparece en la barra lateral como las aplicaciones. Puede buscar iconos, arrastrar y soltar imagenes o elegir archivos locales — el mismo flujo de trabajo que para cambiar iconos de aplicaciones.
+
+::: tip
+Los nombres de carpetas como "go" o "Downloads" pueden no devolver buenos resultados de busqueda en macOSicons.com. Use [alias](./aliases) para establecer un nombre mas adecuado para la busqueda (por ejemplo, establecer el alias de "Documents" como "folder").
+:::
+
 ## Cache de iconos
 
 Cuando aplica un icono personalizado, se almacena automaticamente en cache. Esto significa:

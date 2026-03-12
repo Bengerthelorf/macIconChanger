@@ -24,6 +24,10 @@ IconChanger, yaygın uygulamalar için bazı yerleşik takma adlar içerir:
 - `PyCharm Professional Edition` → `PyCharm`
 - `Discord PTB` → `Discord`
 
+## Klasör Takma Adları
+
+Takma adlar klasörler için de çalışır. Kenar çubuğunda bir klasöre sağ tıklayın ve arama dostu bir ad atamak için **Set the Alias** seçeneğini seçin. Bu, kısa veya genel adlara sahip klasörler için özellikle kullanışlıdır (ör. "go" için takma adı "folder" veya "development" olarak ayarlayın).
+
 ## İpuçları
 
 - Daha iyi arama sonuçları için takma ad adlarını kısa ve genel tutun.

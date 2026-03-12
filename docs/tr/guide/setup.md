@@ -8,7 +8,16 @@ IconChanger, uygulama simgelerini değiştirmek için yönetici ayrıcalıkları
 2. İstendiğinde **Setup** düğmesine tıklayın.
 3. Yönetici parolanızı girin.
 
-Uygulama, `~/.iconchanger/helper.sh` konumunda bir yardımcı betik oluşturacak ve her seferinde parola sormadan çalışabilmesi için bir sudoers kuralı yapılandıracaktır.
+Uygulama, `/usr/local/lib/iconchanger/` konumuna (`root:wheel` sahipliğinde) bir yardımcı betik yükleyecek ve her seferinde parola sormadan çalışabilmesi için kapsamlı bir sudoers kuralı yapılandıracaktır.
+
+## Güvenlik
+
+IconChanger, yardımcı boru hattını korumak için çeşitli güvenlik önlemleri kullanır:
+
+- **Root sahipliğindeki yardımcı dizin** — Yardımcı dosyalar `/usr/local/lib/iconchanger/` konumunda `root:wheel` sahipliğiyle bulunur ve yetkisiz değişiklikleri önler.
+- **SHA-256 bütünlük doğrulaması** — Yardımcı betik, her çalıştırmadan önce bilinen bir hash değerine karşı doğrulanır.
+- **Kapsamlı sudoers kuralı** — Sudoers girişi yalnızca belirli yardımcı betiğe parolasız erişim verir, rastgele komutlara değil.
+- **Denetim günlüğü** — Tüm simge işlemleri izlenebilirlik için zaman damgalarıyla kaydedilir.
 
 ## Manuel Kurulum
 
@@ -18,16 +27,14 @@ Otomatik kurulum başarısız olursa, manuel olarak yapılandırabilirsiniz:
 2. Şu komutu çalıştırın:
 
 ```bash
-sudo visudo
+sudo visudo -f /etc/sudoers.d/iconchanger
 ```
 
-3. Dosyanın sonuna aşağıdaki satırı ekleyin:
+3. Aşağıdaki satırı ekleyin:
 
 ```
-ALL ALL=(ALL) NOPASSWD: /Users/<kullanici-adiniz>/.iconchanger/helper.sh
+ALL ALL=(ALL) NOPASSWD: /usr/local/lib/iconchanger/helper.sh
 ```
-
-`<kullanici-adiniz>` kısmını gerçek macOS kullanıcı adınızla değiştirin.
 
 ## Kurulumu Doğrulama
 

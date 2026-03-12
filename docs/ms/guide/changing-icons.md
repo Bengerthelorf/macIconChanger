@@ -49,6 +49,16 @@ Ikon tersuai yang ditetapkan dengan cara ini **tidak** menyokong mod ikon Clear,
 Perkhidmatan latar belakang anda akan menggunakan semula ikon secara automatik selepas kemas kini aplikasi, memastikan ia kekal di luar squircle jail.
 :::
 
+## Ikon Folder
+
+Anda juga boleh menyesuaikan ikon folder. Tambah folder melalui **Settings** > **Application** > **Application Folders**, atau klik butang **+** di bahagian folder bar sisi.
+
+Selepas folder ditambah, ia muncul di bar sisi seperti aplikasi. Anda boleh mencari ikon, seret dan lepas imej, atau pilih fail tempatan — aliran kerja yang sama seperti menukar ikon aplikasi.
+
+::: tip
+Nama folder seperti "go" atau "Downloads" mungkin tidak memberikan hasil carian yang baik dari macOSicons.com. Gunakan [alias](./aliases) untuk menetapkan nama yang lebih mesra carian (contohnya, tetapkan alias "Documents" kepada "folder").
+:::
+
 ## Cache Ikon
 
 Apabila anda menggunakan ikon tersuai, ia dicache secara automatik. Ini bermakna:

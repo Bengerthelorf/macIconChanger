@@ -24,6 +24,10 @@ IconChanger 内置了一些常见应用的别名：
 - `PyCharm Professional Edition` → `PyCharm`
 - `Discord PTB` → `Discord`
 
+## 文件夹别名
+
+别名也适用于文件夹。右键侧边栏中的文件夹，选择 **设置别名**，即可映射一个便于搜索的名称。这对名称较短或较通用的文件夹特别有用（例如，将 "go" 的别名设为 "folder" 或 "development"）。
+
 ## 提示
 
 - 别名越短、越通用，搜索结果越好。

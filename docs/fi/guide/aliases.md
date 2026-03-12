@@ -24,6 +24,10 @@ IconChanger sisältää joitakin valmiita aliaksia yleisille sovelluksille:
 - `PyCharm Professional Edition` → `PyCharm`
 - `Discord PTB` → `Discord`
 
+## Kansioiden aliakset
+
+Aliakset toimivat myös kansioissa. Napsauta kansiota sivupalkissa hiiren oikealla painikkeella ja valitse **Set the Alias** asettaaksesi hakuystävällisemmän nimen. Tämä on erityisen hyödyllistä kansioille, joilla on lyhyitä tai yleispäteviä nimiä (esim. aseta "go"-kansion aliakseksi "folder" tai "development").
+
 ## Vinkkejä
 
 - Pidä aliasnimet lyhyinä ja yleispätevinä parempien hakutulosten saamiseksi.

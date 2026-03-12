@@ -26,6 +26,22 @@ Una chiave API di [macosicons.com](https://macosicons.com/) è necessaria per ce
 - Utilizzando file immagine locali (fate clic su **Choose from the Local** o trascinate un'immagine)
 - Utilizzando le icone incluse nell'app stessa (mostrate nella sezione "Local")
 
+## Impostazioni API avanzate
+
+In **Settings** > **Advanced** > **API Settings**, potete regolare in modo preciso il comportamento dell'API:
+
+| Impostazione | Predefinito | Descrizione |
+|---|---|---|
+| **Retry Count** | 0 (nessun nuovo tentativo) | Quante volte riprovare una richiesta non riuscita (0–3) |
+| **Timeout** | 15 secondi | Timeout per ogni singolo tentativo di richiesta |
+| **Monthly Limit** | 50 | Numero massimo di query API al mese |
+
+Il contatore **Monthly Usage** mostra l'utilizzo corrente. Si azzera automaticamente il 1° di ogni mese, oppure potete azzerarlo manualmente.
+
+### Cache di ricerca icone
+
+Attivate **Cache API Results** per salvare i risultati di ricerca su disco. I risultati memorizzati nella cache persistono dopo il riavvio dell'app, riducendo l'utilizzo dell'API. Utilizzate il pulsante di aggiornamento durante la navigazione delle icone per ottenere risultati aggiornati.
+
 ## Risoluzione dei problemi
 
 Se il test dell'API non riesce:

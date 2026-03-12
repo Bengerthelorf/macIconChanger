@@ -8,7 +8,16 @@ Az IconChanger alkalmazásnak rendszergazdai jogosultságra van szüksége az al
 2. Kattints a **Setup** gombra, amikor a rendszer kéri.
 3. Add meg a rendszergazdai jelszavadat.
 
-Az alkalmazás létrehoz egy segédszkriptet a `~/.iconchanger/helper.sh` helyen, és beállít egy sudoers szabályt, hogy a továbbiakban jelszókérés nélkül fusson.
+Az alkalmazás telepíti a segédszkriptet a `/usr/local/lib/iconchanger/` könyvtárba (`root:wheel` tulajdonban), és beállít egy korlátozott sudoers szabályt, hogy a továbbiakban jelszókérés nélkül fusson.
+
+## Biztonság
+
+Az IconChanger több biztonsági intézkedést alkalmaz a segédfolyamat védelmére:
+
+- **Root tulajdonú segédkönyvtár** — A segédfájlok a `/usr/local/lib/iconchanger/` könyvtárban találhatók `root:wheel` tulajdonnal, megakadályozva a jogosulatlan módosításokat.
+- **SHA-256 integritás-ellenőrzés** — A segédszkriptet minden futtatás előtt egy ismert hash alapján ellenőrzi a rendszer.
+- **Korlátozott sudoers szabály** — A sudoers bejegyzés csak a meghatározott segédszkripthez ad jelszó nélküli hozzáférést, nem tetszőleges parancsokhoz.
+- **Auditnapló** — Minden ikonművelet időbélyeggel kerül naplózásra a nyomon követhetőség érdekében.
 
 ## Kézi beállítás
 
@@ -18,16 +27,14 @@ Ha az automatikus beállítás sikertelen, kézzel is konfigurálhatod:
 2. Futtasd a következő parancsot:
 
 ```bash
-sudo visudo
+sudo visudo -f /etc/sudoers.d/iconchanger
 ```
 
-3. Add hozzá a következő sort a fájl végéhez:
+3. Add hozzá a következő sort:
 
 ```
-ALL ALL=(ALL) NOPASSWD: /Users/<felhasználóneved>/.iconchanger/helper.sh
+ALL ALL=(ALL) NOPASSWD: /usr/local/lib/iconchanger/helper.sh
 ```
-
-A `<felhasználóneved>` helyére írd a tényleges macOS felhasználónevedet.
 
 ## Beállítás ellenőrzése
 

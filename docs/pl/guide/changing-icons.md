@@ -49,6 +49,16 @@ Ikony niestandardowe ustawione w ten sposób **nie** obsługują trybów ikon Cl
 Usługa w tle automatycznie ponownie zastosuje ikony po aktualizacjach aplikacji, chroniąc je przed więzieniem squircle.
 :::
 
+## Ikony folderów
+
+Możesz również dostosowywać ikony folderów. Dodaj foldery poprzez **Settings** > **Application** > **Application Folders** lub kliknij przycisk **+** w sekcji folderów na pasku bocznym.
+
+Po dodaniu folder pojawia się na pasku bocznym tak jak aplikacje. Możesz wyszukiwać ikony, przeciągać i upuszczać obrazy lub wybierać pliki lokalne — ten sam przepływ pracy, co przy zmianie ikon aplikacji.
+
+::: tip
+Nazwy folderów takie jak „go" czy „Downloads" mogą nie dawać dobrych wyników wyszukiwania na macOSicons.com. Użyj [aliasów](./aliases), aby ustawić bardziej przyjazną dla wyszukiwania nazwę (np. alias „Documents" na „folder").
+:::
+
 ## Pamięć podręczna ikon
 
 Po zastosowaniu niestandardowej ikony jest ona automatycznie zapisywana w pamięci podręcznej. Oznacza to, że:

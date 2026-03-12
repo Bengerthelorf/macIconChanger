@@ -24,6 +24,10 @@ Az IconChanger tartalmaz néhány beépített álnevet a gyakori alkalmazásokho
 - `PyCharm Professional Edition` → `PyCharm`
 - `Discord PTB` → `Discord`
 
+## Mappa-álnevek
+
+Az álnevek mappákra is működnek. Kattints jobb gombbal egy mappára az oldalsávban, és válaszd a **Set the Alias** lehetőséget egy keresésbarátabb név hozzárendeléséhez. Ez különösen hasznos rövid vagy általános nevű mappáknál (pl. a „go" álneve legyen „folder" vagy „development").
+
 ## Tippek
 
 - Tartsd az álneveket rövidnek és általánosnak a jobb keresési eredmények érdekében.

@@ -24,6 +24,10 @@ O IconChanger inclui alguns aliases integrados para apps comuns:
 - `PyCharm Professional Edition` → `PyCharm`
 - `Discord PTB` → `Discord`
 
+## Aliases de Pastas
+
+Os aliases tambem funcionam para pastas. Clique com o botao direito em uma pasta na barra lateral e selecione **Set the Alias** para mapear um nome mais adequado para pesquisa. Isso e especialmente util para pastas com nomes curtos ou genericos (por exemplo, definir o alias de "go" como "folder" ou "development").
+
 ## Dicas
 
 - Mantenha os nomes dos aliases curtos e genericos para obter melhores resultados de pesquisa.

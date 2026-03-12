@@ -26,6 +26,22 @@ Możesz zmieniać ikony aplikacji bez klucza API, korzystając z:
 - Lokalnych plików obrazów (kliknij **Choose from the Local** lub przeciągnij i upuść obraz)
 - Ikon dołączonych do samej aplikacji (wyświetlanych w sekcji "Local")
 
+## Zaawansowane ustawienia API
+
+W **Settings** > **Advanced** > **API Settings** możesz dostosować zachowanie API:
+
+| Ustawienie | Domyślnie | Opis |
+|---|---|---|
+| **Retry Count** | 0 (bez ponawiania) | Ile razy ponowić nieudane żądanie (0–3) |
+| **Timeout** | 15 sekund | Limit czasu dla każdego żądania |
+| **Monthly Limit** | 50 | Maksymalna liczba zapytań API na miesiąc |
+
+Licznik **Monthly Usage** pokazuje bieżące zużycie. Resetuje się automatycznie 1. dnia każdego miesiąca lub możesz go zresetować ręcznie.
+
+### Pamięć podręczna wyszukiwania ikon
+
+Włącz **Cache API Results**, aby zapisywać wyniki wyszukiwania na dysku. Wyniki w pamięci podręcznej są zachowywane po ponownym uruchomieniu aplikacji, co zmniejsza zużycie API. Użyj przycisku odświeżania podczas przeglądania ikon, aby pobrać najnowsze wyniki.
+
 ## Rozwiązywanie problemów
 
 Jeśli test API się nie powiedzie:

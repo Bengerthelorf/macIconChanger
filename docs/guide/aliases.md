@@ -24,6 +24,10 @@ IconChanger includes some built-in aliases for common apps:
 - `PyCharm Professional Edition` → `PyCharm`
 - `Discord PTB` → `Discord`
 
+## Folder Aliases
+
+Aliases also work for folders. Right-click a folder in the sidebar and select **Set the Alias** to map a search-friendly name. This is especially useful for folders with short or generic names (e.g., alias "go" to "folder" or "development").
+
 ## Tips
 
 - Keep alias names short and generic for better search results.

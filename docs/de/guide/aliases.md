@@ -24,6 +24,10 @@ IconChanger enthält einige integrierte Aliasse für gängige Apps:
 - `PyCharm Professional Edition` → `PyCharm`
 - `Discord PTB` → `Discord`
 
+## Ordner-Aliasse
+
+Aliasse funktionieren auch für Ordner. Klicken Sie mit der rechten Maustaste auf einen Ordner in der Seitenleiste und wählen Sie **Set the Alias**, um einen suchfreundlicheren Namen zuzuordnen. Dies ist besonders nützlich für Ordner mit kurzen oder generischen Namen (z. B. „go" als Alias „folder" oder „development" festlegen).
+
 ## Tipps
 
 - Halten Sie Alias-Namen kurz und allgemein für bessere Suchergebnisse.

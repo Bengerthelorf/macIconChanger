@@ -24,6 +24,10 @@ IconChanger include cateva aliasuri predefinite pentru aplicatii frecvente:
 - `PyCharm Professional Edition` → `PyCharm`
 - `Discord PTB` → `Discord`
 
+## Aliasuri pentru foldere
+
+Aliasurile functioneaza si pentru foldere. Apasa click dreapta pe un folder in bara laterala si selecteaza **Set the Alias** pentru a asocia un nume mai potrivit pentru cautare. Acest lucru este deosebit de util pentru folderele cu nume scurte sau generice (de ex., seteaza aliasul "go" la "folder" sau "development").
+
 ## Sfaturi
 
 - Pastreaza numele aliasurilor scurte si generice pentru rezultate mai bune la cautare.

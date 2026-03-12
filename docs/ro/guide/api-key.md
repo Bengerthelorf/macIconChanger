@@ -26,6 +26,22 @@ Poti schimba pictogramele aplicatiilor si fara o cheie API prin:
 - Folosirea fisierelor imagine locale (apasa **Choose from the Local** sau trage si plaseaza o imagine)
 - Folosirea pictogramelor incluse in aplicatie (afisate in sectiunea "Local")
 
+## Setari API avansate
+
+In **Settings** > **Advanced** > **API Settings**, poti regla fin comportamentul API-ului:
+
+| Setare | Implicit | Descriere |
+|---|---|---|
+| **Retry Count** | 0 (fara reincercare) | De cate ori sa se reincerce o solicitare esuata (0–3) |
+| **Timeout** | 15 secunde | Timp de asteptare pentru fiecare incercare |
+| **Monthly Limit** | 50 | Numar maxim de interogari API pe luna |
+
+Contorul **Monthly Usage** arata utilizarea curenta. Se reseteaza automat in prima zi a fiecarei luni sau il poti reseta manual.
+
+### Cache pentru cautarea pictogramelor
+
+Activeaza **Cache API Results** pentru a salva rezultatele cautarii pe disc. Rezultatele din cache persista dupa repornirea aplicatiei, reducand utilizarea API-ului. Foloseste butonul de reimprospatare cand navighezi printre pictograme pentru a obtine rezultate actualizate.
+
 ## Depanare
 
 Daca testul API esueaza:

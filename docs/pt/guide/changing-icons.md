@@ -49,6 +49,16 @@ Icones personalizados definidos dessa forma **nao** suportam os modos de icone C
 Seu servico em segundo plano reaplicara automaticamente os icones apos atualizacoes de apps, mantendo-os fora da prisao squircle.
 :::
 
+## Icones de Pastas
+
+Voce tambem pode personalizar icones de pastas. Adicione pastas em **Settings** > **Application** > **Application Folders**, ou clique no botao **+** na secao de pastas da barra lateral.
+
+Uma vez adicionada, a pasta aparece na barra lateral como os apps. Voce pode pesquisar icones, arrastar e soltar imagens ou escolher arquivos locais — o mesmo fluxo de trabalho usado para alterar icones de apps.
+
+::: tip
+Nomes de pastas como "go" ou "Downloads" podem nao retornar bons resultados de pesquisa no macOSicons.com. Use [aliases](./aliases) para definir um nome mais adequado para pesquisa (por exemplo, definir o alias de "Documents" como "folder").
+:::
+
 ## Cache de Icones
 
 Quando voce aplica um icone personalizado, ele e automaticamente armazenado em cache. Isso significa:

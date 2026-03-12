@@ -49,6 +49,16 @@ Anpassade ikoner som ställs in på detta sätt stöder **inte** macOS Tahoes ik
 Din bakgrundstjänst tillämpar automatiskt ikoner på nytt efter appuppdateringar, så att de hålls utanför squircle-fängelset.
 :::
 
+## Mappikoner
+
+Du kan även anpassa mappikoner. Lägg till mappar via **Settings** > **Application** > **Application Folders**, eller klicka på knappen **+** i sidofältets mappsektion.
+
+När en mapp har lagts till visas den i sidofältet precis som appar. Du kan söka efter ikoner, dra och släppa bilder eller välja lokala filer — samma arbetsflöde som för att ändra appikoner.
+
+::: tip
+Mappnamn som "go" eller "Downloads" kanske inte ger bra sökresultat från macOSicons.com. Använd [alias](./aliases) för att ange ett mer sökvänligt namn (t.ex. ange alias "Documents" till "folder").
+:::
+
 ## Ikoncache
 
 När du tillämpar en anpassad ikon cachas den automatiskt. Det innebär att:

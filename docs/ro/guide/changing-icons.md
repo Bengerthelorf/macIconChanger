@@ -49,6 +49,16 @@ Pictogramele personalizate setate in acest mod **nu** accepta modurile de pictog
 Serviciul in fundal va reaplica automat pictogramele dupa actualizarile aplicatiilor, mentinandu-le in afara captivitati squircle.
 :::
 
+## Pictograme pentru foldere
+
+Poti personaliza si pictogramele folderelor. Adauga foldere prin **Settings** > **Application** > **Application Folders**, sau apasa butonul **+** din sectiunea de foldere a barei laterale.
+
+Odata adaugat, un folder apare in bara laterala la fel ca aplicatiile. Poti cauta pictograme, trage si plasa imagini sau alege fisiere locale — acelasi flux de lucru ca la schimbarea pictogramelor aplicatiilor.
+
+::: tip
+Numele de foldere precum "go" sau "Downloads" pot sa nu returneze rezultate bune de cautare pe macOSicons.com. Foloseste [aliasuri](./aliases) pentru a seta un nume mai potrivit pentru cautare (de ex., seteaza aliasul "Documents" la "folder").
+:::
+
 ## Memorarea in cache a pictogramelor
 
 Cand aplici o pictograma personalizata, aceasta este memorata automat in cache. Asta inseamna ca:

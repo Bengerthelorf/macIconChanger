@@ -49,6 +49,16 @@ Brugerdefinerede ikoner sat på denne måde understøtter **ikke** macOS Tahoes 
 Din baggrundstjeneste genanvender automatisk ikoner efter appopdateringer og holder dem ude af squircle jail.
 :::
 
+## Mappeikoner
+
+Du kan også tilpasse mappeikoner. Tilføj mapper via **Settings** > **Application** > **Application Folders**, eller klik på knappen **+** i sidebjælkens mappesektion.
+
+Når en mappe er tilføjet, vises den i sidebjælken ligesom apps. Du kan søge efter ikoner, trække og slippe billeder eller vælge lokale filer — samme arbejdsgang som ved ændring af appikoner.
+
+::: tip
+Mappenavne som "go" eller "Downloads" giver muligvis ikke gode søgeresultater fra macOSicons.com. Brug [aliasser](./aliases) til at indstille et mere søgevenligt navn (f.eks. sæt alias "Documents" til "folder").
+:::
+
 ## Ikoncaching
 
 Når du anvender et brugerdefineret ikon, caches det automatisk. Det betyder:

@@ -8,7 +8,16 @@ IconChanger tarvitsee ylläpitäjän oikeudet sovellusten kuvakkeiden vaihtamise
 2. Napsauta **Setup**-painiketta pyydettäessä.
 3. Anna ylläpitäjän salasanasi.
 
-Sovellus luo apuskriptin polkuun `~/.iconchanger/helper.sh` ja määrittää sudoers-säännön, jotta skripti voidaan suorittaa ilman salasanakyselyä joka kerralla.
+Sovellus asentaa apuskriptin polkuun `/usr/local/lib/iconchanger/` (omistaja `root:wheel`) ja määrittää rajatun sudoers-säännön, jotta skripti voidaan suorittaa ilman salasanakyselyä joka kerralla.
+
+## Tietoturva
+
+IconChanger käyttää useita turvatoimia apuputken suojaamiseksi:
+
+- **Rootin omistama apuhakemisto** — Aputiedostot sijaitsevat polussa `/usr/local/lib/iconchanger/` ja ne ovat `root:wheel`-omistuksessa, mikä estää oikeudettomien käyttäjien muokkaukset.
+- **SHA-256-eheyden tarkistus** — Apuskripti tarkistetaan tunnettua tiivistettä vasten ennen jokaista suoritusta.
+- **Rajattu sudoers-sääntö** — Sudoers-merkintä myöntää salasanattoman pääsyn vain tiettyyn apuskriptiin, ei mielivaltaisiin komentoihin.
+- **Tarkastusloki** — Kaikki kuvakeoperaatiot kirjataan aikaleimoilla jäljitettävyyttä varten.
 
 ## Manuaalinen määritys
 
@@ -18,16 +27,14 @@ Jos automaattinen määritys epäonnistuu, voit tehdä sen manuaalisesti:
 2. Suorita:
 
 ```bash
-sudo visudo
+sudo visudo -f /etc/sudoers.d/iconchanger
 ```
 
-3. Lisää seuraava rivi loppuun:
+3. Lisää seuraava rivi:
 
 ```
-ALL ALL=(ALL) NOPASSWD: /Users/<käyttäjänimesi>/.iconchanger/helper.sh
+ALL ALL=(ALL) NOPASSWD: /usr/local/lib/iconchanger/helper.sh
 ```
-
-Korvaa `<käyttäjänimesi>` todellisella macOS-käyttäjänimelläsi.
 
 ## Määrityksen tarkistaminen
 

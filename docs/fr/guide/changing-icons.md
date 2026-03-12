@@ -49,6 +49,16 @@ Les icones personnalisees definies de cette maniere ne prennent **pas** en charg
 Votre service d'arriere-plan reappliquera automatiquement les icones apres les mises a jour des applications, les maintenant hors du carcan du squircle.
 :::
 
+## Icones de dossiers
+
+Vous pouvez egalement personnaliser les icones des dossiers. Ajoutez des dossiers via **Settings** > **Application** > **Application Folders**, ou cliquez sur le bouton **+** dans la section des dossiers de la barre laterale.
+
+Une fois un dossier ajoute, il apparait dans la barre laterale comme les applications. Vous pouvez rechercher des icones, glisser-deposer des images ou choisir des fichiers locaux — le meme flux de travail que pour changer les icones d'applications.
+
+::: tip
+Les noms de dossiers comme « go » ou « Downloads » peuvent ne pas donner de bons resultats de recherche sur macOSicons.com. Utilisez les [alias](./aliases) pour definir un nom plus adapte a la recherche (par ex., definir l'alias de « Documents » en « folder »).
+:::
+
 ## Mise en cache des icones
 
 Lorsque vous appliquez une icone personnalisee, elle est automatiquement mise en cache. Cela signifie :

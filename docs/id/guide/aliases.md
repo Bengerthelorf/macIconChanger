@@ -24,6 +24,10 @@ IconChanger menyertakan beberapa alias bawaan untuk aplikasi umum:
 - `PyCharm Professional Edition` → `PyCharm`
 - `Discord PTB` → `Discord`
 
+## Alias Folder
+
+Alias juga berfungsi untuk folder. Klik kanan folder di sidebar dan pilih **Set the Alias** untuk memetakan nama yang lebih ramah pencarian. Ini sangat berguna untuk folder dengan nama pendek atau umum (misalnya, atur alias "go" menjadi "folder" atau "development").
+
 ## Tips
 
 - Gunakan nama alias yang pendek dan umum untuk hasil pencarian yang lebih baik.

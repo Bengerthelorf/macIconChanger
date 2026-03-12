@@ -24,6 +24,10 @@ IconChanger bao gồm một số bí danh tích hợp sẵn cho các ứng dụn
 - `PyCharm Professional Edition` → `PyCharm`
 - `Discord PTB` → `Discord`
 
+## Bí danh thư mục
+
+Bí danh cũng hoạt động với thư mục. Nhấn chuột phải vào thư mục ở thanh bên và chọn **Set the Alias** để ánh xạ tên dễ tìm kiếm hơn. Điều này đặc biệt hữu ích cho các thư mục có tên ngắn hoặc chung chung (ví dụ: đặt bí danh "go" thành "folder" hoặc "development").
+
 ## Mẹo
 
 - Giữ tên bí danh ngắn gọn và chung chung để có kết quả tìm kiếm tốt hơn.

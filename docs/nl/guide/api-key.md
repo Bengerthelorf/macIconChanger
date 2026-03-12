@@ -26,6 +26,22 @@ Je kunt ook zonder API-sleutel apppictogrammen wijzigen door:
 - Lokale afbeeldingsbestanden te gebruiken (klik op **Choose from the Local** of sleep een afbeelding)
 - Pictogrammen te gebruiken die in de app zelf zijn meegeleverd (te zien in het gedeelte "Local")
 
+## Geavanceerde API-instellingen
+
+In **Settings** > **Advanced** > **API Settings** kun je het API-gedrag fijnafstemmen:
+
+| Instelling | Standaard | Beschrijving |
+|---|---|---|
+| **Retry Count** | 0 (geen nieuwe poging) | Aantal keren dat een mislukt verzoek opnieuw wordt geprobeerd (0–3) |
+| **Timeout** | 15 seconden | Timeout per verzoek |
+| **Monthly Limit** | 50 | Maximaal aantal API-query's per maand |
+
+De teller **Monthly Usage** toont je huidige gebruik. Deze wordt automatisch op de 1e van elke maand gereset, of je kunt hem handmatig resetten.
+
+### Cache voor pictogramzoekopdrachten
+
+Schakel **Cache API Results** in om zoekresultaten op schijf op te slaan. Gecachete resultaten blijven bewaard na het herstarten van de app, waardoor het API-gebruik wordt verminderd. Gebruik de vernieuwknop bij het bladeren door pictogrammen om actuele resultaten op te halen.
+
 ## Probleemoplossing
 
 Als de API-test mislukt:

@@ -24,6 +24,10 @@ IconChanger inclut des alias integres pour les applications courantes :
 - `PyCharm Professional Edition` -> `PyCharm`
 - `Discord PTB` -> `Discord`
 
+## Alias de dossiers
+
+Les alias fonctionnent egalement pour les dossiers. Faites un clic droit sur un dossier dans la barre laterale et selectionnez **Set the Alias** pour lui attribuer un nom plus adapte a la recherche. C'est particulierement utile pour les dossiers aux noms courts ou generiques (par ex., definir l'alias de « go » en « folder » ou « development »).
+
 ## Conseils
 
 - Privilegiez des noms d'alias courts et generiques pour de meilleurs resultats de recherche.

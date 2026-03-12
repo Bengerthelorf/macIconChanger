@@ -26,6 +26,22 @@ Aun puede cambiar los iconos de las aplicaciones sin una clave API mediante:
 - Archivos de imagen locales (haga clic en **Choose from the Local** o arrastre y suelte una imagen)
 - Iconos incluidos dentro de la propia aplicacion (mostrados en la seccion "Local")
 
+## Configuracion avanzada de API
+
+En **Settings** > **Advanced** > **API Settings**, puede ajustar el comportamiento de la API:
+
+| Configuracion | Predeterminado | Descripcion |
+|---|---|---|
+| **Retry Count** | 0 (sin reintentos) | Cuantas veces reintentar una solicitud fallida (0–3) |
+| **Timeout** | 15 segundos | Tiempo de espera por cada intento de solicitud |
+| **Monthly Limit** | 50 | Consultas API maximas por mes |
+
+El contador **Monthly Usage** muestra su uso actual. Se reinicia automaticamente el dia 1 de cada mes, o puede reiniciarlo manualmente.
+
+### Cache de busqueda de iconos
+
+Active **Cache API Results** para guardar los resultados de busqueda en disco. Los resultados almacenados en cache persisten entre reinicios de la aplicacion, lo que reduce el uso de la API. Use el boton de actualizar al explorar iconos para obtener resultados actualizados.
+
 ## Solucion de problemas
 
 Si la prueba de la API falla:

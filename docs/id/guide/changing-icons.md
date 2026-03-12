@@ -49,6 +49,16 @@ Ikon kustom yang diatur dengan cara ini **tidak** mendukung mode ikon Clear, Tin
 Layanan latar belakang Anda akan secara otomatis menerapkan ulang ikon setelah pembaruan aplikasi, menjaga ikon tetap keluar dari squircle jail.
 :::
 
+## Ikon Folder
+
+Anda juga dapat menyesuaikan ikon folder. Tambahkan folder melalui **Settings** > **Application** > **Application Folders**, atau klik tombol **+** di bagian folder sidebar.
+
+Setelah folder ditambahkan, folder tersebut muncul di sidebar seperti aplikasi. Anda dapat mencari ikon, menyeret & melepas gambar, atau memilih file lokal — alur kerja yang sama seperti mengubah ikon aplikasi.
+
+::: tip
+Nama folder seperti "go" atau "Downloads" mungkin tidak memberikan hasil pencarian yang baik dari macOSicons.com. Gunakan [alias](./aliases) untuk menetapkan nama yang lebih ramah pencarian (misalnya, atur alias "Documents" menjadi "folder").
+:::
+
 ## Cache Ikon
 
 Saat Anda menerapkan ikon kustom, ikon tersebut secara otomatis di-cache. Ini berarti:

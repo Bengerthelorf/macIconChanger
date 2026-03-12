@@ -41,6 +41,7 @@ export default defineConfig({
               items: [
                 { text: '變更圖示', link: '/zh-Hant/guide/changing-icons' },
                 { text: '應用程式別名', link: '/zh-Hant/guide/aliases' },
+                { text: '顯示設定', link: '/zh-Hant/guide/display-settings' },
                 { text: '背景服務', link: '/zh-Hant/guide/background-service' },
                 { text: '匯入與匯出', link: '/zh-Hant/guide/import-export' },
               ],
@@ -77,6 +78,7 @@ export default defineConfig({
             { text: '使用', items: [
               { text: '更改圖標', link: '/zh-HK/guide/changing-icons' },
               { text: '應用別名', link: '/zh-HK/guide/aliases' },
+              { text: '顯示設置', link: '/zh-HK/guide/display-settings' },
               { text: '後台服務', link: '/zh-HK/guide/background-service' },
               { text: '導入與導出', link: '/zh-HK/guide/import-export' },
             ]},
@@ -117,6 +119,7 @@ export default defineConfig({
               items: [
                 { text: '更改图标', link: '/zh/guide/changing-icons' },
                 { text: '应用别名', link: '/zh/guide/aliases' },
+                { text: '显示设置', link: '/zh/guide/display-settings' },
                 { text: '后台服务', link: '/zh/guide/background-service' },
                 { text: '导入与导出', link: '/zh/guide/import-export' },
               ],
@@ -161,6 +164,7 @@ export default defineConfig({
               items: [
                 { text: 'アイコンの変更', link: '/ja/guide/changing-icons' },
                 { text: 'アプリのエイリアス', link: '/ja/guide/aliases' },
+                { text: '表示設定', link: '/ja/guide/display-settings' },
                 { text: 'バックグラウンドサービス', link: '/ja/guide/background-service' },
                 { text: 'インポート＆エクスポート', link: '/ja/guide/import-export' },
               ],
@@ -205,6 +209,7 @@ export default defineConfig({
               items: [
                 { text: '아이콘 변경', link: '/ko/guide/changing-icons' },
                 { text: '앱 별칭', link: '/ko/guide/aliases' },
+                { text: '디스플레이 설정', link: '/ko/guide/display-settings' },
                 { text: '백그라운드 서비스', link: '/ko/guide/background-service' },
                 { text: '가져오기 및 내보내기', link: '/ko/guide/import-export' },
               ],
@@ -241,6 +246,7 @@ export default defineConfig({
             { text: 'Penggunaan', items: [
               { text: 'Mengubah Ikon', link: '/id/guide/changing-icons' },
               { text: 'Alias Aplikasi', link: '/id/guide/aliases' },
+              { text: 'Pengaturan tampilan', link: '/id/guide/display-settings' },
               { text: 'Layanan Latar Belakang', link: '/id/guide/background-service' },
               { text: 'Impor & Ekspor', link: '/id/guide/import-export' },
             ]},
@@ -273,6 +279,7 @@ export default defineConfig({
             { text: 'Penggunaan', items: [
               { text: 'Menukar Ikon', link: '/ms/guide/changing-icons' },
               { text: 'Alias Aplikasi', link: '/ms/guide/aliases' },
+              { text: 'Tetapan paparan', link: '/ms/guide/display-settings' },
               { text: 'Perkhidmatan Latar Belakang', link: '/ms/guide/background-service' },
               { text: 'Import & Eksport', link: '/ms/guide/import-export' },
             ]},
@@ -313,6 +320,7 @@ export default defineConfig({
               items: [
                 { text: 'Skift ikoner', link: '/da/guide/changing-icons' },
                 { text: 'App-aliasser', link: '/da/guide/aliases' },
+                { text: 'Skærmindstillinger', link: '/da/guide/display-settings' },
                 { text: 'Baggrundstjeneste', link: '/da/guide/background-service' },
                 { text: 'Import og eksport', link: '/da/guide/import-export' },
               ],
@@ -357,6 +365,7 @@ export default defineConfig({
               items: [
                 { text: 'Symbole ändern', link: '/de/guide/changing-icons' },
                 { text: 'App-Aliasse', link: '/de/guide/aliases' },
+                { text: 'Anzeigeeinstellungen', link: '/de/guide/display-settings' },
                 { text: 'Hintergrunddienst', link: '/de/guide/background-service' },
                 { text: 'Import & Export', link: '/de/guide/import-export' },
               ],
@@ -401,6 +410,7 @@ export default defineConfig({
               items: [
                 { text: 'Cambiar iconos', link: '/es/guide/changing-icons' },
                 { text: 'Alias de aplicaciones', link: '/es/guide/aliases' },
+                { text: 'Ajustes de pantalla', link: '/es/guide/display-settings' },
                 { text: 'Servicio en segundo plano', link: '/es/guide/background-service' },
                 { text: 'Importar y exportar', link: '/es/guide/import-export' },
               ],
@@ -445,6 +455,7 @@ export default defineConfig({
               items: [
                 { text: 'Changer les icônes', link: '/fr/guide/changing-icons' },
                 { text: 'Alias d\'applications', link: '/fr/guide/aliases' },
+                { text: 'Paramètres d\'affichage', link: '/fr/guide/display-settings' },
                 { text: 'Service d\'arrière-plan', link: '/fr/guide/background-service' },
                 { text: 'Import et export', link: '/fr/guide/import-export' },
               ],
@@ -489,6 +500,7 @@ export default defineConfig({
               items: [
                 { text: 'Cambiare le icone', link: '/it/guide/changing-icons' },
                 { text: 'Alias delle app', link: '/it/guide/aliases' },
+                { text: 'Impostazioni schermo', link: '/it/guide/display-settings' },
                 { text: 'Servizio in background', link: '/it/guide/background-service' },
                 { text: 'Importazione ed esportazione', link: '/it/guide/import-export' },
               ],
@@ -525,6 +537,7 @@ export default defineConfig({
             { text: 'Használat', items: [
               { text: 'Ikonok módosítása', link: '/hu/guide/changing-icons' },
               { text: 'Alkalmazás-álnevek', link: '/hu/guide/aliases' },
+              { text: 'Megjelenítési beállítások', link: '/hu/guide/display-settings' },
               { text: 'Háttérszolgáltatás', link: '/hu/guide/background-service' },
               { text: 'Importálás és exportálás', link: '/hu/guide/import-export' },
             ]},
@@ -565,6 +578,7 @@ export default defineConfig({
               items: [
                 { text: 'Iconen wijzigen', link: '/nl/guide/changing-icons' },
                 { text: 'App-aliassen', link: '/nl/guide/aliases' },
+                { text: 'Weergave-instellingen', link: '/nl/guide/display-settings' },
                 { text: 'Achtergronddienst', link: '/nl/guide/background-service' },
                 { text: 'Importeren en exporteren', link: '/nl/guide/import-export' },
               ],
@@ -601,6 +615,7 @@ export default defineConfig({
             { text: 'Bruk', items: [
               { text: 'Endre ikoner', link: '/nb/guide/changing-icons' },
               { text: 'App-aliaser', link: '/nb/guide/aliases' },
+              { text: 'Skjerminnstillinger', link: '/nb/guide/display-settings' },
               { text: 'Bakgrunnstjeneste', link: '/nb/guide/background-service' },
               { text: 'Import og eksport', link: '/nb/guide/import-export' },
             ]},
@@ -641,6 +656,7 @@ export default defineConfig({
               items: [
                 { text: 'Zmiana ikon', link: '/pl/guide/changing-icons' },
                 { text: 'Aliasy aplikacji', link: '/pl/guide/aliases' },
+                { text: 'Ustawienia wyświetlania', link: '/pl/guide/display-settings' },
                 { text: 'Usługa w tle', link: '/pl/guide/background-service' },
                 { text: 'Import i eksport', link: '/pl/guide/import-export' },
               ],
@@ -685,6 +701,7 @@ export default defineConfig({
               items: [
                 { text: 'Alterar ícones', link: '/pt/guide/changing-icons' },
                 { text: 'Aliases de apps', link: '/pt/guide/aliases' },
+                { text: 'Configurações de exibição', link: '/pt/guide/display-settings' },
                 { text: 'Serviço em segundo plano', link: '/pt/guide/background-service' },
                 { text: 'Importar e exportar', link: '/pt/guide/import-export' },
               ],
@@ -721,6 +738,7 @@ export default defineConfig({
             { text: 'Utilizare', items: [
               { text: 'Schimbarea pictogramelor', link: '/ro/guide/changing-icons' },
               { text: 'Aliasuri pentru aplicații', link: '/ro/guide/aliases' },
+              { text: 'Setări de afișare', link: '/ro/guide/display-settings' },
               { text: 'Serviciul în fundal', link: '/ro/guide/background-service' },
               { text: 'Import și export', link: '/ro/guide/import-export' },
             ]},
@@ -761,6 +779,7 @@ export default defineConfig({
               items: [
                 { text: 'Kuvakkeiden vaihtaminen', link: '/fi/guide/changing-icons' },
                 { text: 'Sovellusten aliakset', link: '/fi/guide/aliases' },
+                { text: 'Näyttöasetukset', link: '/fi/guide/display-settings' },
                 { text: 'Taustapalvelu', link: '/fi/guide/background-service' },
                 { text: 'Tuonti ja vienti', link: '/fi/guide/import-export' },
               ],
@@ -805,6 +824,7 @@ export default defineConfig({
               items: [
                 { text: 'Ändra ikoner', link: '/sv/guide/changing-icons' },
                 { text: 'App-alias', link: '/sv/guide/aliases' },
+                { text: 'Visningsinställningar', link: '/sv/guide/display-settings' },
                 { text: 'Bakgrundstjänst', link: '/sv/guide/background-service' },
                 { text: 'Import och export', link: '/sv/guide/import-export' },
               ],
@@ -849,6 +869,7 @@ export default defineConfig({
               items: [
                 { text: 'Thay đổi biểu tượng', link: '/vi/guide/changing-icons' },
                 { text: 'Bí danh ứng dụng', link: '/vi/guide/aliases' },
+                { text: 'Cài đặt hiển thị', link: '/vi/guide/display-settings' },
                 { text: 'Dịch vụ nền', link: '/vi/guide/background-service' },
                 { text: 'Nhập & Xuất', link: '/vi/guide/import-export' },
               ],
@@ -893,6 +914,7 @@ export default defineConfig({
               items: [
                 { text: 'Simge Değiştirme', link: '/tr/guide/changing-icons' },
                 { text: 'Uygulama Takma Adları', link: '/tr/guide/aliases' },
+                { text: 'Görüntü ayarları', link: '/tr/guide/display-settings' },
                 { text: 'Arka Plan Hizmeti', link: '/tr/guide/background-service' },
                 { text: 'İçe ve Dışa Aktarma', link: '/tr/guide/import-export' },
               ],
@@ -929,6 +951,7 @@ export default defineConfig({
             { text: 'Použití', items: [
               { text: 'Změna ikon', link: '/cs/guide/changing-icons' },
               { text: 'Aliasy aplikací', link: '/cs/guide/aliases' },
+              { text: 'Nastavení zobrazení', link: '/cs/guide/display-settings' },
               { text: 'Služba na pozadí', link: '/cs/guide/background-service' },
               { text: 'Import a export', link: '/cs/guide/import-export' },
             ]},
@@ -961,6 +984,7 @@ export default defineConfig({
             { text: 'Χρήση', items: [
               { text: 'Αλλαγή εικονιδίων', link: '/el/guide/changing-icons' },
               { text: 'Ψευδώνυμα εφαρμογών', link: '/el/guide/aliases' },
+              { text: 'Ρυθμίσεις εμφάνισης', link: '/el/guide/display-settings' },
               { text: 'Υπηρεσία παρασκηνίου', link: '/el/guide/background-service' },
               { text: 'Εισαγωγή και εξαγωγή', link: '/el/guide/import-export' },
             ]},
@@ -1001,6 +1025,7 @@ export default defineConfig({
               items: [
                 { text: 'Изменение иконок', link: '/ru/guide/changing-icons' },
                 { text: 'Псевдонимы приложений', link: '/ru/guide/aliases' },
+                { text: 'Настройки отображения', link: '/ru/guide/display-settings' },
                 { text: 'Фоновый сервис', link: '/ru/guide/background-service' },
                 { text: 'Импорт и экспорт', link: '/ru/guide/import-export' },
               ],
@@ -1037,6 +1062,7 @@ export default defineConfig({
             { text: 'Використання', items: [
               { text: 'Зміна іконок', link: '/uk/guide/changing-icons' },
               { text: 'Псевдоніми додатків', link: '/uk/guide/aliases' },
+              { text: 'Налаштування відображення', link: '/uk/guide/display-settings' },
               { text: 'Фоновий сервіс', link: '/uk/guide/background-service' },
               { text: 'Імпорт та експорт', link: '/uk/guide/import-export' },
             ]},
@@ -1078,6 +1104,7 @@ export default defineConfig({
               items: [
                 { text: 'تغيير الأيقونات', link: '/ar/guide/changing-icons' },
                 { text: 'أسماء بديلة للتطبيقات', link: '/ar/guide/aliases' },
+                { text: 'إعدادات العرض', link: '/ar/guide/display-settings' },
                 { text: 'الخدمة الخلفية', link: '/ar/guide/background-service' },
                 { text: 'الاستيراد والتصدير', link: '/ar/guide/import-export' },
               ],
@@ -1114,6 +1141,7 @@ export default defineConfig({
             { text: 'उपयोग', items: [
               { text: 'आइकन बदलना', link: '/hi/guide/changing-icons' },
               { text: 'ऐप उपनाम', link: '/hi/guide/aliases' },
+              { text: 'प्रदर्शन सेटिंग', link: '/hi/guide/display-settings' },
               { text: 'बैकग्राउंड सेवा', link: '/hi/guide/background-service' },
               { text: 'आयात और निर्यात', link: '/hi/guide/import-export' },
             ]},
@@ -1146,6 +1174,7 @@ export default defineConfig({
             { text: 'การใช้งาน', items: [
               { text: 'เปลี่ยนไอคอน', link: '/th/guide/changing-icons' },
               { text: 'นามแฝงแอป', link: '/th/guide/aliases' },
+              { text: 'การตั้งค่าการแสดงผล', link: '/th/guide/display-settings' },
               { text: 'บริการพื้นหลัง', link: '/th/guide/background-service' },
               { text: 'นำเข้าและส่งออก', link: '/th/guide/import-export' },
             ]},
@@ -1188,6 +1217,7 @@ export default defineConfig({
           items: [
             { text: 'Changing Icons', link: '/guide/changing-icons' },
             { text: 'App Aliases', link: '/guide/aliases' },
+            { text: 'Display Settings', link: '/guide/display-settings' },
             { text: 'Background Service', link: '/guide/background-service' },
             { text: 'Import & Export', link: '/guide/import-export' },
           ],

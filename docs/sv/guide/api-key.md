@@ -26,6 +26,22 @@ Du kan fortfarande byta appikoner utan en API-nyckel genom att:
 - Använda lokala bildfiler (klicka på **Choose from the Local** eller dra och släpp en bild)
 - Använda ikoner som följer med appen (visas under avsnittet "Local")
 
+## Avancerade API-inställningar
+
+Under **Settings** > **Advanced** > **API Settings** kan du finjustera API-beteendet:
+
+| Inställning | Standard | Beskrivning |
+|---|---|---|
+| **Retry Count** | 0 (inget nytt försök) | Antal gånger ett misslyckat anrop ska försökas på nytt (0–3) |
+| **Timeout** | 15 sekunder | Tidsgräns för varje enskilt anropsförsök |
+| **Monthly Limit** | 50 | Maximalt antal API-förfrågningar per månad |
+
+Räknaren **Monthly Usage** visar din aktuella användning. Den återställs automatiskt den 1:a varje månad, eller så kan du återställa den manuellt.
+
+### Cache för ikonsökning
+
+Aktivera **Cache API Results** för att spara sökresultat till disk. Cachade resultat bevaras över omstarter av appen, vilket minskar API-användningen. Använd uppdateringsknappen när du bläddrar bland ikoner för att hämta färska resultat.
+
 ## Felsökning
 
 Om API-testet misslyckas:

@@ -8,7 +8,16 @@ IconChanger necessita di privilegi di amministratore per modificare le icone del
 2. Fate clic sul pulsante **Setup** quando richiesto.
 3. Inserite la password di amministratore.
 
-L'app creerà uno script helper in `~/.iconchanger/helper.sh` e configurerà una regola sudoers in modo che possa essere eseguito senza richiedere la password ogni volta.
+L'app installerà uno script helper in `/usr/local/lib/iconchanger/` (di proprietà di `root:wheel`) e configurerà una regola sudoers limitata in modo che possa essere eseguito senza richiedere la password ogni volta.
+
+## Sicurezza
+
+IconChanger utilizza diverse misure di sicurezza per proteggere la pipeline helper:
+
+- **Directory helper di proprietà di root** — I file helper si trovano in `/usr/local/lib/iconchanger/` con proprietà `root:wheel`, impedendo modifiche non privilegiate.
+- **Verifica dell'integrità SHA-256** — Lo script helper viene verificato rispetto a un hash noto prima di ogni esecuzione.
+- **Regola sudoers limitata** — La voce sudoers concede l'accesso senza password solo allo script helper specifico, non a comandi arbitrari.
+- **Registrazione di audit** — Tutte le operazioni sulle icone vengono registrate con timestamp per la tracciabilità.
 
 ## Configurazione manuale
 
@@ -18,16 +27,14 @@ Se la configurazione automatica non riesce, è possibile procedere manualmente:
 2. Eseguite:
 
 ```bash
-sudo visudo
+sudo visudo -f /etc/sudoers.d/iconchanger
 ```
 
-3. Aggiungete la seguente riga alla fine:
+3. Aggiungete la seguente riga:
 
 ```
-ALL ALL=(ALL) NOPASSWD: /Users/<nome-utente>/.iconchanger/helper.sh
+ALL ALL=(ALL) NOPASSWD: /usr/local/lib/iconchanger/helper.sh
 ```
-
-Sostituite `<nome-utente>` con il vostro nome utente macOS effettivo.
 
 ## Verifica della configurazione
 

@@ -26,6 +26,22 @@ Voit silti vaihtaa sovellusten kuvakkeita ilman API-avainta:
 - Käyttämällä paikallisia kuvatiedostoja (napsauta **Choose from the Local** tai vedä ja pudota kuva)
 - Käyttämällä sovelluksen sisällä olevia kuvakkeita (näytetään "Local"-osiossa)
 
+## Edistyneet API-asetukset
+
+Kohdassa **Settings** > **Advanced** > **API Settings** voit hienosäätää API:n toimintaa:
+
+| Asetus | Oletus | Kuvaus |
+|---|---|---|
+| **Retry Count** | 0 (ei uudelleenyritystä) | Kuinka monta kertaa epäonnistunutta pyyntöä yritetään uudelleen (0–3) |
+| **Timeout** | 15 sekuntia | Aikakatkaisu yksittäistä pyyntöä kohden |
+| **Monthly Limit** | 50 | API-kyselyiden enimmäismäärä kuukaudessa |
+
+**Monthly Usage** -laskuri näyttää nykyisen käyttösi. Se nollautuu automaattisesti jokaisen kuukauden 1. päivänä, tai voit nollata sen manuaalisesti.
+
+### Kuvakehaun välimuisti
+
+Ota käyttöön **Cache API Results** tallentaaksesi hakutulokset levylle. Välimuistissa olevat tulokset säilyvät sovelluksen uudelleenkäynnistyksen jälkeen, mikä vähentää API:n käyttöä. Käytä päivityspainiketta kuvakkeita selatessasi saadaksesi tuoreet tulokset.
+
 ## Vianmääritys
 
 Jos API-testi epäonnistuu:
