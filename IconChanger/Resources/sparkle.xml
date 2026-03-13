@@ -8,9 +8,9 @@
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>2026031303</sparkle:version>
                     <sparkle:shortVersionString>1.4.4-3</sparkle:shortVersionString>
-                    <pubDate>Fri, 13 Mar 2026 22:00:00 +0000</pubDate>
+                    <pubDate>Fri, 13 Mar 2026 11:43:38 +0000</pubDate>
                     <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-3/IconChanger.dmg"
-                    sparkle:edSignature="PLACEHOLDER" length="0"
+                    sparkle:edSignature="0G5eiHG87zmWw+sZBzne0QVaPiZmURXKxtFBZNI8erLB14hO5vzMn565KmQ2kiPSdq8wAmIzF4fgbUYwF/RMDw==" length="5334127"
                     type="application/octet-stream"/>
                     <description>
                         <![CDATA[
@@ -23,7 +23,12 @@
                     </ul>
                         ]]>
                     </description>
-                </item>
+                
+                    <sparkle:deltas>
+                <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-3/IconChanger2026031303-2026031301.delta" sparkle:deltaFrom="2026031301" length="265722" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="860544" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="YscQWTHzy6R0Jvhzu2tLtnmtGd9g/N7ZclhOHZtSlXBx3HHjx1ilR/kxbOTone46lvlCWEeCSVupCm7ciI4MBA=="/>
+                <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-3/IconChanger2026031303-2026031200.delta" sparkle:deltaFrom="2026031200" length="404786" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="860544" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="BDDNVAXHnEY9Iqz0btkbs8zed00XiTr/vG8Y60WFK3spJRf9Cn41Jy9bHzNXKzAg/RlmY6rFI+byYtV2uvjWDA=="/>
+                <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-3/IconChanger2026031303-2026031101.delta" sparkle:deltaFrom="2026031101" length="480582" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="860544" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="X3lZwszkIiskovB9ZWtFUb0wAP5pRozId8JIedNEMbzK8Au/X+bp5GUfYF5W4bE2eDbdN2fH92deEnjfQ056BA=="/>
+            </sparkle:deltas></item>
         <item>
                     <title>Version 1.4.4-2</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
