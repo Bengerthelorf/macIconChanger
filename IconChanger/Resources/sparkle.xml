@@ -4,6 +4,24 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.4.4-1</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>2026031301</sparkle:version>
+                    <sparkle:shortVersionString>1.4.4-1</sparkle:shortVersionString>
+                    <pubDate>Thu, 13 Mar 2026 18:00:00 +0000</pubDate>
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-1/IconChanger.dmg"
+                    sparkle:edSignature="PLACEHOLDER" length="0"
+                    type="application/octet-stream"/>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.4.4-1</h2>
+                    <ul>
+                        <li><strong>Fixed:</strong> Improved handling of server-side rate limiting (HTTP 429) in request retry loop</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
                     <title>Version 1.4.4</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>2026031300</sparkle:version>
