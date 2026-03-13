@@ -44,6 +44,7 @@ struct AdvancedSettingsView: View {
     @AppStorage("apiRetryCount") private var apiRetryCount = 0
     @AppStorage("apiTimeoutSeconds") private var apiTimeoutSeconds: Double = 15.0
     @AppStorage("apiMonthlyLimit") private var apiMonthlyLimit = 50
+    @AppStorage("extendedSearch") private var extendedSearch = false
 
     private var aliasCount: Int {
         AliasNames.getAll().count
@@ -145,10 +146,13 @@ struct AdvancedSettingsView: View {
                 } label: {
                     Label(NSLocalizedString("Reset Usage Counter", comment: "API setting"), systemImage: "arrow.counterclockwise")
                 }
+                Toggle(isOn: $extendedSearch) {
+                    Label(NSLocalizedString("Extended Search", comment: "API setting"), systemImage: "text.magnifyingglass")
+                }
             } header: {
                 Label(NSLocalizedString("API Settings", comment: "Settings section"), systemImage: "gearshape")
             } footer: {
-                Text(NSLocalizedString("Retry count controls how many times a failed request is retried. Timeout applies to each individual request attempt.", comment: "API settings description"))
+                Text(NSLocalizedString("Retry count controls how many times a failed request is retried. Timeout applies to each individual request attempt.\n\nExtended Search uses multiple queries per search to find more icons. This uses 2–3× more API calls.", comment: "API settings description"))
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 

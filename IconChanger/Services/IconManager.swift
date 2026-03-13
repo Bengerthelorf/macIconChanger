@@ -611,14 +611,27 @@ class IconManager: ObservableObject {
 
         func appendQuery(_ value: String?) {
             guard let value = value, !value.isEmpty else { return }
-            if seenQueries.insert(value).inserted {
-                orderedQueries.append(value)
+            let lowered = value.lowercased()
+            if seenQueries.insert(lowered).inserted {
+                orderedQueries.append(lowered)
             }
         }
 
-        appendQuery(appName)
-        appendQuery(urlName)
-        appendQuery(bundleName)
+        let isFolder = app.url.pathExtension != "app"
+        let extendedSearch = UserDefaults.standard.bool(forKey: "extendedSearch")
+
+        if isFolder {
+            appendQuery("folder \(appName)")
+            if extendedSearch {
+                appendQuery(appName)
+            }
+        } else {
+            appendQuery(appName)
+            if extendedSearch {
+                appendQuery(urlName)
+                appendQuery(bundleName)
+            }
+        }
         appendQuery(aliasName)
 
         let fetchedIcons: [IconRes] = try await withThrowingTaskGroup(of: [IconRes].self) { group in

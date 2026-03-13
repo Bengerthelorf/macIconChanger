@@ -312,9 +312,10 @@ class MyQueryRequestController {
                 }
             }
 
-            let normalizedQuery = query.lowercased().replace(target: " ", withString: "")
-            let filteredRes = res.filter {
-                $0.appName.lowercased().replace(target: " ", withString: "").contains(normalizedQuery)
+            let queryWords = query.lowercased().split(separator: " ").map(String.init)
+            let filteredRes = res.filter { icon in
+                let name = icon.appName.lowercased()
+                return queryWords.allSatisfy { name.contains($0) }
             }
             logger.debug("Returning \(filteredRes.count) icons after filtering for '\(query, privacy: .public)'")
 
