@@ -337,12 +337,12 @@ class MyQueryRequestController {
         }
     }
     
-    func testAPIConnection() async throws -> (success: Bool, iconCount: Int) {
+    func testAPIConnection(apiKey: String? = nil) async throws -> (success: Bool, iconCount: Int) {
         let testQuery = "test_api_connection"
         logger.debug("Testing API connectivity.")
 
         let session = self.session
-        
+
         let urlString = "\(Self.apiBaseURL)/search"
         guard let URL = URL(string: urlString) else {
             throw NSError(domain: "IconChanger", code: 1001, userInfo: [NSLocalizedDescriptionKey: "Invalid API endpoint URL"])
@@ -351,14 +351,12 @@ class MyQueryRequestController {
         var request = URLRequest(url: URL)
         request.httpMethod = "POST"
 
-        // Get API key from Keychain - this is what we're actually testing
-        let apiKey = KeychainHelper.load(key: "apiKey") ?? ""
-        if apiKey.isEmpty {
+        let resolvedKey = apiKey ?? KeychainHelper.load(key: "apiKey") ?? ""
+        if resolvedKey.isEmpty {
             throw NSError(domain: "IconChanger", code: 1002, userInfo: [NSLocalizedDescriptionKey: "API key not provided"])
         }
-        
-        // Add the API key to the request headers
-        request.addValue(apiKey, forHTTPHeaderField: "x-api-key")
+
+        request.addValue(resolvedKey, forHTTPHeaderField: "x-api-key")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.addValue("application/json", forHTTPHeaderField: "Accept")
         

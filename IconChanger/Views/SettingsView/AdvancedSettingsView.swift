@@ -53,6 +53,9 @@ struct AdvancedSettingsView: View {
     @AppStorage("developerOptionsEnabled") private var developerOptionsEnabled = false
     @State private var extraAPIKeys: [IdentifiableKey] = APIKeyManager.loadExtraKeys().map { IdentifiableKey(value: $0) }
     @State private var newAPIKey: String = ""
+    @State private var extraKeyTestResults: [UUID: (success: Bool, message: String)] = [:]
+    @State private var testingKeyIDs: Set<UUID> = []
+    @State private var showDisableConfirmation = false
 
     private var aliasCount: Int {
         AliasNames.getAll().count
@@ -292,18 +295,37 @@ struct AdvancedSettingsView: View {
             if developerOptionsEnabled {
                 Section {
                     ForEach($extraAPIKeys) { $key in
-                        HStack {
-                            SecureField("API Key", text: $key.value)
-                                .onChange(of: key.value) { _ in
-                                    syncExtraKeys()
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                SecureField("API Key", text: $key.value)
+                                    .onChange(of: key.value) { _ in
+                                        syncExtraKeys()
+                                        extraKeyTestResults.removeValue(forKey: key.id)
+                                    }
+                                Button {
+                                    testExtraKey(key)
+                                } label: {
+                                    if testingKeyIDs.contains(key.id) {
+                                        ProgressView().controlSize(.small)
+                                    } else {
+                                        Image(systemName: "play.circle")
+                                    }
                                 }
-                            Button(role: .destructive) {
-                                extraAPIKeys.removeAll { $0.id == key.id }
-                                syncExtraKeys()
-                            } label: {
-                                Image(systemName: "minus.circle.fill")
+                                .buttonStyle(.borderless)
+                                .disabled(key.value.isEmpty || testingKeyIDs.contains(key.id))
+                                Button(role: .destructive) {
+                                    extraAPIKeys.removeAll { $0.id == key.id }
+                                    syncExtraKeys()
+                                } label: {
+                                    Image(systemName: "minus.circle.fill")
+                                }
+                                .buttonStyle(.borderless)
                             }
-                            .buttonStyle(.borderless)
+                            if let result = extraKeyTestResults[key.id] {
+                                Label(result.message, systemImage: result.success ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                                    .font(.caption)
+                                    .foregroundColor(result.success ? .green : .red)
+                            }
                         }
                     }
 
@@ -321,9 +343,17 @@ struct AdvancedSettingsView: View {
                         .disabled(newAPIKey.isEmpty)
                     }
                     Button(role: .destructive) {
-                        developerOptionsEnabled = false
+                        showDisableConfirmation = true
                     } label: {
                         Label("Disable Developer Options", systemImage: "xmark.circle")
+                    }
+                    .alert("Disable Developer Options?", isPresented: $showDisableConfirmation) {
+                        Button("Cancel", role: .cancel) {}
+                        Button("Disable", role: .destructive) {
+                            developerOptionsEnabled = false
+                        }
+                    } message: {
+                        Text("Extra API keys will stop being used until re-enabled.")
                     }
                 } header: {
                     Label("Developer Options", systemImage: "hammer")
@@ -350,6 +380,25 @@ struct AdvancedSettingsView: View {
 
     private func syncExtraKeys() {
         APIKeyManager.saveExtraKeys(extraAPIKeys.map(\.value))
+    }
+
+    private func testExtraKey(_ key: IdentifiableKey) {
+        testingKeyIDs.insert(key.id)
+        Task {
+            let controller = MyQueryRequestController()
+            do {
+                let result = try await controller.testAPIConnection(apiKey: key.value)
+                await MainActor.run {
+                    testingKeyIDs.remove(key.id)
+                    extraKeyTestResults[key.id] = (true, result.iconCount > 0 ? "Connected" : "Connected (no results)")
+                }
+            } catch {
+                await MainActor.run {
+                    testingKeyIDs.remove(key.id)
+                    extraKeyTestResults[key.id] = (false, extractErrorMessage(from: error))
+                }
+            }
+        }
     }
 
     func testAPI() async {
