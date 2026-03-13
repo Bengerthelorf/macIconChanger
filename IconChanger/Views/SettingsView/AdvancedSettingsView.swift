@@ -353,7 +353,7 @@ struct AdvancedSettingsView: View {
                             developerOptionsEnabled = false
                         }
                     } message: {
-                        Text("Extra API keys will stop being used until re-enabled.")
+                        Text("Are you sure you want to disable Developer Options?")
                     }
                 } header: {
                     Label("Developer Options", systemImage: "hammer")

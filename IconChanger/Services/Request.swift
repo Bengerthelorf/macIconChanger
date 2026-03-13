@@ -121,6 +121,12 @@ class APIUsageTracker {
         lock.unlock()
     }
 
+    func markCurrentKeyExhausted() {
+        lock.lock()
+        UserDefaults.standard.set(monthlyLimit, forKey: countKey)
+        lock.unlock()
+    }
+
     func resetCount() {
         lock.lock()
         UserDefaults.standard.set(0, forKey: countKey)
@@ -218,7 +224,9 @@ class MyQueryRequestController {
                     } catch let error as APIError {
                         if case .httpError(let statusCode, _) = error, statusCode == 429, totalKeys > 1, keysRotated < totalKeys - 1 {
                             keysRotated += 1
+                            APIUsageTracker.shared.markCurrentKeyExhausted()
                             APIKeyManager.rotateToNextKey()
+                            APIUsageTracker.shared.resetCount()
                             currentKey = APIKeyManager.pickKey()
                             self.logger.debug("Rotated to next key (\(keysRotated)/\(totalKeys - 1))")
                             attempt -= 1
@@ -401,7 +409,17 @@ class MyQueryRequestController {
             throw NSError(domain: "IconChanger", code: 1003, userInfo: [NSLocalizedDescriptionKey: "Invalid response type"])
         }
         
-        // Check if the status code indicates success
+        if httpResponse.statusCode == 429 {
+            if resolvedKey == APIKeyManager.pickKey() && APIKeyManager.allKeys.count > 1 {
+                APIUsageTracker.shared.markCurrentKeyExhausted()
+                APIKeyManager.rotateToNextKey()
+                APIUsageTracker.shared.resetCount()
+            }
+            let message = Self.extractAPIMessage(from: data) ?? "HTTP 429"
+            throw NSError(domain: "IconChanger", code: 429,
+                          userInfo: [NSLocalizedDescriptionKey: message])
+        }
+
         if httpResponse.statusCode != 200 {
             let message = Self.extractAPIMessage(from: data) ?? "HTTP \(httpResponse.statusCode)"
             throw NSError(domain: "IconChanger", code: httpResponse.statusCode,

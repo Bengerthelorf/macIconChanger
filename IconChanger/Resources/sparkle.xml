@@ -4,6 +4,25 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.4.4-2</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>2026031302</sparkle:version>
+                    <sparkle:shortVersionString>1.4.4-2</sparkle:shortVersionString>
+                    <pubDate>Thu, 13 Mar 2026 20:00:00 +0000</pubDate>
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-2/IconChanger.dmg"
+                    sparkle:edSignature="PLACEHOLDER" length="0"
+                    type="application/octet-stream"/>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.4.4-2</h2>
+                    <ul>
+                        <li><strong>Improved:</strong> API usage tracker now syncs with server-side rate limit responses</li>
+                        <li><strong>Improved:</strong> Settings confirmation dialogs</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
                     <title>Version 1.4.4-1</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>2026031301</sparkle:version>
