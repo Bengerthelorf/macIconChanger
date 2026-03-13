@@ -117,15 +117,24 @@ jobs:
           mkdir -p build/deltas
           cp build/IconChanger.dmg build/deltas/
 
-          # Download previous release DMGs for delta generation
-          for prev_tag in $(gh release list --limit 5 --json tagName -q '.[].tagName'); do
+          # Download previous release DMGs for delta generation (skip patch variants to avoid duplicate build numbers)
+          DOWNLOADED=0
+          for prev_tag in $(gh release list --limit 10 --json tagName -q '.[].tagName'); do
             if [ "$prev_tag" = "$TAG" ]; then continue; fi
+            PREV_VER=${prev_tag#v}
+            BASE_VER=$(echo "$PREV_VER" | cut -d'-' -f1)
+            if [ -f "/tmp/seen_${BASE_VER}" ]; then
+              echo "Skipping $prev_tag (duplicate base version $BASE_VER)"
+              continue
+            fi
+            touch "/tmp/seen_${BASE_VER}"
             echo "Downloading $prev_tag for delta generation..."
             mkdir -p /tmp/prev_dl
             gh release download "$prev_tag" --pattern "IconChanger.dmg" --dir /tmp/prev_dl --clobber 2>/dev/null || continue
-            PREV_VER=${prev_tag#v}
             mv /tmp/prev_dl/IconChanger.dmg "build/deltas/IconChanger-${PREV_VER}.dmg"
             rm -rf /tmp/prev_dl
+            DOWNLOADED=$((DOWNLOADED + 1))
+            if [ "$DOWNLOADED" -ge 3 ]; then break; fi
           done
 
           echo "$SPARKLE_KEY" > /tmp/sparkle_key
