@@ -13,12 +13,14 @@ enum APIKeyManager {
         KeychainHelper.load(key: "apiKey") ?? ""
     }
 
-    /// Returns all available API keys (primary + extras). Empty keys are excluded.
+    /// Returns all available API keys (primary + extras when developer mode is on). Empty keys are excluded.
     static var allKeys: [String] {
         var keys: [String] = []
         let primary = primaryKey
         if !primary.isEmpty { keys.append(primary) }
-        keys.append(contentsOf: loadExtraKeys().filter { !$0.isEmpty })
+        if UserDefaults.standard.bool(forKey: "developerOptionsEnabled") {
+            keys.append(contentsOf: loadExtraKeys().filter { !$0.isEmpty })
+        }
         return keys
     }
 

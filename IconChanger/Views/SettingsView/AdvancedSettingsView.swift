@@ -5,6 +5,11 @@
 
 import SwiftUI
 
+private struct IdentifiableKey: Identifiable {
+    let id = UUID()
+    var value: String
+}
+
 enum AppAppearance: String, CaseIterable, Identifiable {
     case system = "system"
     case light = "light"
@@ -46,7 +51,7 @@ struct AdvancedSettingsView: View {
     @AppStorage("apiMonthlyLimit") private var apiMonthlyLimit = 50
     @AppStorage("extendedSearch") private var extendedSearch = false
     @AppStorage("developerOptionsEnabled") private var developerOptionsEnabled = false
-    @State private var extraAPIKeys: [String] = APIKeyManager.loadExtraKeys()
+    @State private var extraAPIKeys: [IdentifiableKey] = APIKeyManager.loadExtraKeys().map { IdentifiableKey(value: $0) }
     @State private var newAPIKey: String = ""
 
     private var aliasCount: Int {
@@ -287,20 +292,15 @@ struct AdvancedSettingsView: View {
             // MARK: - Developer Options
             if developerOptionsEnabled {
                 Section {
-                    ForEach(Array(extraAPIKeys.enumerated()), id: \.offset) { index, key in
+                    ForEach($extraAPIKeys) { $key in
                         HStack {
-                            SecureField("API Key \(index + 2)", text: Binding(
-                                get: { extraAPIKeys.indices.contains(index) ? extraAPIKeys[index] : "" },
-                                set: { newValue in
-                                    if extraAPIKeys.indices.contains(index) {
-                                        extraAPIKeys[index] = newValue
-                                        APIKeyManager.saveExtraKeys(extraAPIKeys)
-                                    }
+                            SecureField("API Key", text: $key.value)
+                                .onChange(of: key.value) { _ in
+                                    syncExtraKeys()
                                 }
-                            ))
                             Button(role: .destructive) {
-                                extraAPIKeys.remove(at: index)
-                                APIKeyManager.saveExtraKeys(extraAPIKeys)
+                                extraAPIKeys.removeAll { $0.id == key.id }
+                                syncExtraKeys()
                             } label: {
                                 Image(systemName: "minus.circle.fill")
                             }
@@ -344,9 +344,13 @@ struct AdvancedSettingsView: View {
     private func addExtraKey() {
         let trimmed = newAPIKey.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
-        extraAPIKeys.append(trimmed)
-        APIKeyManager.saveExtraKeys(extraAPIKeys)
+        extraAPIKeys.append(IdentifiableKey(value: trimmed))
+        syncExtraKeys()
         newAPIKey = ""
+    }
+
+    private func syncExtraKeys() {
+        APIKeyManager.saveExtraKeys(extraAPIKeys.map(\.value))
     }
 
     func testAPI() async {

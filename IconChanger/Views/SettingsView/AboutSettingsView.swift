@@ -15,6 +15,8 @@ struct AboutSettingsView: View {
     @State private var versionTapCount = 0
     @State private var showDevUnlocked = false
     @State private var showCopied = false
+    @State private var copiedWorkItem: DispatchWorkItem?
+    @State private var devUnlockedWorkItem: DispatchWorkItem?
 
     init(updater: SPUUpdater) {
         self.updater = updater
@@ -62,10 +64,11 @@ struct AboutSettingsView: View {
                     // Copy version to clipboard
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString("IconChanger \(appVersion) (\(buildNumber))", forType: .string)
+                    copiedWorkItem?.cancel()
                     showCopied = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                        showCopied = false
-                    }
+                    let item = DispatchWorkItem { showCopied = false }
+                    copiedWorkItem = item
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: item)
 
                     if developerOptionsEnabled { return }
                     if NSApp.currentEvent?.modifierFlags.contains(.option) == true {
@@ -109,10 +112,11 @@ struct AboutSettingsView: View {
 
     private func unlockDeveloperOptions() {
         developerOptionsEnabled = true
+        devUnlockedWorkItem?.cancel()
         showDevUnlocked = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            showDevUnlocked = false
-        }
+        let item = DispatchWorkItem { showDevUnlocked = false }
+        devUnlockedWorkItem = item
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: item)
     }
 
     // MARK: - Avatar Caching (memory + disk + bundled asset)
