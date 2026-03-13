@@ -61,7 +61,6 @@ struct AboutSettingsView: View {
                 .animation(.easeInOut, value: showDevUnlocked)
                 .animation(.easeInOut, value: showCopied)
                 .onTapGesture {
-                    // Copy version to clipboard
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString("IconChanger \(appVersion) (\(buildNumber))", forType: .string)
                     copiedWorkItem?.cancel()
@@ -107,8 +106,6 @@ struct AboutSettingsView: View {
             fetchTask = nil
         }
     }
-
-    // MARK: - Developer Options
 
     private func unlockDeveloperOptions() {
         developerOptionsEnabled = true

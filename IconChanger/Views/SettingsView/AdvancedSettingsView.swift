@@ -289,7 +289,6 @@ struct AdvancedSettingsView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            // MARK: - Developer Options
             if developerOptionsEnabled {
                 Section {
                     ForEach($extraAPIKeys) { $key in

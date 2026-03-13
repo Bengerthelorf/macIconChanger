@@ -634,11 +634,12 @@ class IconManager: ObservableObject {
         }
         appendQuery(aliasName)
 
+        let selectedKey = APIKeyManager.pickKey()
         let fetchedIcons: [IconRes] = try await withThrowingTaskGroup(of: [IconRes].self) { group in
             for query in orderedQueries {
                 group.addTask {
                     try Task.checkCancellation()
-                    return try await queryController.sendRequest(query, style: style)
+                    return try await queryController.sendRequest(query, style: style, apiKey: selectedKey)
                 }
             }
 

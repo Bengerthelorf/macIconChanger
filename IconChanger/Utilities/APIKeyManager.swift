@@ -7,13 +7,12 @@ import Foundation
 
 enum APIKeyManager {
     private static let extraKeysKey = "apiExtraKeys"
+    private static let keyIndexKey = "com.iconchanger.currentKeyIndex"
 
-    /// Returns the primary API key from Keychain.
     static var primaryKey: String {
         KeychainHelper.load(key: "apiKey") ?? ""
     }
 
-    /// Returns all available API keys (primary + extras when developer mode is on). Empty keys are excluded.
     static var allKeys: [String] {
         var keys: [String] = []
         let primary = primaryKey
@@ -24,14 +23,20 @@ enum APIKeyManager {
         return keys
     }
 
-    /// Picks a random API key from the pool. Falls back to primary if no extras.
     static func pickKey() -> String {
         let keys = allKeys
         guard !keys.isEmpty else { return "" }
-        return keys.randomElement()!
+        if keys.count == 1 { return keys[0] }
+        let index = UserDefaults.standard.integer(forKey: keyIndexKey) % keys.count
+        return keys[index]
     }
 
-    // MARK: - Extra Keys Storage
+    static func rotateToNextKey() {
+        let keys = allKeys
+        guard keys.count > 1 else { return }
+        let current = UserDefaults.standard.integer(forKey: keyIndexKey)
+        UserDefaults.standard.set((current + 1) % keys.count, forKey: keyIndexKey)
+    }
 
     static func loadExtraKeys() -> [String] {
         guard let json = KeychainHelper.load(key: extraKeysKey),
