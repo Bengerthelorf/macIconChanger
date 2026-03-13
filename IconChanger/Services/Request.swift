@@ -197,19 +197,38 @@ class MyQueryRequestController {
             Task<[IconRes], Error> {
                 let maxAttempts = max(1, self.retryCount + 1)
                 var lastError: Error?
+                var currentKey = resolvedKey
+                var keysRotated = 0
+                let totalKeys = APIKeyManager.allKeys.count
+                var attempt = 0
 
-                for attempt in 1...maxAttempts {
+                while attempt < maxAttempts {
+                    attempt += 1
                     do {
-                        let results = try await self.sendRequestToMeilisearch(query, style: style, apiKey: resolvedKey)
+                        let results = try await self.sendRequestToMeilisearch(query, style: style, apiKey: currentKey)
                         if results.isEmpty {
                             self.logger.debug("Meilisearch returned no results for '\(query, privacy: .public)'. Trying backup API.")
-                            return try await self.sendBackupRequest(query, style: style, apiKey: resolvedKey)
+                            return try await self.sendBackupRequest(query, style: style, apiKey: currentKey)
                         }
                         return results
                     } catch is CancellationError {
                         throw CancellationError()
                     } catch let error as APIError where error.isNonRetryable {
                         throw error
+                    } catch let error as APIError {
+                        if case .httpError(let statusCode, _) = error, statusCode == 429, totalKeys > 1, keysRotated < totalKeys - 1 {
+                            keysRotated += 1
+                            APIKeyManager.rotateToNextKey()
+                            currentKey = APIKeyManager.pickKey()
+                            self.logger.debug("Rotated to next key (\(keysRotated)/\(totalKeys - 1))")
+                            attempt -= 1
+                            continue
+                        }
+                        lastError = error
+                        if attempt < maxAttempts {
+                            self.logger.debug("Attempt \(attempt) failed for '\(query, privacy: .public)': \(error.localizedDescription, privacy: .public). Retrying...")
+                            try await Task.sleep(nanoseconds: UInt64(attempt) * 500_000_000)
+                        }
                     } catch {
                         lastError = error
                         if attempt < maxAttempts {
