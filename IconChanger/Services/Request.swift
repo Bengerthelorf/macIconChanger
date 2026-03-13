@@ -256,7 +256,7 @@ class MyQueryRequestController {
         defer { if isNew { Task { await dedup.remove(key) } } }
 
         let results = try await task.value
-        APIUsageTracker.shared.recordRequest()
+        if isNew { APIUsageTracker.shared.recordRequest() }
         return results
     }
     
