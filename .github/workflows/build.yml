@@ -105,6 +105,48 @@ jobs:
           ED_SIG=$(echo "$SIGNATURE" | grep -o 'sparkle:edSignature="[^"]*"' | sed 's/sparkle:edSignature="//;s/"//')
           echo "ED_SIGNATURE=$ED_SIG" >> $GITHUB_ENV
 
+      - name: Generate delta updates
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          SPARKLE_KEY: ${{ secrets.SPARKLE_EDDSA_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          GENERATE_APPCAST="/tmp/sparkle/bin/generate_appcast"
+
+          mkdir -p build/deltas
+          cp build/IconChanger.dmg build/deltas/
+
+          # Download previous release DMGs for delta generation
+          for prev_tag in $(gh release list --limit 5 --json tagName -q '.[].tagName'); do
+            if [ "$prev_tag" = "$TAG" ]; then continue; fi
+            echo "Downloading $prev_tag for delta generation..."
+            mkdir -p /tmp/prev_dl
+            gh release download "$prev_tag" --pattern "IconChanger.dmg" --dir /tmp/prev_dl --clobber 2>/dev/null || continue
+            PREV_VER=${prev_tag#v}
+            mv /tmp/prev_dl/IconChanger.dmg "build/deltas/IconChanger-${PREV_VER}.dmg"
+            rm -rf /tmp/prev_dl
+          done
+
+          echo "$SPARKLE_KEY" > /tmp/sparkle_key
+
+          "$GENERATE_APPCAST" \
+            --ed-key-file /tmp/sparkle_key \
+            --download-url-prefix "https://github.com/${{ github.repository }}/releases/download/${TAG}/" \
+            -o build/deltas/generated-appcast.xml \
+            build/deltas/ || echo "generate_appcast failed, skipping deltas"
+
+          rm -f /tmp/sparkle_key
+
+          # Move delta files to build root for upload
+          if ls build/deltas/*.delta 1>/dev/null 2>&1; then
+            cp build/deltas/*.delta build/
+            echo "Delta files generated:"
+            ls -lh build/*.delta
+          else
+            echo "No delta files generated"
+          fi
+
       - name: Generate changelog
         if: startsWith(github.ref, 'refs/tags/')
         run: |
@@ -249,6 +291,36 @@ jobs:
               xml = xml[:insert_pos] + item + '\n' + xml[insert_pos:]
               print(f"No existing entry for {version}, generated new item.")
 
+          # Inject delta entries from generated appcast
+          try:
+              generated = open("build/deltas/generated-appcast.xml").read()
+              # Find the deltas block for the current version
+              deltas_match = re.search(
+                  r'<sparkle:shortVersionString>' + re.escape(version) + r'</sparkle:shortVersionString>'
+                  r'.*?(<sparkle:deltas>.*?</sparkle:deltas>)',
+                  generated, flags=re.DOTALL
+              )
+              if deltas_match:
+                  deltas_block = deltas_match.group(1)
+                  # Find the current version's </item> in our xml and insert deltas before it
+                  current_item = re.search(
+                      r'(<item>\s*(?:<title>Version ' + re.escape(version) + r'</title>|'
+                      r'<title>Version ' + re.escape(version) + r'</title>).*?)(</item>)',
+                      xml, flags=re.DOTALL
+                  )
+                  if current_item and '<sparkle:deltas>' not in current_item.group(0):
+                      indent = "\n                    "
+                      xml = (xml[:current_item.end(1)]
+                             + indent + deltas_block
+                             + xml[current_item.end(1):])
+                      print(f"Injected delta entries for {version}")
+                  else:
+                      print(f"Deltas already present or item not found for {version}")
+              else:
+                  print(f"No delta entries found in generated appcast for {version}")
+          except FileNotFoundError:
+              print("No generated appcast found, skipping delta injection")
+
           open("IconChanger/Resources/sparkle.xml", "w").write(xml)
           PYEOF
 
@@ -275,7 +347,9 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
-          files: build/IconChanger.dmg
+          files: |
+            build/IconChanger.dmg
+            build/*.delta
           body_path: CHANGELOG.md
           draft: false
           prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
