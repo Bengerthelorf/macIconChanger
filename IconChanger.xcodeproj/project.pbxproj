@@ -57,6 +57,7 @@
 		C66396BF2F0EAD0C006729FC /* AppItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C66396BE2F0EAD0C006729FC /* AppItem.swift */; };
 		C6E571DA2EA2319C00EC9E5E /* IconImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6E571D92EA2319C00EC9E5E /* IconImageLoader.swift */; };
 		9E409D184D0BFA7ACC289C3A /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 322513C7E4692CC3A6193007 /* KeychainHelper.swift */; };
+		A20000APIKEY0002 /* APIKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000APIKEY0001 /* APIKeyManager.swift */; };
 		A20000010311000100000001 /* IconHistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010311000200000001 /* IconHistoryManager.swift */; };
 		A20000010311000100000002 /* IconFavoriteManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010311000200000002 /* IconFavoriteManager.swift */; };
 		A20000010311000100000003 /* FavoriteImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010311000200000003 /* FavoriteImageView.swift */; };
@@ -138,6 +139,7 @@
 		C66396BE2F0EAD0C006729FC /* AppItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppItem.swift; sourceTree = "<group>"; };
 		C6E571D92EA2319C00EC9E5E /* IconImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconImageLoader.swift; sourceTree = "<group>"; };
 		322513C7E4692CC3A6193007 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
+		A20000APIKEY0001 /* APIKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIKeyManager.swift; sourceTree = "<group>"; };
 		A20000010311000200000001 /* IconHistoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconHistoryManager.swift; sourceTree = "<group>"; };
 		A20000010311000200000002 /* IconFavoriteManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconFavoriteManager.swift; sourceTree = "<group>"; };
 		A20000010311000200000003 /* FavoriteImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteImageView.swift; sourceTree = "<group>"; };
@@ -318,6 +320,7 @@
 				6843168B503282547D31EC35 /* PermissionRequest.swift */,
 				9053434E286B2A6800237F98 /* AutoUpdater.swift */,
 				322513C7E4692CC3A6193007 /* KeychainHelper.swift */,
+				A20000APIKEY0001 /* APIKeyManager.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -525,6 +528,7 @@
 				68431D85DB8E44D55E7421B7 /* ApplicationAliasSettingsView.swift in Sources */,
 				684319BAF8AE3F8E503A8FCD /* ApplicationSettingsView.swift in Sources */,
 				9E409D184D0BFA7ACC289C3A /* KeychainHelper.swift in Sources */,
+				A20000APIKEY0002 /* APIKeyManager.swift in Sources */,
 				68431A9559BEE5B0B6042265 /* ApplicationFolderSettingsView.swift in Sources */,
 				A20000010311000100000001 /* IconHistoryManager.swift in Sources */,
 				A20000010311000100000002 /* IconFavoriteManager.swift in Sources */,

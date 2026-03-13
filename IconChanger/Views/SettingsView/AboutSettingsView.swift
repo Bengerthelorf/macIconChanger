@@ -11,6 +11,10 @@ struct AboutSettingsView: View {
     @State private var avatarImage: NSImage?
     @State private var fetchTask: Task<Void, Never>?
     private static var memoryCache: NSImage?
+    @AppStorage("developerOptionsEnabled") private var developerOptionsEnabled = false
+    @State private var versionTapCount = 0
+    @State private var showDevUnlocked = false
+    @State private var showCopied = false
 
     init(updater: SPUUpdater) {
         self.updater = updater
@@ -50,8 +54,30 @@ struct AboutSettingsView: View {
             Text("IconChanger")
                 .font(.title.bold())
 
-            Text("Version \(appVersion) (\(buildNumber))")
-                .foregroundColor(.secondary)
+            Text(showDevUnlocked ? "Developer Options Enabled" : showCopied ? "Copied!" : "Version \(appVersion) (\(buildNumber))")
+                .foregroundColor(showDevUnlocked ? .accentColor : showCopied ? .green : .secondary)
+                .animation(.easeInOut, value: showDevUnlocked)
+                .animation(.easeInOut, value: showCopied)
+                .onTapGesture {
+                    // Copy version to clipboard
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString("IconChanger \(appVersion) (\(buildNumber))", forType: .string)
+                    showCopied = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        showCopied = false
+                    }
+
+                    if developerOptionsEnabled { return }
+                    if NSApp.currentEvent?.modifierFlags.contains(.option) == true {
+                        unlockDeveloperOptions()
+                    } else {
+                        versionTapCount += 1
+                        if versionTapCount >= 7 {
+                            unlockDeveloperOptions()
+                        }
+                    }
+                }
+                .help("Click to copy version")
 
             VStack(spacing: 6) {
                 Link("GitHub Repository", destination: URL(string: "https://github.com/Bengerthelorf/macIconChanger")!)
@@ -76,6 +102,16 @@ struct AboutSettingsView: View {
         .onDisappear {
             fetchTask?.cancel()
             fetchTask = nil
+        }
+    }
+
+    // MARK: - Developer Options
+
+    private func unlockDeveloperOptions() {
+        developerOptionsEnabled = true
+        showDevUnlocked = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            showDevUnlocked = false
         }
     }
 

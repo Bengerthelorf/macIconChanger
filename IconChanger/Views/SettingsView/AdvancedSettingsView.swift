@@ -45,6 +45,9 @@ struct AdvancedSettingsView: View {
     @AppStorage("apiTimeoutSeconds") private var apiTimeoutSeconds: Double = 15.0
     @AppStorage("apiMonthlyLimit") private var apiMonthlyLimit = 50
     @AppStorage("extendedSearch") private var extendedSearch = false
+    @AppStorage("developerOptionsEnabled") private var developerOptionsEnabled = false
+    @State private var extraAPIKeys: [String] = APIKeyManager.loadExtraKeys()
+    @State private var newAPIKey: String = ""
 
     private var aliasCount: Int {
         AliasNames.getAll().count
@@ -280,12 +283,70 @@ struct AdvancedSettingsView: View {
                 Text("Install path: \(cliManager.installLocation)")
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
+
+            // MARK: - Developer Options
+            if developerOptionsEnabled {
+                Section {
+                    ForEach(Array(extraAPIKeys.enumerated()), id: \.offset) { index, key in
+                        HStack {
+                            SecureField("API Key \(index + 2)", text: Binding(
+                                get: { extraAPIKeys.indices.contains(index) ? extraAPIKeys[index] : "" },
+                                set: { newValue in
+                                    if extraAPIKeys.indices.contains(index) {
+                                        extraAPIKeys[index] = newValue
+                                        APIKeyManager.saveExtraKeys(extraAPIKeys)
+                                    }
+                                }
+                            ))
+                            Button(role: .destructive) {
+                                extraAPIKeys.remove(at: index)
+                                APIKeyManager.saveExtraKeys(extraAPIKeys)
+                            } label: {
+                                Image(systemName: "minus.circle.fill")
+                            }
+                            .buttonStyle(.borderless)
+                        }
+                    }
+
+                    HStack {
+                        SecureField("Add API Key...", text: $newAPIKey)
+                            .onSubmit {
+                                addExtraKey()
+                            }
+                        Button {
+                            addExtraKey()
+                        } label: {
+                            Image(systemName: "plus.circle.fill")
+                        }
+                        .buttonStyle(.borderless)
+                        .disabled(newAPIKey.isEmpty)
+                    }
+                    Button(role: .destructive) {
+                        developerOptionsEnabled = false
+                    } label: {
+                        Label("Disable Developer Options", systemImage: "xmark.circle")
+                    }
+                } header: {
+                    Label("Developer Options", systemImage: "hammer")
+                } footer: {
+                    Text("Additional API keys are rotated automatically to distribute usage across keys.")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
         }
         .formStyle(.grouped)
         .onAppear {
             ConfigManager.shared.checkForCLIImports()
             fetchCacheCount = IconFetchCacheManager.shared.getCacheCount()
         }
+    }
+
+    private func addExtraKey() {
+        let trimmed = newAPIKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        extraAPIKeys.append(trimmed)
+        APIKeyManager.saveExtraKeys(extraAPIKeys)
+        newAPIKey = ""
     }
 
     func testAPI() async {

@@ -239,8 +239,8 @@ class MyQueryRequestController {
         var request = URLRequest(url: URL)
         request.httpMethod = "POST"
 
-        // Get API key from Keychain
-        let apiKey = KeychainHelper.load(key: "apiKey") ?? ""
+        // Get API key (rotates across all configured keys)
+        let apiKey = APIKeyManager.pickKey()
         if apiKey.isEmpty {
             logger.warning("API key not configured; search request may be rejected.")
         }
