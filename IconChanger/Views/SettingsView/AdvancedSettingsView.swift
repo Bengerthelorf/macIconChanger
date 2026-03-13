@@ -10,6 +10,41 @@ private struct IdentifiableKey: Identifiable {
     var value: String
 }
 
+private struct MaskedKeyField: View {
+    @Binding var text: String
+    @State private var isEditing = false
+    @FocusState private var isFocused: Bool
+
+    var body: some View {
+        Group {
+            if isEditing {
+                TextField("API Key", text: $text)
+                    .focused($isFocused)
+                    .onChange(of: isFocused) { focused in
+                        if !focused { isEditing = false }
+                    }
+            } else {
+                Text(maskedText)
+                    .foregroundColor(text.isEmpty ? .secondary : .primary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        isEditing = true
+                        DispatchQueue.main.async { isFocused = true }
+                    }
+            }
+        }
+        .textFieldStyle(.roundedBorder)
+    }
+
+    private var maskedText: String {
+        guard text.count > 10 else { return text.isEmpty ? "API Key" : text }
+        let prefix = String(text.prefix(6))
+        let suffix = String(text.suffix(5))
+        return "\(prefix)...\(suffix)"
+    }
+}
+
 enum AppAppearance: String, CaseIterable, Identifiable {
     case system = "system"
     case light = "light"
@@ -56,6 +91,7 @@ struct AdvancedSettingsView: View {
     @State private var extraKeyTestResults: [UUID: (success: Bool, message: String)] = [:]
     @State private var testingKeyIDs: Set<UUID> = []
     @State private var showDisableConfirmation = false
+    @State private var usageCount: Int = APIUsageTracker.shared.currentCount
 
     private var aliasCount: Int {
         AliasNames.getAll().count
@@ -142,11 +178,12 @@ struct AdvancedSettingsView: View {
                 }
 
                 LabeledContent {
+                    let remaining = max(0, apiMonthlyLimit - usageCount)
                     HStack(spacing: 4) {
-                        Text("\(APIUsageTracker.shared.currentCount)/\(APIUsageTracker.shared.monthlyLimit)")
+                        Text("\(usageCount)/\(apiMonthlyLimit)")
                             .monospacedDigit()
-                        Text("(\(APIUsageTracker.shared.remaining) " + NSLocalizedString("remaining", comment: "API usage") + ")")
-                            .foregroundColor(APIUsageTracker.shared.remaining > 10 ? .secondary : .orange)
+                        Text("(\(remaining) " + NSLocalizedString("remaining", comment: "API usage") + ")")
+                            .foregroundColor(remaining > 10 ? .secondary : .orange)
                     }
                 } label: {
                     Label(NSLocalizedString("Monthly Usage", comment: "API setting"), systemImage: "chart.bar")
@@ -154,6 +191,7 @@ struct AdvancedSettingsView: View {
 
                 Button(role: .destructive) {
                     APIUsageTracker.shared.resetCount()
+                    usageCount = 0
                 } label: {
                     Label(NSLocalizedString("Reset Usage Counter", comment: "API setting"), systemImage: "arrow.counterclockwise")
                 }
@@ -297,7 +335,7 @@ struct AdvancedSettingsView: View {
                     ForEach($extraAPIKeys) { $key in
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
-                                SecureField("API Key", text: $key.value)
+                                MaskedKeyField(text: $key.value)
                                     .onChange(of: key.value) { _ in
                                         syncExtraKeys()
                                         extraKeyTestResults.removeValue(forKey: key.id)
@@ -415,6 +453,7 @@ struct AdvancedSettingsView: View {
                 }
                 testSuccess = true
                 isTestingAPI = false
+                usageCount = APIUsageTracker.shared.currentCount
             }
         } catch {
             await MainActor.run {
@@ -422,6 +461,7 @@ struct AdvancedSettingsView: View {
                 testResult = String(format: NSLocalizedString("API test failed: %@", comment: "API testing error"), errorMessage)
                 testSuccess = false
                 isTestingAPI = false
+                usageCount = APIUsageTracker.shared.currentCount
             }
         }
     }

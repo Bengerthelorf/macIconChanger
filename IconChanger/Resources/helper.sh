@@ -14,18 +14,20 @@ case "$FILEICON_PATH" in
         ;;
 esac
 
-case "$APP_PATH" in
-    *.app|*.app/*) ;;
-    *)
-        echo "ERROR: APP_PATH does not appear to be a .app bundle: $APP_PATH" >&2
-        exit 1
-        ;;
-esac
-
 if [ ! -e "$APP_PATH" ]; then
     echo "ERROR: APP_PATH does not exist: $APP_PATH" >&2
     exit 1
 fi
+
+case "$APP_PATH" in
+    *.app|*.app/*) ;;
+    *)
+        if [ ! -d "$APP_PATH" ]; then
+            echo "ERROR: APP_PATH is not a .app bundle or directory: $APP_PATH" >&2
+            exit 1
+        fi
+        ;;
+esac
 
 if [ ! -f "$IMAGE_PATH" ]; then
     echo "ERROR: IMAGE_PATH does not exist or is not a file: $IMAGE_PATH" >&2
