@@ -1,5 +1,23 @@
+/* Purple brand colors */
 :root {
-  --vp-home-hero-image-filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.15));
+  --vp-c-brand-1: #8B5CF6;
+  --vp-c-brand-2: #7C3AED;
+  --vp-c-brand-3: #6D28D9;
+  --vp-c-brand-soft: rgba(139, 92, 246, 0.14);
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(135deg, #A78BFA, #7C3AED, #6D28D9);
+  --vp-home-hero-image-background-image: radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, transparent 70%);
+  --vp-home-hero-image-filter: drop-shadow(0 0 40px rgba(139, 92, 246, 0.4)) drop-shadow(0 8px 24px rgba(109, 40, 217, 0.25));
+}
+
+.dark {
+  --vp-c-brand-1: #A78BFA;
+  --vp-c-brand-2: #8B5CF6;
+  --vp-c-brand-3: #7C3AED;
+  --vp-c-brand-soft: rgba(167, 139, 250, 0.16);
+  --vp-home-hero-name-background: linear-gradient(135deg, #C4B5FD, #A78BFA, #8B5CF6);
+  --vp-home-hero-image-background-image: radial-gradient(circle, rgba(139, 92, 246, 0.35) 0%, transparent 70%);
+  --vp-home-hero-image-filter: drop-shadow(0 0 50px rgba(139, 92, 246, 0.5)) drop-shadow(0 8px 24px rgba(109, 40, 217, 0.35));
 }
 
 .VPHero .VPImage {
