@@ -86,6 +86,7 @@ struct AdvancedSettingsView: View {
     @AppStorage("apiMonthlyLimit") private var apiMonthlyLimit = 50
     @AppStorage("extendedSearch") private var extendedSearch = false
     @AppStorage("developerOptionsEnabled") private var developerOptionsEnabled = false
+    @AppStorage("enablePreRelease") private var enablePreRelease = false
     @State private var extraAPIKeys: [IdentifiableKey] = APIKeyManager.loadExtraKeys().map { IdentifiableKey(value: $0) }
     @State private var newAPIKey: String = ""
     @State private var extraKeyTestResults: [UUID: (success: Bool, message: String)] = [:]
@@ -327,6 +328,15 @@ struct AdvancedSettingsView: View {
                 Label("Command Line Tool", systemImage: "terminal")
             } footer: {
                 Text("Install path: \(cliManager.installLocation)")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            Section {
+                Toggle("Enable Pre-Release Updates", isOn: $enablePreRelease)
+            } header: {
+                Label("Updates", systemImage: "arrow.triangle.2.circlepath")
+            } footer: {
+                Text("Receive beta versions before they are officially released.")
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
