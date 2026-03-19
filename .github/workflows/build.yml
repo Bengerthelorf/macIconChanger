@@ -276,28 +276,57 @@ jobs:
           )
           if existing:
               updated_item = existing.group(0)
-              updated_item = re.sub(
-                  r'sparkle:edSignature="[^"]*"',
-                  f'sparkle:edSignature="{ed_sig}"',
-                  updated_item
+
+              enclosure_tag = (
+                  f'\n                    <pubDate>{pubdate}</pubDate>'
+                  f'\n                    <enclosure url="{download_url}"'
+                  f'\n                    sparkle:edSignature="{ed_sig}" length="{dmg_size}"'
+                  f'\n                    type="application/octet-stream"/>'
               )
-              updated_item = re.sub(
-                  r'length="[^"]*"',
-                  f'length="{dmg_size}"',
-                  updated_item
-              )
-              updated_item = re.sub(
-                  r'<sparkle:version>[^<]*</sparkle:version>',
-                  f'<sparkle:version>{build}</sparkle:version>',
-                  updated_item
-              )
-              updated_item = re.sub(
-                  r'<pubDate>[^<]*</pubDate>',
-                  f'<pubDate>{pubdate}</pubDate>',
-                  updated_item
-              )
+
+              if 'enclosure' in updated_item:
+                  # Update existing enclosure fields
+                  updated_item = re.sub(
+                      r'sparkle:edSignature="[^"]*"',
+                      f'sparkle:edSignature="{ed_sig}"',
+                      updated_item
+                  )
+                  updated_item = re.sub(
+                      r'length="[^"]*"',
+                      f'length="{dmg_size}"',
+                      updated_item
+                  )
+                  updated_item = re.sub(
+                      r'<sparkle:version>[^<]*</sparkle:version>',
+                      f'<sparkle:version>{build}</sparkle:version>',
+                      updated_item
+                  )
+                  updated_item = re.sub(
+                      r'<pubDate>[^<]*</pubDate>',
+                      f'<pubDate>{pubdate}</pubDate>',
+                      updated_item
+                  )
+              else:
+                  # Insert enclosure before </description> closing or before </item>
+                  if '</description>' in updated_item:
+                      updated_item = updated_item.replace(
+                          '</description>\n                </item>',
+                          '</description>' + enclosure_tag + '\n                </item>'
+                      )
+                  else:
+                      updated_item = updated_item.replace(
+                          '</item>',
+                          enclosure_tag + '\n                </item>'
+                      )
+                  # Also update build number
+                  updated_item = re.sub(
+                      r'<sparkle:version>[^<]*</sparkle:version>',
+                      f'<sparkle:version>{build}</sparkle:version>',
+                      updated_item
+                  )
+
               xml = xml[:existing.start()] + updated_item + xml[existing.end():]
-              print(f"Found existing entry for {version}, updated enclosure only.")
+              print(f"Found existing entry for {version}, updated enclosure.")
           else:
               marker = '<title>IconChanger</title>'
               idx = xml.find(marker)
