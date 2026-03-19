@@ -4,6 +4,25 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.4.4-pre-3</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>2026032001</sparkle:version>
+                    <sparkle:shortVersionString>1.4.4-pre-3</sparkle:shortVersionString>
+                    <pubDate>Thu, 19 Mar 2026 23:32:11 +0000</pubDate>
+                    <sparkle:channel>beta</sparkle:channel>
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-pre-3/IconChanger.dmg"
+                    sparkle:edSignature="bWBN3AV0XbXLfvFNDS4rCla2GgXdqxg5FgnzVEah652DYuz6cqHL/F+prV8lxtfvLIE0lKoJtwrABDm0S+DFBw==" length="5345290"
+                    type="application/octet-stream"/>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.4.4-pre-3</h2>
+                    <ul>
+                        <li><strong>Fixed:</strong> CI inserts enclosure when missing from manual sparkle entries</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
                     <title>Version 1.4.4-pre-2</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>2026032000</sparkle:version>
