@@ -4,6 +4,21 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.4.4-pre-2</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>2026032000</sparkle:version>
+                    <sparkle:shortVersionString>1.4.4-pre-2</sparkle:shortVersionString>
+                    <sparkle:channel>beta</sparkle:channel>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.4.4-pre-2</h2>
+                    <ul>
+                        <li><strong>Improved:</strong> App Management permission detection using TCC framework</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
                     <title>Version 1.4.4-5</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>2026031900</sparkle:version>

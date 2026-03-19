@@ -144,12 +144,23 @@ struct ContentView: View {
                          .padding(.horizontal)
 
                      Button {
+                         iconManager.requestAppManagementPermission { granted in
+                             if granted {
+                                 checkFullSetup()
+                             }
+                         }
+                     } label: {
+                         Label("Request Permission", systemImage: "lock.open.fill")
+                     }
+                     .controlSize(.large)
+                     .padding(.top, 5)
+
+                     Button {
                          NSWorkspace.shared.openLocationService(for: .appManagement)
                      } label: {
                          Label("Open System Settings", systemImage: "gear")
                      }
                      .controlSize(.large)
-                     .padding(.top, 5)
 
                      Button {
                          checkFullSetup()
@@ -221,11 +232,11 @@ struct ContentView: View {
 
         switch detailedStatus {
         case .completed:
-            if !iconManager.checkAppManagementPermission() {
-                logger.error("App Management permission not granted")
-                setupState = .needsAppManagement
-            } else {
+            switch iconManager.appManagementStatus() {
+            case .authorized, .unknown:
                 setupState = .completed
+            case .denied, .notDetermined:
+                setupState = .needsAppManagement
             }
         case .helperFilesMissing(let missingFiles):
             logger.error("Helper files missing")
