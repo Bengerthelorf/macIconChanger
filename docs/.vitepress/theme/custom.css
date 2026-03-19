@@ -1,25 +1,72 @@
-/* Purple brand colors */
+/* Purple brand colors — desaturated, frosted tone */
 :root {
-  --vp-c-brand-1: #8B5CF6;
-  --vp-c-brand-2: #7C3AED;
-  --vp-c-brand-3: #6D28D9;
-  --vp-c-brand-soft: rgba(139, 92, 246, 0.14);
+  --vp-c-brand-1: #7E6BBE;
+  --vp-c-brand-2: #6E5BAE;
+  --vp-c-brand-3: #5E4B9E;
+  --vp-c-brand-soft: rgba(126, 107, 190, 0.12);
   --vp-home-hero-name-color: transparent;
-  --vp-home-hero-name-background: linear-gradient(135deg, #A78BFA, #7C3AED, #6D28D9);
-  --vp-home-hero-image-background-image: radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, transparent 70%);
-  --vp-home-hero-image-filter: drop-shadow(0 0 40px rgba(139, 92, 246, 0.4)) drop-shadow(0 8px 24px rgba(109, 40, 217, 0.25));
+  --vp-home-hero-name-background: linear-gradient(135deg, #B0A0D8, #7E6BBE, #5E4B9E);
+  --vp-home-hero-image-background-image: none;
+  --vp-home-hero-image-filter: none;
 }
 
 .dark {
-  --vp-c-brand-1: #A78BFA;
-  --vp-c-brand-2: #8B5CF6;
-  --vp-c-brand-3: #7C3AED;
-  --vp-c-brand-soft: rgba(167, 139, 250, 0.16);
-  --vp-home-hero-name-background: linear-gradient(135deg, #C4B5FD, #A78BFA, #8B5CF6);
-  --vp-home-hero-image-background-image: radial-gradient(circle, rgba(139, 92, 246, 0.35) 0%, transparent 70%);
-  --vp-home-hero-image-filter: drop-shadow(0 0 50px rgba(139, 92, 246, 0.5)) drop-shadow(0 8px 24px rgba(109, 40, 217, 0.35));
+  --vp-c-brand-1: #B0A0D8;
+  --vp-c-brand-2: #9688C4;
+  --vp-c-brand-3: #7E6BBE;
+  --vp-c-brand-soft: rgba(176, 160, 216, 0.14);
+  --vp-home-hero-name-background: linear-gradient(135deg, #D0C4EC, #B0A0D8, #9688C4);
+  --vp-home-hero-image-background-image: none;
+  --vp-home-hero-image-filter: none;
 }
 
+/* Frosted purple glow on hero image */
+.VPHero .image-container img {
+  filter: drop-shadow(0 0 32px rgba(100, 80, 160, 0.5))
+          drop-shadow(0 0 64px rgba(90, 70, 150, 0.3))
+          drop-shadow(0 0 110px rgba(80, 60, 140, 0.18)) !important;
+}
+
+.dark .VPHero .image-container img {
+  filter: drop-shadow(0 0 32px rgba(176, 160, 216, 0.35))
+          drop-shadow(0 0 64px rgba(150, 136, 196, 0.2))
+          drop-shadow(0 0 100px rgba(126, 107, 190, 0.1)) !important;
+}
+
+/* Feature cards — frosted glass */
+.VPFeature {
+  background: rgba(126, 107, 190, 0.04) !important;
+  border: 1px solid rgba(126, 107, 190, 0.1) !important;
+  backdrop-filter: blur(8px);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.VPFeature:hover {
+  border-color: rgba(126, 107, 190, 0.25) !important;
+  box-shadow: 0 0 20px rgba(126, 107, 190, 0.08);
+}
+
+.dark .VPFeature {
+  background: rgba(176, 160, 216, 0.05) !important;
+  border: 1px solid rgba(176, 160, 216, 0.08) !important;
+}
+
+.dark .VPFeature:hover {
+  border-color: rgba(176, 160, 216, 0.2) !important;
+  box-shadow: 0 0 24px rgba(176, 160, 216, 0.06);
+}
+
+/* Nav bar subtle glass tint */
+.VPNav .VPNavBar {
+  backdrop-filter: blur(12px) saturate(1.2);
+}
+
+/* Sidebar active item purple accent */
+.VPSidebar .is-active .link {
+  color: var(--vp-c-brand-1) !important;
+}
+
+/* Hero image sizing */
 .VPHero .VPImage {
   max-width: min(520px, 100%) !important;
   max-height: 520px !important;
@@ -30,6 +77,7 @@
   text-wrap: balance;
 }
 
+/* RTL support */
 html[dir='rtl'] .VPHero .name,
 html[dir='rtl'] .VPHero .text,
 html[dir='rtl'] .VPHero .tagline {
