@@ -4,6 +4,24 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.4.4-6</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>2026032002</sparkle:version>
+                    <sparkle:shortVersionString>1.4.4-6</sparkle:shortVersionString>
+                    <pubDate>Thu, 19 Mar 2026 23:58:36 +0000</pubDate>
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-6/IconChanger.dmg"
+                    sparkle:edSignature="lawpqX/8va0fIcWL1WdWknskiGA+5YavAeYQjobh+oyw55sYRtQ1vid2eqKhi+5CBmPUXEnI2Eov5IIynz0ZCw==" length="5337218"
+                    type="application/octet-stream"/>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.4.4-6</h2>
+                    <ul>
+                        <li><strong>Fixed:</strong> CI appcast handling, pipe deadlock, and main thread blocking</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
                     <title>Version 1.4.4-pre-3</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>2026032001</sparkle:version>
