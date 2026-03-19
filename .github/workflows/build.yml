@@ -180,6 +180,10 @@ jobs:
           PUBDATE=$(date -u "+%a, %d %b %Y %H:%M:%S +0000")
           DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/IconChanger.dmg"
 
+          # Detect pre-release from tag name
+          IS_PRERELEASE="false"
+          case "$TAG" in *pre*|*alpha*|*beta*|*rc*) IS_PRERELEASE="true" ;; esac
+
           export SPARKLE_VERSION="$VERSION"
           export SPARKLE_BUILD="$BUILD_NUMBER"
           export SPARKLE_PUBDATE="$PUBDATE"
@@ -187,6 +191,7 @@ jobs:
           export SPARKLE_ED_SIG="$ED_SIGNATURE"
           export SPARKLE_DMG_SIZE="$DMG_SIZE"
           export SPARKLE_REPO="${{ github.repository }}"
+          export SPARKLE_IS_PRERELEASE="$IS_PRERELEASE"
 
           python3 << 'PYEOF'
           import sys, re, os
@@ -198,6 +203,7 @@ jobs:
           ed_sig = os.environ["SPARKLE_ED_SIG"]
           dmg_size = os.environ["SPARKLE_DMG_SIZE"]
           repo = os.environ["SPARKLE_REPO"]
+          is_prerelease = os.environ.get("SPARKLE_IS_PRERELEASE", "false") == "true"
 
           # Read CHANGELOG.md and convert to HTML for Sparkle description
           changelog_html = ""
@@ -243,13 +249,17 @@ jobs:
                   "                    </description>"
               )
 
+          channel_tag = ""
+          if is_prerelease:
+              channel_tag = "\n                    <sparkle:channel>beta</sparkle:channel>"
+
           item = (
               "        <item>\n"
               "                    <title>Version " + version + "</title>\n"
               "                    <link>https://github.com/" + repo + "</link>\n"
               "                    <sparkle:version>" + build + "</sparkle:version>\n"
               "                    <sparkle:shortVersionString>" + version + "</sparkle:shortVersionString>\n"
-              "                    <pubDate>" + pubdate + "</pubDate>\n"
+              "                    <pubDate>" + pubdate + "</pubDate>" + channel_tag + "\n"
               "                    <enclosure url=\"" + download_url + "\"\n"
               "                    sparkle:edSignature=\"" + ed_sig + "\" length=\"" + dmg_size + "\"\n"
               "                    type=\"application/octet-stream\"/>" + desc_block + "\n"
@@ -358,12 +368,12 @@ jobs:
             build/*.delta
           body_path: CHANGELOG.md
           draft: false
-          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+          prerelease: ${{ contains(github.ref, 'pre') || contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update Homebrew Cask
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') && !contains(github.ref, 'pre') && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc')
         env:
           TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
         run: |

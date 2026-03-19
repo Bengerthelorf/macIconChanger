@@ -9,6 +9,7 @@ import Sparkle
 @main
 struct IconChangerApp: App {
     @StateObject var folderPermission = FolderPermission.shared
+    private let updaterDelegate = UpdaterDelegate()
     private let updaterController: SPUStandardUpdaterController
 
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
@@ -24,7 +25,7 @@ struct IconChangerApp: App {
             }
         }
 
-        updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
+        updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: updaterDelegate, userDriverDelegate: nil)
         migrateAPIKeyToKeychain()
         setupDefaultAliasNames()
     }
