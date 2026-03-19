@@ -4,6 +4,27 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.4.4-pre-1</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>2026031900</sparkle:version>
+                    <sparkle:shortVersionString>1.4.4-pre-1</sparkle:shortVersionString>
+                    <pubDate>Thu, 19 Mar 2026 20:00:50 +0000</pubDate>
+                    <sparkle:channel>beta</sparkle:channel>
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-pre-1/IconChanger.dmg"
+                    sparkle:edSignature="VRZOZLvL0oUzQ6O8sfSJpVQq2MnzpsROhmHq6A3R9zOIzRryfejGGkbafVmVg5UZbcqsFPUPaJp1+uswW2/qDg==" length="5342630"
+                    type="application/octet-stream"/>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.4.4-pre-1</h2>
+                    <ul>
+                        <li>ci: force checkout main when pushing appcast from non-main branches</li>
+                        <li><strong>New:</strong> Sparkle pre-release channel with opt-in toggle</li>
+                        <li><strong>New:</strong> add App Management (TCC) permission check to setup flow</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
                     <title>Version 1.4.4-5</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>2026031900</sparkle:version>
@@ -16,14 +37,7 @@
                     </ul>
                         ]]>
                     </description>
-                
-                    <sparkle:deltas>
-                <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-5/IconChanger2026031900-2026031304.delta" sparkle:deltaFrom="2026031304" length="129046" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="860544" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="mldRM4qGZTVIqdocAs/eLkCGVtojwyicPD6+jrCzymBDwOujhfCdw0XW1ffuEZlIws8IcKVRNH3Ib9ETjTFmDA=="/>
-                <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-5/IconChanger2026031900-2026031303.delta" sparkle:deltaFrom="2026031303" length="129086" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="860544" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="6Xk8QLYLHEOtlDOJLWwP6MpIgTKpNZEIehbPLQGjh7YlXDFOZqZUkGG/Za19L/pJm6ubNd5P4y1X/KYpWegyBA=="/>
-                <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-5/IconChanger2026031900-2026031301.delta" sparkle:deltaFrom="2026031301" length="263882" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="860544" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="bdF9votK2yFzQgbyaKwMGZudL9PMqA8e0soLR5uAwypQNaHwH8iDNogmZ2mJHzw7uM2xIlKa7JjQ41+kHkzkAg=="/>
-                <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-5/IconChanger2026031900-2026031300.delta" sparkle:deltaFrom="2026031300" length="306926" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="860544" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="T6nFO4tfIqkQKxIzWEufLEdUl/WiRhatkVDwks6fli6Wk5WrCjCoIPyzCCItntIZXvKJRHeLostvFOMgsVnSBg=="/>
-                <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-5/IconChanger2026031900-2026031200.delta" sparkle:deltaFrom="2026031200" length="407702" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="860544" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="Cn//fl+EaDMri/XeFek//Tg8HWegQLhG0Vq0j+0dqve5NkzTqyZ6orpTsOTmsTxHlEmygdokqzJbt8+1OjZsAA=="/>
-            </sparkle:deltas></item>
+                </item>
         <item>
                     <title>Version 1.4.4-4</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
