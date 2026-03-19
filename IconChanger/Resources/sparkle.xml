@@ -4,22 +4,16 @@
     <channel>
         <title>IconChanger</title>
         <item>
-                    <title>Version 1.4.4-pre-1</title>
+                    <title>Version 1.4.4-pre-2</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
-                    <sparkle:version>2026031900</sparkle:version>
-                    <sparkle:shortVersionString>1.4.4-pre-1</sparkle:shortVersionString>
-                    <pubDate>Thu, 19 Mar 2026 20:00:50 +0000</pubDate>
+                    <sparkle:version>2026032000</sparkle:version>
+                    <sparkle:shortVersionString>1.4.4-pre-2</sparkle:shortVersionString>
                     <sparkle:channel>beta</sparkle:channel>
-                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-pre-1/IconChanger.dmg"
-                    sparkle:edSignature="VRZOZLvL0oUzQ6O8sfSJpVQq2MnzpsROhmHq6A3R9zOIzRryfejGGkbafVmVg5UZbcqsFPUPaJp1+uswW2/qDg==" length="5342630"
-                    type="application/octet-stream"/>
                     <description>
                         <![CDATA[
-                    <h2>Version 1.4.4-pre-1</h2>
+                    <h2>Version 1.4.4-pre-2</h2>
                     <ul>
-                        <li>ci: force checkout main when pushing appcast from non-main branches</li>
-                        <li><strong>New:</strong> Sparkle pre-release channel with opt-in toggle</li>
-                        <li><strong>New:</strong> add App Management (TCC) permission check to setup flow</li>
+                        <li><strong>Improved:</strong> App Management permission detection using TCC framework</li>
                     </ul>
                         ]]>
                     </description>
