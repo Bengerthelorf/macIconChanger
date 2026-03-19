@@ -147,6 +147,11 @@ struct ContentView: View {
                          .foregroundColor(.secondary)
                          .multilineTextAlignment(.center)
                          .padding(.horizontal)
+                     Button("Retry") {
+                         checkFullSetup()
+                     }
+                     .controlSize(.large)
+                     .padding(.top)
                  }
             }
         }
@@ -184,23 +189,27 @@ struct ContentView: View {
             return
         }
 
-        iconManager.ensureHelperFilesCopied()
+        DispatchQueue.global(qos: .userInitiated).async {
+            iconManager.ensureHelperFilesCopied()
+            let detailedStatus = iconManager.checkSetupStatus()
 
-        let detailedStatus = iconManager.checkSetupStatus()
-        logger.debug("Setup status: \(String(describing: detailedStatus))")
+            DispatchQueue.main.async {
+                logger.debug("Setup status: \(String(describing: detailedStatus))")
 
-        switch detailedStatus {
-        case .completed:
-            setupState = .completed
-        case .helperFilesMissing(let missingFiles):
-            logger.error("Helper files missing")
-            setupState = .needsHelperFiles(missingFiles: missingFiles)
-        case .sudoersPermissionMissing:
-            logger.error("Sudoers permission missing")
-            setupState = .needsSudoersSetup
-        case .unknownError(let message):
-             logger.error("Setup error: \(message)")
-             setupState = .error(message)
+                switch detailedStatus {
+                case .completed:
+                    setupState = .completed
+                case .helperFilesMissing(let missingFiles):
+                    logger.error("Helper files missing")
+                    setupState = .needsHelperFiles(missingFiles: missingFiles)
+                case .sudoersPermissionMissing:
+                    logger.error("Sudoers permission missing")
+                    setupState = .needsSudoersSetup
+                case .unknownError(let message):
+                     logger.error("Setup error: \(message)")
+                     setupState = .error(message)
+                }
+            }
         }
     }
 

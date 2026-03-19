@@ -688,6 +688,22 @@ class IconManager: ObservableObject {
 
         logger.debug("Executing: sudo -n \(helperToolPath) \(fileiconPath) \(appPath) \(imagePath)")
 
+        // Read pipes concurrently to avoid deadlock when buffers fill up
+        var outputData = Data()
+        var errorData = Data()
+        let pipeGroup = DispatchGroup()
+
+        pipeGroup.enter()
+        DispatchQueue.global().async {
+            outputData = outPipe.fileHandleForReading.readDataToEndOfFile()
+            pipeGroup.leave()
+        }
+        pipeGroup.enter()
+        DispatchQueue.global().async {
+            errorData = errPipe.fileHandleForReading.readDataToEndOfFile()
+            pipeGroup.leave()
+        }
+
         let semaphore = DispatchSemaphore(value: 0)
         var timedOut = false
 
@@ -708,8 +724,7 @@ class IconManager: ObservableObject {
             task.terminate()
         }
 
-        let outputData = outPipe.fileHandleForReading.readDataToEndOfFile()
-        let errorData = errPipe.fileHandleForReading.readDataToEndOfFile()
+        pipeGroup.wait()
         let output = String(data: outputData, encoding: .utf8) ?? ""
         let errorOutput = String(data: errorData, encoding: .utf8) ?? ""
 

@@ -180,6 +180,10 @@ jobs:
           PUBDATE=$(date -u "+%a, %d %b %Y %H:%M:%S +0000")
           DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/IconChanger.dmg"
 
+          # Detect pre-release from tag name
+          IS_PRERELEASE="false"
+          case "$TAG" in *pre*|*alpha*|*beta*|*rc*) IS_PRERELEASE="true" ;; esac
+
           export SPARKLE_VERSION="$VERSION"
           export SPARKLE_BUILD="$BUILD_NUMBER"
           export SPARKLE_PUBDATE="$PUBDATE"
@@ -187,6 +191,7 @@ jobs:
           export SPARKLE_ED_SIG="$ED_SIGNATURE"
           export SPARKLE_DMG_SIZE="$DMG_SIZE"
           export SPARKLE_REPO="${{ github.repository }}"
+          export SPARKLE_IS_PRERELEASE="$IS_PRERELEASE"
 
           python3 << 'PYEOF'
           import sys, re, os
@@ -198,6 +203,7 @@ jobs:
           ed_sig = os.environ["SPARKLE_ED_SIG"]
           dmg_size = os.environ["SPARKLE_DMG_SIZE"]
           repo = os.environ["SPARKLE_REPO"]
+          is_prerelease = os.environ.get("SPARKLE_IS_PRERELEASE", "false") == "true"
 
           # Read CHANGELOG.md and convert to HTML for Sparkle description
           changelog_html = ""
@@ -243,13 +249,17 @@ jobs:
                   "                    </description>"
               )
 
+          channel_tag = ""
+          if is_prerelease:
+              channel_tag = "\n                    <sparkle:channel>beta</sparkle:channel>"
+
           item = (
               "        <item>\n"
               "                    <title>Version " + version + "</title>\n"
               "                    <link>https://github.com/" + repo + "</link>\n"
               "                    <sparkle:version>" + build + "</sparkle:version>\n"
               "                    <sparkle:shortVersionString>" + version + "</sparkle:shortVersionString>\n"
-              "                    <pubDate>" + pubdate + "</pubDate>\n"
+              "                    <pubDate>" + pubdate + "</pubDate>" + channel_tag + "\n"
               "                    <enclosure url=\"" + download_url + "\"\n"
               "                    sparkle:edSignature=\"" + ed_sig + "\" length=\"" + dmg_size + "\"\n"
               "                    type=\"application/octet-stream\"/>" + desc_block + "\n"
@@ -258,36 +268,67 @@ jobs:
 
           xml = open("IconChanger/Resources/sparkle.xml").read()
 
-          # If a manually-written entry for this version already exists, only update
-          # the enclosure (signature + size) and leave the description untouched.
+          # If a manually-written entry for this version already exists, update it.
           existing = re.search(
               r'<item>\s*<title>Version ' + re.escape(version) + r'</title>.*?</item>',
               xml, flags=re.DOTALL
           )
           if existing:
               updated_item = existing.group(0)
-              updated_item = re.sub(
-                  r'sparkle:edSignature="[^"]*"',
-                  f'sparkle:edSignature="{ed_sig}"',
-                  updated_item
+
+              enclosure_tag = (
+                  f'\n                    <pubDate>{pubdate}</pubDate>'
+                  f'\n                    <enclosure url="{download_url}"'
+                  f'\n                    sparkle:edSignature="{ed_sig}" length="{dmg_size}"'
+                  f'\n                    type="application/octet-stream"/>'
               )
-              updated_item = re.sub(
-                  r'length="[^"]*"',
-                  f'length="{dmg_size}"',
-                  updated_item
-              )
-              updated_item = re.sub(
-                  r'<sparkle:version>[^<]*</sparkle:version>',
-                  f'<sparkle:version>{build}</sparkle:version>',
-                  updated_item
-              )
-              updated_item = re.sub(
-                  r'<pubDate>[^<]*</pubDate>',
-                  f'<pubDate>{pubdate}</pubDate>',
-                  updated_item
-              )
+
+              if 'enclosure' in updated_item:
+                  # Only update the FIRST (main) enclosure, not delta enclosures
+                  # Find the main enclosure block and replace only within it
+                  main_enc = re.search(
+                      r'<enclosure url="[^"]*IconChanger\.dmg".*?/>',
+                      updated_item, re.DOTALL
+                  )
+                  if main_enc:
+                      new_enc = (
+                          f'<enclosure url="{download_url}"\n'
+                          f'                    sparkle:edSignature="{ed_sig}" length="{dmg_size}"\n'
+                          f'                    type="application/octet-stream"/>'
+                      )
+                      updated_item = updated_item[:main_enc.start()] + new_enc + updated_item[main_enc.end():]
+
+                  updated_item = re.sub(
+                      r'<sparkle:version>[^<]*</sparkle:version>',
+                      f'<sparkle:version>{build}</sparkle:version>',
+                      updated_item
+                  )
+                  updated_item = re.sub(
+                      r'<pubDate>[^<]*</pubDate>',
+                      f'<pubDate>{pubdate}</pubDate>',
+                      updated_item,
+                      count=1
+                  )
+              else:
+                  # Insert enclosure into entry that lacks one
+                  if '</description>' in updated_item:
+                      updated_item = updated_item.replace(
+                          '</description>\n                </item>',
+                          '</description>' + enclosure_tag + '\n                </item>'
+                      )
+                  else:
+                      updated_item = updated_item.replace(
+                          '</item>',
+                          enclosure_tag + '\n                </item>'
+                      )
+                  updated_item = re.sub(
+                      r'<sparkle:version>[^<]*</sparkle:version>',
+                      f'<sparkle:version>{build}</sparkle:version>',
+                      updated_item
+                  )
+
               xml = xml[:existing.start()] + updated_item + xml[existing.end():]
-              print(f"Found existing entry for {version}, updated enclosure only.")
+              print(f"Found existing entry for {version}, updated enclosure.")
           else:
               marker = '<title>IconChanger</title>'
               idx = xml.find(marker)
@@ -308,10 +349,8 @@ jobs:
               )
               if deltas_match:
                   deltas_block = deltas_match.group(1)
-                  # Find the current version's </item> in our xml and insert deltas before it
                   current_item = re.search(
-                      r'(<item>\s*(?:<title>Version ' + re.escape(version) + r'</title>|'
-                      r'<title>Version ' + re.escape(version) + r'</title>).*?)(</item>)',
+                      r'(<item>\s*<title>Version ' + re.escape(version) + r'</title>.*?)(</item>)',
                       xml, flags=re.DOTALL
                   )
                   if current_item and '<sparkle:deltas>' not in current_item.group(0):
@@ -330,6 +369,19 @@ jobs:
           open("IconChanger/Resources/sparkle.xml", "w").write(xml)
           PYEOF
 
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            build/IconChanger.dmg
+            build/*.delta
+          body_path: CHANGELOG.md
+          draft: false
+          prerelease: ${{ contains(github.ref, 'pre') || contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Commit and push appcast
         if: startsWith(github.ref, 'refs/tags/')
         run: |
@@ -337,7 +389,7 @@ jobs:
           git config user.email "actions@github.com"
           cp IconChanger/Resources/sparkle.xml /tmp/sparkle.xml.updated
           git fetch origin main
-          git checkout -B main origin/main
+          git checkout -f -B main origin/main
           cp /tmp/sparkle.xml.updated IconChanger/Resources/sparkle.xml
           git add IconChanger/Resources/sparkle.xml
           git diff --cached --quiet && echo "No changes" || git commit -m "release: update appcast for ${GITHUB_REF#refs/tags/}"
@@ -349,21 +401,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            build/IconChanger.dmg
-            build/*.delta
-          body_path: CHANGELOG.md
-          draft: false
-          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Update Homebrew Cask
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') && !contains(github.ref, 'pre') && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc')
         env:
           TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
         run: |
