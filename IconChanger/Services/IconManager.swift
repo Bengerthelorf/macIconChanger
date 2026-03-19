@@ -906,6 +906,17 @@ class IconManager: ObservableObject {
             return .unknownError("An unexpected error occurred during sudoers check.")
         }
     }
+
+    // Uses the same NSWorkspace.setIcon API as fileicon, which triggers
+    // the TCC prompt on first call if permission hasn't been granted yet.
+    func checkAppManagementPermission() -> Bool {
+        let bundlePath = Bundle.main.bundlePath
+
+        guard bundlePath.hasPrefix("/Applications/") else { return true }
+
+        let icon = NSWorkspace.shared.icon(forFile: bundlePath)
+        return NSWorkspace.shared.setIcon(icon, forFile: bundlePath, options: [])
+    }
 }
 
 extension LaunchPadManagerDBHelper.AppInfo: @retroactive Identifiable {
