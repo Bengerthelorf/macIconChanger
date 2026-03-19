@@ -22,6 +22,7 @@ struct ContentView: View {
         case needsPermission
         case needsHelperFiles(missingFiles: [String])
         case needsSudoersSetup
+        case needsAppManagement
         case completed
         case error(String)
     }
@@ -130,6 +131,35 @@ struct ContentView: View {
                  .padding()
 
 
+            case .needsAppManagement:
+                 VStack(spacing: 15) {
+                      Image(systemName: "app.badge.checkmark")
+                          .resizable().scaledToFit().frame(width: 40, height: 40).foregroundColor(.orange)
+                          .padding(.bottom, 5)
+                     Text("App Management Permission")
+                         .font(.title2.bold())
+                     Text("IconChanger needs App Management permission to modify app icons.\nPlease enable it in System Settings, then come back and click the button below.")
+                          .multilineTextAlignment(.center)
+                          .foregroundColor(.secondary)
+                         .padding(.horizontal)
+
+                     Button {
+                         NSWorkspace.shared.openLocationService(for: .appManagement)
+                     } label: {
+                         Label("Open System Settings", systemImage: "gear")
+                     }
+                     .controlSize(.large)
+                     .padding(.top, 5)
+
+                     Button {
+                         checkFullSetup()
+                     } label: {
+                         Label("I've Enabled It", systemImage: "checkmark.circle")
+                     }
+                     .controlSize(.large)
+                 }
+                 .padding()
+
             case .completed:
                 IconList()
 
@@ -198,7 +228,12 @@ struct ContentView: View {
 
                 switch detailedStatus {
                 case .completed:
-                    setupState = .completed
+                    if !iconManager.checkAppManagementPermission() {
+                        logger.error("App Management permission not granted")
+                        setupState = .needsAppManagement
+                    } else {
+                        setupState = .completed
+                    }
                 case .helperFilesMissing(let missingFiles):
                     logger.error("Helper files missing")
                     setupState = .needsHelperFiles(missingFiles: missingFiles)
@@ -233,6 +268,7 @@ extension NSWorkspace {
         case reminders = "x-apple.systempreferences:com.apple.preference.security?Privacy_Reminders"
         case photos = "x-apple.systempreferences:com.apple.preference.security?Privacy_Photos"
         case fullDisk = "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles"
+        case appManagement = "x-apple.systempreferences:com.apple.preference.security?Privacy_AppBundles"
     }
 
     func openLocationService(for type: SystemServiceType) {
