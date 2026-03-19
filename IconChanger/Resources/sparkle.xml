@@ -4,6 +4,20 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.4.4-5</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>2026031900</sparkle:version>
+                    <sparkle:shortVersionString>1.4.4-5</sparkle:shortVersionString>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.4.4-5</h2>
+                    <ul>
+                        <li><strong>Fixed:</strong> Permission setup detection on corporate/managed Macs</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
                     <title>Version 1.4.4-4</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>2026031304</sparkle:version>

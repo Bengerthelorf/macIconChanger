@@ -884,10 +884,7 @@ class IconManager: ObservableObject {
         }
         
         let helperPath = self.helperScriptURL.path
-        let escapedHelperPathForGrep = helperPath.replacingOccurrences(of: " ", with: "[[:space:]]")
-        let grepPattern = "NOPASSWD:[[:space:]]*\(escapedHelperPathForGrep)"
-
-        let checkCommand = "sudo -n -l | grep -q -E '\(grepPattern.shellEscaped)'"
+        let checkCommand = "sudo -n -l \(helperPath.shellEscaped)"
         
         do {
             _ = try Self.safeShell(checkCommand)
