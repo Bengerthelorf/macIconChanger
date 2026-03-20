@@ -453,6 +453,9 @@ class IconManager: ObservableObject {
                         if let appInfo = appMap[appPath] {
                             try applyIcon(image, to: appInfo)
                             logger.info("Restored icon for \(cache.appName)")
+                        } else {
+                            logger.warning("Skipped \(cache.appName): not in current app list")
+                            failedApps.append((cache.appName, RestoreError.iconFileNotFound(cache.appName)))
                         }
                     } else {
                         IconCacheManager.shared.removeCachedIcon(for: appPath)
