@@ -640,10 +640,17 @@ class BackgroundService: ObservableObject, @unchecked Sendable {
             let appPath = cache.appPath
             guard let appItem = appMap[appPath] else { return nil }
 
-            guard let attributes = try? FileManager.default.attributesOfItem(atPath: appPath),
-                  let modDate = attributes[.modificationDate] as? Date,
-                  modDate > cache.timestamp else {
-                return nil
+            if let cachedVersion = cache.appVersion {
+                // Compare bundle version — only triggers on real app updates
+                let currentVersion = IconCache.currentVersion(for: appPath)
+                guard currentVersion != cachedVersion else { return nil }
+            } else {
+                // Fallback for old cache entries without version: use modDate
+                guard let attributes = try? FileManager.default.attributesOfItem(atPath: appPath),
+                      let modDate = attributes[.modificationDate] as? Date,
+                      modDate > cache.timestamp else {
+                    return nil
+                }
             }
 
             return appItem
