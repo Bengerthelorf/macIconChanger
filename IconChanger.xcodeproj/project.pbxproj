@@ -41,6 +41,8 @@
 		9017B5FA294ED626005709C6 /* IconRes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9017B5F9294ED626005709C6 /* IconRes.swift */; };
 		9017B61E295282ED005709C6 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 9017B61D295282ED005709C6 /* LICENSE */; };
 		9053434F286B2A6800237F98 /* AutoUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9053434E286B2A6800237F98 /* AutoUpdater.swift */; };
+		D428FC81D231B8B76467CD43 /* ConfigCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4964ECA4AA2619D609E3DDBA /* ConfigCrypto.swift */; };
+		1466242F19B3C04FD0C1CF1B /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC059F97C128C0CF4CAC7D8 /* AppSettings.swift */; };
 		90534352286C8BDA00237F98 /* fileicon in Resources */ = {isa = PBXBuildFile; fileRef = 90534351286C8BDA00237F98 /* fileicon */; };
 		9053438B287550C200237F98 /* helper.sh in Resources */ = {isa = PBXBuildFile; fileRef = 9053438A287534C300237F98 /* helper.sh */; };
 		907AC4F92954038600F9F0F9 /* README-zh.md in Resources */ = {isa = PBXBuildFile; fileRef = 907AC4F82954038600F9F0F9 /* README-zh.md */; };
@@ -123,6 +125,8 @@
 		9017B61D295282ED005709C6 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		9053434D286B2A2900237F98 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		9053434E286B2A6800237F98 /* AutoUpdater.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoUpdater.swift; sourceTree = "<group>"; };
+		4964ECA4AA2619D609E3DDBA /* ConfigCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigCrypto.swift; sourceTree = "<group>"; };
+		CBC059F97C128C0CF4CAC7D8 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		90534350286B441900237F98 /* sparkle.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = sparkle.xml; sourceTree = "<group>"; };
 		90534351286C8BDA00237F98 /* fileicon */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = fileicon; sourceTree = "<group>"; };
 		9053438A287534C300237F98 /* helper.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = helper.sh; sourceTree = "<group>"; };
@@ -319,6 +323,8 @@
 				900D1CF7281936C7007ABB12 /* FullDiskPermision.swift */,
 				6843168B503282547D31EC35 /* PermissionRequest.swift */,
 				9053434E286B2A6800237F98 /* AutoUpdater.swift */,
+				4964ECA4AA2619D609E3DDBA /* ConfigCrypto.swift */,
+				CBC059F97C128C0CF4CAC7D8 /* AppSettings.swift */,
 				322513C7E4692CC3A6193007 /* KeychainHelper.swift */,
 				A20000APIKEY0001 /* APIKeyManager.swift */,
 			);
@@ -505,6 +511,8 @@
 				900D1CFA281938D6007ABB12 /* IconList.swift in Sources */,
 				2FC131602D8F7D7E00F60B19 /* CachedIconsView.swift in Sources */,
 				9053434F286B2A6800237F98 /* AutoUpdater.swift in Sources */,
+				D428FC81D231B8B76467CD43 /* ConfigCrypto.swift in Sources */,
+				1466242F19B3C04FD0C1CF1B /* AppSettings.swift in Sources */,
 				908A79022819753E00951B15 /* String+RangeSubscript.swift in Sources */,
 				900D1CF8281936C7007ABB12 /* FullDiskPermision.swift in Sources */,
 				908A79092819840D00951B15 /* ChangeView.swift in Sources */,

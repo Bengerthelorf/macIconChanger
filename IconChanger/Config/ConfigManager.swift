@@ -17,7 +17,8 @@ class ConfigManager {
     struct AppConfiguration: Codable {
         var appAliases: [AliasConfig] = []
         var cachedIcons: [IconCacheConfig] = []
-        var version: String = "1.0"
+        var settings: [String: JSON]?
+        var version: String = "2.0"
         var exportDate: Date = Date()
     }
 
@@ -33,7 +34,9 @@ class ConfigManager {
         var iconData: Data
     }
 
-    func exportConfiguration() -> URL? {
+    // MARK: - Export
+
+    func exportConfiguration(password: String?) -> URL? {
         var config = AppConfiguration()
 
         for alias in AliasNames.getAll() {
@@ -43,35 +46,67 @@ class ConfigManager {
         for cache in IconCacheManager.shared.getAllCachedIcons() {
             if let iconURL = IconCacheManager.shared.getCachedIconURL(for: cache.appPath),
                let iconData = try? Data(contentsOf: iconURL) {
-                let iconConfig = IconCacheConfig(
+                config.cachedIcons.append(IconCacheConfig(
                     appPath: cache.appPath,
                     appName: cache.appName,
                     iconFileName: cache.iconFileName,
                     iconData: iconData
-                )
-                config.cachedIcons.append(iconConfig)
+                ))
             }
         }
 
+        let t2Active = UserDefaults.standard.bool(forKey: "t2e")
+        let settingsDict = AppSettings.shared.exportSettings(tier2Enabled: t2Active)
+        config.settings = settingsDict.mapValues { JSON($0) }
+
         do {
-            let data = try JSONEncoder().encode(config)
+            let jsonData = try JSONEncoder().encode(config)
+            let ext: String
+            let outputData: Data
+
+            if let password, !password.isEmpty {
+                outputData = try ConfigCrypto.encrypt(jsonData, password: password)
+                ext = "icconfig"
+            } else {
+                outputData = jsonData
+                ext = "json"
+            }
 
             let tempDir = FileManager.default.temporaryDirectory
-            let exportURL = tempDir.appendingPathComponent("IconChanger_Config_\(Date().timeIntervalSince1970).json")
-
-            try data.write(to: exportURL)
+            let exportURL = tempDir.appendingPathComponent("IconChanger_Config_\(formattedDate()).\(ext)")
+            try outputData.write(to: exportURL)
             return exportURL
         } catch {
-            logger.error("Error exporting configuration: \(error.localizedDescription)")
+            logger.error("Export failed: \(error.localizedDescription)")
             return nil
         }
     }
 
-    func importConfiguration(from url: URL) -> (aliases: Int, icons: Int) {
-        do {
-            let data = try Data(contentsOf: url)
-            let config = try JSONDecoder().decode(AppConfiguration.self, from: data)
+    // Legacy compat
+    func exportConfiguration() -> URL? {
+        exportConfiguration(password: nil)
+    }
 
+    // MARK: - Import
+
+    func importConfiguration(from url: URL, password: String? = nil) -> (aliases: Int, icons: Int, settings: Int) {
+        do {
+            let rawData = try Data(contentsOf: url)
+            let jsonData: Data
+
+            if url.pathExtension == "icconfig" {
+                guard let password, !password.isEmpty else {
+                    logger.error("Password required for .icconfig")
+                    return (0, 0, 0)
+                }
+                jsonData = try ConfigCrypto.decrypt(rawData, password: password)
+            } else {
+                jsonData = rawData
+            }
+
+            let config = try JSONDecoder().decode(AppConfiguration.self, from: jsonData)
+
+            // Import aliases
             var importedAliases = 0
             var existingAliases = AliasNames.getAll()
             let existingNames = Set(existingAliases.map(\.appName))
@@ -82,68 +117,72 @@ class ConfigManager {
                     importedAliases += 1
                 }
             }
-
             AliasNames.save(existingAliases)
 
+            // Import icons
             var importedIcons = 0
-
             for iconConfig in config.cachedIcons {
                 if FileManager.default.fileExists(atPath: iconConfig.appPath) {
                     let newFileName = "\(UUID().uuidString).png"
                     let iconURL = IconCacheManager.cacheDirectory.appendingPathComponent(newFileName)
-
                     try iconConfig.iconData.write(to: iconURL)
-
-                    let cache = IconCache(
+                    IconCacheManager.shared.addImportedCache(IconCache(
                         appPath: iconConfig.appPath,
                         iconFileName: newFileName,
                         appName: iconConfig.appName,
                         timestamp: Date()
-                    )
-
-                    IconCacheManager.shared.addImportedCache(cache)
+                    ))
                     importedIcons += 1
                 }
             }
 
-            return (importedAliases, importedIcons)
+            // Import settings
+            var importedSettings = 0
+            if let settings = config.settings {
+                let dict = settings.mapValues { $0.object }
+                AppSettings.shared.importSettings(dict as [String: Any])
+                importedSettings = settings.count
+            }
+
+            return (importedAliases, importedIcons, importedSettings)
         } catch {
-            logger.error("Error importing configuration: \(error.localizedDescription)")
-            return (0, 0)
+            logger.error("Import failed: \(error.localizedDescription)")
+            return (0, 0, 0)
         }
     }
 
-    func showExportDialog() {
+    // MARK: - Dialogs
+
+    func showExportDialog(password: String? = nil) {
+        let ext = (password != nil && !password!.isEmpty) ? "icconfig" : "json"
         let savePanel = NSSavePanel()
         savePanel.title = NSLocalizedString("Export IconChanger Configuration", comment: "Save panel title")
         savePanel.nameFieldLabel = "Save As:"
         savePanel.canCreateDirectories = true
         savePanel.showsTagField = false
-        savePanel.allowedContentTypes = [UTType(filenameExtension: "json")].compactMap { $0 }
+        savePanel.allowedContentTypes = [UTType(filenameExtension: ext)].compactMap { $0 }
         savePanel.allowsOtherFileTypes = false
         savePanel.isExtensionHidden = false
-        savePanel.nameFieldStringValue = "IconChanger_Config_\(formattedDate()).json"
+        savePanel.nameFieldStringValue = "IconChanger_Config_\(formattedDate()).\(ext)"
 
         savePanel.begin { result in
             if result == .OK, let url = savePanel.url {
-                if let tempURL = self.exportConfiguration() {
+                if let tempURL = self.exportConfiguration(password: password) {
                     do {
                         if FileManager.default.fileExists(atPath: url.path) {
                             try FileManager.default.removeItem(at: url)
                         }
-
                         try FileManager.default.copyItem(at: tempURL, to: url)
-
                         self.showNotification(
-                            title: NSLocalizedString("Export Successful", comment: "Notification title"),
-                            message: NSLocalizedString("Configuration exported successfully", comment: "Notification body"),
+                            title: NSLocalizedString("Export Successful", comment: ""),
+                            message: NSLocalizedString("Configuration exported successfully", comment: ""),
                             success: true
                         )
                     } catch {
-                        self.logger.error("Error saving to selected location: \(error.localizedDescription)")
+                        self.logger.error("Save failed: \(error.localizedDescription)")
                         self.showNotification(
-                            title: NSLocalizedString("Export Failed", comment: "Notification title"),
-                            message: String(format: NSLocalizedString("Unable to save configuration file: %@", comment: "Notification body"), error.localizedDescription),
+                            title: NSLocalizedString("Export Failed", comment: ""),
+                            message: error.localizedDescription,
                             success: false
                         )
                     }
@@ -154,33 +193,66 @@ class ConfigManager {
 
     func showImportDialog() {
         let openPanel = NSOpenPanel()
-        openPanel.title = NSLocalizedString("Import IconChanger Configuration", comment: "Open panel title")
-        openPanel.showsResizeIndicator = true
+        openPanel.title = NSLocalizedString("Import IconChanger Configuration", comment: "")
         openPanel.showsHiddenFiles = false
         openPanel.canChooseDirectories = false
-        openPanel.canCreateDirectories = false
         openPanel.canChooseFiles = true
         openPanel.allowsMultipleSelection = false
-        openPanel.allowedContentTypes = [UTType(filenameExtension: "json")].compactMap { $0 }
+        openPanel.allowedContentTypes = [
+            UTType(filenameExtension: "json"),
+            UTType(filenameExtension: "icconfig")
+        ].compactMap { $0 }
 
         openPanel.begin { result in
-            if result == .OK, let url = openPanel.url {
-                let results = self.importConfiguration(from: url)
+            guard result == .OK, let url = openPanel.url else { return }
 
-                if results.aliases > 0 || results.icons > 0 {
-                    self.showNotification(
-                        title: NSLocalizedString("Import Successful", comment: "Notification title"),
-                        message: String(format: NSLocalizedString("Imported %lld aliases and %lld icons", comment: "Notification body"), results.aliases, results.icons),
-                        success: true
-                    )
-                } else {
-                    self.showNotification(
-                        title: NSLocalizedString("Import Complete", comment: "Notification title"),
-                        message: NSLocalizedString("No new items were found to import", comment: "Notification body"),
-                        success: true
-                    )
+            if url.pathExtension == "icconfig" {
+                self.promptPassword { password in
+                    guard let password else { return }
+                    let results = self.importConfiguration(from: url, password: password)
+                    self.showImportResults(results)
                 }
+            } else {
+                let results = self.importConfiguration(from: url)
+                self.showImportResults(results)
             }
+        }
+    }
+
+    // MARK: - Private
+
+    private func promptPassword(completion: @escaping (String?) -> Void) {
+        let alert = NSAlert()
+        alert.messageText = NSLocalizedString("Enter Password", comment: "")
+        alert.informativeText = NSLocalizedString("This configuration file is encrypted.", comment: "")
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+        alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
+
+        let input = NSSecureTextField(frame: NSRect(x: 0, y: 0, width: 260, height: 24))
+        alert.accessoryView = input
+
+        if alert.runModal() == .alertFirstButtonReturn {
+            completion(input.stringValue)
+        } else {
+            completion(nil)
+        }
+    }
+
+    private func showImportResults(_ results: (aliases: Int, icons: Int, settings: Int)) {
+        if results.aliases > 0 || results.icons > 0 || results.settings > 0 {
+            showNotification(
+                title: NSLocalizedString("Import Successful", comment: ""),
+                message: String(format: NSLocalizedString("Imported %lld aliases, %lld icons, and %lld settings", comment: ""),
+                                results.aliases, results.icons, results.settings),
+                success: true
+            )
+        } else {
+            showNotification(
+                title: NSLocalizedString("Import Complete", comment: ""),
+                message: NSLocalizedString("No new items were found to import", comment: ""),
+                success: true
+            )
         }
     }
 
@@ -195,32 +267,21 @@ class ConfigManager {
         alert.messageText = title
         alert.informativeText = message
         alert.alertStyle = success ? .informational : .warning
-        alert.addButton(withTitle: NSLocalizedString("OK", comment: "Alert button"))
+        alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
         alert.runModal()
 
         let content = UNMutableNotificationContent()
         content.title = title
         content.body = message
         content.sound = UNNotificationSound.default
-        content.categoryIdentifier = success ? "SUCCESS" : "ERROR"
-
-        let request = UNNotificationRequest(
-            identifier: UUID().uuidString,
-            content: content,
-            trigger: nil
-        )
-
-        UNUserNotificationCenter.current().add(request) { error in
-            if let error = error {
-                self.logger.error("Failed to send notification: \(error.localizedDescription)")
-            }
-        }
+        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
+        UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
     }
 
     init() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, error in
             if let error = error {
-                self.logger.error("Notification permission request failed: \(error.localizedDescription)")
+                self.logger.error("Notification permission failed: \(error.localizedDescription)")
             }
         }
     }
