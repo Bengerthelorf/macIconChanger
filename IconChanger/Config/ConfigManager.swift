@@ -89,15 +89,21 @@ class ConfigManager {
 
     // MARK: - Import
 
-    func importConfiguration(from url: URL, password: String? = nil) -> (aliases: Int, icons: Int, settings: Int) {
+    struct ImportResult {
+        var aliases: Int = 0
+        var icons: Int = 0
+        var settings: Int = 0
+        var error: Error?
+    }
+
+    func importConfiguration(from url: URL, password: String? = nil) -> ImportResult {
         do {
             let rawData = try Data(contentsOf: url)
             let jsonData: Data
 
             if url.pathExtension == "icconfig" {
                 guard let password, !password.isEmpty else {
-                    logger.error("Password required for .icconfig")
-                    return (0, 0, 0)
+                    return ImportResult(error: ConfigCrypto.CryptoError.wrongPassword)
                 }
                 jsonData = try ConfigCrypto.decrypt(rawData, password: password)
             } else {
@@ -106,7 +112,6 @@ class ConfigManager {
 
             let config = try JSONDecoder().decode(AppConfiguration.self, from: jsonData)
 
-            // Import aliases
             var importedAliases = 0
             var existingAliases = AliasNames.getAll()
             let existingNames = Set(existingAliases.map(\.appName))
@@ -119,7 +124,6 @@ class ConfigManager {
             }
             AliasNames.save(existingAliases)
 
-            // Import icons
             var importedIcons = 0
             for iconConfig in config.cachedIcons {
                 if FileManager.default.fileExists(atPath: iconConfig.appPath) {
@@ -136,7 +140,6 @@ class ConfigManager {
                 }
             }
 
-            // Import settings
             var importedSettings = 0
             if let settings = config.settings {
                 let dict = settings.mapValues { $0.object }
@@ -144,10 +147,13 @@ class ConfigManager {
                 importedSettings = settings.count
             }
 
-            return (importedAliases, importedIcons, importedSettings)
+            return ImportResult(aliases: importedAliases, icons: importedIcons, settings: importedSettings)
+        } catch let error as ConfigCrypto.CryptoError {
+            logger.error("Import failed: \(error.localizedDescription)")
+            return ImportResult(error: error)
         } catch {
             logger.error("Import failed: \(error.localizedDescription)")
-            return (0, 0, 0)
+            return ImportResult(error: error)
         }
     }
 
@@ -241,13 +247,22 @@ class ConfigManager {
 
     static let didImportNotification = Notification.Name("ConfigManagerDidImport")
 
-    private func showImportResults(_ results: (aliases: Int, icons: Int, settings: Int)) {
+    private func showImportResults(_ result: ImportResult) {
+        if let error = result.error {
+            showNotification(
+                title: NSLocalizedString("Import Failed", comment: ""),
+                message: error.localizedDescription,
+                success: false
+            )
+            return
+        }
+
         NotificationCenter.default.post(name: Self.didImportNotification, object: nil)
-        if results.aliases > 0 || results.icons > 0 || results.settings > 0 {
+        if result.aliases > 0 || result.icons > 0 || result.settings > 0 {
             showNotification(
                 title: NSLocalizedString("Import Successful", comment: ""),
                 message: String(format: NSLocalizedString("Imported %lld aliases, %lld icons, and %lld settings", comment: ""),
-                                results.aliases, results.icons, results.settings),
+                                result.aliases, result.icons, result.settings),
                 success: true
             )
         } else {
