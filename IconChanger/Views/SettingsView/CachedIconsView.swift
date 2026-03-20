@@ -239,7 +239,7 @@ struct CachedIconsView: View {
             restoreError = nil
 
             do {
-                try await iconManager.restoreAllCachedIcons()
+                let _ = try await iconManager.restoreAllCachedIcons()
 
                 await MainActor.run {
                     isRestoring = false

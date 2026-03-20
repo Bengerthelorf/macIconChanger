@@ -583,7 +583,7 @@ class BackgroundService: ObservableObject, @unchecked Sendable {
     private func performScheduledRestore() {
         Task {
             do {
-                try await iconManager.restoreAllCachedIcons()
+                let _ = try await iconManager.restoreAllCachedIcons()
 
                 await MainActor.run {
                     lastScheduledRestore = Date()
@@ -601,7 +601,7 @@ class BackgroundService: ObservableObject, @unchecked Sendable {
     @objc func restoreCachedIcons() {
         Task {
             do {
-                try await iconManager.restoreAllCachedIcons()
+                let _ = try await iconManager.restoreAllCachedIcons()
                 await MainActor.run {
                     lastScheduledRestore = Date()
                 }

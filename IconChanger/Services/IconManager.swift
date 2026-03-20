@@ -401,7 +401,13 @@ class IconManager: ObservableObject {
         }
     }
 
-    func restoreAllCachedIcons() async throws {
+    struct RestoreResult {
+        var restored: Int = 0
+        var skippedNotInstalled: Int = 0
+        var failed: [(String, Error)] = []
+    }
+
+    func restoreAllCachedIcons() async throws -> RestoreResult {
         logger.log("Starting restoreAllCachedIcons...")
         try ensureSetupCompleted()
 
@@ -417,7 +423,7 @@ class IconManager: ObservableObject {
         let appMap = Dictionary(uniqueKeysWithValues: appList.map { ($0.url.universalPath(), $0) })
 
         let cachedIcons = IconCacheManager.shared.getAllCachedIcons()
-        var failedApps: [(String, Error)] = []
+        var result = RestoreResult()
 
         await MainActor.run {
             isRestoring = true
@@ -441,23 +447,24 @@ class IconManager: ObservableObject {
                     if let image = NSImage(contentsOf: iconURL) {
                         if let appInfo = appMap[appPath] {
                             try applyIcon(image, to: appInfo)
-                            logger.info("Restored icon for \(cache.appName)")
+                            result.restored += 1
                         } else {
-                            logger.warning("Skipped \(cache.appName): not in current app list")
-                            failedApps.append((cache.appName, RestoreError.iconFileNotFound(cache.appName)))
+                            result.skippedNotInstalled += 1
                         }
                     } else {
                         IconCacheManager.shared.removeCachedIcon(for: appPath)
                         throw RestoreError.iconFileNotFound(cache.appName)
                     }
                 } else if !appExists {
+                    result.skippedNotInstalled += 1
                     IconCacheManager.shared.removeCachedIcon(for: appPath)
                 } else {
                     IconCacheManager.shared.removeCachedIcon(for: appPath)
+                    throw RestoreError.iconFileNotFound(cache.appName)
                 }
             } catch {
                 logger.error("Failed to restore icon for \(cache.appName): \(error.localizedDescription)")
-                failedApps.append((cache.appName, error))
+                result.failed.append((cache.appName, error))
             }
         }
 
@@ -469,10 +476,7 @@ class IconManager: ObservableObject {
             iconRefreshTrigger = UUID()
         }
 
-        if !failedApps.isEmpty {
-            logger.error("Restore completed with \(failedApps.count) failures.")
-            throw RestoreError.someFailed(failed: failedApps)
-        }
+        return result
     }
     
     func getIconInPath(_ url: URL) -> [URL] {
