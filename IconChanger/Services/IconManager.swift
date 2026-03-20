@@ -921,9 +921,9 @@ class IconManager: ObservableObject {
             return .helperFilesMissing(missingFiles: missingFiles)
         }
         
-        // Run helper with no args — if NOPASSWD is set for the correct path,
-        // the helper will run and exit with its own usage error (not a sudo error).
-        // If NOPASSWD is missing, sudo will output "password is required".
+        // `sudo -n -l <cmd>` can't distinguish NOPASSWD from password-required
+        // when the user has a blanket (ALL) ALL rule. Dry-running the helper
+        // and checking for "password" in stderr is the only reliable method.
         let helperPath = self.helperScriptURL.path
         let checkCommand = "sudo -n '\(helperPath.shellEscaped)' 2>&1"
 
@@ -935,10 +935,8 @@ class IconManager: ObservableObject {
             case .commandFailed(_, let output):
                 let lower = output.lowercased()
                 if lower.contains("password") || lower.contains("sudo:") {
-                    logger.debug("NOPASSWD not configured for \(helperPath)")
                     return .sudoersPermissionMissing
                 }
-                // Helper ran but exited non-zero (e.g. missing args) — sudo worked fine
                 return .completed
             case .timeout:
                 return .sudoersPermissionMissing
