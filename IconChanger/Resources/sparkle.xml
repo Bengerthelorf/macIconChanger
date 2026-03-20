@@ -4,6 +4,28 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.4.4-7</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>2026032003</sparkle:version>
+                    <sparkle:shortVersionString>1.4.4-7</sparkle:shortVersionString>
+                    <pubDate>Fri, 20 Mar 2026 00:08:18 +0000</pubDate>
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-7/IconChanger.dmg"
+                    sparkle:edSignature="ZRG1IRZe+T1m8rbUr3IqMzlw9cDDcLomUK05YGNce+0Junx12rzCaexO9JlNG3tD4IoAGcwM55ugKvLjg0AQBg==" length="5354428"
+                    type="application/octet-stream"/>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.4.4-7</h2>
+                    <ul>
+                        <li><strong>Fixed:</strong> CI inserts enclosure when missing from manual sparkle entries</li>
+                        <li><strong>New:</strong> use TCC private API for App Management permission detection</li>
+                        <li>ci: force checkout main when pushing appcast from non-main branches</li>
+                        <li><strong>New:</strong> Sparkle pre-release channel with opt-in toggle</li>
+                        <li><strong>New:</strong> add App Management (TCC) permission check to setup flow</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
                     <title>Version 1.4.4-6</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>2026032002</sparkle:version>
