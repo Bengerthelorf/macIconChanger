@@ -4,20 +4,25 @@
     <channel>
         <title>IconChanger</title>
         <item>
-                    <title>Version 1.4.4-pre-6</title>
+                    <title>Version 1.4.4-pre-7</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
-                    <sparkle:version>3014470006</sparkle:version>
-                    <sparkle:shortVersionString>1.4.4-pre-6</sparkle:shortVersionString>
-                    <pubDate>Fri, 20 Mar 2026 13:22:46 +0000</pubDate>
+                    <sparkle:version>3014470007</sparkle:version>
+                    <sparkle:shortVersionString>1.4.4-pre-7</sparkle:shortVersionString>
+                    <pubDate>Fri, 20 Mar 2026 14:27:24 +0000</pubDate>
                     <sparkle:channel>beta</sparkle:channel>
-                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-pre-6/IconChanger.dmg"
-                    sparkle:edSignature="7U9gC8/vPin9R1OJj5saVj68ubKbZQwN8y50fB583BX2hnwc3kHfrKQnKlaqWmO/Nu7KDARnh5G6PmPQs0HrBQ==" length="5382489"
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-pre-7/IconChanger.dmg"
+                    sparkle:edSignature="mRrX1BmNqORRzbLrryRQanLMykHYBkQcSjYrmMwH/095Zxm8/RyiLjEEZHu6auwW+2rixA0XqNLuKPHEJ1j1DQ==" length="5388890"
                     type="application/octet-stream"/>
                     <description>
                         <![CDATA[
-                    <h2>Version 1.4.4-pre-6</h2>
+                    <h2>Version 1.4.4-pre-7</h2>
                     <ul>
-                        <li><strong>New:</strong> floating restore progress with liquid glass on macOS 26</li>
+                        <li><strong>Fixed:</strong> restore error now shows specific app names and failure reasons</li>
+                        <li><strong>Fixed:</strong> settings restore now shows partial failures instead of false success</li>
+                        <li><strong>Fixed:</strong> detect app updates by bundle version instead of modDate</li>
+                        <li><strong>New:</strong> restore result summary with skipped/failed counts</li>
+                        <li><strong>Fixed:</strong> restore cleanup ordering, progress accuracy, main thread safety</li>
+                        <li><strong>Fixed:</strong> PBKDF2 key derivation, wrong password error, restore skip reporting</li>
                     </ul>
                         ]]>
                     </description>
