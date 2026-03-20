@@ -26,7 +26,6 @@ final class AppSettings: ObservableObject {
     private let defaults = UserDefaults.standard
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "IconChanger", category: "Settings")
 
-    // Adding a new setting = adding one line. Export auto-includes it.
     static let definitions: [SettingDef] = [
         // API
         .init(key: "apiRetryCount",     type: .int(0),          flags: .exported),
@@ -102,7 +101,6 @@ final class AppSettings: ObservableObject {
 
     // MARK: - Migration helpers
 
-    /// Maps legacy key names used in older code to current definitions.
     static func definition(forLegacyKey key: String) -> SettingDef? {
         let map: [String: String] = [
             "developerOptionsEnabled": "t2e",

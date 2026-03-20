@@ -4,7 +4,6 @@ import CommonCrypto
 
 enum ConfigCrypto {
 
-    // .icconfig layout: [salt 16B] [nonce 12B] [encrypted payload + tag]
 
     static func encrypt(_ data: Data, password: String) throws -> Data {
         let salt = try randomBytes(count: 16)
@@ -30,7 +29,6 @@ enum ConfigCrypto {
         }
     }
 
-    // PBKDF2 with 100k iterations for real brute-force resistance
     private static func deriveKey(password: String, salt: Data) throws -> SymmetricKey {
         let passData = Data(password.utf8)
         var derivedBytes = [UInt8](repeating: 0, count: 32)
