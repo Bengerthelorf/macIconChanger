@@ -239,7 +239,10 @@ class ConfigManager {
         }
     }
 
+    static let didImportNotification = Notification.Name("ConfigManagerDidImport")
+
     private func showImportResults(_ results: (aliases: Int, icons: Int, settings: Int)) {
+        NotificationCenter.default.post(name: Self.didImportNotification, object: nil)
         if results.aliases > 0 || results.icons > 0 || results.settings > 0 {
             showNotification(
                 title: NSLocalizedString("Import Successful", comment: ""),
