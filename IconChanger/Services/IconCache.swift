@@ -162,11 +162,13 @@ enum RestoreError: Error, LocalizedError {
     case someFailed(failed: [(String, Error)])
     case appNotFound(String)
     case iconFileNotFound(String)
-    
+
     var errorDescription: String? {
         switch self {
         case .someFailed(let failed):
-            return "Failed to restore \(failed.count) icons"
+            let details = failed.prefix(5).map { "\($0.0): \($0.1.localizedDescription)" }.joined(separator: "\n")
+            let suffix = failed.count > 5 ? "\n...and \(failed.count - 5) more" : ""
+            return "Failed to restore \(failed.count) icon(s):\n\(details)\(suffix)"
         case .appNotFound(let appName):
             return "App not found: \(appName)"
         case .iconFileNotFound(let appName):
