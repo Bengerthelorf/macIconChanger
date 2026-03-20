@@ -921,26 +921,31 @@ class IconManager: ObservableObject {
             return .helperFilesMissing(missingFiles: missingFiles)
         }
         
+        // Run helper with no args — if NOPASSWD is set for the correct path,
+        // the helper will run and exit with its own usage error (not a sudo error).
+        // If NOPASSWD is missing, sudo will output "password is required".
         let helperPath = self.helperScriptURL.path
-        let checkCommand = "sudo -n -l \(helperPath.shellEscaped)"
-        
+        let checkCommand = "sudo -n '\(helperPath.shellEscaped)' 2>&1"
+
         do {
             _ = try Self.safeShell(checkCommand)
             return .completed
         } catch let error as ShellError {
             switch error {
-            case .commandFailed(let status, let output):
-                logger.debug("Sudoers check failed (status \(status)): \(output)")
-                return .sudoersPermissionMissing
+            case .commandFailed(_, let output):
+                let lower = output.lowercased()
+                if lower.contains("password") || lower.contains("sudo:") {
+                    logger.debug("NOPASSWD not configured for \(helperPath)")
+                    return .sudoersPermissionMissing
+                }
+                // Helper ran but exited non-zero (e.g. missing args) — sudo worked fine
+                return .completed
             case .timeout:
-                logger.error("Sudoers check command timed out. Assuming permission missing.")
                 return .sudoersPermissionMissing
             case .taskCreationFailed:
-                logger.error("Failed to create task for sudoers check. Error: \(error.localizedDescription)")
                 return .unknownError("Failed to execute sudoers check.")
             }
         } catch {
-            logger.error("Unexpected error during sudoers check: \(error.localizedDescription)")
             return .unknownError("An unexpected error occurred during sudoers check.")
         }
     }
