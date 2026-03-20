@@ -24,6 +24,9 @@ class IconManager: ObservableObject {
     @Published var apps: [AppItem] = []
     @Published var needsSetupCheck: Bool = false
     @Published var iconRefreshTrigger = UUID()
+    @Published var isRestoring: Bool = false
+    @Published var restoreProgress: (current: Int, total: Int) = (0, 0)
+    @Published var restoringAppName: String = ""
 
     private var refreshTask: Task<Void, Never>?
 
@@ -416,7 +419,28 @@ class IconManager: ObservableObject {
         let cachedIcons = IconCacheManager.shared.getAllCachedIcons()
         var failedApps: [(String, Error)] = []
 
-        for cache in cachedIcons {
+        await MainActor.run {
+            isRestoring = true
+            restoreProgress = (0, cachedIcons.count)
+        }
+
+        defer {
+            Task { @MainActor in
+                isRestoring = false
+                restoreProgress = (0, 0)
+                restoringAppName = ""
+                // Single batch refresh after all icons are done
+                AppIconCache.shared.removeAll()
+                iconRefreshTrigger = UUID()
+            }
+        }
+
+        for (index, cache) in cachedIcons.enumerated() {
+            await MainActor.run {
+                restoreProgress = (index + 1, cachedIcons.count)
+                restoringAppName = cache.appName
+            }
+
             do {
                 let appPath = cache.appPath
                 let iconURL = IconCacheManager.cacheDirectory.appendingPathComponent(cache.iconFileName)
@@ -427,21 +451,16 @@ class IconManager: ObservableObject {
                 if appExists && iconExists {
                     if let image = NSImage(contentsOf: iconURL) {
                         if let appInfo = appMap[appPath] {
-                            try await setIconWithoutCaching(image, app: appInfo)
-                            logger.info("Successfully restored icon for \(cache.appName)")
-                        } else {
-                            logger.warning("App info not found for \(cache.appName) at \(appPath), skipping restore.")
+                            try applyIcon(image, to: appInfo)
+                            logger.info("Restored icon for \(cache.appName)")
                         }
                     } else {
-                        logger.error("Could not load cached icon image for \(cache.appName) from \(iconURL.path)")
                         IconCacheManager.shared.removeCachedIcon(for: appPath)
                         throw RestoreError.iconFileNotFound(cache.appName)
                     }
                 } else if !appExists {
-                    logger.warning("App at path \(appPath) no longer exists, removing cache for \(cache.appName).")
                     IconCacheManager.shared.removeCachedIcon(for: appPath)
                 } else {
-                    logger.warning("Icon file \(cache.iconFileName) missing for \(cache.appName), removing cache.")
                     IconCacheManager.shared.removeCachedIcon(for: appPath)
                 }
             } catch {
@@ -449,9 +468,9 @@ class IconManager: ObservableObject {
                 failedApps.append((cache.appName, error))
             }
         }
-        
+
         if !failedApps.isEmpty {
-            logger.error("Restore process completed with \(failedApps.count) failures.")
+            logger.error("Restore completed with \(failedApps.count) failures.")
             throw RestoreError.someFailed(failed: failedApps)
         }
     }

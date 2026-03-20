@@ -246,6 +246,28 @@ struct IconList: View {
             .onPreferenceChange(DockBarHeightKey.self) { dockBarHeight = $0 }
         }
         .navigationSplitViewStyle(.prominentDetail)
+        .overlay {
+            if iconManager.isRestoring {
+                ZStack {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                    VStack(spacing: 12) {
+                        ProgressView(value: Double(iconManager.restoreProgress.current),
+                                     total: Double(max(iconManager.restoreProgress.total, 1)))
+                            .progressViewStyle(.linear)
+                            .frame(width: 240)
+                        Text("Restoring \(iconManager.restoringAppName)...")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        Text("\(iconManager.restoreProgress.current)/\(iconManager.restoreProgress.total)")
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.7))
+                    }
+                    .padding(24)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                }
+            }
+        }
 
                 .sheet(item: $setAlias) {
                     SetAliasNameView(raw: $0, lastText: AliasName.getName(for: $0) ?? "")
