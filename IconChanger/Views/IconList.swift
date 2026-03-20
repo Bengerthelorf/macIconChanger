@@ -246,26 +246,16 @@ struct IconList: View {
             .onPreferenceChange(DockBarHeightKey.self) { dockBarHeight = $0 }
         }
         .navigationSplitViewStyle(.prominentDetail)
-        .overlay {
+        .overlay(alignment: .bottomTrailing) {
             if iconManager.isRestoring {
-                ZStack {
-                    Color.black.opacity(0.4)
-                        .ignoresSafeArea()
-                    VStack(spacing: 12) {
-                        ProgressView(value: Double(iconManager.restoreProgress.current),
-                                     total: Double(max(iconManager.restoreProgress.total, 1)))
-                            .progressViewStyle(.linear)
-                            .frame(width: 240)
-                        Text("Restoring \(iconManager.restoringAppName)...")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                        Text("\(iconManager.restoreProgress.current)/\(iconManager.restoreProgress.total)")
-                            .font(.caption)
-                            .foregroundColor(.white.opacity(0.7))
-                    }
-                    .padding(24)
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-                }
+                RestoreProgressView(
+                    appName: iconManager.restoringAppName,
+                    current: iconManager.restoreProgress.current,
+                    total: iconManager.restoreProgress.total
+                )
+                .padding(16)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .animation(.easeInOut, value: iconManager.isRestoring)
             }
         }
 
@@ -871,6 +861,44 @@ struct DockPreviewIcon: View {
 extension String: @retroactive Identifiable {
     public var id: String {
         self
+    }
+}
+
+private struct RestoreProgressView: View {
+    let appName: String
+    let current: Int
+    let total: Int
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                ProgressView()
+                    .controlSize(.small)
+                Text("Restoring \(appName)")
+                    .font(.callout.weight(.medium))
+                    .lineLimit(1)
+                Spacer()
+                Text("\(current)/\(total)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            ProgressView(value: Double(current), total: Double(max(total, 1)))
+                .progressViewStyle(.linear)
+        }
+        .frame(width: 280)
+        .padding(12)
+        .modifier(RestoreProgressBackground())
+    }
+}
+
+private struct RestoreProgressBackground: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(macOS 26.0, *) {
+            content.glassEffect(.regular.interactive(), in: .rect(cornerRadius: 12))
+        } else {
+            content.background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                .shadow(color: .black.opacity(0.15), radius: 8, y: 4)
+        }
     }
 }
 
