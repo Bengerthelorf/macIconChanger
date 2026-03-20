@@ -12,6 +12,11 @@ struct IconCache: Codable, Identifiable {
     let iconFileName: String
     let appName: String
     let timestamp: Date
+    var appVersion: String?
+
+    static func currentVersion(for appPath: String) -> String? {
+        Bundle(path: appPath)?.object(forInfoDictionaryKey: "CFBundleVersion") as? String
+    }
 }
 
 class IconCacheManager {
@@ -60,7 +65,8 @@ class IconCacheManager {
             appPath: appPath,
             iconFileName: iconFileName,
             appName: appName,
-            timestamp: Date()
+            timestamp: Date(),
+            appVersion: IconCache.currentVersion(for: appPath)
         )
 
         lock.lock()
@@ -105,7 +111,8 @@ class IconCacheManager {
                 appPath: existing.appPath,
                 iconFileName: existing.iconFileName,
                 appName: existing.appName,
-                timestamp: date
+                timestamp: date,
+                appVersion: IconCache.currentVersion(for: appPath)
             )
             snapshot = cachedIcons
         }
