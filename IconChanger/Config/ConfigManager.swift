@@ -172,6 +172,7 @@ class ConfigManager {
         savePanel.nameFieldStringValue = "IconChanger_Config_\(formattedDate()).\(ext)"
 
         savePanel.begin { result in
+            DispatchQueue.main.async {
             if result == .OK, let url = savePanel.url {
                 if let tempURL = self.exportConfiguration(password: password) {
                     do {
@@ -194,6 +195,7 @@ class ConfigManager {
                     }
                 }
             }
+            }
         }
     }
 
@@ -210,17 +212,19 @@ class ConfigManager {
         ].compactMap { $0 }
 
         openPanel.begin { result in
-            guard result == .OK, let url = openPanel.url else { return }
+            DispatchQueue.main.async {
+                guard result == .OK, let url = openPanel.url else { return }
 
-            if url.pathExtension == "icconfig" {
-                self.promptPassword { password in
-                    guard let password else { return }
-                    let results = self.importConfiguration(from: url, password: password)
+                if url.pathExtension == "icconfig" {
+                    self.promptPassword { password in
+                        guard let password else { return }
+                        let results = self.importConfiguration(from: url, password: password)
+                        self.showImportResults(results)
+                    }
+                } else {
+                    let results = self.importConfiguration(from: url)
                     self.showImportResults(results)
                 }
-            } else {
-                let results = self.importConfiguration(from: url)
-                self.showImportResults(results)
             }
         }
     }
