@@ -268,7 +268,8 @@ jobs:
 
           xml = open("IconChanger/Resources/sparkle.xml").read()
 
-          # If a manually-written entry for this version already exists, update it.
+          # If a manually-written entry for this version already exists, only update
+          # the enclosure (signature + size) and leave the description untouched.
           existing = re.search(
               r'<item>\s*<title>Version ' + re.escape(version) + r'</title>.*?</item>',
               xml, flags=re.DOTALL
@@ -284,20 +285,17 @@ jobs:
               )
 
               if 'enclosure' in updated_item:
-                  # Only update the FIRST (main) enclosure, not delta enclosures
-                  # Find the main enclosure block and replace only within it
-                  main_enc = re.search(
-                      r'<enclosure url="[^"]*IconChanger\.dmg".*?/>',
-                      updated_item, re.DOTALL
+                  # Update existing enclosure fields
+                  updated_item = re.sub(
+                      r'sparkle:edSignature="[^"]*"',
+                      f'sparkle:edSignature="{ed_sig}"',
+                      updated_item
                   )
-                  if main_enc:
-                      new_enc = (
-                          f'<enclosure url="{download_url}"\n'
-                          f'                    sparkle:edSignature="{ed_sig}" length="{dmg_size}"\n'
-                          f'                    type="application/octet-stream"/>'
-                      )
-                      updated_item = updated_item[:main_enc.start()] + new_enc + updated_item[main_enc.end():]
-
+                  updated_item = re.sub(
+                      r'length="[^"]*"',
+                      f'length="{dmg_size}"',
+                      updated_item
+                  )
                   updated_item = re.sub(
                       r'<sparkle:version>[^<]*</sparkle:version>',
                       f'<sparkle:version>{build}</sparkle:version>',
@@ -306,11 +304,10 @@ jobs:
                   updated_item = re.sub(
                       r'<pubDate>[^<]*</pubDate>',
                       f'<pubDate>{pubdate}</pubDate>',
-                      updated_item,
-                      count=1
+                      updated_item
                   )
               else:
-                  # Insert enclosure into entry that lacks one
+                  # Insert enclosure before </description> closing or before </item>
                   if '</description>' in updated_item:
                       updated_item = updated_item.replace(
                           '</description>\n                </item>',
@@ -321,6 +318,7 @@ jobs:
                           '</item>',
                           enclosure_tag + '\n                </item>'
                       )
+                  # Also update build number
                   updated_item = re.sub(
                       r'<sparkle:version>[^<]*</sparkle:version>',
                       f'<sparkle:version>{build}</sparkle:version>',
@@ -349,8 +347,10 @@ jobs:
               )
               if deltas_match:
                   deltas_block = deltas_match.group(1)
+                  # Find the current version's </item> in our xml and insert deltas before it
                   current_item = re.search(
-                      r'(<item>\s*<title>Version ' + re.escape(version) + r'</title>.*?)(</item>)',
+                      r'(<item>\s*(?:<title>Version ' + re.escape(version) + r'</title>|'
+                      r'<title>Version ' + re.escape(version) + r'</title>).*?)(</item>)',
                       xml, flags=re.DOTALL
                   )
                   if current_item and '<sparkle:deltas>' not in current_item.group(0):
@@ -369,19 +369,6 @@ jobs:
           open("IconChanger/Resources/sparkle.xml", "w").write(xml)
           PYEOF
 
-      - name: Create GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            build/IconChanger.dmg
-            build/*.delta
-          body_path: CHANGELOG.md
-          draft: false
-          prerelease: ${{ contains(github.ref, 'pre') || contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Commit and push appcast
         if: startsWith(github.ref, 'refs/tags/')
         run: |
@@ -398,6 +385,19 @@ jobs:
       - name: Trigger docs redeploy
         if: startsWith(github.ref, 'refs/tags/')
         run: gh workflow run docs.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            build/IconChanger.dmg
+            build/*.delta
+          body_path: CHANGELOG.md
+          draft: false
+          prerelease: ${{ contains(github.ref, 'pre') || contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

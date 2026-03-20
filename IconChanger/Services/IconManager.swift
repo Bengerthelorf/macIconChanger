@@ -921,6 +921,49 @@ class IconManager: ObservableObject {
             return .unknownError("An unexpected error occurred during sudoers check.")
         }
     }
+
+    // MARK: - App Management (TCC) Permission
+
+    private static let tccHandle: UnsafeMutableRawPointer? = {
+        dlopen("/System/Library/PrivateFrameworks/TCC.framework/Versions/A/TCC", RTLD_NOW)
+    }()
+
+    private static let tccPreflight: (@convention(c) (CFString, CFDictionary?) -> Int)? = {
+        guard let handle = tccHandle, let sym = dlsym(handle, "TCCAccessPreflight") else { return nil }
+        return unsafeBitCast(sym, to: (@convention(c) (CFString, CFDictionary?) -> Int).self)
+    }()
+
+    private static let tccRequest: (@convention(c) (CFString, CFDictionary?, @escaping (Bool) -> Void) -> Void)? = {
+        guard let handle = tccHandle, let sym = dlsym(handle, "TCCAccessRequest") else { return nil }
+        return unsafeBitCast(sym, to: (@convention(c) (CFString, CFDictionary?, @escaping (Bool) -> Void) -> Void).self)
+    }()
+
+    private static let tccServiceAppBundles = "kTCCServiceSystemPolicyAppBundles" as CFString
+
+    enum AppManagementStatus {
+        case authorized, denied, notDetermined, unknown
+    }
+
+    func appManagementStatus() -> AppManagementStatus {
+        guard Bundle.main.bundlePath.hasPrefix("/Applications/") else { return .authorized }
+        guard let preflight = Self.tccPreflight else { return .unknown }
+
+        // 0 = authorized, 1 = denied, 2 = not determined
+        switch preflight(Self.tccServiceAppBundles, nil) {
+        case 0: return .authorized
+        case 1: return .denied
+        case 2: return .notDetermined
+        default: return .unknown
+        }
+    }
+
+    // Triggers the system TCC prompt if status is notDetermined.
+    func requestAppManagementPermission(completion: @escaping (Bool) -> Void) {
+        guard let request = Self.tccRequest else { completion(false); return }
+        request(Self.tccServiceAppBundles, nil) { granted in
+            DispatchQueue.main.async { completion(granted) }
+        }
+    }
 }
 
 extension LaunchPadManagerDBHelper.AppInfo: @retroactive Identifiable {
