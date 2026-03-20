@@ -11,7 +11,7 @@ struct AboutSettingsView: View {
     @State private var avatarImage: NSImage?
     @State private var fetchTask: Task<Void, Never>?
     private static var memoryCache: NSImage?
-    @AppStorage("developerOptionsEnabled") private var developerOptionsEnabled = false
+    @AppStorage("t2e") private var t2Enabled = false
     @State private var versionTapCount = 0
     @State private var showDevUnlocked = false
     @State private var showCopied = false
@@ -69,7 +69,7 @@ struct AboutSettingsView: View {
                     copiedWorkItem = item
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: item)
 
-                    if developerOptionsEnabled { return }
+                    if t2Enabled { return }
                     if NSApp.currentEvent?.modifierFlags.contains(.option) == true {
                         unlockDeveloperOptions()
                     } else {
@@ -108,7 +108,7 @@ struct AboutSettingsView: View {
     }
 
     private func unlockDeveloperOptions() {
-        developerOptionsEnabled = true
+        t2Enabled = true
         devUnlockedWorkItem?.cancel()
         showDevUnlocked = true
         let item = DispatchWorkItem { showDevUnlocked = false }

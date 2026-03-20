@@ -26,6 +26,7 @@ struct IconChangerApp: App {
         }
 
         updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: updaterDelegate, userDriverDelegate: nil)
+        APIKeyManager.migrateIfNeeded()
         migrateAPIKeyToKeychain()
         setupDefaultAliasNames()
     }

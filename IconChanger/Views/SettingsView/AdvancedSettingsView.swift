@@ -85,13 +85,15 @@ struct AdvancedSettingsView: View {
     @AppStorage("apiTimeoutSeconds") private var apiTimeoutSeconds: Double = 15.0
     @AppStorage("apiMonthlyLimit") private var apiMonthlyLimit = 50
     @AppStorage("extendedSearch") private var extendedSearch = false
-    @AppStorage("developerOptionsEnabled") private var developerOptionsEnabled = false
+    @AppStorage("t2e") private var t2Enabled = false
     @AppStorage("enablePreRelease") private var enablePreRelease = false
     @State private var extraAPIKeys: [IdentifiableKey] = APIKeyManager.loadExtraKeys().map { IdentifiableKey(value: $0) }
     @State private var newAPIKey: String = ""
     @State private var extraKeyTestResults: [UUID: (success: Bool, message: String)] = [:]
     @State private var testingKeyIDs: Set<UUID> = []
     @State private var showDisableConfirmation = false
+    @State private var showExportPasswordPrompt = false
+    @State private var exportPassword = ""
     @State private var usageCount: Int = APIUsageTracker.shared.currentCount
 
     private var aliasCount: Int {
@@ -266,9 +268,7 @@ struct AdvancedSettingsView: View {
 
             Section {
                 Button {
-                    if let _ = ConfigManager.shared.exportConfigurationForCLI() {
-                        ConfigManager.shared.showExportDialog()
-                    }
+                    showExportPasswordPrompt = true
                 } label: {
                     Label("Export Configuration", systemImage: "square.and.arrow.up")
                 }
@@ -281,10 +281,22 @@ struct AdvancedSettingsView: View {
                 }
             } footer: {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Export your aliases and icon cache for backup or to use on another Mac.")
+                    Text("Export your aliases, icon cache, and settings for backup or to use on another Mac.")
                     Text("Import will only add new items, never replace or remove existing ones.")
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .alert("Export Configuration", isPresented: $showExportPasswordPrompt) {
+                SecureField("Password (optional)", text: $exportPassword)
+                Button("Export") {
+                    let pw = exportPassword.isEmpty ? nil : exportPassword
+                    _ = ConfigManager.shared.exportConfigurationForCLI()
+                    ConfigManager.shared.showExportDialog(password: pw)
+                    exportPassword = ""
+                }
+                Button("Cancel", role: .cancel) { exportPassword = "" }
+            } message: {
+                Text("Set a password to encrypt the export, or leave blank for unencrypted JSON.")
             }
 
             // MARK: - CLI
@@ -340,7 +352,7 @@ struct AdvancedSettingsView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            if developerOptionsEnabled {
+            if t2Enabled {
                 Section {
                     ForEach($extraAPIKeys) { $key in
                         VStack(alignment: .leading, spacing: 4) {
@@ -393,18 +405,18 @@ struct AdvancedSettingsView: View {
                     Button(role: .destructive) {
                         showDisableConfirmation = true
                     } label: {
-                        Label("Disable Developer Options", systemImage: "xmark.circle")
+                        Label("Disable Advanced Mode", systemImage: "xmark.circle")
                     }
-                    .alert("Disable Developer Options?", isPresented: $showDisableConfirmation) {
+                    .alert("Disable Advanced Mode?", isPresented: $showDisableConfirmation) {
                         Button("Cancel", role: .cancel) {}
                         Button("Disable", role: .destructive) {
-                            developerOptionsEnabled = false
+                            t2Enabled = false
                         }
                     } message: {
-                        Text("Are you sure you want to disable Developer Options?")
+                        Text("Are you sure you want to disable Advanced Mode?")
                     }
                 } header: {
-                    Label("Developer Options", systemImage: "hammer")
+                    Label("Advanced Mode", systemImage: "hammer")
                 } footer: {
                     Text("Additional API keys are rotated automatically to distribute usage across keys.")
                         .frame(maxWidth: .infinity, alignment: .leading)

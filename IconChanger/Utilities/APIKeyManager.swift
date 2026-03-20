@@ -6,8 +6,8 @@
 import Foundation
 
 enum APIKeyManager {
-    private static let extraKeysKey = "apiExtraKeys"
-    private static let keyIndexKey = "com.iconchanger.currentKeyIndex"
+    private static let extraKeysKey = "t2k"
+    private static let keyIndexKey = "t2ki"
 
     static var primaryKey: String {
         KeychainHelper.load(key: "apiKey") ?? ""
@@ -17,7 +17,7 @@ enum APIKeyManager {
         var keys: [String] = []
         let primary = primaryKey
         if !primary.isEmpty { keys.append(primary) }
-        if UserDefaults.standard.bool(forKey: "developerOptionsEnabled") {
+        if UserDefaults.standard.bool(forKey: "t2e") {
             keys.append(contentsOf: loadExtraKeys().filter { !$0.isEmpty })
         }
         return keys
@@ -51,5 +51,24 @@ enum APIKeyManager {
         guard let data = try? JSONEncoder().encode(keys),
               let json = String(data: data, encoding: .utf8) else { return }
         KeychainHelper.save(key: extraKeysKey, value: json)
+    }
+
+    /// Migrate legacy key names to current ones
+    static func migrateIfNeeded() {
+        let defaults = UserDefaults.standard
+
+        if defaults.object(forKey: "developerOptionsEnabled") != nil {
+            defaults.set(defaults.bool(forKey: "developerOptionsEnabled"), forKey: "t2e")
+            defaults.removeObject(forKey: "developerOptionsEnabled")
+        }
+
+        if defaults.object(forKey: "com.iconchanger.currentKeyIndex") != nil {
+            defaults.set(defaults.integer(forKey: "com.iconchanger.currentKeyIndex"), forKey: "t2ki")
+            defaults.removeObject(forKey: "com.iconchanger.currentKeyIndex")
+        }
+
+        if let old = KeychainHelper.load(key: "apiExtraKeys"), KeychainHelper.load(key: "t2k") == nil {
+            KeychainHelper.save(key: "t2k", value: old)
+        }
     }
 }
