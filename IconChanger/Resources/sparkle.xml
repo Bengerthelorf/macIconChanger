@@ -4,21 +4,20 @@
     <channel>
         <title>IconChanger</title>
         <item>
-                    <title>Version 1.4.4-pre-5</title>
+                    <title>Version 1.4.4-pre-6</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
-                    <sparkle:version>3014470005</sparkle:version>
-                    <sparkle:shortVersionString>1.4.4-pre-5</sparkle:shortVersionString>
-                    <pubDate>Fri, 20 Mar 2026 13:10:01 +0000</pubDate>
+                    <sparkle:version>3014470006</sparkle:version>
+                    <sparkle:shortVersionString>1.4.4-pre-6</sparkle:shortVersionString>
+                    <pubDate>Fri, 20 Mar 2026 13:22:46 +0000</pubDate>
                     <sparkle:channel>beta</sparkle:channel>
-                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-pre-5/IconChanger.dmg"
-                    sparkle:edSignature="TOKbvmyupzZZkokK7oDkb/BXh6RYM8ZBfWTuZfOu56p3PtXjGC/XNgBKDnNmV4JHyRPYwOT+4i4PEQjXhvdnDg==" length="5377970"
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-pre-6/IconChanger.dmg"
+                    sparkle:edSignature="7U9gC8/vPin9R1OJj5saVj68ubKbZQwN8y50fB583BX2hnwc3kHfrKQnKlaqWmO/Nu7KDARnh5G6PmPQs0HrBQ==" length="5382489"
                     type="application/octet-stream"/>
                     <description>
                         <![CDATA[
-                    <h2>Version 1.4.4-pre-5</h2>
+                    <h2>Version 1.4.4-pre-6</h2>
                     <ul>
-                        <li><strong>New:</strong> restore progress overlay, batch UI refresh</li>
-                        <li><strong>Fixed:</strong> refresh UI after config import</li>
+                        <li><strong>New:</strong> floating restore progress with liquid glass on macOS 26</li>
                     </ul>
                         ]]>
                     </description>
