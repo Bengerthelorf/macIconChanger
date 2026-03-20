@@ -424,20 +424,9 @@ class IconManager: ObservableObject {
             restoreProgress = (0, cachedIcons.count)
         }
 
-        defer {
-            Task { @MainActor in
-                isRestoring = false
-                restoreProgress = (0, 0)
-                restoringAppName = ""
-                // Single batch refresh after all icons are done
-                AppIconCache.shared.removeAll()
-                iconRefreshTrigger = UUID()
-            }
-        }
-
         for (index, cache) in cachedIcons.enumerated() {
             await MainActor.run {
-                restoreProgress = (index + 1, cachedIcons.count)
+                restoreProgress = (index, cachedIcons.count)
                 restoringAppName = cache.appName
             }
 
@@ -470,6 +459,14 @@ class IconManager: ObservableObject {
                 logger.error("Failed to restore icon for \(cache.appName): \(error.localizedDescription)")
                 failedApps.append((cache.appName, error))
             }
+        }
+
+        await MainActor.run {
+            isRestoring = false
+            restoreProgress = (0, 0)
+            restoringAppName = ""
+            AppIconCache.shared.removeAll()
+            iconRefreshTrigger = UUID()
         }
 
         if !failedApps.isEmpty {
