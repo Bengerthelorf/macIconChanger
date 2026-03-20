@@ -65,7 +65,7 @@ struct IconChangerApp: App {
 
                         Button("Restore All Cached Icons") {
                             Task {
-                                try? await IconManager.shared.restoreAllCachedIcons()
+                                let _ = try? await IconManager.shared.restoreAllCachedIcons()
                             }
                         }
 
