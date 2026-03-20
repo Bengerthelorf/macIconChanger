@@ -428,6 +428,12 @@ struct AdvancedSettingsView: View {
             ConfigManager.shared.checkForCLIImports()
             fetchCacheCount = IconFetchCacheManager.shared.getCacheCount()
         }
+        .onReceive(NotificationCenter.default.publisher(for: ConfigManager.didImportNotification)) { _ in
+            apiKey = KeychainHelper.load(key: "apiKey") ?? ""
+            extraAPIKeys = APIKeyManager.loadExtraKeys().map { IdentifiableKey(value: $0) }
+            usageCount = APIUsageTracker.shared.currentCount
+            fetchCacheCount = IconFetchCacheManager.shared.getCacheCount()
+        }
     }
 
     private func addExtraKey() {
