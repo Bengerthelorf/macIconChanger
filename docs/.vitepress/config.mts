@@ -3,10 +3,10 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'IconChanger',
   description: 'Customize macOS app icons with ease',
-  base: '/macIconChanger/',
+  base: '/iconchanger/',
 
   head: [
-    ['link', { rel: 'icon', type: 'image/png', href: '/macIconChanger/images/favicon.png' }],
+    ['link', { rel: 'icon', type: 'image/png', href: '/iconchanger/images/favicon.png' }],
   ],
 
   locales: {
