@@ -82,7 +82,7 @@ struct IconChangerApp: App {
 
             CommandGroup(replacing: .help) {
                 Button("IconChanger Help") {
-                    if let url = URL(string: "https://bengerthelorf.github.io/macIconChanger/") {
+                    if let url = URL(string: "https://app.snaix.homes/iconchanger/") {
                         NSWorkspace.shared.open(url)
                     }
                 }
