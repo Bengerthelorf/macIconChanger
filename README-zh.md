@@ -8,7 +8,7 @@
 
 [![下载](https://img.shields.io/github/v/release/Bengerthelorf/macIconChanger?label=下载&style=for-the-badge&color=blue)](https://github.com/Bengerthelorf/macIconChanger/releases/latest)
 &nbsp;
-[![文档](https://img.shields.io/badge/文档-查看_→-2ea44f?style=for-the-badge)](https://bengerthelorf.github.io/macIconChanger/zh/)
+[![文档](https://img.shields.io/badge/文档-查看_→-2ea44f?style=for-the-badge)](https://app.snaix.homes/iconchanger/zh/)
 &nbsp;
 [![Homebrew](https://img.shields.io/badge/Homebrew-可用-orange?style=for-the-badge)](https://github.com/Bengerthelorf/macIconChanger#quick-install)
 
@@ -20,7 +20,7 @@
 
 <br>
 
-### [📖 查看完整文档 →](https://bengerthelorf.github.io/macIconChanger/zh/)
+### [📖 查看完整文档 →](https://app.snaix.homes/iconchanger/zh/)
 
 安装指南、CLI 命令、API 配置、后台服务、导入导出等全部内容。
 
@@ -50,7 +50,7 @@ brew install Bengerthelorf/tap/iconchanger
 
 从 [Releases](https://github.com/Bengerthelorf/macIconChanger/releases/latest) 下载最新 DMG，拖入应用程序文件夹，启动即可。
 
-> **需要帮助？** 查看[快速入门](https://bengerthelorf.github.io/macIconChanger/zh/guide/getting-started)指南，或浏览完整的[文档](https://bengerthelorf.github.io/macIconChanger/zh/)。
+> **需要帮助？** 查看[快速入门](https://app.snaix.homes/iconchanger/zh/guide/getting-started)指南，或浏览完整的[文档](https://app.snaix.homes/iconchanger/zh/)。
 
 ## 系统要求
 

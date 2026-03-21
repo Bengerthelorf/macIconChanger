@@ -8,7 +8,7 @@
 
 [![Télécharger](https://img.shields.io/github/v/release/Bengerthelorf/macIconChanger?label=Télécharger&style=for-the-badge&color=blue)](https://github.com/Bengerthelorf/macIconChanger/releases/latest)
 &nbsp;
-[![Documentation](https://img.shields.io/badge/Documentation-Visiter_→-2ea44f?style=for-the-badge)](https://bengerthelorf.github.io/macIconChanger/)
+[![Documentation](https://img.shields.io/badge/Documentation-Visiter_→-2ea44f?style=for-the-badge)](https://app.snaix.homes/iconchanger/)
 &nbsp;
 [![Homebrew](https://img.shields.io/badge/Homebrew-Disponible-orange?style=for-the-badge)](https://github.com/Bengerthelorf/macIconChanger#quick-install)
 
@@ -20,7 +20,7 @@
 
 <br>
 
-### [📖 Lire la documentation complète →](https://bengerthelorf.github.io/macIconChanger/)
+### [📖 Lire la documentation complète →](https://app.snaix.homes/iconchanger/)
 
 Guides d'installation, commandes CLI, configuration API, service en arrière-plan, import/export, et plus encore.
 
@@ -50,7 +50,7 @@ brew install Bengerthelorf/tap/iconchanger
 
 Téléchargez le dernier DMG depuis [Releases](https://github.com/Bengerthelorf/macIconChanger/releases/latest), glissez dans Applications, et lancez.
 
-> **Besoin d'aide ?** Consultez le guide de [démarrage rapide](https://bengerthelorf.github.io/macIconChanger/guide/getting-started), ou parcourez la [documentation complète](https://bengerthelorf.github.io/macIconChanger/).
+> **Besoin d'aide ?** Consultez le guide de [démarrage rapide](https://app.snaix.homes/iconchanger/guide/getting-started), ou parcourez la [documentation complète](https://app.snaix.homes/iconchanger/).
 
 ## Configuration requise
 
