@@ -8,13 +8,6 @@ import AppKit
 import SwiftyJSON
 import os
 
-class MyRequestController {
-    @Sendable
-    func sendRequest(_ url: URL) async throws -> NSImage? {
-        try await IconImageLoader.shared.image(for: url)
-    }
-}
-
 private actor RequestDeduplicator {
     private var inflight: [String: Task<[IconRes], Error>] = [:]
 
@@ -113,6 +106,25 @@ class APIUsageTracker {
         return false
     }
 
+    /// Atomically checks whether a request can be made and records it if so,
+    /// preventing a TOCTOU race between separate check-then-increment calls.
+    func tryRecordRequest() -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        resetIfNewMonth()
+        if UserDefaults.standard.integer(forKey: countKey) < monthlyLimit {
+            let current = UserDefaults.standard.integer(forKey: countKey)
+            UserDefaults.standard.set(current + 1, forKey: countKey)
+            return true
+        }
+        if APIKeyManager.allKeys.count > 1 {
+            APIKeyManager.rotateToNextKey()
+            UserDefaults.standard.set(1, forKey: countKey)
+            return true
+        }
+        return false
+    }
+
     func recordRequest() {
         lock.lock()
         resetIfNewMonth()
@@ -189,7 +201,7 @@ class MyQueryRequestController {
     }
 
     func sendRequest(_ query: String, style: IconStyle = .all, apiKey: String? = nil) async throws -> [IconRes] {
-        guard APIUsageTracker.shared.canMakeRequest() else {
+        guard APIUsageTracker.shared.tryRecordRequest() else {
             throw APIError.rateLimitExceeded(
                 used: APIUsageTracker.shared.currentCount,
                 limit: APIUsageTracker.shared.monthlyLimit
@@ -256,7 +268,6 @@ class MyQueryRequestController {
         defer { if isNew { Task { await dedup.remove(key) } } }
 
         let results = try await task.value
-        if isNew { APIUsageTracker.shared.recordRequest() }
         return results
     }
     
@@ -325,7 +336,6 @@ class MyQueryRequestController {
 
             let json = try JSON(data: data)
 
-            // Check if the response has expected structure
             if json["hits"].exists() {
                 logger.debug("Received \(json["hits"].arrayValue.count) hits for '\(query, privacy: .public)'")
             } else {
@@ -387,7 +397,6 @@ class MyQueryRequestController {
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.addValue("application/json", forHTTPHeaderField: "Accept")
         
-        // Create a minimal query body
         let bodyObject: [String: Any] = [
             "query": testQuery,
             "searchOptions": [
@@ -397,14 +406,11 @@ class MyQueryRequestController {
             ]
         ]
         
-        // Convert body to JSON data
         let jsonData = try JSONSerialization.data(withJSONObject: bodyObject, options: [])
         request.httpBody = jsonData
-        
-        // Make the request
+
         let (data, response) = try await session.data(for: request)
-        
-        // Check response status code
+
         guard let httpResponse = response as? HTTPURLResponse else {
             throw NSError(domain: "IconChanger", code: 1003, userInfo: [NSLocalizedDescriptionKey: "Invalid response type"])
         }
@@ -426,23 +432,17 @@ class MyQueryRequestController {
                           userInfo: [NSLocalizedDescriptionKey: message])
         }
         
-        // Parse the response
         let json = try JSON(data: data)
-        
-        // Check if the response has the expected structure
+
         guard json["hits"].exists() else {
             throw NSError(domain: "IconChanger", code: 1004,
                           userInfo: [NSLocalizedDescriptionKey: "Invalid API response format"])
         }
         
-        // Count the icons
         let iconCount = json["hits"].arrayValue.count
-        
-        // Return success and icon count
         return (true, iconCount)
     }
     
-    // Backup method using a different approach to search the site
     private func sendBackupRequest(_ query: String, style: IconStyle, apiKey: String) async throws -> [IconRes] {
         let query = queryMix(query)
         logger.debug("Running backup search for '\(query, privacy: .public)', style=\(style.displayName, privacy: .public)")
@@ -510,13 +510,9 @@ class MyQueryRequestController {
         }
     }
     
-    // Helper method to try and extract icons from JSON in various formats
     private func extractIconsFromJSON(_ json: JSON) -> [IconRes]? {
         var results: [IconRes] = []
-        
-        // Try different possible response structures
-        
-        // Try format with "data" array
+
         if let dataArray = json["data"].array {
             logger.debug("Backup response contained 'data' array.")
             for item in dataArray {
@@ -534,7 +530,6 @@ class MyQueryRequestController {
             }
         }
         
-        // Try format with "icons" array
         else if let iconsArray = json["icons"].array {
             logger.debug("Backup response contained 'icons' array.")
             for item in iconsArray {
@@ -552,7 +547,6 @@ class MyQueryRequestController {
             }
         }
         
-        // Try format where the response is directly an array
         else if let directArray = json.array {
             logger.debug("Backup response was a direct array.")
             for item in directArray {

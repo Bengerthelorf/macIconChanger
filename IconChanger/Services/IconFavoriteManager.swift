@@ -63,21 +63,25 @@ class IconFavoriteManager {
             timestamp: Date()
         )
 
-        lock.lock()
-        favorites.insert(favorite, at: 0)
-        let snapshot = favorites
-        lock.unlock()
+        let snapshot: [FavoriteIcon] = {
+            lock.lock()
+            defer { lock.unlock() }
+            favorites.insert(favorite, at: 0)
+            return favorites
+        }()
         persistFavorites(snapshot)
         return true
     }
 
     func removeFavorite(_ favorite: FavoriteIcon) {
-        lock.lock()
+        let snapshot: [FavoriteIcon] = {
+            lock.lock()
+            defer { lock.unlock() }
+            favorites.removeAll { $0.id == favorite.id }
+            return favorites
+        }()
         let fileURL = Self.favoritesDirectory.appendingPathComponent(favorite.cachedFileName)
         try? FileManager.default.removeItem(at: fileURL)
-        favorites.removeAll { $0.id == favorite.id }
-        let snapshot = favorites
-        lock.unlock()
         persistFavorites(snapshot)
     }
 
@@ -113,14 +117,18 @@ class IconFavoriteManager {
     }
 
     func clearAllFavorites() {
-        lock.lock()
-        for fav in favorites {
-            let fileURL = Self.favoritesDirectory.appendingPathComponent(fav.cachedFileName)
-            try? FileManager.default.removeItem(at: fileURL)
+        let (snapshot, urlsToDelete): ([FavoriteIcon], [URL]) = {
+            lock.lock()
+            defer { lock.unlock() }
+            let urls = favorites.map {
+                Self.favoritesDirectory.appendingPathComponent($0.cachedFileName)
+            }
+            favorites.removeAll()
+            return (favorites, urls)
+        }()
+        for url in urlsToDelete {
+            try? FileManager.default.removeItem(at: url)
         }
-        favorites.removeAll()
-        let snapshot = favorites
-        lock.unlock()
         persistFavorites(snapshot)
     }
 

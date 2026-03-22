@@ -18,7 +18,7 @@ enum SetupStatus {
 
 class IconManager: ObservableObject {
     static let shared = IconManager()
-    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "IconManager")
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "IconChanger", category: "IconManager")
     
     @Published var icons = [(String, String)]()
     @Published var apps: [AppItem] = []
@@ -862,6 +862,10 @@ class IconManager: ObservableObject {
     func configureSudoers() throws {
         let helperPath = self.helperScriptURL.path
         let username = NSUserName()
+        guard username.range(of: "^[a-zA-Z0-9._-]+$", options: .regularExpression) != nil else {
+            throw NSError(domain: "IconManager", code: 22,
+                          userInfo: [NSLocalizedDescriptionKey: "Username '\(username)' contains characters not safe for sudoers configuration."])
+        }
         let sudoersLine = "\(username) ALL=(ALL) NOPASSWD: \(helperPath)"
         let sudoersFile = "/etc/sudoers.d/iconchanger"
 

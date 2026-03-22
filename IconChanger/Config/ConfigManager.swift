@@ -12,7 +12,7 @@ import os
 
 class ConfigManager {
     static let shared = ConfigManager()
-    let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ConfigManager")
+    let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "IconChanger", category: "ConfigManager")
 
     struct AppConfiguration: Codable {
         var appAliases: [AliasConfig] = []
@@ -301,10 +301,5 @@ class ConfigManager {
     }
 
     init() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, error in
-            if let error = error {
-                self.logger.error("Notification permission failed: \(error.localizedDescription)")
-            }
-        }
     }
 }

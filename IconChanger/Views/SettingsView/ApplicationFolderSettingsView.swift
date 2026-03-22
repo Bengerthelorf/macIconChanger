@@ -37,8 +37,6 @@ struct ApplicationFolderSettingsView: View {
                 TableColumn("Folder", value: \.path)
 
             }
-                    .onChange(of: selectedId) { newValue in
-                    }
                     .onAppear {
                         folderPermission.check()
                     }

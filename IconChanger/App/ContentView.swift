@@ -15,7 +15,7 @@ struct ContentView: View {
     @State private var isConfiguring = false
     @State private var configError: String?
 
-    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ContentView")
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "IconChanger", category: "ContentView")
 
     enum SetupState {
         case checking

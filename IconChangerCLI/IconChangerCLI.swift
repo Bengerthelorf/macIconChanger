@@ -30,8 +30,9 @@ private let cacheDir: URL = {
     return url
 }()
 
-private let helperScript = iconchangerDir.appendingPathComponent("helper.sh")
-private let fileicon = iconchangerDir.appendingPathComponent("fileicon")
+private let libDir = URL(fileURLWithPath: "/usr/local/lib/iconchanger")
+private let helperScript = URL(fileURLWithPath: "/usr/local/lib/iconchanger/helper.sh")
+private let fileicon = URL(fileURLWithPath: "/usr/local/lib/iconchanger/fileicon")
 
 // MARK: - App Defaults Reader
 

@@ -37,7 +37,7 @@ if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     error "Version must be in format X.Y.Z (e.g. 1.4.0)"
 fi
 
-BUILD_NUMBER=$(echo "$VERSION" | tr -d '.')
+BUILD_NUMBER=$(python3 "$PROJECT_DIR/scripts/build-number.py" "$VERSION")
 TAG="v$VERSION"
 
 info "Preparing release: $VERSION (build $BUILD_NUMBER, tag $TAG)"

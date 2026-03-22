@@ -53,8 +53,6 @@ class IconHistoryManager {
     func addEntry(image: NSImage, for appPath: String, appName: String) {
         let fileName = "\(UUID().uuidString).png"
         let fileURL = Self.historyDirectory.appendingPathComponent(fileName)
-
-        // Save image to disk
         if IconManager.saveImage(image, atUrl: fileURL) != nil {
             return // failed to save, skip
         }
@@ -67,27 +65,33 @@ class IconHistoryManager {
             timestamp: Date()
         )
 
-        lock.lock()
-        var entries = history[appPath] ?? []
-        entries.insert(entry, at: 0) // newest first
+        let (snapshot, urlsToDelete): ([String: [IconHistoryEntry]], [URL]) = {
+            lock.lock()
+            defer { lock.unlock() }
+            var entries = history[appPath] ?? []
+            entries.insert(entry, at: 0) // newest first
 
-        // Enforce per-app limit
-        while entries.count > maxPerApp {
-            let removed = entries.removeLast()
-            let removeURL = Self.historyDirectory.appendingPathComponent(removed.cachedFileName)
-            try? FileManager.default.removeItem(at: removeURL)
+            // Enforce per-app limit
+            var urls: [URL] = []
+            while entries.count > maxPerApp {
+                let removed = entries.removeLast()
+                urls.append(Self.historyDirectory.appendingPathComponent(removed.cachedFileName))
+            }
+            history[appPath] = entries
+
+            // Enforce total limit
+            urls.append(contentsOf: enforceGlobalLimit())
+
+            return (history, urls)
+        }()
+        for url in urlsToDelete {
+            try? FileManager.default.removeItem(at: url)
         }
-        history[appPath] = entries
-
-        // Enforce total limit
-        enforceGlobalLimit()
-
-        let snapshot = history
-        lock.unlock()
         persistHistory(snapshot)
     }
 
-    private func enforceGlobalLimit() {
+    /// Must be called while holding the lock. Returns URLs to delete after releasing the lock.
+    private func enforceGlobalLimit() -> [URL] {
         var allEntries: [(appPath: String, entry: IconHistoryEntry)] = []
         for (appPath, entries) in history {
             for entry in entries {
@@ -95,21 +99,22 @@ class IconHistoryManager {
             }
         }
 
-        if allEntries.count <= maxTotal { return }
+        if allEntries.count <= maxTotal { return [] }
 
         // Sort by timestamp, oldest first
         allEntries.sort { $0.entry.timestamp < $1.entry.timestamp }
 
         let toRemove = allEntries.count - maxTotal
+        var urls: [URL] = []
         for i in 0..<toRemove {
             let item = allEntries[i]
-            let removeURL = Self.historyDirectory.appendingPathComponent(item.entry.cachedFileName)
-            try? FileManager.default.removeItem(at: removeURL)
+            urls.append(Self.historyDirectory.appendingPathComponent(item.entry.cachedFileName))
             history[item.appPath]?.removeAll { $0.id == item.entry.id }
         }
 
         // Clean up empty keys
         history = history.filter { !$0.value.isEmpty }
+        return urls
     }
 
     func getHistory(for appPath: String) -> [IconHistoryEntry] {
@@ -119,43 +124,49 @@ class IconHistoryManager {
     }
 
     func removeEntry(_ entry: IconHistoryEntry) {
-        lock.lock()
+        let snapshot: [String: [IconHistoryEntry]] = {
+            lock.lock()
+            defer { lock.unlock() }
+            history[entry.appPath]?.removeAll { $0.id == entry.id }
+            if history[entry.appPath]?.isEmpty == true {
+                history.removeValue(forKey: entry.appPath)
+            }
+            return history
+        }()
         let fileURL = Self.historyDirectory.appendingPathComponent(entry.cachedFileName)
         try? FileManager.default.removeItem(at: fileURL)
-        history[entry.appPath]?.removeAll { $0.id == entry.id }
-        if history[entry.appPath]?.isEmpty == true {
-            history.removeValue(forKey: entry.appPath)
-        }
-        let snapshot = history
-        lock.unlock()
         persistHistory(snapshot)
     }
 
     func clearHistory(for appPath: String) {
-        lock.lock()
-        if let entries = history[appPath] {
-            for entry in entries {
-                let fileURL = Self.historyDirectory.appendingPathComponent(entry.cachedFileName)
-                try? FileManager.default.removeItem(at: fileURL)
+        let (snapshot, urlsToDelete): ([String: [IconHistoryEntry]], [URL]) = {
+            lock.lock()
+            defer { lock.unlock() }
+            let urls = (history[appPath] ?? []).map {
+                Self.historyDirectory.appendingPathComponent($0.cachedFileName)
             }
             history.removeValue(forKey: appPath)
+            return (history, urls)
+        }()
+        for url in urlsToDelete {
+            try? FileManager.default.removeItem(at: url)
         }
-        let snapshot = history
-        lock.unlock()
         persistHistory(snapshot)
     }
 
     func clearAllHistory() {
-        lock.lock()
-        for (_, entries) in history {
-            for entry in entries {
-                let fileURL = Self.historyDirectory.appendingPathComponent(entry.cachedFileName)
-                try? FileManager.default.removeItem(at: fileURL)
+        let (snapshot, urlsToDelete): ([String: [IconHistoryEntry]], [URL]) = {
+            lock.lock()
+            defer { lock.unlock() }
+            let urls = history.values.flatMap { entries in
+                entries.map { Self.historyDirectory.appendingPathComponent($0.cachedFileName) }
             }
+            history.removeAll()
+            return (history, urls)
+        }()
+        for url in urlsToDelete {
+            try? FileManager.default.removeItem(at: url)
         }
-        history.removeAll()
-        let snapshot = history
-        lock.unlock()
         persistHistory(snapshot)
     }
 

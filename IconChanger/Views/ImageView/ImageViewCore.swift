@@ -91,14 +91,14 @@ struct ImageViewCore: View {
                     }
     }
     func changeIcon(image: NSImage) {
-        task = Task {
+        task = Task.detached {
             do {
                 await MainActor.run {
                     isTaskRunning = true
                 }
                 
                 // Create a local copy of the image for memory safety
-                let imageCopy = image
+                let imageCopy = image.copy() as! NSImage
                 try IconManager.shared.setImage(imageCopy, app: setPath)
                 
                 await MainActor.run {

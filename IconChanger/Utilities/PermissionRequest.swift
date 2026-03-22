@@ -24,7 +24,7 @@ struct PermissionList: Identifiable {
 
 class FolderPermission: ObservableObject {
     static let shared = FolderPermission()
-    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "FolderPermission")
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "IconChanger", category: "FolderPermission")
 
     @Published var permissions: [PermissionList] = []
 

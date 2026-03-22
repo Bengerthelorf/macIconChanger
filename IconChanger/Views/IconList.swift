@@ -259,8 +259,13 @@ struct IconList: View {
             }
         }
 
-                .sheet(item: $setAlias) {
-                    SetAliasNameView(raw: $0, lastText: AliasName.getName(for: $0) ?? "")
+                .sheet(isPresented: Binding(
+                    get: { setAlias != nil },
+                    set: { if !$0 { setAlias = nil } }
+                )) {
+                    if let alias = setAlias {
+                        SetAliasNameView(raw: alias, lastText: AliasName.getName(for: alias) ?? "")
+                    }
                 }
                 .searchable(text: $searchText)
                 .toolbar {
@@ -867,11 +872,6 @@ struct DockPreviewIcon: View {
     }
 }
 
-extension String: @retroactive Identifiable {
-    public var id: String {
-        self
-    }
-}
 
 private struct RestoreProgressView: View {
     let appName: String

@@ -48,7 +48,7 @@ struct IconFetchCacheEntry: Codable {
 /// Manages icon search result caching with optional disk persistence.
 class IconFetchCacheManager {
     static let shared = IconFetchCacheManager()
-    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "IconFetchCache")
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "IconChanger", category: "IconFetchCache")
 
     // MARK: - Properties
 

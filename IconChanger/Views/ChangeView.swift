@@ -292,8 +292,13 @@ struct ChangeView: View {
                 .task {
                     triggerIconFetch()
                 }
-                .sheet(item: $setAlias) {
-                    SetAliasNameView(raw: $0, lastText: AliasName.getName(for: $0) ?? "")
+                .sheet(isPresented: Binding(
+                    get: { setAlias != nil },
+                    set: { if !$0 { setAlias = nil } }
+                )) {
+                    if let alias = setAlias {
+                        SetAliasNameView(raw: alias, lastText: AliasName.getName(for: alias) ?? "")
+                    }
                 }
                 .onDisappear {
                     loadIconsTask?.cancel()

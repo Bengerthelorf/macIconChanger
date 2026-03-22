@@ -10,9 +10,9 @@ import UserNotifications
 import ServiceManagement
 import os
 
-class BackgroundService: ObservableObject, @unchecked Sendable {
+@MainActor class BackgroundService: ObservableObject {
     static let shared = BackgroundService()
-    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "BackgroundService")
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "IconChanger", category: "BackgroundService")
 
     private static let fetchCacheMaxAge: TimeInterval = 600
     private static let fetchCacheCleanupInterval: TimeInterval = 900
@@ -510,7 +510,7 @@ class BackgroundService: ObservableObject, @unchecked Sendable {
 
         if IconFetchCacheManager.shared.getCacheCount() > 0 {
             fetchCacheCleanupTimer = makeRepeatingTimer(interval: Self.fetchCacheCleanupInterval) { [weak self] in
-                self?.cleanupFetchCache()
+                DispatchQueue.main.async { self?.cleanupFetchCache() }
             }
         }
     }

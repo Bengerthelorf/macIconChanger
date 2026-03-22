@@ -146,44 +146,6 @@ class LanguageManager: ObservableObject {
     }
 }
 
-struct LanguageSettingsView: View {
-    @StateObject private var languageManager = LanguageManager.shared
-    @State private var showRestartAlert = false
-
-    var body: some View {
-        Form {
-            Section {
-                Picker(NSLocalizedString("Language", comment: "Settings section title"), selection: Binding(
-                    get: { self.languageManager.currentLanguage },
-                    set: { newValue in
-                        self.languageManager.currentLanguage = newValue
-                        self.showRestartAlert = true
-                    }
-                )) {
-                    ForEach(AppLanguage.allCases) { language in
-                        Text(language.displayName).tag(language)
-                    }
-                }
-                .pickerStyle(RadioGroupPickerStyle())
-                .labelsHidden()
-            } header: {
-                Label(NSLocalizedString("Language", comment: "Settings section title"), systemImage: "globe")
-            } footer: {
-                Label(NSLocalizedString("Changes will take full effect after restarting the app", comment: "Language settings instruction"), systemImage: "info.circle")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-        }
-        .formStyle(.grouped)
-        .alert(isPresented: $showRestartAlert) {
-            Alert(
-                title: Text(NSLocalizedString("Language Changed", comment: "Language alert title")),
-                message: Text(NSLocalizedString("The language has been changed. For the best experience, please restart the application.", comment: "Language alert message")),
-                dismissButton: .default(Text("OK"))
-            )
-        }
-    }
-}
-
 struct SettingsView: View {
     let updater: SPUUpdater
 

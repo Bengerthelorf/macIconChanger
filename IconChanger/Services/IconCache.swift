@@ -69,10 +69,12 @@ class IconCacheManager {
             appVersion: IconCache.currentVersion(for: appPath)
         )
 
-        lock.lock()
-        cachedIcons[appPath] = iconCache
-        let snapshot = cachedIcons
-        lock.unlock()
+        let snapshot: [String: IconCache] = {
+            lock.lock()
+            defer { lock.unlock() }
+            cachedIcons[appPath] = iconCache
+            return cachedIcons
+        }()
         persistCache(snapshot)
 
         return iconURL
@@ -104,9 +106,10 @@ class IconCacheManager {
     }
 
     func updateTimestamp(for appPath: String, to date: Date = Date()) {
-        var snapshot: [String: IconCache]?
-        lock.lock()
-        if let existing = cachedIcons[appPath] {
+        let snapshot: [String: IconCache]? = {
+            lock.lock()
+            defer { lock.unlock() }
+            guard let existing = cachedIcons[appPath] else { return nil }
             cachedIcons[appPath] = IconCache(
                 appPath: existing.appPath,
                 iconFileName: existing.iconFileName,
@@ -114,34 +117,36 @@ class IconCacheManager {
                 timestamp: date,
                 appVersion: IconCache.currentVersion(for: appPath)
             )
-            snapshot = cachedIcons
-        }
-        lock.unlock()
+            return cachedIcons
+        }()
         if let snapshot { persistCache(snapshot) }
     }
 
     func removeCachedIcon(for appPath: String) {
-        var snapshot: [String: IconCache]?
-        lock.lock()
-        if let cache = cachedIcons[appPath] {
+        let result: (snapshot: [String: IconCache], iconURL: URL)? = {
+            lock.lock()
+            defer { lock.unlock() }
+            guard let cache = cachedIcons[appPath] else { return nil }
             let iconURL = Self.cacheDirectory.appendingPathComponent(cache.iconFileName)
-            try? FileManager.default.removeItem(at: iconURL)
-
             cachedIcons.removeValue(forKey: appPath)
-            snapshot = cachedIcons
+            return (cachedIcons, iconURL)
+        }()
+        if let result {
+            try? FileManager.default.removeItem(at: result.iconURL)
+            persistCache(result.snapshot)
         }
-        lock.unlock()
-        if let snapshot { persistCache(snapshot) }
     }
 
     func clearCache() {
-        lock.lock()
-        let urlsToDelete = cachedIcons.values.map {
-            Self.cacheDirectory.appendingPathComponent($0.iconFileName)
-        }
-        cachedIcons.removeAll()
-        let snapshot = cachedIcons
-        lock.unlock()
+        let (snapshot, urlsToDelete): ([String: IconCache], [URL]) = {
+            lock.lock()
+            defer { lock.unlock() }
+            let urls = cachedIcons.values.map {
+                Self.cacheDirectory.appendingPathComponent($0.iconFileName)
+            }
+            cachedIcons.removeAll()
+            return (cachedIcons, urls)
+        }()
         persistCache(snapshot)
 
         for url in urlsToDelete {
@@ -150,10 +155,12 @@ class IconCacheManager {
     }
 
     func addImportedCache(_ cache: IconCache) {
-        lock.lock()
-        cachedIcons[cache.appPath] = cache
-        let snapshot = cachedIcons
-        lock.unlock()
+        let snapshot: [String: IconCache] = {
+            lock.lock()
+            defer { lock.unlock() }
+            cachedIcons[cache.appPath] = cache
+            return cachedIcons
+        }()
         persistCache(snapshot)
     }
 }

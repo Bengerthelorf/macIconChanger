@@ -67,7 +67,8 @@ new_item = (
     f"                </item>"
 )
 
-xml = open("IconChanger/Resources/sparkle.xml").read()
+with open("IconChanger/Resources/sparkle.xml") as f:
+    xml = f.read()
 
 existing = re.search(
     r'<item>\s*<title>Version ' + re.escape(version) + r'</title>.*?</item>',
@@ -132,4 +133,5 @@ try:
 except FileNotFoundError:
     pass
 
-open("IconChanger/Resources/sparkle.xml", "w").write(xml)
+with open("IconChanger/Resources/sparkle.xml", "w") as f:
+    f.write(xml)
