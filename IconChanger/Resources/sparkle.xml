@@ -4,6 +4,39 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.4.4-8</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>3014400008</sparkle:version>
+                    <sparkle:shortVersionString>1.4.4-8</sparkle:shortVersionString>
+                    <pubDate>Sun, 22 Mar 2026 20:19:38 +0000</pubDate>
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-8/IconChanger.dmg"
+                    sparkle:edSignature="Mf+VP3NtCsl+ao4sFBdBlCBpEbksAAwVWQcTxxQJXNfO5b3s3WAecNXgzZ3NTM5D8a29L4TwvsAsAnZlP547Aw==" length="5393040"
+                    type="application/octet-stream"/>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.4.4-8</h2>
+                    <ul>
+                        <li><strong>Refactor:</strong> second-pass audit — threading, dead code, and code quality</li>
+                        <li><strong>Fixed:</strong> comprehensive code audit — threading, safety, and dead code cleanup</li>
+                        <li><strong>Fixed:</strong> restore VitePress base to /macIconChanger/ on main</li>
+                        <li><strong>Fixed:</strong> update documentation URLs to new domain app.snaix.homes</li>
+                        <li><strong>Fixed:</strong> update VitePress base path to match new deployment URL</li>
+                        <li><strong>Refactor:</strong> clean up comments to only explain why</li>
+                        <li><strong>Fixed:</strong> detect stale sudoers path by dry-running helper instead of sudo -n -l</li>
+                        <li><strong>Fixed:</strong> restore error now shows specific app names and failure reasons</li>
+                        <li><strong>Fixed:</strong> settings restore now shows partial failures instead of false success</li>
+                        <li><strong>Fixed:</strong> detect app updates by bundle version instead of modDate</li>
+                        <li><strong>New:</strong> restore result summary with skipped/failed counts</li>
+                        <li><strong>Fixed:</strong> restore cleanup ordering, progress accuracy, main thread safety</li>
+                        <li><strong>Fixed:</strong> PBKDF2 key derivation, wrong password error, restore skip reporting</li>
+                        <li><strong>New:</strong> floating restore progress with liquid glass on macOS 26</li>
+                        <li><strong>New:</strong> restore progress overlay, batch UI refresh</li>
+                        <li><strong>Fixed:</strong> refresh UI after config import</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
                     <title>Version 1.4.4-pre-8</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>3014470008</sparkle:version>
