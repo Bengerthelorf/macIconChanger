@@ -27,7 +27,6 @@
 		684319A985908FD7F396A2B9 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684311E6ADA4C380BC5296B0 /* SettingsView.swift */; };
 		684319BAF8AE3F8E503A8FCD /* ApplicationSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68431E71D50DCD6E570EC101 /* ApplicationSettingsView.swift */; };
 		68431A9559BEE5B0B6042265 /* ApplicationFolderSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68431EB0D4F0448EC3F269CE /* ApplicationFolderSettingsView.swift */; };
-		68431CD74AE43807FEA2060C /* AliasName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68431D5A5B918C1F369508C2 /* AliasName.swift */; };
 		68431D584237DD997A7513DA /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68431AB7EEBD9DCD4429645F /* ImageView.swift */; };
 		68431D85DB8E44D55E7421B7 /* ApplicationAliasSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68431257D7AB81F1EC9AC811 /* ApplicationAliasSettingsView.swift */; };
 		68431F5F90EFAE60C30EF968 /* AliasNameCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68431A145EE994BD86061133 /* AliasNameCore.swift */; };
@@ -51,7 +50,6 @@
 		9083CCEC2867FDDD0093A1B2 /* LaunchPadManagerDBHelper in Frameworks */ = {isa = PBXBuildFile; productRef = 9083CCEB2867FDDD0093A1B2 /* LaunchPadManagerDBHelper */; };
 		9083CCEE28680BE20093A1B2 /* URL+Universal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9083CCED28680BE20093A1B2 /* URL+Universal.swift */; };
 		908A78FB2819640800951B15 /* IconManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 908A78FA2819640800951B15 /* IconManager.swift */; };
-		908A79022819753E00951B15 /* String+RangeSubscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 908A79012819753E00951B15 /* String+RangeSubscript.swift */; };
 		908A79092819840D00951B15 /* ChangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 908A79082819840D00951B15 /* ChangeView.swift */; };
 		908A790B281A128700951B15 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 908A790A281A128700951B15 /* Request.swift */; };
 		908A7927281A5A4A00951B15 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 908A7926281A5A4A00951B15 /* README.md */; };
@@ -112,7 +110,6 @@
 		68431A145EE994BD86061133 /* AliasNameCore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AliasNameCore.swift; sourceTree = "<group>"; };
 		68431AB7EEBD9DCD4429645F /* ImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageView.swift; sourceTree = "<group>"; };
 		68431B5BF95B69F7A3E9C314 /* ImageViewCore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageViewCore.swift; sourceTree = "<group>"; };
-		68431D5A5B918C1F369508C2 /* AliasName.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AliasName.swift; sourceTree = "<group>"; };
 		68431E71D50DCD6E570EC101 /* ApplicationSettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplicationSettingsView.swift; sourceTree = "<group>"; };
 		68431EB0D4F0448EC3F269CE /* ApplicationFolderSettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplicationFolderSettingsView.swift; sourceTree = "<group>"; };
 		900D1CE8281934C7007ABB12 /* IconChangerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconChangerApp.swift; sourceTree = "<group>"; };
@@ -134,7 +131,6 @@
 		907AC5002955363800F9F0F9 /* README-fr.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = "README-fr.md"; sourceTree = "<group>"; };
 		9083CCED28680BE20093A1B2 /* URL+Universal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Universal.swift"; sourceTree = "<group>"; };
 		908A78FA2819640800951B15 /* IconManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconManager.swift; sourceTree = "<group>"; };
-		908A79012819753E00951B15 /* String+RangeSubscript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+RangeSubscript.swift"; sourceTree = "<group>"; };
 		908A79082819840D00951B15 /* ChangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeView.swift; sourceTree = "<group>"; };
 		908A790A281A128700951B15 /* Request.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
 		908A7926281A5A4A00951B15 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -183,7 +179,6 @@
 		6843107C0C56CB3BC8FB61D4 /* AliasName */ = {
 			isa = PBXGroup;
 			children = (
-				68431D5A5B918C1F369508C2 /* AliasName.swift */,
 				684312DDF57DD3F7FD140291 /* SetAliasNameView.swift */,
 				68431A145EE994BD86061133 /* AliasNameCore.swift */,
 			);
@@ -312,7 +307,6 @@
 			isa = PBXGroup;
 			children = (
 				9083CCED28680BE20093A1B2 /* URL+Universal.swift */,
-				908A79012819753E00951B15 /* String+RangeSubscript.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -512,13 +506,11 @@
 				9053434F286B2A6800237F98 /* AutoUpdater.swift in Sources */,
 				D428FC81D231B8B76467CD43 /* ConfigCrypto.swift in Sources */,
 				1466242F19B3C04FD0C1CF1B /* AppSettings.swift in Sources */,
-				908A79022819753E00951B15 /* String+RangeSubscript.swift in Sources */,
 				908A79092819840D00951B15 /* ChangeView.swift in Sources */,
 				684314A1977FA2DF04BCD0F2 /* LocalImageView.swift in Sources */,
 				2FC131622D8F7DB000F60B19 /* IconCache.swift in Sources */,
 				68431D584237DD997A7513DA /* ImageView.swift in Sources */,
 				684312FB180B32D3350C6687 /* ImageViewCore.swift in Sources */,
-				68431CD74AE43807FEA2060C /* AliasName.swift in Sources */,
 				684311E1DAA0EE528A75D6B4 /* SetAliasNameView.swift in Sources */,
 				C6E571DA2EA2319C00EC9E5E /* IconImageLoader.swift in Sources */,
 				2FC1318B2D8FB37B00F60B19 /* AppDelegate.swift in Sources */,

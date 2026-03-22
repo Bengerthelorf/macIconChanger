@@ -142,7 +142,6 @@ class LanguageManager: ObservableObject {
             UserDefaults.standard.removeObject(forKey: "AppleLanguages")
         }
 
-        UserDefaults.standard.synchronize()
     }
 }
 

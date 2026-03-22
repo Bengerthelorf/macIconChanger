@@ -93,14 +93,19 @@ class APIUsageTracker {
 
     func canMakeRequest() -> Bool {
         lock.lock()
-        defer { lock.unlock() }
         resetIfNewMonth()
-        if UserDefaults.standard.integer(forKey: countKey) < monthlyLimit {
+        let count = UserDefaults.standard.integer(forKey: countKey)
+        let limit = monthlyLimit
+        lock.unlock()
+
+        if count < limit {
             return true
         }
         if APIKeyManager.allKeys.count > 1 {
             APIKeyManager.rotateToNextKey()
+            lock.lock()
             UserDefaults.standard.set(0, forKey: countKey)
+            lock.unlock()
             return true
         }
         return false
@@ -110,16 +115,21 @@ class APIUsageTracker {
     /// preventing a TOCTOU race between separate check-then-increment calls.
     func tryRecordRequest() -> Bool {
         lock.lock()
-        defer { lock.unlock() }
         resetIfNewMonth()
-        if UserDefaults.standard.integer(forKey: countKey) < monthlyLimit {
-            let current = UserDefaults.standard.integer(forKey: countKey)
-            UserDefaults.standard.set(current + 1, forKey: countKey)
+        let count = UserDefaults.standard.integer(forKey: countKey)
+        let limit = monthlyLimit
+        if count < limit {
+            UserDefaults.standard.set(count + 1, forKey: countKey)
+            lock.unlock()
             return true
         }
+        lock.unlock()
+
         if APIKeyManager.allKeys.count > 1 {
             APIKeyManager.rotateToNextKey()
+            lock.lock()
             UserDefaults.standard.set(1, forKey: countKey)
+            lock.unlock()
             return true
         }
         return false
@@ -135,15 +145,15 @@ class APIUsageTracker {
 
     func markCurrentKeyExhausted() {
         lock.lock()
+        defer { lock.unlock() }
         UserDefaults.standard.set(monthlyLimit, forKey: countKey)
-        lock.unlock()
     }
 
     func resetCount() {
         lock.lock()
+        defer { lock.unlock() }
         UserDefaults.standard.set(0, forKey: countKey)
         UserDefaults.standard.set(Date(), forKey: resetDateKey)
-        lock.unlock()
     }
 
     private func resetIfNewMonth() {

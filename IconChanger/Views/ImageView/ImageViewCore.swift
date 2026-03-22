@@ -98,7 +98,7 @@ struct ImageViewCore: View {
                 }
                 
                 // Create a local copy of the image for memory safety
-                let imageCopy = image.copy() as! NSImage
+                guard let imageCopy = image.copy() as? NSImage else { return }
                 try IconManager.shared.setImage(imageCopy, app: setPath)
                 
                 await MainActor.run {

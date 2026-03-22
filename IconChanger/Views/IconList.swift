@@ -430,15 +430,8 @@ struct IconList: View {
                 )) {
                     Button("OK", role: .cancel) { }
                 } message: {
-                    Text(IconList.friendlyErrorMessage(restoreError ?? ""))
+                    Text(ChangeView.friendlyErrorMessage(restoreError ?? ""))
                 }
-    }
-
-    static func friendlyErrorMessage(_ raw: String) -> String {
-        if raw.contains("permission") || raw.contains("权限") {
-            return NSLocalizedString("This app may be protected by macOS. Try closing the app first, or the app may not support icon changes.", comment: "Permission error explanation")
-        }
-        return raw
     }
 
     /// Reads the full Dock layout: pinned apps (ordered) + running apps.

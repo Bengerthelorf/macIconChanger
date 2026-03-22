@@ -6,13 +6,12 @@
 import Foundation
 import AppKit
 
-class FolderManager: ObservableObject {
+@MainActor class FolderManager: ObservableObject {
     static let shared = FolderManager()
 
     private let storageKey = "com.iconchanger.userFolders"
     private let bookmarkKey = "com.iconchanger.folderBookmarks"
     @Published var folders: [AppItem] = []
-    private let lock = NSLock()
 
     init() {
         loadFolders()
@@ -48,9 +47,7 @@ class FolderManager: ObservableObject {
             }
         }
 
-        lock.lock()
         folders = resolved.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
-        lock.unlock()
 
         UserDefaults.standard.set(validBookmarks, forKey: bookmarkKey)
     }
@@ -58,9 +55,7 @@ class FolderManager: ObservableObject {
     func addFolder(url: URL) -> Bool {
         let path = url.universalPath()
 
-        lock.lock()
         let alreadyExists = folders.contains { $0.id == path }
-        lock.unlock()
 
         if alreadyExists { return false }
 
@@ -75,21 +70,17 @@ class FolderManager: ObservableObject {
         let name = url.lastPathComponent
         let item = AppItem(name: name, url: url, originalAppInfo: nil)
 
-        lock.lock()
         folders.append(item)
         folders.sort { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
-        lock.unlock()
 
         return true
     }
 
     func removeFolder(at path: String) {
-        lock.lock()
         if let item = folders.first(where: { $0.id == path }) {
             item.url.stopAccessingSecurityScopedResource()
         }
         folders.removeAll { $0.id == path }
-        lock.unlock()
 
         var bookmarks = (UserDefaults.standard.dictionary(forKey: bookmarkKey) as? [String: Data]) ?? [:]
         bookmarks.removeValue(forKey: path)

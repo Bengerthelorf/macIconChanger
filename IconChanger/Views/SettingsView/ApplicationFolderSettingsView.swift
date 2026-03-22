@@ -37,9 +37,6 @@ struct ApplicationFolderSettingsView: View {
                 TableColumn("Folder", value: \.path)
 
             }
-                    .onAppear {
-                        folderPermission.check()
-                    }
 
         }
 

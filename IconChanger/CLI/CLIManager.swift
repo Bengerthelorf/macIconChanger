@@ -6,7 +6,7 @@
 import SwiftUI
 import Foundation
 
-class CLIManager: ObservableObject {
+@MainActor class CLIManager: ObservableObject {
     static let shared = CLIManager()
     
     @Published var isInstalled: Bool = false
@@ -27,17 +27,17 @@ class CLIManager: ObservableObject {
     func installCLI() {
         isInstalling = true
         lastError = nil
-        
-        Task {
+
+        let cliName = bundledCLIName
+        let location = installLocation
+        Task.detached {
             do {
-                // Get the CLI tool from the application's bundle
-                guard let bundlePath = Bundle.main.path(forResource: bundledCLIName, ofType: nil) else {
+                guard let bundlePath = Bundle.main.path(forResource: cliName, ofType: nil) else {
                     throw NSError(domain: "CLIManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "CLI executable not found in application bundle"])
                 }
-                
-                // Use osascript to execute the sudo command for installation
+
                 let escapedBundlePath = bundlePath.shellEscaped
-                let escapedInstallLocation = installLocation.shellEscaped
+                let escapedInstallLocation = location.shellEscaped
                 let script = """
                 do shell script "cp '\(escapedBundlePath)' '\(escapedInstallLocation)' && chmod +x '\(escapedInstallLocation)'" with administrator privileges
                 """
@@ -66,12 +66,12 @@ class CLIManager: ObservableObject {
     func uninstallCLI() {
         isInstalling = true
         lastError = nil
-        
-        Task {
+
+        let location = installLocation
+        Task.detached {
             do {
-                // Use osascript to execute the sudo command for uninstallation
                 let script = """
-                do shell script "rm '\(installLocation.shellEscaped)'" with administrator privileges
+                do shell script "rm '\(location.shellEscaped)'" with administrator privileges
                 """
                 
                 let appleScript = NSAppleScript(source: script)

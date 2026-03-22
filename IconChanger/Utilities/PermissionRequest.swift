@@ -80,12 +80,6 @@ class FolderPermission: ObservableObject {
         self.permissions = validPermissions
     }
 
-    func check() {
-        if !hasPermission {
-            // add() // Don't automatically add, let user decide
-        }
-    }
-
     func add() {
         let openPanel = NSOpenPanel()
         openPanel.directoryURL = URL(fileURLWithPath: "/Applications")
