@@ -48,10 +48,7 @@ class IconManager: ObservableObject {
     }()
 
     private static let auditLogURL: URL = {
-        let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let dir = appSupport.appendingPathComponent("IconChanger")
-        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        return dir.appendingPathComponent("audit.log")
+        AppPaths.applicationSupportRoot.appendingPathComponent("audit.log")
     }()
 
     private func auditLog(operation: String, appName: String, appPath: String, detail: String = "") {

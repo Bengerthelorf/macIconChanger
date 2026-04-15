@@ -12,27 +12,88 @@ import ArgumentParser
 
 private let appBundleID = "com.zhuhaoyu.IconChanger"
 
-private let iconchangerDir: URL = {
-    let url = URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent(".iconchanger", isDirectory: true)
+/// Legacy root from pre-migration versions (`~/.iconchanger/`).
+private let legacyRoot: URL = FileManager.default.homeDirectoryForCurrentUser
+    .appendingPathComponent(".iconchanger", isDirectory: true)
+
+private let cachesRoot: URL = {
+    let url = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+        .appendingPathComponent(appBundleID, isDirectory: true)
+    try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+    return url
+}()
+
+private let applicationSupportRoot: URL = {
+    let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        .appendingPathComponent(appBundleID, isDirectory: true)
     try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
     return url
 }()
 
 private let sharedConfigDir: URL = {
-    let url = iconchangerDir.appendingPathComponent("config", isDirectory: true)
+    let url = applicationSupportRoot.appendingPathComponent("config", isDirectory: true)
     try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
     return url
 }()
 
 private let cacheDir: URL = {
-    let url = iconchangerDir.appendingPathComponent("cache", isDirectory: true)
+    let url = cachesRoot.appendingPathComponent("cache", isDirectory: true)
     try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
     return url
 }()
 
-private let libDir = URL(fileURLWithPath: "/usr/local/lib/iconchanger")
 private let helperScript = URL(fileURLWithPath: "/usr/local/lib/iconchanger/helper.sh")
 private let fileicon = URL(fileURLWithPath: "/usr/local/lib/iconchanger/fileicon")
+
+/// Idempotent one-time migration from legacy `~/.iconchanger/` layout.
+/// Kept in sync with the GUI app's `AppPaths.migrateLegacyDirectoryIfNeeded()`.
+private func migrateLegacyDirectoryIfNeeded() {
+    let fm = FileManager.default
+    guard fm.fileExists(atPath: legacyRoot.path) else { return }
+
+    let applicationSupportHistoryDir = applicationSupportRoot.appendingPathComponent("history", isDirectory: true)
+    let applicationSupportFavoritesDir = applicationSupportRoot.appendingPathComponent("favorites", isDirectory: true)
+
+    let dirMoves: [(from: URL, to: URL)] = [
+        (legacyRoot.appendingPathComponent("cache", isDirectory: true), cacheDir),
+        (legacyRoot.appendingPathComponent("history", isDirectory: true), applicationSupportHistoryDir),
+        (legacyRoot.appendingPathComponent("favorites", isDirectory: true), applicationSupportFavoritesDir),
+        (legacyRoot.appendingPathComponent("config", isDirectory: true), sharedConfigDir)
+    ]
+    for move in dirMoves where fm.fileExists(atPath: move.from.path) {
+        try? fm.createDirectory(at: move.to, withIntermediateDirectories: true)
+        if let items = try? fm.contentsOfDirectory(atPath: move.from.path) {
+            for item in items {
+                let src = move.from.appendingPathComponent(item)
+                let dst = move.to.appendingPathComponent(item)
+                if fm.fileExists(atPath: dst.path) {
+                    try? fm.removeItem(at: src)
+                } else {
+                    try? fm.moveItem(at: src, to: dst)
+                }
+            }
+        }
+        if let remaining = try? fm.contentsOfDirectory(atPath: move.from.path), remaining.isEmpty {
+            try? fm.removeItem(at: move.from)
+        }
+    }
+
+    let legacyFetchCache = legacyRoot.appendingPathComponent("icon_fetch_cache.json")
+    if fm.fileExists(atPath: legacyFetchCache.path) {
+        let destination = cachesRoot.appendingPathComponent("icon_fetch_cache.json")
+        if !fm.fileExists(atPath: destination.path) {
+            try? fm.moveItem(at: legacyFetchCache, to: destination)
+        } else {
+            try? fm.removeItem(at: legacyFetchCache)
+        }
+    }
+
+    let remaining = (try? fm.contentsOfDirectory(atPath: legacyRoot.path)) ?? []
+    let nonIgnored = remaining.filter { $0 != ".DS_Store" }
+    if nonIgnored.isEmpty {
+        try? fm.removeItem(at: legacyRoot)
+    }
+}
 
 // MARK: - App Defaults Reader
 
@@ -198,6 +259,11 @@ struct IconChangerCLI: ParsableCommand {
             CompletionsCommand.self,
         ]
     )
+
+    static func main() {
+        migrateLegacyDirectoryIfNeeded()
+        Self.main(nil)
+    }
 }
 
 // MARK: - status
@@ -240,7 +306,7 @@ struct StatusCommand: ParsableCommand {
         if verbose {
             print("")
             print("Paths:")
-            print("  Config dir:    \(iconchangerDir.path)")
+            print("  Config dir:    \(sharedConfigDir.path)")
             print("  Cache dir:     \(cacheDir.path)")
             print("  Helper:        \(helperScript.path) \(helperOK ? "✓" : "✗")")
             print("  Fileicon:      \(fileicon.path) \(fileiconOK ? "✓" : "✗")")

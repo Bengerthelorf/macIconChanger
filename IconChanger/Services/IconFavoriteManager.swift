@@ -22,12 +22,7 @@ class IconFavoriteManager {
     private let lock = NSLock()
 
     static var favoritesDirectory: URL {
-        let path = "\(NSHomeDirectory())/.iconchanger/favorites"
-        let url = URL(fileURLWithPath: path)
-        if !FileManager.default.fileExists(atPath: path) {
-            try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
-        }
-        return url
+        AppPaths.iconFavoritesDirectory
     }
 
     init() {

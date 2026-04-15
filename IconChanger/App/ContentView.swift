@@ -270,15 +270,6 @@ struct ContentView_Previews: PreviewProvider {
 extension NSWorkspace {
 
     enum SystemServiceType: String {
-        case privacy = "x-apple.systempreferences:com.apple.preference.security?Privacy"
-        case camera = "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera"
-        case microphone = "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone"
-        case location = "x-apple.systempreferences:com.apple.preference.security?Privacy_LocationServices"
-        case contacts = "x-apple.systempreferences:com.apple.preference.security?Privacy_Contacts"
-        case calendars = "x-apple.systempreferences:com.apple.preference.security?Privacy_Calendars"
-        case reminders = "x-apple.systempreferences:com.apple.preference.security?Privacy_Reminders"
-        case photos = "x-apple.systempreferences:com.apple.preference.security?Privacy_Photos"
-        case fullDisk = "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles"
         case appManagement = "x-apple.systempreferences:com.apple.preference.security?Privacy_AppBundles"
     }
 

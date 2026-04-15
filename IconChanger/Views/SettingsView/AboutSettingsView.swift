@@ -119,10 +119,7 @@ struct AboutSettingsView: View {
     // MARK: - Avatar Caching (memory + disk + bundled asset)
 
     private static let avatarCacheURL: URL = {
-        let cacheDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
-            .appendingPathComponent(Bundle.main.bundleIdentifier ?? "com.zhuhaoyu.IconChanger", isDirectory: true)
-        try? FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
-        return cacheDir.appendingPathComponent("avatar.png")
+        AppPaths.cachesRoot.appendingPathComponent("avatar.png")
     }()
 
     private static let cacheMaxAge: TimeInterval = 86400 // 24 hours

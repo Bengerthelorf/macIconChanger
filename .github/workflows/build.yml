@@ -209,6 +209,8 @@ jobs:
             app "IconChanger.app"
             zap trash: [
               "~/Library/Preferences/com.zhuhaoyu.IconChanger.plist",
+              "~/Library/Caches/com.zhuhaoyu.IconChanger",
+              "~/Library/Application Support/com.zhuhaoyu.IconChanger",
               "~/.iconchanger",
             ]
           end

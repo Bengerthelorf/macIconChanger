@@ -63,11 +63,7 @@ class IconFetchCacheManager {
     // MARK: - Disk Persistence
 
     private static var persistentCacheFileURL: URL {
-        let dir = URL(fileURLWithPath: "\(NSHomeDirectory())/.iconchanger")
-        if !FileManager.default.fileExists(atPath: dir.path) {
-            try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        }
-        return dir.appendingPathComponent("icon_fetch_cache.json")
+        AppPaths.iconFetchCacheFile
     }
 
     private static let cacheAPIResultsKey = "cacheAPIResults"

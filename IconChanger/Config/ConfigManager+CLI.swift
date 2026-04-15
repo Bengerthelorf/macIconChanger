@@ -7,12 +7,9 @@ import Foundation
 
 extension ConfigManager {
 
-    static let sharedConfigDirectory: URL = {
-        let url = URL(fileURLWithPath: NSHomeDirectory())
-            .appendingPathComponent(".iconchanger/config", isDirectory: true)
-        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
-        return url
-    }()
+    static var sharedConfigDirectory: URL {
+        AppPaths.sharedConfigDirectory
+    }
 
     func exportConfigurationForCLI() -> URL? {
         guard let exportUrl = exportConfiguration() else { return nil }

@@ -5,6 +5,7 @@
 
 import Foundation
 import AppKit
+import os
 
 struct IconCache: Codable, Identifiable {
     var id: String { appPath }
@@ -22,17 +23,13 @@ struct IconCache: Codable, Identifiable {
 class IconCacheManager {
     static let shared = IconCacheManager()
 
+    private let logger = Logger(subsystem: AppPaths.bundleID, category: "IconCache")
     private let cacheKey = "com.iconchanger.cachedIcons"
     private var cachedIcons: [String: IconCache] = [:]
     private let lock = NSLock()
 
     static var cacheDirectory: URL {
-        let path = "\(NSHomeDirectory())/.iconchanger/cache"
-        let url = URL(fileURLWithPath: path)
-        if !FileManager.default.fileExists(atPath: path) {
-            try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
-        }
-        return url
+        AppPaths.iconCacheDirectory
     }
 
     init() {
@@ -48,8 +45,11 @@ class IconCacheManager {
 
     /// Must be called outside the lock. Pass a snapshot of cachedIcons.
     private func persistCache(_ snapshot: [String: IconCache]) {
-        if let encoded = try? JSONEncoder().encode(snapshot) {
+        do {
+            let encoded = try JSONEncoder().encode(snapshot)
             UserDefaults.standard.set(encoded, forKey: cacheKey)
+        } catch {
+            logger.error("Failed to persist icon cache metadata: \(error.localizedDescription, privacy: .public)")
         }
     }
 

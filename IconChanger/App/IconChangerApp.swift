@@ -25,6 +25,8 @@ struct IconChangerApp: App {
             }
         }
 
+        AppPaths.migrateLegacyDirectoryIfNeeded()
+
         updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: updaterDelegate, userDriverDelegate: nil)
         APIKeyManager.migrateIfNeeded()
         migrateAPIKeyToKeychain()
@@ -64,8 +66,30 @@ struct IconChangerApp: App {
                         Divider()
 
                         Button("Restore All Cached Icons") {
-                            Task {
-                                let _ = try? await IconManager.shared.restoreAllCachedIcons()
+                            Task { @MainActor in
+                                do {
+                                    let result = try await IconManager.shared.restoreAllCachedIcons()
+                                    let alert = NSAlert()
+                                    alert.alertStyle = .informational
+                                    alert.messageText = NSLocalizedString("Restore Complete", comment: "")
+                                    var message = String(format: NSLocalizedString("%lld icons restored.", comment: ""), result.restored)
+                                    if result.skippedNotInstalled > 0 {
+                                        message += "\n" + String(format: NSLocalizedString("%lld skipped (app not installed).", comment: ""), result.skippedNotInstalled)
+                                    }
+                                    if !result.failed.isEmpty {
+                                        message += "\n" + String(format: NSLocalizedString("%lld failed.", comment: ""), result.failed.count)
+                                    }
+                                    alert.informativeText = message
+                                    alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+                                    alert.runModal()
+                                } catch {
+                                    let alert = NSAlert()
+                                    alert.alertStyle = .critical
+                                    alert.messageText = NSLocalizedString("Error Restoring Icons", comment: "")
+                                    alert.informativeText = error.localizedDescription
+                                    alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
+                                    alert.runModal()
+                                }
                             }
                         }
 

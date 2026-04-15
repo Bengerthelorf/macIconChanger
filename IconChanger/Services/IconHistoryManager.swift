@@ -25,12 +25,7 @@ class IconHistoryManager {
     private let maxTotal = 500
 
     static var historyDirectory: URL {
-        let path = "\(NSHomeDirectory())/.iconchanger/history"
-        let url = URL(fileURLWithPath: path)
-        if !FileManager.default.fileExists(atPath: path) {
-            try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
-        }
-        return url
+        AppPaths.iconHistoryDirectory
     }
 
     init() {
