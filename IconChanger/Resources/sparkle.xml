@@ -4,6 +4,25 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.4.4-pre-9</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>3014470009</sparkle:version>
+                    <sparkle:shortVersionString>1.4.4-pre-9</sparkle:shortVersionString>
+                    <pubDate>Wed, 15 Apr 2026 18:55:43 +0000</pubDate>
+                    <sparkle:channel>beta</sparkle:channel>
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.4.4-pre-9/IconChanger.dmg"
+                    sparkle:edSignature="Dsia5mKR4IbZyD+XyCHCL5SxtVzCuLGOoBY13nAOgsK+wUir32VJqM01pULxQai3YyGQ698R6ZUb/dQQ1pzXCg==" length="5416672"
+                    type="application/octet-stream"/>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.4.4-pre-9</h2>
+                    <ul>
+                        <li><strong>Fixed:</strong> migrate storage to macOS-standard paths (#32)</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
                     <title>Version 1.4.4-8</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>3014400008</sparkle:version>
