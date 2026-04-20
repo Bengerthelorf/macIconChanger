@@ -1,4 +1,10 @@
-# 命令参考
+---
+title: 命令参考
+section: cli
+order: 2
+locale: zh
+---
+
 
 ## 概览
 
@@ -183,7 +189,7 @@ iconchanger escape-jail --dry-run --verbose
 iconchanger escape-jail /Applications/Safari.app
 ```
 
-::: warning
+:::callout[warning]{kind="warn"}
 自定义图标不支持 macOS Tahoe 的 Clear（透明）、Tinted（着色）或 Dark（深色）图标模式，它们保持为静态图片。
 :::
 

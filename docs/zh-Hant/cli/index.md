@@ -1,4 +1,10 @@
-# CLI 安裝
+---
+title: CLI 安裝
+section: cli
+order: 1
+locale: zh-Hant
+---
+
 
 IconChanger 包含命令列工具，適用於腳本和自動化。
 

@@ -1,4 +1,9 @@
-# Command Reference
+---
+title: Command Reference
+section: cli
+order: 2
+---
+
 
 ## Overview
 
@@ -183,7 +188,7 @@ iconchanger escape-jail --dry-run --verbose
 iconchanger escape-jail /Applications/Safari.app
 ```
 
-::: warning
+:::callout[warning]{kind="warn"}
 Custom icons do not support macOS Tahoe's Clear, Tinted, or Dark icon modes. They remain as static bitmaps.
 :::
 

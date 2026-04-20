@@ -1,4 +1,9 @@
-# CLI Installation
+---
+title: CLI Installation
+section: cli
+order: 1
+---
+
 
 IconChanger includes a command-line interface for scripting and automation.
 
