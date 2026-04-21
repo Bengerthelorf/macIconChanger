@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'docs/**'
+  release:
+    types: [published]
   workflow_dispatch:
 
 jobs:
