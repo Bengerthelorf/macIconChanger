@@ -50,7 +50,7 @@ brew install Bengerthelorf/tap/iconchanger
 
 Download the latest DMG from [Releases](https://github.com/Bengerthelorf/macIconChanger/releases/latest), drag to Applications, and launch.
 
-> **Need help?** Check the [Getting Started](https://app.snaix.homes/iconchanger/guide/getting-started) guide, or browse the full [Documentation](https://app.snaix.homes/iconchanger/).
+> **Need help?** Check the [Getting Started](https://app.snaix.homes/iconchanger/docs/getting-started) guide, or browse the full [Documentation](https://app.snaix.homes/iconchanger/).
 
 ## System Requirements
 
