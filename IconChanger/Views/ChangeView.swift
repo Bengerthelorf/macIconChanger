@@ -266,18 +266,27 @@ struct ChangeView: View {
                 }
                 .onChange(of: importedImageURL) { url in
                     guard let url = url else { return }
-                    defer {
-                        // Clean up temp files we created during drag-drop
-                        if url.lastPathComponent.hasPrefix("dropped_icon_") {
-                            try? FileManager.default.removeItem(at: url)
-                        }
-                        importedImageURL = nil
+                    let isTempDrop = url.lastPathComponent.hasPrefix("dropped_icon_")
+                    importedImageURL = nil
+                    guard let nsimage = NSImage(contentsOf: url) else {
+                        if isTempDrop { try? FileManager.default.removeItem(at: url) }
+                        setIconError = NSLocalizedString("The selected file is not a valid image.", comment: "Local icon load error")
+                        return
                     }
-                    if let nsimage = NSImage(contentsOf: url) {
+                    showProgress = true
+                    Task.detached {
+                        defer {
+                            if isTempDrop { try? FileManager.default.removeItem(at: url) }
+                        }
                         do {
-                            try IconManager.shared.setImage(nsimage, app: setPath)
+                            guard let imageCopy = nsimage.copy() as? NSImage else { return }
+                            try IconManager.shared.setImage(imageCopy, app: setPath)
+                            await MainActor.run { showProgress = false }
                         } catch {
-                            setIconError = error.localizedDescription
+                            await MainActor.run {
+                                showProgress = false
+                                setIconError = error.localizedDescription
+                            }
                         }
                     }
                 }
@@ -339,6 +348,23 @@ struct ChangeView: View {
                     Button("OK", role: .cancel) { }
                 } message: {
                     Text(Self.friendlyErrorMessage(setIconError ?? ""))
+                }
+                .overlay {
+                    if showProgress {
+                        ZStack {
+                            Color.black.opacity(0.25)
+                            VStack(spacing: 12) {
+                                ProgressView()
+                                    .progressViewStyle(AppStoreProgressViewStyle())
+                                Text("Applying icon…")
+                                    .font(.title3)
+                                    .fontWeight(.semibold)
+                            }
+                            .padding(28)
+                            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+                        }
+                        .ignoresSafeArea()
+                    }
                 }
     }
     
