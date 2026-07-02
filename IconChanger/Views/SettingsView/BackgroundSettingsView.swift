@@ -84,6 +84,9 @@ struct BackgroundSettingsView: View {
 
                 Section {
                     Toggle("Restore Icons on Schedule", isOn: $backgroundService.enableScheduledRestore)
+                        .onChange(of: backgroundService.enableScheduledRestore) { _ in
+                            backgroundService.setupTimers()
+                        }
 
                     if backgroundService.enableScheduledRestore {
                         Picker("Interval", selection: Binding(
@@ -140,6 +143,9 @@ struct BackgroundSettingsView: View {
 
                 Section {
                     Toggle("Restore Icons When Apps Update", isOn: $backgroundService.enableAutoRestoreOnUpdate)
+                        .onChange(of: backgroundService.enableAutoRestoreOnUpdate) { _ in
+                            backgroundService.setupTimers()
+                        }
 
                     if backgroundService.enableAutoRestoreOnUpdate {
                         Picker("Check Interval", selection: Binding(
