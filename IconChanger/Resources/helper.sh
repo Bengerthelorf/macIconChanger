@@ -5,6 +5,17 @@ FILEICON_PATH="$1"
 APP_PATH="$2"
 IMAGE_PATH="$3"
 
+# Reject control chars in caller paths (defense-in-depth; real paths never have them).
+control_chars=$'\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f\x7f'
+for p in "$APP_PATH" "$IMAGE_PATH"; do
+    case "$p" in
+        *["$control_chars"]*)
+            echo "ERROR: path contains control characters, refusing: $p" >&2
+            exit 1
+            ;;
+    esac
+done
+
 EXPECTED_DIR="/usr/local/lib/iconchanger"
 case "$FILEICON_PATH" in
     "$EXPECTED_DIR"/fileicon) ;;

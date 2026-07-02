@@ -206,14 +206,17 @@ setCustomIcon() {
 
   # !! Note: The setIcon method seemingly always indicates True, even with invalid image files, so
   # !!       we attempt no error handling in the AppleScript code, and instead verify success explicitly later.
-  osascript <<EOF >/dev/null || die
+  # Pass paths as argv (injection-safe), never interpolated into the script source.
+  osascript - "$imgFile" "$fileOrFolder" >/dev/null <<'EOF' || die
     use framework "Cocoa"
 
-    set sourcePath to "$imgFile"
-    set destPath to "$fileOrFolder"
+    on run argv
+        set sourcePath to item 1 of argv
+        set destPath to item 2 of argv
 
-    set imageData to (current application's NSImage's alloc()'s initWithContentsOfFile:sourcePath)
-    (current application's NSWorkspace's sharedWorkspace()'s setIcon:imageData forFile:destPath options:2)
+        set imageData to (current application's NSImage's alloc()'s initWithContentsOfFile:sourcePath)
+        (current application's NSWorkspace's sharedWorkspace()'s setIcon:imageData forFile:destPath options:2)
+    end run
 EOF
 
   # Verify that a resource fork with icons was actually created.
