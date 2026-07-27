@@ -17,8 +17,6 @@ fi
 
 hdiutil verify "$DMG_PATH"
 codesign --verify --strict --verbose=4 "$DMG_PATH"
-xcrun stapler validate "$DMG_PATH"
-spctl --assess --type open --context context:primary-signature --verbose=4 "$DMG_PATH"
 
 MOUNT_INFO="$(mktemp "${TMPDIR:-/tmp}/iconchanger-mount.XXXXXX.plist")"
 MOUNT_POINT=""
@@ -64,8 +62,6 @@ APP_PATH="$MOUNT_POINT/IconChanger.app"
 }
 
 codesign --verify --deep --strict --verbose=4 "$APP_PATH"
-xcrun stapler validate "$APP_PATH"
-spctl --assess --type execute --verbose=4 "$APP_PATH"
 
 ACTUAL_VERSION=$(
     /usr/libexec/PlistBuddy \
@@ -87,4 +83,4 @@ ACTUAL_BUILD=$(
     exit 1
 }
 
-echo "Release artifact passed signature, notarization, layout, and version checks."
+echo "Release artifact passed signature, layout, and version checks."

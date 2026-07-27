@@ -18,10 +18,9 @@ permissions:
 
 jobs:
   candidate:
-    name: Signed and notarized candidate
+    name: Release candidate
     runs-on: macos-26
     env:
-      ARCHIVE_PATH: build/IconChanger.xcarchive
       APP_PATH: build/IconChanger.app
       DMG_PATH: build/candidate/IconChanger.dmg
       CANDIDATE_DIR: build/candidate
@@ -61,89 +60,26 @@ jobs:
             -scheme IconChanger \
             -derivedDataPath build/DerivedData
 
-      - name: Import Developer ID certificate
-        env:
-          CERTIFICATE_P12: ${{ secrets.CERTIFICATE_P12 }}
-          CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+      - name: Build candidate app
         run: |
-          test -n "$CERTIFICATE_P12"
-          test -n "$CERTIFICATE_PASSWORD"
-
-          KEYCHAIN_PATH="$RUNNER_TEMP/iconchanger-signing.keychain-db"
-          KEYCHAIN_PASSWORD=$(openssl rand -base64 32)
-          CERTIFICATE_PATH="$RUNNER_TEMP/iconchanger-certificate.p12"
-
-          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          printf '%s' "$CERTIFICATE_P12" | base64 --decode > "$CERTIFICATE_PATH"
-          security import "$CERTIFICATE_PATH" \
-            -P "$CERTIFICATE_PASSWORD" \
-            -A -t cert -f pkcs12 \
-            -k "$KEYCHAIN_PATH"
-          security set-key-partition-list \
-            -S apple-tool:,apple: \
-            -k "$KEYCHAIN_PASSWORD" \
-            "$KEYCHAIN_PATH"
-          security list-keychains -d user -s "$KEYCHAIN_PATH"
-
-          SIGNING_IDENTITY=$(
-            security find-identity -v -p codesigning "$KEYCHAIN_PATH" |
-              sed -n 's/.*"\(Developer ID Application:.*\)"/\1/p' |
-              head -1
-          )
-          test -n "$SIGNING_IDENTITY" || {
-            echo "CERTIFICATE_P12 must contain a Developer ID Application certificate." >&2
-            exit 1
-          }
-
-          echo "KEYCHAIN_PATH=$KEYCHAIN_PATH" >> "$GITHUB_ENV"
-          echo "SIGNING_IDENTITY=$SIGNING_IDENTITY" >> "$GITHUB_ENV"
-
-      - name: Archive signed app
-        env:
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: |
-          test -n "$APPLE_TEAM_ID"
           mkdir -p build
 
-          xcodebuild archive \
+          xcodebuild build \
             -project IconChanger.xcodeproj \
             -scheme IconChanger \
             -configuration Release \
             -destination "generic/platform=macOS" \
             -derivedDataPath build/DerivedData \
-            -archivePath "$ARCHIVE_PATH" \
             MARKETING_VERSION="$VERSION" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
             CODE_SIGN_STYLE=Manual \
-            CODE_SIGN_IDENTITY="$SIGNING_IDENTITY" \
-            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
-            OTHER_CODE_SIGN_FLAGS="--timestamp" \
+            CODE_SIGN_IDENTITY="-" \
             -quiet
 
-          ditto "$ARCHIVE_PATH/Products/Applications/IconChanger.app" "$APP_PATH"
+          ditto \
+            build/DerivedData/Build/Products/Release/IconChanger.app \
+            "$APP_PATH"
           codesign --verify --deep --strict --verbose=4 "$APP_PATH"
-
-      - name: Notarize and staple app
-        env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: |
-          test -n "$APPLE_ID"
-          test -n "$APPLE_APP_SPECIFIC_PASSWORD"
-          test -n "$APPLE_TEAM_ID"
-
-          ditto -c -k --keepParent "$APP_PATH" build/IconChanger-notary.zip
-          xcrun notarytool submit build/IconChanger-notary.zip \
-            --apple-id "$APPLE_ID" \
-            --password "$APPLE_APP_SPECIFIC_PASSWORD" \
-            --team-id "$APPLE_TEAM_ID" \
-            --wait
-          xcrun stapler staple "$APP_PATH"
-          xcrun stapler validate "$APP_PATH"
-          spctl --assess --type execute --verbose=4 "$APP_PATH"
 
       - name: Build styled DMG
         run: |
@@ -154,20 +90,7 @@ jobs:
 
           mkdir -p "$CANDIDATE_DIR"
           scripts/create-dmg.sh "$APP_PATH" "$DMG_PATH"
-          codesign --force --timestamp --sign "$SIGNING_IDENTITY" "$DMG_PATH"
-
-      - name: Notarize and staple DMG
-        env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: |
-          xcrun notarytool submit "$DMG_PATH" \
-            --apple-id "$APPLE_ID" \
-            --password "$APPLE_APP_SPECIFIC_PASSWORD" \
-            --team-id "$APPLE_TEAM_ID" \
-            --wait
-          xcrun stapler staple "$DMG_PATH"
+          codesign --force --sign - "$DMG_PATH"
           scripts/validate-release-artifact.sh \
             "$DMG_PATH" \
             "$VERSION" \
@@ -239,10 +162,3 @@ jobs:
           path: build/candidate/
           if-no-files-found: error
           retention-days: 14
-
-      - name: Cleanup signing keychain
-        if: always()
-        run: |
-          if [[ -n "${KEYCHAIN_PATH:-}" ]]; then
-            security delete-keychain "$KEYCHAIN_PATH" 2>/dev/null || true
-          fi

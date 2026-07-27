@@ -28,14 +28,22 @@ fi
 
 /usr/bin/grep -Fq "workflow_dispatch:" "$CANDIDATE_WORKFLOW" ||
     fail "candidate builds must be manually dispatched"
-/usr/bin/grep -Fq "notarytool submit" "$CANDIDATE_WORKFLOW" ||
-    fail "candidate workflow must notarize artifacts"
-/usr/bin/grep -Fq "stapler staple" "$CANDIDATE_WORKFLOW" ||
-    fail "candidate workflow must staple notarization tickets"
-/usr/bin/grep -Fq "spctl --assess" "$CANDIDATE_WORKFLOW" ||
-    fail "candidate workflow must validate Gatekeeper acceptance"
+/usr/bin/grep -Fq 'CODE_SIGN_IDENTITY="-"' "$CANDIDATE_WORKFLOW" ||
+    fail "candidate workflow must use repeatable local signing"
+/usr/bin/grep -Fq "codesign --verify" "$CANDIDATE_WORKFLOW" ||
+    fail "candidate workflow must verify its app signature"
 /usr/bin/grep -Fq "actions/upload-artifact@" "$CANDIDATE_WORKFLOW" ||
     fail "candidate workflow must upload testable artifacts"
+
+if /usr/bin/grep -Fq "hide_extensions" "$DMG_SETTINGS"; then
+    fail "DMG layout must not add FinderInfo metadata to the signed app"
+fi
+
+if /usr/bin/grep -Eq \
+    'notarytool|stapler|APPLE_ID|APPLE_TEAM_ID|CERTIFICATE_P12|Developer ID|spctl' \
+    "$CANDIDATE_WORKFLOW"; then
+    fail "candidate workflow must not require a paid Apple developer account"
+fi
 
 /usr/bin/grep -Fq "workflow_dispatch:" "$PUBLISH_WORKFLOW" ||
     fail "publishing must require a manual dispatch"

@@ -36,5 +36,4 @@ icon_locations = {
     "Applications": (490, 230),
 }
 
-hide_extensions = [application.name]
 badge_icon = str(application)
