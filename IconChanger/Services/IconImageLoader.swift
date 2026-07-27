@@ -78,19 +78,34 @@ actor IconImageLoader {
         if url.isFileURL {
             return loadLocalImage(from: url)
         } else {
+            guard RemoteImagePolicy.acceptsRemoteURL(url) else {
+                return nil
+            }
             return try await downloadImage(from: url)
         }
     }
 
     private func downloadImage(from url: URL) async throws -> NSImage? {
-        let (data, response) = try await session.data(from: url)
+        let (bytes, response) = try await session.bytes(from: url)
 
         guard let httpResponse = response as? HTTPURLResponse,
               200..<300 ~= httpResponse.statusCode,
-              !data.isEmpty else {
+              RemoteImagePolicy.acceptsContentLength(response.expectedContentLength) else {
             return nil
         }
 
+        var data = Data()
+        if response.expectedContentLength > 0 {
+            data.reserveCapacity(Int(response.expectedContentLength))
+        }
+        for try await byte in bytes {
+            guard data.count < RemoteImagePolicy.maxResponseBytes else {
+                return nil
+            }
+            data.append(byte)
+        }
+
+        guard !data.isEmpty else { return nil }
         return makeDetachedImage(from: data)
     }
 

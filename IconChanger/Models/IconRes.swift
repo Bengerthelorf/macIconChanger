@@ -5,6 +5,20 @@
 
 import Foundation
 
+enum RemoteImagePolicy {
+    static let maxResponseBytes = 20 * 1024 * 1024
+
+    static func acceptsRemoteURL(_ url: URL) -> Bool {
+        url.scheme?.lowercased() == "https" &&
+            url.user == nil &&
+            url.password == nil
+    }
+
+    static func acceptsContentLength(_ length: Int64) -> Bool {
+        length < 0 || length <= Int64(maxResponseBytes)
+    }
+}
+
 class IconRes: Identifiable, Hashable {
     let appName: String
     let icnsUrl: URL
@@ -22,11 +36,11 @@ class IconRes: Identifiable, Hashable {
             return nil
         }
 
-        guard icnsUrl.scheme == "https" || icnsUrl.scheme == "http" else {
+        guard RemoteImagePolicy.acceptsRemoteURL(icnsUrl) else {
             return nil
         }
 
-        guard lowResPngUrl.scheme == "https" || lowResPngUrl.scheme == "http" else {
+        guard RemoteImagePolicy.acceptsRemoteURL(lowResPngUrl) else {
             return nil
         }
 
@@ -48,4 +62,3 @@ class IconRes: Identifiable, Hashable {
         hasher.combine(lowResPngUrl)
     }
 }
-
