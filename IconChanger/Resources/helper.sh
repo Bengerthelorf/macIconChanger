@@ -1,6 +1,20 @@
 #!/bin/bash
 set -euo pipefail
 
+if [[ "${1:-}" == "--self-test" ]]; then
+    if [[ "$#" -ne 1 ]]; then
+        echo "ERROR: --self-test does not accept additional arguments." >&2
+        exit 64
+    fi
+    echo "IconChanger helper ready"
+    exit 0
+fi
+
+if [[ "$#" -ne 3 ]]; then
+    echo "Usage: helper.sh FILEICON_PATH APP_PATH IMAGE_PATH" >&2
+    exit 64
+fi
+
 FILEICON_PATH="$1"
 APP_PATH="$2"
 IMAGE_PATH="$3"

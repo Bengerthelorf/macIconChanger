@@ -802,15 +802,19 @@ class IconManager: ObservableObject {
     }
     
     @discardableResult
-    static func safeShell(_ command: String, timeout: TimeInterval = 10.0) throws -> String {
+    static func runProcess(
+        executableURL: URL,
+        arguments: [String],
+        timeout: TimeInterval = 10.0
+    ) throws -> String {
         let task = Process()
         let pipe = Pipe()
         let errorPipe = Pipe()
 
         task.standardOutput = pipe
         task.standardError = errorPipe
-        task.arguments = ["-c", command]
-        task.executableURL = URL(fileURLWithPath: "/bin/zsh")
+        task.arguments = arguments
+        task.executableURL = executableURL
         task.standardInput = nil
 
         task.environment = ProcessInfo.processInfo.environment
@@ -874,6 +878,42 @@ class IconManager: ObservableObject {
         return output
     }
 
+    @discardableResult
+    static func safeShell(_ command: String, timeout: TimeInterval = 10.0) throws -> String {
+        try runProcess(
+            executableURL: URL(fileURLWithPath: "/bin/zsh"),
+            arguments: ["-c", command],
+            timeout: timeout
+        )
+    }
+
+    private func probeSudoPermission() -> SudoPermissionProbeResult {
+        do {
+            _ = try Self.runProcess(
+                executableURL: URL(fileURLWithPath: "/usr/bin/sudo"),
+                arguments: ["-n", "--", helperScriptURL.path, "--self-test"],
+                timeout: 5.0
+            )
+            return .authorized
+        } catch let error as ShellError {
+            switch error {
+            case .commandFailed(let status, let output):
+                return SudoPermissionProbePolicy.classify(
+                    exitStatus: status,
+                    output: output
+                )
+            case .timeout:
+                return .helperFailed("Privileged helper self-test timed out.")
+            case .taskCreationFailed(let underlying):
+                return .helperFailed(
+                    "Could not start sudo: \(underlying?.localizedDescription ?? "unknown error")"
+                )
+            }
+        } catch {
+            return .helperFailed(error.localizedDescription)
+        }
+    }
+
     func configureSudoers() throws {
         let helperPath = self.helperScriptURL.path
         let username = NSUserName()
@@ -920,6 +960,28 @@ class IconManager: ObservableObject {
                           userInfo: [NSLocalizedDescriptionKey: String(format: NSLocalizedString("Failed to configure permissions: %@", comment: "Sudoers config error"), errorOutput)])
         }
 
+        switch probeSudoPermission() {
+        case .authorized:
+            break
+        case .permissionMissing:
+            throw NSError(
+                domain: "IconManager",
+                code: 23,
+                userInfo: [
+                    NSLocalizedDescriptionKey:
+                        "The sudoers rule was installed, but the exact helper command still requires a password. A managed Mac policy may be overriding it."
+                ]
+            )
+        case .helperFailed(let detail):
+            throw NSError(
+                domain: "IconManager",
+                code: 24,
+                userInfo: [
+                    NSLocalizedDescriptionKey:
+                        "The sudoers rule was installed, but the helper self-test failed: \(detail)"
+                ]
+            )
+        }
     }
 
     func checkSetupStatus() -> SetupStatus {
@@ -944,30 +1006,13 @@ class IconManager: ObservableObject {
             return .helperFilesOutdated
         }
         
-        // `sudo -n -l <cmd>` can't distinguish NOPASSWD from password-required
-        // when the user has a blanket (ALL) ALL rule. Dry-running the helper
-        // and checking for "password" in stderr is the only reliable method.
-        let helperPath = self.helperScriptURL.path
-        let checkCommand = "sudo -n '\(helperPath.shellEscaped)' 2>&1"
-
-        do {
-            _ = try Self.safeShell(checkCommand)
+        switch probeSudoPermission() {
+        case .authorized:
             return .completed
-        } catch let error as ShellError {
-            switch error {
-            case .commandFailed(_, let output):
-                let lower = output.lowercased()
-                if lower.contains("password") || lower.contains("sudo:") {
-                    return .sudoersPermissionMissing
-                }
-                return .completed
-            case .timeout:
-                return .sudoersPermissionMissing
-            case .taskCreationFailed:
-                return .unknownError("Failed to execute sudoers check.")
-            }
-        } catch {
-            return .unknownError("An unexpected error occurred during sudoers check.")
+        case .permissionMissing:
+            return .sudoersPermissionMissing
+        case .helperFailed(let detail):
+            return .unknownError("Privileged helper self-test failed: \(detail)")
         }
     }
 
