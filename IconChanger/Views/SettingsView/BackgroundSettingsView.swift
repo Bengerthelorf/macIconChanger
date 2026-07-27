@@ -84,9 +84,6 @@ struct BackgroundSettingsView: View {
 
                 Section {
                     Toggle("Restore Icons on Schedule", isOn: $backgroundService.enableScheduledRestore)
-                        .onChange(of: backgroundService.enableScheduledRestore) { _ in
-                            backgroundService.setupTimers()
-                        }
 
                     if backgroundService.enableScheduledRestore {
                         Picker("Interval", selection: Binding(
@@ -100,7 +97,6 @@ struct BackgroundSettingsView: View {
                                 } else {
                                     backgroundService.scheduledRestoreInterval = newValue
                                     backgroundService.useCustomScheduledRestoreInterval = false
-                                    backgroundService.setupTimers()
                                 }
                             }
                         )) {
@@ -143,9 +139,6 @@ struct BackgroundSettingsView: View {
 
                 Section {
                     Toggle("Restore Icons When Apps Update", isOn: $backgroundService.enableAutoRestoreOnUpdate)
-                        .onChange(of: backgroundService.enableAutoRestoreOnUpdate) { _ in
-                            backgroundService.setupTimers()
-                        }
 
                     if backgroundService.enableAutoRestoreOnUpdate {
                         Picker("Check Interval", selection: Binding(
@@ -159,7 +152,6 @@ struct BackgroundSettingsView: View {
                                     showCustomCheckIntervalDialog = true
                                 } else {
                                     backgroundService.autoRestoreCheckInterval = newValue
-                                    backgroundService.setupTimers()
                                 }
                             }
                         )) {
@@ -256,7 +248,6 @@ struct BackgroundSettingsView: View {
                     if let hours = Int(temporaryCustomRestoreInterval), hours > 0 {
                         backgroundService.customScheduledRestoreInterval = hours
                         backgroundService.useCustomScheduledRestoreInterval = true
-                        backgroundService.setupTimers()
                     }
                     showCustomRestoreIntervalDialog = false
                 }
@@ -293,7 +284,6 @@ struct BackgroundSettingsView: View {
                 Button("Save") {
                     if let minutes = Int(temporaryCustomCheckInterval), minutes > 0 {
                         backgroundService.autoRestoreCheckInterval = minutes
-                        backgroundService.setupTimers()
                     }
                     showCustomCheckIntervalDialog = false
                 }

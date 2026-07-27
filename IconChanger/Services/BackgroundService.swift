@@ -58,24 +58,28 @@ import os
     @Published var enableScheduledRestore: Bool {
         didSet {
             UserDefaults.standard.set(enableScheduledRestore, forKey: "enableScheduledRestore")
+            rescheduleIfRunning(changed: enableScheduledRestore != oldValue)
         }
     }
 
     @Published var scheduledRestoreInterval: Int {
         didSet {
             UserDefaults.standard.set(scheduledRestoreInterval, forKey: "scheduledRestoreInterval")
+            rescheduleIfRunning(changed: scheduledRestoreInterval != oldValue)
         }
     }
 
     @Published var customScheduledRestoreInterval: Int {
         didSet {
             UserDefaults.standard.set(customScheduledRestoreInterval, forKey: "customScheduledRestoreInterval")
+            rescheduleIfRunning(changed: customScheduledRestoreInterval != oldValue)
         }
     }
 
     @Published var useCustomScheduledRestoreInterval: Bool {
         didSet {
             UserDefaults.standard.set(useCustomScheduledRestoreInterval, forKey: "useCustomScheduledRestoreInterval")
+            rescheduleIfRunning(changed: useCustomScheduledRestoreInterval != oldValue)
         }
     }
 
@@ -88,12 +92,14 @@ import os
     @Published var enableAutoRestoreOnUpdate: Bool {
         didSet {
             UserDefaults.standard.set(enableAutoRestoreOnUpdate, forKey: "enableAutoRestoreOnUpdate")
+            rescheduleIfRunning(changed: enableAutoRestoreOnUpdate != oldValue)
         }
     }
 
     @Published var autoRestoreCheckInterval: Int {
         didSet {
             UserDefaults.standard.set(autoRestoreCheckInterval, forKey: "autoRestoreCheckInterval")
+            rescheduleIfRunning(changed: autoRestoreCheckInterval != oldValue)
         }
     }
 
@@ -115,6 +121,7 @@ import os
     private var scheduledRestoreTimer: DispatchSourceTimer?
     private var updateCheckTimer: DispatchSourceTimer?
     private var fetchCacheCleanupTimer: DispatchSourceTimer?
+    private var isRunning = false
     private let timerQueue = DispatchQueue(label: "com.iconchanger.backgroundservice.timers", qos: .utility)
 
     private init() {
@@ -200,6 +207,9 @@ import os
     }
 
     func startBackgroundService() {
+        guard !isRunning else { return }
+        isRunning = true
+
         if showInMenuBar {
             setupStatusBar()
         }
@@ -219,6 +229,8 @@ import os
     }
 
     func stopBackgroundService() {
+        isRunning = false
+
         if let item = statusItem {
             NSStatusBar.system.removeStatusItem(item)
             statusItem = nil
@@ -451,19 +463,16 @@ import os
 
     @objc func toggleScheduledRestore() {
         enableScheduledRestore.toggle()
-        setupTimers()
         updateStatusMenu()
     }
 
     @objc func toggleAutoRestoreOnUpdate() {
         enableAutoRestoreOnUpdate.toggle()
-        setupTimers()
         updateStatusMenu()
     }
 
     @objc func toggleCustomRestoreInterval() {
         useCustomScheduledRestoreInterval.toggle()
-        setupTimers()
         updateStatusMenu()
     }
 
@@ -471,13 +480,17 @@ import os
         guard let interval = sender.representedObject as? Int else { return }
         scheduledRestoreInterval = interval
         useCustomScheduledRestoreInterval = false
-        setupTimers()
         updateStatusMenu()
     }
 
     @objc func setCheckInterval(_ sender: NSMenuItem) {
         guard let interval = sender.representedObject as? Int else { return }
         autoRestoreCheckInterval = interval
+        updateStatusMenu()
+    }
+
+    private func rescheduleIfRunning(changed: Bool) {
+        guard changed, isRunning else { return }
         setupTimers()
         updateStatusMenu()
     }
@@ -490,8 +503,11 @@ import os
         if enableScheduledRestore {
             let intervalHours = getActiveRestoreInterval()
             let intervalSeconds = TimeInterval(intervalHours * 3600)
-            let nextRestore = lastScheduledRestore.addingTimeInterval(intervalSeconds)
-            let delay = max(60, nextRestore.timeIntervalSinceNow)
+            let delay = BackgroundSchedulePolicy.nextDelay(
+                interval: intervalSeconds,
+                lastRun: lastScheduledRestore,
+                minimumDelay: 60
+            )
 
             scheduledRestoreTimer = makeOneShotThenRepeatingTimer(
                 initialDelay: delay,
@@ -503,7 +519,15 @@ import os
 
         if enableAutoRestoreOnUpdate {
             let timeInterval = Double(autoRestoreCheckInterval * 60)
-            updateCheckTimer = makeRepeatingTimer(interval: timeInterval) { [weak self] in
+            let delay = BackgroundSchedulePolicy.nextDelay(
+                interval: timeInterval,
+                lastRun: lastUpdateCheck,
+                minimumDelay: 1
+            )
+            updateCheckTimer = makeOneShotThenRepeatingTimer(
+                initialDelay: delay,
+                repeatingInterval: timeInterval
+            ) { [weak self] in
                 DispatchQueue.main.async { self?.checkForAppUpdates() }
             }
         }
@@ -626,34 +650,24 @@ import os
         let cachedIcons = IconCacheManager.shared.getAllCachedIcons()
         guard !cachedIcons.isEmpty else { return [] }
 
-        let currentApps: [AppItem] = await MainActor.run { iconManager.apps }
-        let appMap: [String: AppItem]
-        if currentApps.isEmpty {
-            let loaded = iconManager.loadAppItems()
-            await MainActor.run { iconManager.apps = loaded }
-            appMap = Dictionary(uniqueKeysWithValues: loaded.map { ($0.url.universalPath(), $0) })
-        } else {
-            appMap = Dictionary(uniqueKeysWithValues: currentApps.map { ($0.url.universalPath(), $0) })
-        }
-
         let updatedApps: [AppItem] = cachedIcons.compactMap { cache in
             let appPath = cache.appPath
-            guard let appItem = appMap[appPath] else { return nil }
+            guard FileManager.default.fileExists(atPath: appPath) else { return nil }
 
-            if let cachedVersion = cache.appVersion {
-                // Compare bundle version — only triggers on real app updates
-                let currentVersion = IconCache.currentVersion(for: appPath)
-                guard currentVersion != cachedVersion else { return nil }
-            } else {
-                // Fallback for old cache entries without version: use modDate
-                guard let attributes = try? FileManager.default.attributesOfItem(atPath: appPath),
-                      let modDate = attributes[.modificationDate] as? Date,
-                      modDate > cache.timestamp else {
-                    return nil
-                }
-            }
+            let attributes = try? FileManager.default.attributesOfItem(atPath: appPath)
+            let modificationDate = attributes?[.modificationDate] as? Date
+            guard CachedAppUpdatePolicy.hasUpdate(
+                cachedVersion: cache.appVersion,
+                currentVersion: IconCache.currentVersion(for: appPath),
+                cachedAt: cache.timestamp,
+                modifiedAt: modificationDate
+            ) else { return nil }
 
-            return appItem
+            return AppItem(
+                name: cache.appName,
+                url: URL(fileURLWithPath: appPath),
+                originalAppInfo: nil
+            )
         }
 
         return updatedApps
