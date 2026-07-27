@@ -12,6 +12,7 @@ import CommonCrypto
 enum SetupStatus {
     case completed
     case helperFilesMissing(missingFiles: [String])
+    case helperFilesOutdated
     case sudoersPermissionMissing
     case unknownError(String)
 }
@@ -286,8 +287,10 @@ class IconManager: ObservableObject {
         }
     }
 
-    private func ensureSetupCompleted() throws {
-        ensureHelperFilesCopied()
+    private func ensureSetupCompleted(allowRepair: Bool = true) throws {
+        if allowRepair {
+            ensureHelperFilesCopied()
+        }
 
         let status = checkSetupStatus()
         guard case .completed = status else {
@@ -296,6 +299,8 @@ class IconManager: ObservableObject {
             switch status {
             case .helperFilesMissing(let missingFiles):
                 errorDescription = "Required helper files are missing: \(missingFiles.joined(separator: ", ")). Please check setup."
+            case .helperFilesOutdated:
+                errorDescription = "Installed helper files are outdated or failed integrity verification. Please repair setup."
             case .sudoersPermissionMissing:
                 errorDescription = "Sudo permission for helper script is missing or incorrect. Please check setup."
             default:
@@ -386,10 +391,14 @@ class IconManager: ObservableObject {
         }
     }
 
-    func setIconWithoutCaching(_ image: NSImage, app: AppItem) async throws {
+    func setIconWithoutCaching(
+        _ image: NSImage,
+        app: AppItem,
+        allowRepair: Bool = true
+    ) async throws {
         logger.log("setIconWithoutCaching called for app: \(app.name)")
 
-        try ensureSetupCompleted()
+        try ensureSetupCompleted(allowRepair: allowRepair)
         try applyIcon(image, to: app)
 
         await MainActor.run {
@@ -404,9 +413,9 @@ class IconManager: ObservableObject {
         var failed: [(String, Error)] = []
     }
 
-    func restoreAllCachedIcons() async throws -> RestoreResult {
+    func restoreAllCachedIcons(allowRepair: Bool = true) async throws -> RestoreResult {
         logger.log("Starting restoreAllCachedIcons...")
-        try ensureSetupCompleted()
+        try ensureSetupCompleted(allowRepair: allowRepair)
 
         let currentApps: [AppItem] = await MainActor.run { apps }
         let appList: [AppItem]
@@ -920,6 +929,10 @@ class IconManager: ObservableObject {
         
         if !missingFiles.isEmpty {
             return .helperFilesMissing(missingFiles: missingFiles)
+        }
+
+        guard verifyHelperIntegrity() else {
+            return .helperFilesOutdated
         }
         
         // `sudo -n -l <cmd>` can't distinguish NOPASSWD from password-required

@@ -4,32 +4,19 @@
 //
 
 import SwiftUI
-import os
 import LaunchPadManagerDBHelper
 
 struct ContentView: View {
     @StateObject var folderPermission = FolderPermission.shared
     @StateObject var iconManager = IconManager.shared
-    @State private var setupState: SetupState = .checking
+    @StateObject private var setupMonitor = SetupMonitor.shared
     @State private var showSetupOKAlert = false
     @State private var isConfiguring = false
     @State private var configError: String?
 
-    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "IconChanger", category: "ContentView")
-
-    enum SetupState {
-        case checking
-        case needsPermission
-        case needsHelperFiles(missingFiles: [String])
-        case needsSudoersSetup
-        case needsAppManagement
-        case completed
-        case error(String)
-    }
-
     var body: some View {
         Group {
-            switch setupState {
+            switch setupMonitor.health {
             case .checking:
                 VStack {
                     Text("Checking Setup...")
@@ -37,7 +24,7 @@ struct ContentView: View {
                     ProgressView().padding()
                 }
 
-            case .needsPermission:
+            case .needsFolderPermission:
                  VStack {
                      Text("We Need Access to /Applications")
                          .font(.largeTitle.bold())
@@ -59,7 +46,7 @@ struct ContentView: View {
                      .padding()
                  }
 
-            case .needsHelperFiles(let missingFiles):
+            case .missingHelperFiles(let missingFiles):
                  VStack {
                      Image(systemName: "exclamationmark.triangle.fill")
                          .resizable().scaledToFit().frame(width: 40, height: 40).foregroundColor(.orange)
@@ -70,17 +57,34 @@ struct ContentView: View {
                          .foregroundColor(.secondary)
                          .padding()
                       Button("Retry Setup Check") {
-                           setupState = .checking
-                           iconManager.ensureHelperFilesCopied()
-                           DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                               checkFullSetup()
-                           }
+                           repairHelperFiles()
                       }
                       .padding(.top)
                  }
                  .padding()
 
-            case .needsSudoersSetup:
+            case .outdatedHelperFiles:
+                 VStack(spacing: 15) {
+                     Image(systemName: "exclamationmark.shield.fill")
+                         .resizable().scaledToFit().frame(width: 40, height: 40).foregroundColor(.orange)
+                         .padding(.bottom, 5)
+                     Text("Helper Update Required")
+                         .font(.title2.bold())
+                     Text("The installed privileged helper does not match this version of IconChanger. Repair it before changing or restoring icons.")
+                         .multilineTextAlignment(.center)
+                         .foregroundColor(.secondary)
+                         .padding(.horizontal)
+                     Button {
+                         repairHelperFiles()
+                     } label: {
+                         Label("Repair Helper Files", systemImage: "wrench.and.screwdriver.fill")
+                     }
+                     .controlSize(.large)
+                     .padding(.top)
+                 }
+                 .padding()
+
+            case .needsSudoersPermission:
                  VStack(spacing: 15) {
                       Image(systemName: "lock.shield.fill")
                           .resizable().scaledToFit().frame(width: 40, height: 40).foregroundColor(.orange)
@@ -131,7 +135,7 @@ struct ContentView: View {
                  .padding()
 
 
-            case .needsAppManagement:
+            case .needsAppManagementPermission:
                  VStack(spacing: 15) {
                       Image(systemName: "app.badge.checkmark")
                           .resizable().scaledToFit().frame(width: 40, height: 40).foregroundColor(.orange)
@@ -171,7 +175,7 @@ struct ContentView: View {
                  }
                  .padding()
 
-            case .completed:
+            case .ready:
                 IconList()
 
             case .error(let errorMessage):
@@ -204,13 +208,12 @@ struct ContentView: View {
         }
          .onChange(of: iconManager.needsSetupCheck) { needsCheck in
               if needsCheck {
-                   let previousState = setupState
-                   checkFullSetup()
-                   if case .completed = previousState, case .completed = setupState {
-                       showSetupOKAlert = true
-                   }
-                   DispatchQueue.main.async {
-                        iconManager.needsSetupCheck = false
+                   let previousState = setupMonitor.health
+                   SetupMonitor.shared.check { newState in
+                       if case .ready = previousState, case .ready = newState {
+                           showSetupOKAlert = true
+                       }
+                       iconManager.needsSetupCheck = false
                    }
               }
          }
@@ -223,38 +226,14 @@ struct ContentView: View {
     }
 
     func checkFullSetup() {
-        setupState = .checking
+        setupMonitor.check()
+    }
 
-        if !folderPermission.hasPermission {
-            setupState = .needsPermission
-            return
-        }
-
+    private func repairHelperFiles() {
         DispatchQueue.global(qos: .userInitiated).async {
             iconManager.ensureHelperFilesCopied()
-            let detailedStatus = iconManager.checkSetupStatus()
-
             DispatchQueue.main.async {
-                logger.debug("Setup status: \(String(describing: detailedStatus))")
-
-                switch detailedStatus {
-                case .completed:
-                    switch iconManager.appManagementStatus() {
-                    case .authorized, .unknown:
-                        setupState = .completed
-                    case .denied, .notDetermined:
-                        setupState = .needsAppManagement
-                    }
-                case .helperFilesMissing(let missingFiles):
-                    logger.error("Helper files missing")
-                    setupState = .needsHelperFiles(missingFiles: missingFiles)
-                case .sudoersPermissionMissing:
-                    logger.error("Sudoers permission missing")
-                    setupState = .needsSudoersSetup
-                case .unknownError(let message):
-                     logger.error("Setup error: \(message)")
-                     setupState = .error(message)
-                }
+                checkFullSetup()
             }
         }
     }

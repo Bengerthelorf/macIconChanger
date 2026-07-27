@@ -7,9 +7,11 @@ import SwiftUI
 import UserNotifications
 import OSLog
 
-class AppDelegate: NSObject, NSApplicationDelegate {
+@MainActor
+final class AppDelegate: NSObject, NSApplicationDelegate {
     private let backgroundService = BackgroundService.shared
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "IconChanger", category: "AppDelegate")
+    private let lastKnownSetupReadyKey = "lastKnownSetupReady"
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         UNUserNotificationCenter.current().delegate = self
@@ -31,46 +33,37 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
-        verifySetup(notifyOnFailure: launchedHidden)
+        verifySetup(launchedHidden: launchedHidden)
     }
 
-    /// Runs setup detection on every launch regardless of window visibility (#35).
-    /// When launched hidden the Setup Error window never appears, so a broken setup
-    /// is reported via a notification instead.
-    private func verifySetup(notifyOnFailure: Bool) {
-        DispatchQueue.global(qos: .utility).async {
-            guard FolderPermission.shared.hasPermission else {
-                self.logger.error("Setup check: folder permission missing")
-                if notifyOnFailure { self.postSetupNeededNotification() }
-                return
-            }
+    private func verifySetup(launchedHidden: Bool) {
+        let defaults = UserDefaults.standard
+        let previousReady = defaults.object(forKey: lastKnownSetupReadyKey) as? Bool
 
-            IconManager.shared.ensureHelperFilesCopied()
-            let status = IconManager.shared.checkSetupStatus()
+        SetupMonitor.shared.check { [weak self] health in
+            guard let self else { return }
+            defaults.set(health == .ready, forKey: self.lastKnownSetupReadyKey)
 
-            let isReady: Bool
-            switch status {
-            case .completed:
-                switch IconManager.shared.appManagementStatus() {
-                case .authorized, .unknown: isReady = true
-                case .denied, .notDetermined: isReady = false
-                }
-            default:
-                isReady = false
-            }
-
-            if !isReady {
-                self.logger.error("Setup check failed: \(String(describing: status))")
-                if notifyOnFailure { self.postSetupNeededNotification() }
+            if SetupNotificationPolicy.shouldNotify(
+                previousReady: previousReady,
+                current: health,
+                launchedHidden: launchedHidden
+            ) {
+                self.logger.error("Setup check needs attention: \(health.statusDescription)")
+                self.postSetupNeededNotification(health: health)
             }
         }
     }
 
-    private func postSetupNeededNotification() {
+    private func postSetupNeededNotification(health: SetupHealth) {
         let content = UNMutableNotificationContent()
         content.title = NSLocalizedString("IconChanger Needs Attention", comment: "Setup notification title")
-        content.body = NSLocalizedString("Setup is incomplete, so custom icons may not be applied or restored. Open IconChanger to finish setup.", comment: "Setup notification body")
+        content.body = String(
+            format: NSLocalizedString("%@. Open IconChanger to repair setup.", comment: "Setup notification body"),
+            health.statusDescription
+        )
         content.sound = UNNotificationSound.default
+        content.userInfo = ["action": "openSetup"]
 
         let request = UNNotificationRequest(identifier: "iconchanger.setup.needed", content: content, trigger: nil)
         UNUserNotificationCenter.current().add(request) { error in
@@ -108,8 +101,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
-extension AppDelegate: UNUserNotificationCenterDelegate {
+extension AppDelegate: @preconcurrency UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.banner, .sound])
+    }
+
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        if response.notification.request.content.userInfo["action"] as? String == "openSetup" {
+            backgroundService.openMainWindow(nil)
+        }
+        completionHandler()
     }
 }

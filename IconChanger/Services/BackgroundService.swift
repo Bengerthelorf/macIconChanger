@@ -188,6 +188,13 @@ import os
         }
 
         self.launchAtLogin = (SMAppService.mainApp.status == .enabled)
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleSetupHealthDidChange),
+            name: .setupHealthDidChange,
+            object: nil
+        )
     }
 
     private func updateLoginItem() {
@@ -249,11 +256,28 @@ import os
             statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
             if let button = statusItem?.button {
-                button.image = NSImage(systemSymbolName: "app.badge.checkmark.fill", accessibilityDescription: "IconChanger")
+                let health = SetupMonitor.shared.health
+                button.image = NSImage(
+                    systemSymbolName: health.statusSymbolName,
+                    accessibilityDescription: health.statusDescription
+                )
+                button.contentTintColor = health.needsAttention ? .systemOrange : nil
             }
 
             updateStatusMenu()
         }
+    }
+
+    @objc private func handleSetupHealthDidChange() {
+        let health = SetupMonitor.shared.health
+        if let button = statusItem?.button {
+            button.image = NSImage(
+                systemSymbolName: health.statusSymbolName,
+                accessibilityDescription: health.statusDescription
+            )
+            button.contentTintColor = health.needsAttention ? .systemOrange : nil
+        }
+        updateStatusMenu()
     }
 
     @objc func openMainWindow(_ sender: Any?) {
@@ -288,9 +312,23 @@ import os
         let appName = Bundle.main.infoDictionary?["CFBundleName"] as? String ?? "IconChanger"
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
         let appInfoItem = NSMenuItem(title: "\(appName) \(appVersion)", action: nil, keyEquivalent: "")
-        appInfoItem.image = NSImage(systemSymbolName: "app.badge.checkmark.fill", accessibilityDescription: nil)
+        let setupHealth = SetupMonitor.shared.health
+        appInfoItem.image = NSImage(systemSymbolName: setupHealth.statusSymbolName, accessibilityDescription: nil)
         appInfoItem.isEnabled = false
         menu.addItem(appInfoItem)
+
+        let setupStatusItem = NSMenuItem(
+            title: setupHealth.statusDescription,
+            action: setupHealth.needsAttention ? #selector(openMainWindow(_:)) : nil,
+            keyEquivalent: ""
+        )
+        setupStatusItem.image = NSImage(
+            systemSymbolName: setupHealth.statusSymbolName,
+            accessibilityDescription: nil
+        )
+        setupStatusItem.target = setupHealth.needsAttention ? self : nil
+        setupStatusItem.isEnabled = setupHealth.needsAttention
+        menu.addItem(setupStatusItem)
 
         menu.addItem(NSMenuItem.separator())
 
@@ -600,6 +638,7 @@ import os
                 }
             } catch {
                 logger.error("Error checking for app updates: \(error.localizedDescription)")
+                handleBackgroundSetupFailure()
             }
         }
     }
@@ -607,7 +646,7 @@ import os
     private func performScheduledRestore() {
         Task {
             do {
-                let _ = try await iconManager.restoreAllCachedIcons()
+                let _ = try await iconManager.restoreAllCachedIcons(allowRepair: false)
 
                 await MainActor.run {
                     lastScheduledRestore = Date()
@@ -618,6 +657,36 @@ import os
                 showRestoreNotification()
             } catch {
                 logger.error("Scheduled restore failed: \(error.localizedDescription)")
+                handleBackgroundSetupFailure()
+            }
+        }
+    }
+
+    private func handleBackgroundSetupFailure() {
+        SetupMonitor.shared.check { [weak self] health in
+            guard health.needsAttention else { return }
+            self?.showSetupFailureNotification(health: health)
+        }
+    }
+
+    private func showSetupFailureNotification(health: SetupHealth) {
+        let content = UNMutableNotificationContent()
+        content.title = NSLocalizedString("IconChanger Needs Attention", comment: "Setup notification title")
+        content.body = String(
+            format: NSLocalizedString("%@. Open IconChanger to repair setup.", comment: "Setup notification body"),
+            health.statusDescription
+        )
+        content.sound = UNNotificationSound.default
+        content.userInfo = ["action": "openSetup"]
+
+        let request = UNNotificationRequest(
+            identifier: "iconchanger.setup.needed",
+            content: content,
+            trigger: nil
+        )
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error {
+                self.logger.error("Error showing setup notification: \(error.localizedDescription)")
             }
         }
     }
@@ -679,7 +748,7 @@ import os
             if let _ = IconCacheManager.shared.getIconCache(for: appPath),
                let iconURL = IconCacheManager.shared.getCachedIconURL(for: appPath),
                let image = NSImage(contentsOf: iconURL) {
-                try await iconManager.setIconWithoutCaching(image, app: app)
+                try await iconManager.setIconWithoutCaching(image, app: app, allowRepair: false)
                 IconCacheManager.shared.updateTimestamp(for: appPath)
             }
         }
