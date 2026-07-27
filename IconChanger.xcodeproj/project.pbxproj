@@ -21,6 +21,7 @@
 		A30000380000000100000002 /* BackgroundSchedulePolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30000380000000100000001 /* BackgroundSchedulePolicy.swift */; };
 		A30000350000000100000003 /* SetupHealth.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30000350000000100000001 /* SetupHealth.swift */; };
 		A30000350000000100000004 /* SetupMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30000350000000100000002 /* SetupMonitor.swift */; };
+		A30000360000000100000002 /* IconInteractionPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30000360000000100000001 /* IconInteractionPolicy.swift */; };
 		436C564F2E99990F00756BC7 /* IconFetchCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436C564E2E99990F00756BC7 /* IconFetchCache.swift */; };
 		43AC17352E991DBA0093962C /* IconStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43AC17342E991DBA0093962C /* IconStyle.swift */; };
 		684311E1DAA0EE528A75D6B4 /* SetAliasNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684312DDF57DD3F7FD140291 /* SetAliasNameView.swift */; };
@@ -105,6 +106,7 @@
 		A30000380000000100000001 /* BackgroundSchedulePolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundSchedulePolicy.swift; sourceTree = "<group>"; };
 		A30000350000000100000001 /* SetupHealth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupHealth.swift; sourceTree = "<group>"; };
 		A30000350000000100000002 /* SetupMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupMonitor.swift; sourceTree = "<group>"; };
+		A30000360000000100000001 /* IconInteractionPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconInteractionPolicy.swift; sourceTree = "<group>"; };
 		2FF217A62D8CEAFF00AE478C /* IconChanger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IconChanger.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		436C564E2E99990F00756BC7 /* IconFetchCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconFetchCache.swift; sourceTree = "<group>"; };
 		43AC17342E991DBA0093962C /* IconStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconStyle.swift; sourceTree = "<group>"; };
@@ -292,6 +294,7 @@
 				A30000380000000100000001 /* BackgroundSchedulePolicy.swift */,
 				A30000350000000100000001 /* SetupHealth.swift */,
 				A30000350000000100000002 /* SetupMonitor.swift */,
+				A30000360000000100000001 /* IconInteractionPolicy.swift */,
 				2FC131612D8F7DB000F60B19 /* IconCache.swift */,
 				436C564E2E99990F00756BC7 /* IconFetchCache.swift */,
 				C6E571D92EA2319C00EC9E5E /* IconImageLoader.swift */,
@@ -537,6 +540,7 @@
 				A30000380000000100000002 /* BackgroundSchedulePolicy.swift in Sources */,
 				A30000350000000100000003 /* SetupHealth.swift in Sources */,
 				A30000350000000100000004 /* SetupMonitor.swift in Sources */,
+				A30000360000000100000002 /* IconInteractionPolicy.swift in Sources */,
 				436C564F2E99990F00756BC7 /* IconFetchCache.swift in Sources */,
 				68431D85DB8E44D55E7421B7 /* ApplicationAliasSettingsView.swift in Sources */,
 				684319BAF8AE3F8E503A8FCD /* ApplicationSettingsView.swift in Sources */,

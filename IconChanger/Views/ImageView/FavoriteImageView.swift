@@ -14,7 +14,12 @@ struct FavoriteImageView: View {
     @State private var isLoading = true
 
     var body: some View {
-        ImageViewCore(nsimage: $nsimage, setPath: setPath, isLoading: $isLoading)
+        ImageViewCore(
+            nsimage: $nsimage,
+            setPath: setPath,
+            isLoading: $isLoading,
+            applicationSource: .favorite
+        )
             .contextMenu {
                 Button(role: .destructive) {
                     onRemove()

@@ -211,18 +211,18 @@ class MyQueryRequestController {
     }
 
     func sendRequest(_ query: String, style: IconStyle = .all, apiKey: String? = nil) async throws -> [IconRes] {
-        guard APIUsageTracker.shared.tryRecordRequest() else {
-            throw APIError.rateLimitExceeded(
-                used: APIUsageTracker.shared.currentCount,
-                limit: APIUsageTracker.shared.monthlyLimit
-            )
-        }
-
         let resolvedKey = apiKey ?? APIKeyManager.pickKey()
         let key = "\(query)|\(style.displayName)"
 
         let (task, isNew) = await dedup.deduplicate(for: key) { [self] in
             Task<[IconRes], Error> {
+                guard APIUsageTracker.shared.tryRecordRequest() else {
+                    throw APIError.rateLimitExceeded(
+                        used: APIUsageTracker.shared.currentCount,
+                        limit: APIUsageTracker.shared.monthlyLimit
+                    )
+                }
+
                 let maxAttempts = max(1, self.retryCount + 1)
                 var lastError: Error?
                 var currentKey = resolvedKey
@@ -591,4 +591,3 @@ class MyQueryRequestController {
         }
     }
 }
-

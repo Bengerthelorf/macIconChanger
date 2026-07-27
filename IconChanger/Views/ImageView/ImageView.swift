@@ -17,7 +17,12 @@ struct ImageView: View {
     var onFavorite: ((NSImage) -> Void)? = nil
 
     var body: some View {
-        ImageViewCore(nsimage: $preview, setPath: setPath, isLoading: $isLoading)
+        ImageViewCore(
+            nsimage: $preview,
+            setPath: setPath,
+            isLoading: $isLoading,
+            applicationSource: .remote
+        )
             .contextMenu {
                 Button {
                     if let image = preview {

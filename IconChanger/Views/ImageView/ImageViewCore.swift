@@ -13,15 +13,22 @@ struct ImageViewCore: View {
     @State private var isTaskRunning = false
     @State private var task: Task<Void, Never>? = nil
     @Binding var isLoading: Bool
+    let applicationSource: IconApplicationSource
 
     @State var showSnackbar = false
     @State var isSuccessful = true
     @State var failureMessage = NSLocalizedString("Failed to load data.", comment: "Default error message")
 
-    init(nsimage: Binding<NSImage?>, setPath: AppItem, isLoading: Binding<Bool> = .constant(true)) {
+    init(
+        nsimage: Binding<NSImage?>,
+        setPath: AppItem,
+        isLoading: Binding<Bool> = .constant(true),
+        applicationSource: IconApplicationSource = .local
+    ) {
         self._nsimage = nsimage
         self.setPath = setPath
         self._isLoading = isLoading
+        self.applicationSource = applicationSource
     }
 
     var body: some View {
@@ -99,7 +106,11 @@ struct ImageViewCore: View {
                 
                 // Create a local copy of the image for memory safety
                 guard let imageCopy = image.copy() as? NSImage else { return }
-                try IconManager.shared.setImage(imageCopy, app: setPath)
+                try IconManager.shared.setImage(
+                    imageCopy,
+                    app: setPath,
+                    source: applicationSource
+                )
                 
                 await MainActor.run {
                     isTaskRunning = false

@@ -15,7 +15,12 @@ struct HistoryImageView: View {
     @State private var isLoading = true
 
     var body: some View {
-        ImageViewCore(nsimage: $nsimage, setPath: setPath, isLoading: $isLoading)
+        ImageViewCore(
+            nsimage: $nsimage,
+            setPath: setPath,
+            isLoading: $isLoading,
+            applicationSource: .history
+        )
             .contextMenu {
                 Button {
                     if let image = nsimage {

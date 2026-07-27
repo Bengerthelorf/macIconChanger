@@ -371,7 +371,11 @@ class IconManager: ObservableObject {
         logger.log("Icon restored to default for \(app.name)")
     }
 
-    func setImage(_ image: NSImage, app: AppItem) throws {
+    func setImage(
+        _ image: NSImage,
+        app: AppItem,
+        source: IconApplicationSource = .local
+    ) throws {
         logger.log("setImage called for app: \(app.name)")
 
         _ = try IconCacheManager.shared.cacheIcon(image: image, for: app.url.universalPath(), appName: app.name)
@@ -382,8 +386,13 @@ class IconManager: ObservableObject {
 
         auditLog(operation: "set_icon", appName: app.name, appPath: app.url.universalPath())
 
-        // Record in history
-        IconHistoryManager.shared.addEntry(image: image, for: app.url.universalPath(), appName: app.name)
+        if IconApplicationPolicy.shouldRecordHistory(source: source) {
+            IconHistoryManager.shared.addEntry(
+                image: image,
+                for: app.url.universalPath(),
+                appName: app.name
+            )
+        }
 
         Task { @MainActor in
             AppIconCache.shared.remove(for: app.url)

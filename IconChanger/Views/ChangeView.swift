@@ -14,7 +14,7 @@ struct ChangeView: View {
     @State var icons: [IconRes] = []
     @State var inIcons: [URL] = []
     @State var showProgress = false
-    @State var isLoadingIcons = true
+    @State var isLoadingIcons = false
     @State var totalIconsCount: Int = 0
     @State var successIconsCount: Int = 0
     @State var validIcons: [IconRes] = []
@@ -43,6 +43,7 @@ struct ChangeView: View {
     @State private var appHistory: [IconHistoryEntry] = []
     @State private var isHistoryExpanded = false
     @State private var hasLoadedLocalIcons = false
+    @State private var hasRequestedIcons = false
 
     var body: some View {
         GeometryReader { geometry in
@@ -143,7 +144,8 @@ struct ChangeView: View {
                         }
                         .pickerStyle(.menu)
                         .onChange(of: selectedStyle) { _ in
-                            triggerIconFetch()
+                            resetRemoteIcons()
+                            handleIconFetchEvent(.styleChanged)
                         }
 
                         if !isLoadingIcons && successIconsCount > 0 {
@@ -153,6 +155,18 @@ struct ChangeView: View {
                                     .foregroundColor(.secondary)
                             }
                         }
+
+                        Button {
+                            handleIconFetchEvent(
+                                hasRequestedIcons ? .userRequestedRefresh : .userRequestedLoad
+                            )
+                        } label: {
+                            Label(
+                                hasRequestedIcons ? "Refresh" : "Load Icons",
+                                systemImage: hasRequestedIcons ? "arrow.clockwise" : "icloud.and.arrow.down"
+                            )
+                        }
+                        .disabled(isLoadingIcons)
                     }
 
                     if isLoadingIcons {
@@ -174,7 +188,7 @@ struct ChangeView: View {
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal)
                             Button(NSLocalizedString("Retry", comment: "Retry button")) {
-                                triggerIconFetch(forceRefresh: true)
+                                handleIconFetchEvent(.userRequestedRefresh)
                             }
                             .padding(.top, 4)
                             Spacer()
@@ -182,15 +196,23 @@ struct ChangeView: View {
                     } else if validIcons.isEmpty {
                         VStack {
                             Spacer()
-                            Text("No Icons Found")
+                            Text(hasRequestedIcons ? "No Icons Found" : "Load icons when you need them")
                                 .font(.title3)
                                 .foregroundColor(.secondary)
                                 .padding()
-                            Text("You can modify the alias name for better results")
+                            Text(
+                                hasRequestedIcons
+                                    ? "You can modify the alias name for better results"
+                                    : "macOSicons.com requests use your monthly API allowance."
+                            )
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
-                            Button("Set Alias Name") {
-                                setAlias = setPath.url.deletingPathExtension().lastPathComponent
+                            Button(hasRequestedIcons ? "Set Alias Name" : "Load Icons") {
+                                if hasRequestedIcons {
+                                    setAlias = setPath.url.deletingPathExtension().lastPathComponent
+                                } else {
+                                    handleIconFetchEvent(.userRequestedLoad)
+                                }
                             }
                             .padding(.top, 8)
                             Spacer()
@@ -297,9 +319,7 @@ struct ChangeView: View {
                     hasDuplicateName = iconManager.apps.contains { $0.name == setPath.name && $0.id != setPath.id }
                     refreshFavorites()
                     refreshHistory()
-                }
-                .task {
-                    triggerIconFetch()
+                    handleIconFetchEvent(.viewAppeared)
                 }
                 .sheet(isPresented: Binding(
                     get: { setAlias != nil },
@@ -314,7 +334,7 @@ struct ChangeView: View {
                 }
                 .onChange(of: iconManager.iconRefreshTrigger) { _ in
                     inIcons = iconManager.getIconInPath(setPath.url)
-                    triggerIconFetch(forceRefresh: true)
+                    handleIconFetchEvent(.localIconChanged)
                     refreshFavorites()
                     refreshHistory()
                 }
@@ -450,6 +470,31 @@ struct ChangeView: View {
         loadIconsTask = Task {
             await fetchIcons(for: appInfo, style: style, token: token, forceRefresh: forceRefresh)
         }
+    }
+
+    private func handleIconFetchEvent(_ event: IconFetchInteractionEvent) {
+        switch IconFetchInteractionPolicy.action(for: event) {
+        case .none:
+            return
+        case .loadAllowingCache:
+            hasRequestedIcons = true
+            triggerIconFetch()
+        case .refreshFromNetwork:
+            hasRequestedIcons = true
+            triggerIconFetch(forceRefresh: true)
+        }
+    }
+
+    private func resetRemoteIcons() {
+        loadIconsTask?.cancel()
+        currentLoadToken = UUID()
+        icons = []
+        validIcons = []
+        totalIconsCount = 0
+        successIconsCount = 0
+        fetchError = nil
+        isLoadingIcons = false
+        hasRequestedIcons = false
     }
 
     private func fetchIcons(for appInfo: AppItem,
