@@ -1,0 +1,20 @@
+cask "iconchanger" do
+  version "@@VERSION@@"
+  sha256 "@@SHA256@@"
+
+  url "@@URL@@"
+  name "IconChanger"
+  desc "Customize macOS app and folder icons"
+  homepage "https://github.com/Bengerthelorf/macIconChanger"
+
+  depends_on macos: ">= :ventura"
+
+  app "IconChanger.app"
+
+  zap trash: [
+    "~/Library/Preferences/com.zhuhaoyu.IconChanger.plist",
+    "~/Library/Caches/com.zhuhaoyu.IconChanger",
+    "~/Library/Application Support/com.zhuhaoyu.IconChanger",
+    "~/.iconchanger",
+  ]
+end

@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Update sparkle.xml with release info from CI environment variables."""
 
-import sys, re, os
+from html import escape
+import os
+import re
+import sys
 
 version = os.environ["SPARKLE_VERSION"]
 build = os.environ["SPARKLE_BUILD"]
@@ -12,32 +15,34 @@ dmg_size = os.environ["SPARKLE_DMG_SIZE"]
 repo = os.environ["SPARKLE_REPO"]
 is_prerelease = os.environ.get("SPARKLE_IS_PRERELEASE", "false") == "true"
 
-changelog_html = ""
-try:
-    with open("CHANGELOG.md") as f:
-        lines = f.readlines()
-    items = []
-    prefix_map = {
-        "feat:": "New:", "fix:": "Fixed:", "perf:": "Perf:",
-        "docs:": "Docs:", "refactor:": "Refactor:"
-    }
-    for line in lines:
-        line = line.strip()
-        if not line.startswith("- "):
-            continue
-        msg = line[2:]
-        if msg.startswith(("release:", "chore:", "Merge ")):
-            continue
-        formatted = None
-        for prefix, label in prefix_map.items():
-            if msg.startswith(prefix):
-                formatted = f"<li><strong>{label}</strong> {msg[len(prefix):].strip()}</li>"
-                break
-        items.append(formatted or f"<li>{msg}</li>")
-    if items:
-        changelog_html = "\n".join(f"                        {i}" for i in items)
-except Exception:
-    pass
+with open("CHANGELOG.md", encoding="utf-8") as changelog:
+    lines = changelog.readlines()
+
+items = []
+prefix_map = {
+    "feat:": "New:",
+    "fix:": "Fixed:",
+    "perf:": "Perf:",
+    "docs:": "Docs:",
+    "refactor:": "Refactor:",
+}
+for line in lines:
+    line = line.strip()
+    if not line.startswith("- "):
+        continue
+    message = line[2:]
+    if message.startswith(("release:", "chore:", "Merge ")):
+        continue
+
+    formatted = None
+    for prefix, label in prefix_map.items():
+        if message.startswith(prefix):
+            body = escape(message[len(prefix):].strip())
+            formatted = f"<li><strong>{label}</strong> {body}</li>"
+            break
+    items.append(formatted or f"<li>{escape(message)}</li>")
+
+changelog_html = "\n".join(f"                        {item}" for item in items)
 
 desc_block = ""
 if changelog_html:

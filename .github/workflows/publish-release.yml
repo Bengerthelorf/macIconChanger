@@ -1,0 +1,196 @@
+name: Publish Tested Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_run_id:
+        description: Run ID from Build Release Candidate
+        required: true
+        type: string
+      approval:
+        description: Type I_APPROVE_RELEASE after testing the candidate
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish:
+    name: Promote exact tested candidate
+    runs-on: macos-26
+    environment: release
+    steps:
+      - name: Require explicit approval
+        run: |
+          if [[ "${{ inputs.approval }}" != "I_APPROVE_RELEASE" ]]; then
+            echo "The approval text did not match I_APPROVE_RELEASE." >&2
+            exit 1
+          fi
+
+      - name: Checkout main
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Download tested candidate
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.candidate_run_id }}
+          pattern: IconChanger-*-candidate
+          path: candidate
+          merge-multiple: true
+
+      - name: Validate candidate provenance and artifact
+        run: |
+          test -f candidate/candidate.json
+          test -f candidate/IconChanger.dmg
+          test -f candidate/CHANGELOG.md
+
+          VERSION=$(jq -er '.version' candidate/candidate.json)
+          BUILD_NUMBER=$(jq -er '.build' candidate/candidate.json)
+          TAG=$(jq -er '.tag' candidate/candidate.json)
+          SOURCE_SHA=$(jq -er '.source_sha' candidate/candidate.json)
+          EXPECTED_SHA=$(jq -er '.sha256' candidate/candidate.json)
+          DMG_SIZE=$(jq -er '.dmg_size' candidate/candidate.json)
+          ED_SIGNATURE=$(jq -er '.ed_signature' candidate/candidate.json)
+          IS_PRERELEASE=$(jq -er '.prerelease' candidate/candidate.json)
+
+          ACTUAL_SHA=$(shasum -a 256 candidate/IconChanger.dmg | awk '{print $1}')
+          ACTUAL_SIZE=$(stat -f%z candidate/IconChanger.dmg)
+          [[ "$ACTUAL_SHA" == "$EXPECTED_SHA" ]]
+          [[ "$ACTUAL_SIZE" == "$DMG_SIZE" ]]
+
+          git fetch origin main --tags
+          git cat-file -e "$SOURCE_SHA^{commit}"
+          git merge-base --is-ancestor "$SOURCE_SHA" origin/main || {
+            echo "Candidate source is not contained in origin/main." >&2
+            exit 1
+          }
+
+          scripts/validate-release-artifact.sh \
+            candidate/IconChanger.dmg \
+            "$VERSION" \
+            "$BUILD_NUMBER"
+
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> "$GITHUB_ENV"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          echo "SOURCE_SHA=$SOURCE_SHA" >> "$GITHUB_ENV"
+          echo "DMG_SIZE=$DMG_SIZE" >> "$GITHUB_ENV"
+          echo "ED_SIGNATURE=$ED_SIGNATURE" >> "$GITHUB_ENV"
+          echo "IS_PRERELEASE=$IS_PRERELEASE" >> "$GITHUB_ENV"
+
+      - name: Create immutable tag
+        run: |
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            EXISTING_SHA=$(git rev-list -n 1 "$TAG")
+            [[ "$EXISTING_SHA" == "$SOURCE_SHA" ]] || {
+              echo "$TAG already points to a different commit." >&2
+              exit 1
+            }
+          else
+            git config user.name "GitHub Actions"
+            git config user.email "actions@github.com"
+            git tag -a "$TAG" "$SOURCE_SHA" -m "IconChanger $TAG"
+            git push origin "$TAG"
+          fi
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            EXISTING_DIR="$RUNNER_TEMP/existing-release"
+            mkdir -p "$EXISTING_DIR"
+            gh release download "$TAG" \
+              --repo "${{ github.repository }}" \
+              --pattern IconChanger.dmg \
+              --dir "$EXISTING_DIR"
+            EXISTING_SHA=$(shasum -a 256 "$EXISTING_DIR/IconChanger.dmg" | awk '{print $1}')
+            CANDIDATE_SHA=$(shasum -a 256 candidate/IconChanger.dmg | awk '{print $1}')
+            [[ "$EXISTING_SHA" == "$CANDIDATE_SHA" ]] || {
+              echo "$TAG already exists with a different DMG." >&2
+              exit 1
+            }
+          else
+            RELEASE_FLAGS=()
+            if [[ "$IS_PRERELEASE" == "true" ]]; then
+              RELEASE_FLAGS+=(--prerelease)
+            fi
+            gh release create "$TAG" \
+              candidate/IconChanger.dmg \
+              --repo "${{ github.repository }}" \
+              --verify-tag \
+              --title "IconChanger $TAG" \
+              --notes-file candidate/CHANGELOG.md \
+              "${RELEASE_FLAGS[@]}"
+          fi
+
+      - name: Publish Sparkle appcast entry
+        run: |
+          git fetch origin main
+          git checkout -B release-appcast origin/main
+          cp candidate/CHANGELOG.md CHANGELOG.md
+          PUBDATE=$(date -u "+%a, %d %b %Y %H:%M:%S +0000")
+          SPARKLE_VERSION="$VERSION" \
+          SPARKLE_BUILD="$BUILD_NUMBER" \
+          SPARKLE_PUBDATE="$PUBDATE" \
+          SPARKLE_DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/IconChanger.dmg" \
+          SPARKLE_ED_SIG="$ED_SIGNATURE" \
+          SPARKLE_DMG_SIZE="$DMG_SIZE" \
+          SPARKLE_REPO="${{ github.repository }}" \
+          SPARKLE_IS_PRERELEASE="$IS_PRERELEASE" \
+          python3 scripts/update-sparkle.py
+
+          python3 scripts/validate-appcast.py \
+            IconChanger/Resources/sparkle.xml \
+            "$VERSION" \
+            "$BUILD_NUMBER" \
+            "$ED_SIGNATURE" \
+            "$DMG_SIZE" \
+            "https://github.com/${{ github.repository }}/releases/download/${TAG}/IconChanger.dmg"
+
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add IconChanger/Resources/sparkle.xml
+          if ! git diff --cached --quiet; then
+            git commit -m "release: update appcast for $TAG"
+            git push origin HEAD:main
+          fi
+
+      - name: Trigger docs redeploy
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run docs.yml --repo "${{ github.repository }}"
+
+      - name: Update Homebrew Cask
+        if: env.IS_PRERELEASE != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+        run: |
+          DMG_URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/IconChanger.dmg"
+          DMG_SHA256=$(shasum -a 256 candidate/IconChanger.dmg | awk '{print $1}')
+          TAP_DIR="$RUNNER_TEMP/homebrew-tap"
+
+          gh repo clone Bengerthelorf/homebrew-tap "$TAP_DIR"
+          mkdir -p "$TAP_DIR/Casks"
+
+          sed \
+            -e "s|@@VERSION@@|$VERSION|g" \
+            -e "s|@@SHA256@@|$DMG_SHA256|g" \
+            -e "s|@@URL@@|$DMG_URL|g" \
+            scripts/iconchanger.rb.template > "$TAP_DIR/Casks/iconchanger.rb"
+
+          cd "$TAP_DIR"
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add Casks/iconchanger.rb
+          if ! git diff --cached --quiet; then
+            git commit -m "Update iconchanger to $TAG"
+            git push origin main
+          fi
