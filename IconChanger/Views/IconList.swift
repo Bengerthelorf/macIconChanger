@@ -4,7 +4,6 @@
 //
 
 import SwiftUI
-import LaunchPadManagerDBHelper
 
 enum AppFilter: String, CaseIterable, Identifiable {
     case all = "All"
@@ -174,15 +173,6 @@ struct IconList: View {
                                     }
                                 }
 
-                                if let original = app.originalAppInfo {
-                                    Button("Remove the Icon from the Launchpad") {
-                                        do {
-                                            try LaunchPadManagerDBHelper().removeApp(original)
-                                        } catch {
-                                            restoreError = error.localizedDescription
-                                        }
-                                    }
-                                }
                             }
                     }
                 }
@@ -903,4 +893,3 @@ private struct RestoreProgressBackground: ViewModifier {
         }
     }
 }
-
