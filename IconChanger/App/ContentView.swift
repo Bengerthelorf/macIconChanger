@@ -101,22 +101,7 @@ struct ContentView: View {
                              .padding(.top)
                      } else {
                          Button {
-                             configError = nil
-                             isConfiguring = true
-                             DispatchQueue.global(qos: .userInitiated).async {
-                                 do {
-                                     try iconManager.configureSudoers()
-                                     DispatchQueue.main.async {
-                                         isConfiguring = false
-                                         checkFullSetup()
-                                     }
-                                 } catch {
-                                     DispatchQueue.main.async {
-                                         isConfiguring = false
-                                         configError = error.localizedDescription
-                                     }
-                                 }
-                             }
+                             configurePermissions()
                          } label: {
                              Label("Configure Permissions", systemImage: "lock.open.fill")
                          }
@@ -134,6 +119,43 @@ struct ContentView: View {
                  }
                  .padding()
 
+            case .needsLegacyPermissionCleanup:
+                 VStack(spacing: 15) {
+                     Image(systemName: "exclamationmark.shield.fill")
+                         .resizable()
+                         .scaledToFit()
+                         .frame(width: 40, height: 40)
+                         .foregroundColor(.orange)
+                         .padding(.bottom, 5)
+                     Text("Permission Cleanup Required")
+                         .font(.title2.bold())
+                     Text("An older IconChanger version left an administrator rule pointing to a user-writable helper. Repair permissions to remove only that legacy rule and keep the current protected helper.")
+                         .multilineTextAlignment(.center)
+                         .foregroundColor(.secondary)
+                         .padding(.horizontal)
+
+                     if isConfiguring {
+                         ProgressView("Cleaning Up...")
+                             .padding(.top)
+                     } else {
+                         Button {
+                             configurePermissions()
+                         } label: {
+                             Label("Repair Permissions", systemImage: "wrench.and.screwdriver.fill")
+                         }
+                         .controlSize(.large)
+                         .padding(.top)
+                     }
+
+                     if let configError {
+                         Text(configError)
+                             .foregroundColor(.red)
+                             .font(.caption)
+                             .multilineTextAlignment(.center)
+                             .padding(.horizontal)
+                     }
+                 }
+                 .padding()
 
             case .needsAppManagementPermission:
                  VStack(spacing: 15) {
@@ -234,6 +256,25 @@ struct ContentView: View {
             iconManager.ensureHelperFilesCopied()
             DispatchQueue.main.async {
                 checkFullSetup()
+            }
+        }
+    }
+
+    private func configurePermissions() {
+        configError = nil
+        isConfiguring = true
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                try iconManager.configureSudoers()
+                DispatchQueue.main.async {
+                    isConfiguring = false
+                    checkFullSetup()
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    isConfiguring = false
+                    configError = error.localizedDescription
+                }
             }
         }
     }

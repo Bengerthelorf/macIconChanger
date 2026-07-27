@@ -13,6 +13,10 @@ enum SetupHealthTests {
             SetupHealth.outdatedHelperFiles.needsAttention,
             "outdated privileged helpers require user attention"
         )
+        assertTrue(
+            SetupHealth.needsLegacyPermissionCleanup.needsAttention,
+            "a legacy user-writable sudoers rule requires explicit cleanup"
+        )
 
         assertTrue(
             SetupNotificationPolicy.shouldNotify(

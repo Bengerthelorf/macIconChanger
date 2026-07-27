@@ -48,6 +48,8 @@ final class SetupMonitor: ObservableObject {
                 result = .outdatedHelperFiles
             case .sudoersPermissionMissing:
                 result = .needsSudoersPermission
+            case .legacySudoersPermissionPresent:
+                result = .needsLegacyPermissionCleanup
             case .unknownError(let message):
                 result = .error(message)
             }

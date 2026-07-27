@@ -32,6 +32,32 @@ enum SudoPermissionProbeTests {
             .helperFailed("/usr/local/lib/iconchanger/helper.sh: internal validation failed"),
             "a helper failure must not be mistaken for valid permission"
         )
+        precondition(
+            LegacySudoersPolicy.containsLegacyRule(
+                in: """
+                User snaix may run:
+                    (ALL) NOPASSWD: /Users/snaix/.iconchanger/helper.sh
+                """,
+                homeDirectory: "/Users/snaix"
+            )
+        )
+        precondition(
+            !LegacySudoersPolicy.containsLegacyRule(
+                in: "(ALL) NOPASSWD: /usr/local/lib/iconchanger/helper.sh",
+                homeDirectory: "/Users/snaix"
+            )
+        )
+        assertEqual(
+            LegacySudoersPolicy.exactLegacyLines(
+                username: "snaix",
+                homeDirectory: "/Users/snaix"
+            ),
+            [
+                "ALL ALL=(ALL) NOPASSWD: /Users/snaix/.iconchanger/helper.sh",
+                "snaix ALL=(ALL) NOPASSWD: /Users/snaix/.iconchanger/helper.sh",
+            ],
+            "cleanup must target only the two historical rules"
+        )
 
         print("PASS: sudo permission checks distinguish authorization from helper failures")
     }

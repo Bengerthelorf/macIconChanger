@@ -12,6 +12,7 @@ enum SetupHealth: Equatable {
     case missingHelperFiles([String])
     case outdatedHelperFiles
     case needsSudoersPermission
+    case needsLegacyPermissionCleanup
     case needsAppManagementPermission
     case error(String)
 
@@ -49,6 +50,8 @@ enum SetupHealth: Equatable {
             return NSLocalizedString("Helper files need an update", comment: "Setup health status")
         case .needsSudoersPermission:
             return NSLocalizedString("Administrator permission setup required", comment: "Setup health status")
+        case .needsLegacyPermissionCleanup:
+            return NSLocalizedString("Legacy administrator permission cleanup required", comment: "Setup health status")
         case .needsAppManagementPermission:
             return NSLocalizedString("App Management permission required", comment: "Setup health status")
         case .error(let message):

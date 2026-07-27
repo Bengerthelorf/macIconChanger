@@ -14,6 +14,7 @@ enum SetupStatus {
     case helperFilesMissing(missingFiles: [String])
     case helperFilesOutdated
     case sudoersPermissionMissing
+    case legacySudoersPermissionPresent
     case unknownError(String)
 }
 
@@ -41,6 +42,12 @@ class IconManager: ObservableObject {
     
     var fileiconURL: URL {
         helperDirectoryURL.appendingPathComponent("fileicon")
+    }
+
+    private var legacyHelperScriptPath: String {
+        LegacySudoersPolicy.legacyHelperPath(
+            homeDirectory: FileManager.default.homeDirectoryForCurrentUser.path
+        )
     }
     
     private static let auditDateFormatter: ISO8601DateFormatter = {
@@ -303,6 +310,8 @@ class IconManager: ObservableObject {
                 errorDescription = "Installed helper files are outdated or failed integrity verification. Please repair setup."
             case .sudoersPermissionMissing:
                 errorDescription = "Sudo permission for helper script is missing or incorrect. Please check setup."
+            case .legacySudoersPermissionPresent:
+                errorDescription = "A legacy user-writable sudoers rule must be removed before changing icons. Please repair permissions."
             default:
                 errorDescription = "An unknown setup error occurred. Please check setup."
             }
@@ -914,6 +923,32 @@ class IconManager: ObservableObject {
         }
     }
 
+    private func legacySudoersRuleIsActive() -> Bool {
+        let output: String
+        do {
+            output = try Self.runProcess(
+                executableURL: URL(fileURLWithPath: "/usr/bin/sudo"),
+                arguments: ["-n", "-l"],
+                timeout: 5.0
+            )
+        } catch let error as ShellError {
+            if case .commandFailed(_, let commandOutput) = error {
+                return LegacySudoersPolicy.containsLegacyRule(
+                    in: commandOutput,
+                    homeDirectory: FileManager.default.homeDirectoryForCurrentUser.path
+                )
+            }
+            return false
+        } catch {
+            return false
+        }
+
+        return LegacySudoersPolicy.containsLegacyRule(
+            in: output,
+            homeDirectory: FileManager.default.homeDirectoryForCurrentUser.path
+        )
+    }
+
     func configureSudoers() throws {
         let helperPath = self.helperScriptURL.path
         let username = NSUserName()
@@ -923,13 +958,26 @@ class IconManager: ObservableObject {
         }
         let sudoersLine = "\(username) ALL=(ALL) NOPASSWD: \(helperPath)"
         let sudoersFile = "/etc/sudoers.d/iconchanger"
+        let homeDirectory = FileManager.default.homeDirectoryForCurrentUser.path
+        let legacyLines = LegacySudoersPolicy.exactLegacyLines(
+            username: username,
+            homeDirectory: homeDirectory
+        )
+        let legacyFileiconPath = "\(homeDirectory)/.iconchanger/fileicon"
 
         let commands = [
-            "TMPFILE=$(mktemp /tmp/iconchanger_sudoers.XXXXXX)",
-            "trap 'rm -f \"$TMPFILE\"' EXIT",
-            "echo '\(sudoersLine.shellEscaped)' > \"$TMPFILE\"",
-            "visudo -c -f \"$TMPFILE\"",
-            "mv \"$TMPFILE\" '\(sudoersFile.shellEscaped)'",
+            "RULE_TMP=$(mktemp /tmp/iconchanger_sudoers.XXXXXX)",
+            "MAIN_TMP=$(mktemp /etc/sudoers.iconchanger.XXXXXX)",
+            "trap 'rm -f \"$RULE_TMP\" \"$MAIN_TMP\"' EXIT",
+            "echo '\(sudoersLine.shellEscaped)' > \"$RULE_TMP\"",
+            "awk -v old_all='\(legacyLines[0].shellEscaped)' -v old_user='\(legacyLines[1].shellEscaped)' '$0 != old_all && $0 != old_user { print }' /etc/sudoers > \"$MAIN_TMP\"",
+            "chmod 0440 \"$RULE_TMP\" \"$MAIN_TMP\"",
+            "chown root:wheel \"$RULE_TMP\" \"$MAIN_TMP\"",
+            "visudo -c -f \"$RULE_TMP\"",
+            "visudo -c -f \"$MAIN_TMP\"",
+            "if cmp -s /etc/sudoers \"$MAIN_TMP\"; then rm -f \"$MAIN_TMP\"; else mv \"$MAIN_TMP\" /etc/sudoers; fi",
+            "mv \"$RULE_TMP\" '\(sudoersFile.shellEscaped)'",
+            "rm -f '\(legacyHelperScriptPath.shellEscaped)' '\(legacyFileiconPath.shellEscaped)'",
             "chmod 0440 '\(sudoersFile.shellEscaped)'",
             "chown root:wheel '\(sudoersFile.shellEscaped)'"
         ].joined(separator: " && ")
@@ -962,7 +1010,16 @@ class IconManager: ObservableObject {
 
         switch probeSudoPermission() {
         case .authorized:
-            break
+            guard !legacySudoersRuleIsActive() else {
+                throw NSError(
+                    domain: "IconManager",
+                    code: 25,
+                    userInfo: [
+                        NSLocalizedDescriptionKey:
+                            "The current helper is authorized, but the legacy user-writable sudoers rule could not be removed."
+                    ]
+                )
+            }
         case .permissionMissing:
             throw NSError(
                 domain: "IconManager",
@@ -1008,7 +1065,9 @@ class IconManager: ObservableObject {
         
         switch probeSudoPermission() {
         case .authorized:
-            return .completed
+            return legacySudoersRuleIsActive()
+                ? .legacySudoersPermissionPresent
+                : .completed
         case .permissionMissing:
             return .sudoersPermissionMissing
         case .helperFailed(let detail):
