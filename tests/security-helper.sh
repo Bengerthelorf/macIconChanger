@@ -1,0 +1,33 @@
+#!/bin/bash
+set -euo pipefail
+
+HELPER_UNDER_TEST="${1:-IconChanger/Resources/helper.sh}"
+REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
+case "$HELPER_UNDER_TEST" in
+    /*) ;;
+    *) HELPER_UNDER_TEST="$REPO_ROOT/$HELPER_UNDER_TEST" ;;
+esac
+
+set +e
+OUTPUT="$(
+    bash "$HELPER_UNDER_TEST" \
+        "/usr/local/lib/iconchanger/fileicon" \
+        $'/Applications/Example.app\nmalicious' \
+        "/tmp/icon.png" 2>&1
+)"
+STATUS=$?
+set -e
+
+if [[ $STATUS -eq 0 ]]; then
+    echo "FAIL: helper accepted a path containing control characters" >&2
+    exit 1
+fi
+
+if [[ "$OUTPUT" != *"path contains control characters"* ]]; then
+    echo "FAIL: helper did not reject the control character at its trust boundary" >&2
+    printf '%s\n' "$OUTPUT" >&2
+    exit 1
+fi
+
+echo "PASS: helper rejects control characters before privileged execution"
