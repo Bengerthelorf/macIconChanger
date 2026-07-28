@@ -21,5 +21,7 @@ grep -Eq 'def\.flags\.contains\(\.secured\) && !includeSensitive' \
     "$repo_root/IconChanger/Utilities/AppSettings.swift"
 grep -Eq '\[\.posixPermissions: 0o600\]' \
     "$repo_root/IconChanger/Config/ConfigManager.swift"
+grep -Eq 'removeLegacyPlaintextCLIExport\(\)' \
+    "$repo_root/IconChanger/Config/ConfigManager.swift"
 
 echo "PASS: configuration export keeps secrets encrypted and files owner-only"

@@ -392,5 +392,20 @@ class ConfigManager {
     }
 
     init() {
+        removeLegacyPlaintextCLIExport()
+    }
+
+    private func removeLegacyPlaintextCLIExport() {
+        let legacyURL = AppPaths.sharedConfigDirectory
+            .appendingPathComponent("latest_export.json")
+        guard FileManager.default.fileExists(atPath: legacyURL.path) else { return }
+        do {
+            try FileManager.default.removeItem(at: legacyURL)
+            logger.info("Removed deprecated plaintext CLI export")
+        } catch {
+            logger.error(
+                "Failed to remove deprecated plaintext CLI export: \(error.localizedDescription, privacy: .public)"
+            )
+        }
     }
 }
