@@ -74,8 +74,9 @@ fi
 HELPER_TEST_CAPTURE="$CAPTURE_FILE" \
 bash "$TEST_HELPER" --remove "$FAKE_FILEICON" "$TARGET_APP"
 
+EXPECTED_TARGET_APP="$(/bin/realpath "$TARGET_APP")"
 if [[ "$(sed -n '1p' "$CAPTURE_FILE")" != "rm" ||
-      "$(sed -n '2p' "$CAPTURE_FILE")" != "$TARGET_APP" ||
+      "$(sed -n '2p' "$CAPTURE_FILE")" != "$EXPECTED_TARGET_APP" ||
       "$(wc -l < "$CAPTURE_FILE" | tr -d ' ')" -ne 2 ]]; then
     echo "FAIL: helper remove mode must pass an exact rm command and app path" >&2
     exit 1
