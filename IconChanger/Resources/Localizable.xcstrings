@@ -7015,6 +7015,52 @@
         }
       }
     },
+    "Automatically Load Icons" : {
+      "comment" : "Icon loading setting",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自动加载图标"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動載入圖示"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動載入圖示"
+          }
+        }
+      }
+    },
+    "Automatically loads macOSicons.com results when you open an app or change the icon style. Cached results are used when available, but loading may use your monthly API allowance." : {
+      "comment" : "Icon loading setting description",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开应用或更改图标风格时自动加载 macOSicons.com 的结果。系统会优先使用缓存结果，但加载仍可能占用每月 API 配额。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟 App 或更改圖示風格時，自動載入 macOSicons.com 的結果。系統會優先使用快取結果，但載入仍可能使用每月 API 配額。"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟應用程式或更改圖示風格時，自動載入 macOSicons.com 的結果。系統會優先使用快取結果，但載入仍可能使用每月 API 配額。"
+          }
+        }
+      }
+    },
     "Background" : {
       "localizations" : {
         "ar" : {
@@ -23550,6 +23596,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "圖示已成功更改。"
+          }
+        }
+      }
+    },
+    "Icon Loading" : {
+      "comment" : "Settings section",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "图标加载"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "圖示載入"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "圖示載入"
           }
         }
       }

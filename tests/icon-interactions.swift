@@ -4,29 +4,111 @@ import Foundation
 enum IconInteractionTests {
     static func main() {
         assertEqual(
-            IconFetchInteractionPolicy.action(for: .viewAppeared),
-            .none,
-            "opening an app must not spend an API request"
+            IconFetchInteractionPolicy.action(
+                for: .viewAppeared,
+                automaticallyLoadIcons: true,
+                hasRequestedIcons: false
+            ),
+            .loadAllowingCache,
+            "opening an app should load icons by default"
         )
         assertEqual(
-            IconFetchInteractionPolicy.action(for: .styleChanged),
+            IconFetchInteractionPolicy.action(
+                for: .viewAppeared,
+                automaticallyLoadIcons: false,
+                hasRequestedIcons: false
+            ),
             .none,
-            "changing style must wait for an explicit load"
+            "opening an app must wait when automatic loading is disabled"
         )
         assertEqual(
-            IconFetchInteractionPolicy.action(for: .localIconChanged),
+            IconFetchInteractionPolicy.action(
+                for: .viewAppeared,
+                automaticallyLoadIcons: true,
+                hasRequestedIcons: true
+            ),
+            .none,
+            "a repeated appearance must not load icons twice"
+        )
+        assertEqual(
+            IconFetchInteractionPolicy.action(
+                for: .styleChanged,
+                automaticallyLoadIcons: true,
+                hasRequestedIcons: false
+            ),
+            .loadAllowingCache,
+            "changing style should load icons when automatic loading is enabled"
+        )
+        assertEqual(
+            IconFetchInteractionPolicy.action(
+                for: .styleChanged,
+                automaticallyLoadIcons: false,
+                hasRequestedIcons: false
+            ),
+            .none,
+            "changing style must wait when automatic loading is disabled"
+        )
+        assertEqual(
+            IconFetchInteractionPolicy.action(
+                for: .localIconChanged,
+                automaticallyLoadIcons: true,
+                hasRequestedIcons: true
+            ),
             .none,
             "applying an icon must not refresh remote results"
         )
         assertEqual(
-            IconFetchInteractionPolicy.action(for: .userRequestedLoad),
+            IconFetchInteractionPolicy.action(
+                for: .userRequestedLoad,
+                automaticallyLoadIcons: false,
+                hasRequestedIcons: false
+            ),
             .loadAllowingCache,
-            "the load button may use a cached response"
+            "the load button must work when automatic loading is disabled"
         )
         assertEqual(
-            IconFetchInteractionPolicy.action(for: .userRequestedRefresh),
+            IconFetchInteractionPolicy.action(
+                for: .userRequestedRefresh,
+                automaticallyLoadIcons: false,
+                hasRequestedIcons: true
+            ),
             .refreshFromNetwork,
             "the refresh button must explicitly request fresh results"
+        )
+        assertTrue(
+            IconFetchInteractionPolicy.defaultAutomaticallyLoadIcons,
+            "automatic icon loading must default to enabled"
+        )
+        assertTrue(
+            IconFetchInteractionPolicy.shouldResetRequestAfterLeaving(
+                pendingAutomaticLoad: true,
+                isLoadingIcons: false
+            ),
+            "leaving during the automatic debounce must allow a later reload"
+        )
+        assertTrue(
+            IconFetchInteractionPolicy.shouldResetRequestAfterLeaving(
+                pendingAutomaticLoad: false,
+                isLoadingIcons: true
+            ),
+            "leaving during a request must allow a later reload"
+        )
+        assertFalse(
+            IconFetchInteractionPolicy.shouldResetRequestAfterLeaving(
+                pendingAutomaticLoad: false,
+                isLoadingIcons: false
+            ),
+            "completed results must remain requested when the view leaves"
+        )
+        assertEqual(
+            IconRemoteRequestPolicy.normalizedAPIKey("  usable-key \n"),
+            "usable-key",
+            "API keys should be normalized before use"
+        )
+        assertEqual(
+            IconRemoteRequestPolicy.normalizedAPIKey(" \n\t"),
+            nil,
+            "a missing API key must stop before usage is recorded"
         )
 
         assertTrue(
@@ -46,7 +128,7 @@ enum IconInteractionTests {
             "reusing a history entry must not create another entry"
         )
 
-        print("PASS: remote icon loads are explicit and history reuse is idempotent")
+        print("PASS: automatic remote icon loading is configurable and history reuse is idempotent")
     }
 
     private static func assertEqual<T: Equatable>(

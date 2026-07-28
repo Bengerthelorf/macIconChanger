@@ -44,6 +44,10 @@ struct ChangeView: View {
     @State private var isHistoryExpanded = false
     @State private var hasLoadedLocalIcons = false
     @State private var hasRequestedIcons = false
+    @State private var pendingAutomaticLoadToken: UUID?
+    @AppStorage(IconFetchInteractionPolicy.automaticallyLoadIconsKey)
+    private var automaticallyLoadIcons =
+        IconFetchInteractionPolicy.defaultAutomaticallyLoadIcons
 
     var body: some View {
         GeometryReader { geometry in
@@ -330,7 +334,7 @@ struct ChangeView: View {
                     }
                 }
                 .onDisappear {
-                    loadIconsTask?.cancel()
+                    cancelIncompleteIconLoad()
                 }
                 .onChange(of: iconManager.iconRefreshTrigger) { _ in
                     inIcons = iconManager.getIconInPath(setPath.url)
@@ -340,6 +344,13 @@ struct ChangeView: View {
                 }
                 .onChange(of: iconManager.apps) { _ in
                     hasDuplicateName = iconManager.apps.contains { $0.name == setPath.name && $0.id != setPath.id }
+                }
+                .onChange(of: automaticallyLoadIcons) { enabled in
+                    if enabled {
+                        handleIconFetchEvent(.viewAppeared)
+                    } else {
+                        cancelPendingAutomaticLoad()
+                    }
                 }
                 .confirmationDialog("Restore Default Icon", isPresented: $showRestoreConfirm) {
                     Button("Restore", role: .destructive) {
@@ -460,25 +471,75 @@ struct ChangeView: View {
         }
     }
 
-    private func triggerIconFetch(forceRefresh: Bool = false) {
+    private func triggerIconFetch(
+        forceRefresh: Bool = false,
+        debounceNanoseconds: UInt64 = 0
+    ) {
         loadIconsTask?.cancel()
         let token = UUID()
         currentLoadToken = token
         let style = selectedStyle
         let appInfo = setPath
+        pendingAutomaticLoadToken =
+            debounceNanoseconds > 0 ? token : nil
 
         loadIconsTask = Task {
+            if debounceNanoseconds > 0 {
+                do {
+                    try await Task.sleep(nanoseconds: debounceNanoseconds)
+                } catch {
+                    return
+                }
+                await MainActor.run {
+                    if pendingAutomaticLoadToken == token {
+                        pendingAutomaticLoadToken = nil
+                    }
+                }
+            }
+            guard !Task.isCancelled else { return }
             await fetchIcons(for: appInfo, style: style, token: token, forceRefresh: forceRefresh)
         }
     }
 
+    private func cancelPendingAutomaticLoad() {
+        guard pendingAutomaticLoadToken != nil else { return }
+        loadIconsTask?.cancel()
+        currentLoadToken = UUID()
+        pendingAutomaticLoadToken = nil
+        isLoadingIcons = false
+        hasRequestedIcons = false
+    }
+
+    private func cancelIncompleteIconLoad() {
+        let shouldReset = IconFetchInteractionPolicy.shouldResetRequestAfterLeaving(
+            pendingAutomaticLoad: pendingAutomaticLoadToken != nil,
+            isLoadingIcons: isLoadingIcons
+        )
+        loadIconsTask?.cancel()
+        currentLoadToken = UUID()
+        pendingAutomaticLoadToken = nil
+        if shouldReset {
+            isLoadingIcons = false
+            hasRequestedIcons = false
+        }
+    }
+
     private func handleIconFetchEvent(_ event: IconFetchInteractionEvent) {
-        switch IconFetchInteractionPolicy.action(for: event) {
+        switch IconFetchInteractionPolicy.action(
+            for: event,
+            automaticallyLoadIcons: automaticallyLoadIcons,
+            hasRequestedIcons: hasRequestedIcons
+        ) {
         case .none:
             return
         case .loadAllowingCache:
             hasRequestedIcons = true
-            triggerIconFetch()
+            if event.isAutomatic {
+                isLoadingIcons = true
+            }
+            triggerIconFetch(
+                debounceNanoseconds: event.isAutomatic ? 250_000_000 : 0
+            )
         case .refreshFromNetwork:
             hasRequestedIcons = true
             triggerIconFetch(forceRefresh: true)
@@ -488,6 +549,7 @@ struct ChangeView: View {
     private func resetRemoteIcons() {
         loadIconsTask?.cancel()
         currentLoadToken = UUID()
+        pendingAutomaticLoadToken = nil
         icons = []
         validIcons = []
         totalIconsCount = 0

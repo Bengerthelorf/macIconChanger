@@ -33,6 +33,11 @@ final class AppSettings: ObservableObject {
         .init(key: "apiMonthlyLimit",   type: .int(50),         flags: .exported),
         .init(key: "cacheAPIResults",   type: .bool(true),      flags: .exported),
         .init(key: "extendedSearch",    type: .bool(false),     flags: .exported),
+        .init(
+            key: IconFetchInteractionPolicy.automaticallyLoadIconsKey,
+            type: .bool(IconFetchInteractionPolicy.defaultAutomaticallyLoadIcons),
+            flags: .exported
+        ),
 
         // Display
         .init(key: "appAppearance",       type: .string("system"), flags: .exported),

@@ -877,7 +877,8 @@ struct ExportCommand: ParsableCommand {
         }
         let exportedSettingKeys: Set<String> = [
             "apiRetryCount", "apiTimeoutSeconds", "apiMonthlyLimit", "cacheAPIResults",
-            "extendedSearch", "appAppearance", "showCustomIconBadge", "dockPreviewMode",
+            "extendedSearch", "automaticallyLoadIcons", "appAppearance",
+            "showCustomIconBadge", "dockPreviewMode",
             "dockPreviewWallpaper", "dockGlassIntensity", "wallpaperBleed", "wallpaperBlur",
             "runInBackground", "showInDock", "showInMenuBar", "launchBehavior",
             "enableScheduledRestore", "scheduledRestoreInterval",
@@ -885,11 +886,16 @@ struct ExportCommand: ParsableCommand {
             "enableAutoRestoreOnUpdate", "autoRestoreCheckInterval",
             "enableAppearanceIconSwitching", "appLanguage", "enablePreRelease", "t2e"
         ]
-        config.settings = appDefaults().reduce(into: [:]) { result, entry in
+        var exportedSettings: [String: ConfigurationValue] =
+            appDefaults().reduce(into: [:]) { result, entry in
             guard exportedSettingKeys.contains(entry.key),
                   let value = ConfigurationValue(entry.value) else { return }
             result[entry.key] = value
         }
+        if exportedSettings["automaticallyLoadIcons"] == nil {
+            exportedSettings["automaticallyLoadIcons"] = .bool(true)
+        }
+        config.settings = exportedSettings
         let configData = try JSONEncoder().encode(config)
 
         let outputURL = URL(fileURLWithPath: resolvedOutput)

@@ -211,7 +211,11 @@ class MyQueryRequestController {
     }
 
     func sendRequest(_ query: String, style: IconStyle = .all, apiKey: String? = nil) async throws -> [IconRes] {
-        let resolvedKey = apiKey ?? APIKeyManager.pickKey()
+        guard let resolvedKey = IconRemoteRequestPolicy.normalizedAPIKey(
+            apiKey ?? APIKeyManager.pickKey()
+        ) else {
+            throw APIError.apiKeyMissing
+        }
         let key = "\(query)|\(style.displayName)"
 
         let (task, isNew) = await dedup.deduplicate(for: key) { [self] in

@@ -85,6 +85,9 @@ struct AdvancedSettingsView: View {
     @AppStorage("apiTimeoutSeconds") private var apiTimeoutSeconds: Double = 15.0
     @AppStorage("apiMonthlyLimit") private var apiMonthlyLimit = 50
     @AppStorage("extendedSearch") private var extendedSearch = false
+    @AppStorage(IconFetchInteractionPolicy.automaticallyLoadIconsKey)
+    private var automaticallyLoadIcons =
+        IconFetchInteractionPolicy.defaultAutomaticallyLoadIcons
     @AppStorage("t2e") private var t2Enabled = false
     @AppStorage("enablePreRelease") private var enablePreRelease = false
     @State private var extraAPIKeys: [IdentifiableKey] = APIKeyManager.loadExtraKeys().map { IdentifiableKey(value: $0) }
@@ -207,6 +210,31 @@ struct AdvancedSettingsView: View {
             } footer: {
                 Text(NSLocalizedString("Retry count controls how many times a failed request is retried. Timeout applies to each individual request attempt.\n\nExtended Search uses multiple queries per search to find more icons. This uses 2–3× more API calls.", comment: "API settings description"))
                     .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            Section {
+                Toggle(isOn: $automaticallyLoadIcons) {
+                    Label(
+                        NSLocalizedString(
+                            "Automatically Load Icons",
+                            comment: "Icon loading setting"
+                        ),
+                        systemImage: "icloud.and.arrow.down"
+                    )
+                }
+            } header: {
+                Label(
+                    NSLocalizedString("Icon Loading", comment: "Settings section"),
+                    systemImage: "square.grid.2x2"
+                )
+            } footer: {
+                Text(
+                    NSLocalizedString(
+                        "Automatically loads macOSicons.com results when you open an app or change the icon style. Cached results are used when available, but loading may use your monthly API allowance.",
+                        comment: "Icon loading setting description"
+                    )
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             // MARK: - Icon Search Cache
