@@ -4,6 +4,29 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.5.0-pre.2</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>40105005002</sparkle:version>
+                    <sparkle:shortVersionString>1.5.0-pre.2</sparkle:shortVersionString>
+                    <pubDate>Tue, 28 Jul 2026 21:57:56 +0000</pubDate>
+                    <sparkle:channel>beta</sparkle:channel>
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.5.0-pre.2/IconChanger.dmg"
+                    sparkle:edSignature="/zXfc9ZX4X8S1zsSvWcSoaD8bpzOOcA8AQwHnDhoAxdrp+oGGw88iBA9TL+jpIChGWGVZAfNGNyF264678gWBw==" length="8272074"
+                    type="application/octet-stream"/>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.5.0-pre.2</h2>
+                    <ul>
+                        <li><strong>New:</strong> switch icons with system appearance</li>
+                        <li>ci: keep appcast publishing idempotent</li>
+                        <li>ci: deploy Sparkle feed with GitHub Pages</li>
+                        <li>ci: rebuild Pages after publishing appcast</li>
+                        <li>ci: allow release workflow to redeploy docs</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
                     <title>Version 1.5.0-pre.1</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>40105005001</sparkle:version>
