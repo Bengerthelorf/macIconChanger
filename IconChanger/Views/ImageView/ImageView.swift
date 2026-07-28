@@ -32,6 +32,10 @@ struct ImageView: View {
                     Label("Add to Favorites", systemImage: "star")
                 }
                 .disabled(preview == nil)
+
+                Divider()
+
+                AppearanceIconContextMenuItems(image: preview, app: setPath)
             }
             .task(id: icon.id) {
                 do {

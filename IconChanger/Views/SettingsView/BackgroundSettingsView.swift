@@ -8,6 +8,7 @@ import UserNotifications
 
 struct BackgroundSettingsView: View {
     @StateObject private var backgroundService = BackgroundService.shared
+    @StateObject private var appearanceSwitchService = IconAppearanceSwitchService.shared
 
     private let intervalOptions = [
         (1, "Every Hour"),
@@ -66,6 +67,32 @@ struct BackgroundSettingsView: View {
                     }
             } header: {
                 Label("Background Service", systemImage: "clock.arrow.circlepath")
+            }
+
+            Section {
+                Toggle(
+                    "Switch Icons with System Appearance",
+                    isOn: $backgroundService.enableAppearanceIconSwitching
+                )
+
+                if appearanceSwitchService.isSwitching {
+                    LabeledContent("Status") {
+                        Label("Switching icons…", systemImage: "arrow.triangle.2.circlepath")
+                            .foregroundColor(.secondary)
+                    }
+                } else if appearanceSwitchService.failedApplicationCount > 0 {
+                    LabeledContent("Status") {
+                        Label(
+                            "\(appearanceSwitchService.failedApplicationCount) failed",
+                            systemImage: "exclamationmark.triangle"
+                        )
+                        .foregroundColor(.orange)
+                    }
+                }
+            } header: {
+                Label("Icon Appearance", systemImage: "circle.lefthalf.filled")
+            } footer: {
+                Text("Apps with both Light and Dark icons switch automatically while IconChanger is running. The Dock refreshes after a successful switch.")
             }
 
             if backgroundService.runInBackground {

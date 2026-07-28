@@ -55,6 +55,16 @@ import os
         }
     }
 
+    @Published var enableAppearanceIconSwitching: Bool {
+        didSet {
+            UserDefaults.standard.set(
+                enableAppearanceIconSwitching,
+                forKey: "enableAppearanceIconSwitching"
+            )
+            IconAppearanceSwitchService.shared.setEnabled(enableAppearanceIconSwitching)
+        }
+    }
+
     @Published var enableScheduledRestore: Bool {
         didSet {
             UserDefaults.standard.set(enableScheduledRestore, forKey: "enableScheduledRestore")
@@ -128,6 +138,7 @@ import os
         self.runInBackground = false
         self.showInDock = true
         self.showInMenuBar = true
+        self.enableAppearanceIconSwitching = false
         self.enableScheduledRestore = false
         self.scheduledRestoreInterval = 24
         self.customScheduledRestoreInterval = 36
@@ -146,6 +157,10 @@ import os
         if UserDefaults.standard.object(forKey: "showInMenuBar") != nil {
             self.showInMenuBar = UserDefaults.standard.bool(forKey: "showInMenuBar")
         }
+
+        self.enableAppearanceIconSwitching = UserDefaults.standard.bool(
+            forKey: "enableAppearanceIconSwitching"
+        )
 
         self.enableScheduledRestore = UserDefaults.standard.bool(forKey: "enableScheduledRestore")
 

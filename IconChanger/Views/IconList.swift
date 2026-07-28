@@ -304,7 +304,9 @@ struct IconList: View {
                             }
 
                             Button {
-                                Self.refreshDock()
+                                Task {
+                                    _ = await DockRefreshService.refreshTwice()
+                                }
                             } label: {
                                 Label("Refresh Dock", systemImage: "dock.rectangle")
                             }
@@ -465,10 +467,9 @@ struct IconList: View {
 
     /// Restarts the Dock process to force icon refresh.
     static func refreshDock() {
-        let task = Process()
-        task.executableURL = URL(fileURLWithPath: "/usr/bin/killall")
-        task.arguments = ["Dock"]
-        try? task.run()
+        Task {
+            _ = await DockRefreshService.refreshTwice()
+        }
     }
 }
 

@@ -33,6 +33,10 @@ struct HistoryImageView: View {
 
                 Divider()
 
+                AppearanceIconContextMenuItems(image: nsimage, app: setPath)
+
+                Divider()
+
                 Button(role: .destructive) {
                     onRemove()
                 } label: {

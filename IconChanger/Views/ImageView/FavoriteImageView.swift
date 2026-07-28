@@ -21,6 +21,10 @@ struct FavoriteImageView: View {
             applicationSource: .favorite
         )
             .contextMenu {
+                AppearanceIconContextMenuItems(image: nsimage, app: setPath)
+
+                Divider()
+
                 Button(role: .destructive) {
                     onRemove()
                 } label: {

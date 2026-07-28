@@ -43,6 +43,9 @@ final class AppSettings: ObservableObject {
         .init(key: "wallpaperBleed",      type: .double(0.0),     flags: .exported),
         .init(key: "wallpaperBlur",       type: .double(0.0),     flags: .exported),
 
+        // Background appearance switching
+        .init(key: "enableAppearanceIconSwitching", type: .bool(false), flags: .exported),
+
         // Updates
         .init(key: "enablePreRelease", type: .bool(false), flags: .exported),
 

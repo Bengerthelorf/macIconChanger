@@ -63,6 +63,14 @@ enum AppPaths {
         ensureDirectory(applicationSupportRoot.appendingPathComponent("favorites", isDirectory: true))
     }
 
+    static var appearanceIconsDirectory: URL {
+        ensureDirectory(applicationSupportRoot.appendingPathComponent("appearance-icons", isDirectory: true))
+    }
+
+    static var appearanceIconsMetadataFile: URL {
+        applicationSupportRoot.appendingPathComponent("appearance-icons.json")
+    }
+
     static var sharedConfigDirectory: URL {
         ensureDirectory(applicationSupportRoot.appendingPathComponent("config", isDirectory: true))
     }

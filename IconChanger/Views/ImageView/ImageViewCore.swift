@@ -131,6 +131,54 @@ struct ImageViewCore: View {
 
 }
 
+struct AppearanceIconContextMenuItems: View {
+    let image: NSImage?
+    let app: AppItem
+
+    var body: some View {
+        ForEach(IconAppearance.allCases, id: \.self) { appearance in
+            Button {
+                assign(appearance)
+            } label: {
+                Label(
+                    String(
+                        format: NSLocalizedString(
+                            "Set as %@ Icon",
+                            comment: "Context menu action for assigning a light or dark icon"
+                        ),
+                        appearance.displayName
+                    ),
+                    systemImage: appearance.systemImage
+                )
+            }
+            .disabled(image == nil)
+        }
+    }
+
+    private func assign(_ appearance: IconAppearance) {
+        guard let imageCopy = image?.copy() as? NSImage else { return }
+        Task { @MainActor in
+            do {
+                try await IconAppearanceSwitchService.shared.assign(
+                    image: imageCopy,
+                    app: app,
+                    appearance: appearance
+                )
+            } catch {
+                let alert = NSAlert()
+                alert.alertStyle = .critical
+                alert.messageText = NSLocalizedString(
+                    "Unable to Save Appearance Icon",
+                    comment: "Appearance icon assignment error title"
+                )
+                alert.informativeText = error.localizedDescription
+                alert.addButton(withTitle: NSLocalizedString("OK", comment: "Alert button"))
+                alert.runModal()
+            }
+        }
+    }
+}
+
 
 struct SnackbarView: View {
     @Binding var isPresented: Bool

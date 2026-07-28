@@ -26,6 +26,10 @@ struct LocalImageView: View {
                     Label("Add to Favorites", systemImage: "star")
                 }
                 .disabled(nsimage == nil)
+
+                Divider()
+
+                AppearanceIconContextMenuItems(image: nsimage, app: setPath)
             }
             .task(id: url) {
                 do {

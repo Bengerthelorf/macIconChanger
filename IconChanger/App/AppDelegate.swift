@@ -20,6 +20,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             backgroundService.startBackgroundService()
         }
 
+        IconAppearanceSwitchService.shared.setEnabled(
+            backgroundService.enableAppearanceIconSwitching
+        )
+
         let launchedHidden = backgroundService.shouldLaunchHidden && isLaunchedAtLogin(notification)
 
         if launchedHidden {

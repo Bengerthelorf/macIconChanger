@@ -370,6 +370,7 @@ class IconManager: ObservableObject {
         }
 
         IconCacheManager.shared.removeCachedIcon(for: appPath)
+        AppearanceIconStore.shared.removeConfiguration(for: appPath)
 
         Task { @MainActor in
             AppIconCache.shared.remove(for: app.url)
