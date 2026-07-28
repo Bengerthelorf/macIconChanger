@@ -11,7 +11,13 @@ Back up your icon configurations or transfer them to another Mac.
 
 An export file (JSON) includes:
 - **App aliases** — your custom search name mappings
-- **Cached icon references** — which apps have custom icons and the cached icon files
+- **Cached icons** — the actual icon data and application paths
+- **Light/Dark icons** — both assigned appearance slots, including incomplete pairs
+- **Settings** — display, background restoration, update, language, and API behavior
+
+Plain JSON exports never include API keys or other Keychain secrets. Set an
+optional password in the GUI to create an encrypted `.icconfig` backup that can
+include those secrets. Export files are written with owner-only permissions.
 
 ## Exporting
 
@@ -38,7 +44,9 @@ iconchanger import ~/Desktop/my-icons.json
 ```
 
 :::callout[tip]{kind="info"}
-Import only **adds** new items. It never replaces or removes your existing aliases or cached icons.
+Import only **adds** missing aliases and icon slots. It never replaces or removes
+your existing icon choices. Settings included in the backup are restored.
+Encrypted files must be imported through the GUI.
 :::
 
 ## Validating

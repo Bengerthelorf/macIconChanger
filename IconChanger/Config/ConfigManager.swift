@@ -4,7 +4,6 @@
 //
 
 import Foundation
-import SwiftyJSON
 import Cocoa
 import UniformTypeIdentifiers
 import UserNotifications
@@ -14,24 +13,22 @@ class ConfigManager {
     static let shared = ConfigManager()
     let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "IconChanger", category: "ConfigManager")
 
-    struct AppConfiguration: Codable {
-        var appAliases: [AliasConfig] = []
-        var cachedIcons: [IconCacheConfig] = []
-        var settings: [String: JSON]?
-        var version: String = "2.0"
-        var exportDate: Date = Date()
-    }
+    typealias AppConfiguration = AppConfigurationArchive
+    typealias AliasConfig = AliasConfigurationArchive
+    typealias IconCacheConfig = IconCacheConfigurationArchive
 
-    struct AliasConfig: Codable {
-        var appName: String
-        var aliasName: String
-    }
+    enum ImportError: LocalizedError {
+        case invalidArchiveSize
+        case invalidIconData(String)
 
-    struct IconCacheConfig: Codable {
-        var appPath: String
-        var appName: String
-        var iconFileName: String
-        var iconData: Data
+        var errorDescription: String? {
+            switch self {
+            case .invalidArchiveSize:
+                return "The configuration contains too many icons or icon data that is too large."
+            case .invalidIconData(let appName):
+                return "The configuration contains invalid icon data for \(appName)."
+            }
+        }
     }
 
     // MARK: - Export
@@ -50,14 +47,38 @@ class ConfigManager {
                     appPath: cache.appPath,
                     appName: cache.appName,
                     iconFileName: cache.iconFileName,
-                    iconData: iconData
+                    iconData: iconData,
+                    appVersion: cache.appVersion
                 ))
             }
         }
 
+        for appearance in AppearanceIconStore.shared.getAllConfigurations() {
+            let lightData = AppearanceIconStore.shared.iconURL(
+                for: appearance.appPath,
+                appearance: .light
+            ).flatMap { try? Data(contentsOf: $0) }
+            let darkData = AppearanceIconStore.shared.iconURL(
+                for: appearance.appPath,
+                appearance: .dark
+            ).flatMap { try? Data(contentsOf: $0) }
+            guard lightData != nil || darkData != nil else { continue }
+            config.appearanceIcons.append(
+                AppearanceIconConfigurationArchive(
+                    appPath: appearance.appPath,
+                    appName: appearance.appName,
+                    lightIconData: lightData,
+                    darkIconData: darkData
+                )
+            )
+        }
+
         let t2Active = UserDefaults.standard.bool(forKey: "t2e")
-        let settingsDict = AppSettings.shared.exportSettings(tier2Enabled: t2Active)
-        config.settings = settingsDict.mapValues { JSON($0) }
+        let includeSensitive = password?.isEmpty == false
+        config.settings = AppSettings.shared.exportSettings(
+            tier2Enabled: t2Active,
+            includeSensitive: includeSensitive
+        )
 
         do {
             let jsonData = try JSONEncoder().encode(config)
@@ -74,7 +95,7 @@ class ConfigManager {
 
             let tempDir = FileManager.default.temporaryDirectory
             let exportURL = tempDir.appendingPathComponent("IconChanger_Config_\(formattedDate()).\(ext)")
-            try outputData.write(to: exportURL)
+            try writePrivateData(outputData, to: exportURL)
             return exportURL
         } catch {
             logger.error("Export failed: \(error.localizedDescription)")
@@ -92,16 +113,21 @@ class ConfigManager {
     struct ImportResult {
         var aliases: Int = 0
         var icons: Int = 0
+        var appearanceIcons: Int = 0
         var settings: Int = 0
         var error: Error?
     }
 
     func importConfiguration(from url: URL, password: String? = nil) -> ImportResult {
         do {
+            guard ConfigurationArchivePolicy.validatesEncodedFileSize(url) else {
+                throw ImportError.invalidArchiveSize
+            }
             let rawData = try Data(contentsOf: url)
             let jsonData: Data
+            let isEncrypted = url.pathExtension.lowercased() == "icconfig"
 
-            if url.pathExtension == "icconfig" {
+            if isEncrypted {
                 guard let password, !password.isEmpty else {
                     return ImportResult(error: ConfigCrypto.CryptoError.wrongPassword)
                 }
@@ -111,13 +137,17 @@ class ConfigManager {
             }
 
             let config = try JSONDecoder().decode(AppConfiguration.self, from: jsonData)
+            guard ConfigurationArchivePolicy.validatesSizeLimits(config) else {
+                throw ImportError.invalidArchiveSize
+            }
+            try validateIconData(in: config)
 
             var importedAliases = 0
             var existingAliases = AliasNames.getAll()
-            let existingNames = Set(existingAliases.map(\.appName))
+            var existingNames = Set(existingAliases.map(\.appName))
 
             for alias in config.appAliases {
-                if !existingNames.contains(alias.appName) {
+                if existingNames.insert(alias.appName).inserted {
                     existingAliases.append(AliasName(appName: alias.appName, aliasName: alias.aliasName))
                     importedAliases += 1
                 }
@@ -127,27 +157,50 @@ class ConfigManager {
             var importedIcons = 0
             for iconConfig in config.cachedIcons {
                 if FileManager.default.fileExists(atPath: iconConfig.appPath) {
-                    let newFileName = "\(UUID().uuidString).png"
-                    let iconURL = IconCacheManager.cacheDirectory.appendingPathComponent(newFileName)
-                    try iconConfig.iconData.write(to: iconURL)
-                    IconCacheManager.shared.addImportedCache(IconCache(
+                    let imported = try IconCacheManager.shared.importIconData(
+                        iconConfig.iconData,
                         appPath: iconConfig.appPath,
-                        iconFileName: newFileName,
                         appName: iconConfig.appName,
-                        timestamp: Date()
-                    ))
-                    importedIcons += 1
+                        appVersion: iconConfig.appVersion
+                    )
+                    if imported {
+                        importedIcons += 1
+                    }
                 }
             }
 
-            var importedSettings = 0
-            if let settings = config.settings {
-                let dict = settings.mapValues { $0.object }
-                AppSettings.shared.importSettings(dict as [String: Any])
-                importedSettings = settings.count
+            var importedAppearanceIcons = 0
+            for appearanceConfig in config.appearanceIcons {
+                guard FileManager.default.fileExists(atPath: appearanceConfig.appPath) else {
+                    continue
+                }
+                importedAppearanceIcons += try AppearanceIconStore.shared.importSlots(
+                    appPath: appearanceConfig.appPath,
+                    appName: appearanceConfig.appName,
+                    lightIconData: appearanceConfig.lightIconData,
+                    darkIconData: appearanceConfig.darkIconData
+                )
             }
 
-            return ImportResult(aliases: importedAliases, icons: importedIcons, settings: importedSettings)
+            let importedSettings: Int
+            if let settings = config.settings {
+                importedSettings = AppSettings.shared.importSettings(
+                    settings,
+                    includeSensitive: isEncrypted
+                )
+                Task { @MainActor in
+                    BackgroundService.shared.reloadPersistentSettingsAfterImport()
+                }
+            } else {
+                importedSettings = 0
+            }
+
+            return ImportResult(
+                aliases: importedAliases,
+                icons: importedIcons,
+                appearanceIcons: importedAppearanceIcons,
+                settings: importedSettings
+            )
         } catch let error as ConfigCrypto.CryptoError {
             logger.error("Import failed: \(error.localizedDescription)")
             return ImportResult(error: error)
@@ -175,11 +228,16 @@ class ConfigManager {
             DispatchQueue.main.async {
             if result == .OK, let url = savePanel.url {
                 if let tempURL = self.exportConfiguration(password: password) {
+                    defer { try? FileManager.default.removeItem(at: tempURL) }
                     do {
                         if FileManager.default.fileExists(atPath: url.path) {
                             try FileManager.default.removeItem(at: url)
                         }
                         try FileManager.default.copyItem(at: tempURL, to: url)
+                        try FileManager.default.setAttributes(
+                            [.posixPermissions: 0o600],
+                            ofItemAtPath: url.path
+                        )
                         self.showNotification(
                             title: NSLocalizedString("Export Successful", comment: ""),
                             message: NSLocalizedString("Configuration exported successfully", comment: ""),
@@ -215,7 +273,7 @@ class ConfigManager {
             DispatchQueue.main.async {
                 guard result == .OK, let url = openPanel.url else { return }
 
-                if url.pathExtension == "icconfig" {
+                if url.pathExtension.lowercased() == "icconfig" {
                     self.promptPassword { password in
                         guard let password else { return }
                         let results = self.importConfiguration(from: url, password: password)
@@ -262,11 +320,22 @@ class ConfigManager {
         }
 
         NotificationCenter.default.post(name: Self.didImportNotification, object: nil)
-        if result.aliases > 0 || result.icons > 0 || result.settings > 0 {
+        if result.aliases > 0 ||
+            result.icons > 0 ||
+            result.appearanceIcons > 0 ||
+            result.settings > 0 {
             showNotification(
                 title: NSLocalizedString("Import Successful", comment: ""),
-                message: String(format: NSLocalizedString("Imported %lld aliases, %lld icons, and %lld settings", comment: ""),
-                                result.aliases, result.icons, result.settings),
+                message: String(
+                    format: NSLocalizedString(
+                        "Imported %lld aliases, %lld icons, %lld appearance slots, and %lld settings",
+                        comment: ""
+                    ),
+                    result.aliases,
+                    result.icons,
+                    result.appearanceIcons,
+                    result.settings
+                ),
                 success: true
             )
         } else {
@@ -282,6 +351,28 @@ class ConfigManager {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyyMMdd_HHmmss"
         return formatter.string(from: Date())
+    }
+
+    private func validateIconData(in config: AppConfiguration) throws {
+        for icon in config.cachedIcons where NSImage(data: icon.iconData) == nil {
+            throw ImportError.invalidIconData(icon.appName)
+        }
+        for appearance in config.appearanceIcons {
+            if let data = appearance.lightIconData, NSImage(data: data) == nil {
+                throw ImportError.invalidIconData(appearance.appName)
+            }
+            if let data = appearance.darkIconData, NSImage(data: data) == nil {
+                throw ImportError.invalidIconData(appearance.appName)
+            }
+        }
+    }
+
+    private func writePrivateData(_ data: Data, to url: URL) throws {
+        try data.write(to: url, options: .atomic)
+        try FileManager.default.setAttributes(
+            [.posixPermissions: 0o600],
+            ofItemAtPath: url.path
+        )
     }
 
     private func showNotification(title: String, message: String, success: Bool) {

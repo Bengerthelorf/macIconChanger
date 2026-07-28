@@ -11,21 +11,6 @@ extension ConfigManager {
         AppPaths.sharedConfigDirectory
     }
 
-    func exportConfigurationForCLI() -> URL? {
-        guard let exportUrl = exportConfiguration() else { return nil }
-
-        let latestExportFile = Self.sharedConfigDirectory.appendingPathComponent("latest_export.json")
-
-        do {
-            let data = try Data(contentsOf: exportUrl)
-            try data.write(to: latestExportFile, options: .atomic)
-            return exportUrl
-        } catch {
-            logger.error("Error saving for CLI: \(error.localizedDescription)")
-            return nil
-        }
-    }
-
     func checkForCLIImports() {
         let flagFile = Self.sharedConfigDirectory.appendingPathComponent("pending_import")
         let importedFile = Self.sharedConfigDirectory.appendingPathComponent("imported_config.json")
@@ -46,7 +31,9 @@ extension ConfigManager {
         }
 
         let result = importConfiguration(from: importedFile)
-        logger.info("CLI Import completed: \(result.aliases) aliases and \(result.icons) icons imported")
+        logger.info(
+            "CLI Import completed: \(result.aliases) aliases, \(result.icons) icons, \(result.appearanceIcons) appearance slots, and \(result.settings) settings imported"
+        )
 
         try? FileManager.default.removeItem(at: flagFile)
         try? FileManager.default.removeItem(at: importedFile)

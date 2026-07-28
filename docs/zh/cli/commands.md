@@ -111,7 +111,7 @@ iconchanger restore --force
 
 ### `export`
 
-导出别名和缓存图标配置到 JSON 文件。
+直接导出别名、普通缓存图标、浅色/深色图标和非敏感设置到仅当前用户可读的 JSON 文件。
 
 ```bash
 iconchanger export <输出路径>
@@ -133,7 +133,8 @@ iconchanger export ~/Desktop/my-icons.json
 iconchanger import <输入路径>
 ```
 
-导入只添加新条目，不会替换或删除现有配置。
+导入只添加缺少的别名与图标槽位，不会替换已有图标选择；IconChanger
+处理导入时也会恢复文件中包含的设置。
 
 **示例：**
 

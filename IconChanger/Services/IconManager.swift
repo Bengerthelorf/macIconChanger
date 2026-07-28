@@ -335,39 +335,8 @@ class IconManager: ObservableObject {
         let appPath = app.url.universalPath()
         logger.log("removeIcon called for app: \(app.name) at \(appPath)")
 
-        let finderInfoName = "com.apple.FinderInfo"
-        var finderInfo = [UInt8](repeating: 0, count: 32)
-        let size = getxattr(appPath, finderInfoName, &finderInfo, 32, 0, 0)
-
-        if size > 0 {
-            if finderInfo[8] & 0x04 != 0 {
-                finderInfo[8] = finderInfo[8] & ~0x04
-
-                let allZero = finderInfo.allSatisfy { $0 == 0 }
-                if allZero {
-                    removexattr(appPath, finderInfoName, 0)
-                } else {
-                    let result = setxattr(appPath, finderInfoName, &finderInfo, 32, 0, 0)
-                    if result != 0 {
-                        let err = String(cString: strerror(errno))
-                        logger.error("Failed to clear FinderInfo custom icon flag: \(err)")
-                        throw NSError(domain: "IconManager", code: 30,
-                                      userInfo: [NSLocalizedDescriptionKey: "Failed to clear custom icon flag: \(err)"])
-                    }
-                }
-            }
-        }
-
-        let iconFile = app.url.appendingPathComponent("Icon\r")
-        if FileManager.default.fileExists(atPath: iconFile.path) {
-            do {
-                try FileManager.default.removeItem(at: iconFile)
-            } catch {
-                logger.error("Failed to remove Icon\\r: \(error.localizedDescription)")
-                throw NSError(domain: "IconManager", code: 31,
-                              userInfo: [NSLocalizedDescriptionKey: "Failed to remove custom icon file: \(error.localizedDescription)"])
-            }
-        }
+        try ensureSetupCompleted()
+        try runHelperRemove(appPath: appPath)
 
         IconCacheManager.shared.removeCachedIcon(for: appPath)
         AppearanceIconStore.shared.removeConfiguration(for: appPath)
@@ -432,65 +401,68 @@ class IconManager: ObservableObject {
         var failed: [(String, Error)] = []
     }
 
+    @discardableResult
+    func restoreCachedIcon(
+        for app: AppItem,
+        allowRepair: Bool = true,
+        refreshDock: Bool = true
+    ) async throws -> Bool {
+        try ensureSetupCompleted(allowRepair: allowRepair)
+        let restored = try applyBestCachedIcon(for: app)
+        if restored, refreshDock {
+            _ = await DockRefreshService.refreshTwice()
+        }
+        return restored
+    }
+
     func restoreAllCachedIcons(allowRepair: Bool = true) async throws -> RestoreResult {
         logger.log("Starting restoreAllCachedIcons...")
         try ensureSetupCompleted(allowRepair: allowRepair)
 
-        let currentApps: [AppItem] = await MainActor.run { apps }
-        let appList: [AppItem]
-        if currentApps.isEmpty {
-            let loaded = loadAppItems()
-            await MainActor.run { apps = loaded }
-            appList = loaded
-        } else {
-            appList = currentApps
-        }
-        let appMap = Dictionary(uniqueKeysWithValues: appList.map { ($0.url.universalPath(), $0) })
-
         let cachedIcons = IconCacheManager.shared.getAllCachedIcons()
+        let appearanceConfigurations = AppearanceIconStore.shared.getAllConfigurations()
+        let cacheByPath = Dictionary(uniqueKeysWithValues: cachedIcons.map { ($0.appPath, $0) })
+        let appearanceByPath = Dictionary(
+            uniqueKeysWithValues: appearanceConfigurations.map { ($0.appPath, $0) }
+        )
+        let allPaths = Set(cacheByPath.keys).union(appearanceByPath.keys).sorted()
         var result = RestoreResult()
 
         await MainActor.run {
             isRestoring = true
-            restoreProgress = (0, cachedIcons.count)
+            restoreProgress = (0, allPaths.count)
         }
 
-        for (index, cache) in cachedIcons.enumerated() {
+        for (index, appPath) in allPaths.enumerated() {
+            let appName = cacheByPath[appPath]?.appName
+                ?? appearanceByPath[appPath]?.appName
+                ?? URL(fileURLWithPath: appPath).deletingPathExtension().lastPathComponent
             await MainActor.run {
-                restoreProgress = (index, cachedIcons.count)
-                restoringAppName = cache.appName
+                restoreProgress = (index, allPaths.count)
+                restoringAppName = appName
             }
 
             do {
-                let appPath = cache.appPath
-                let iconURL = IconCacheManager.cacheDirectory.appendingPathComponent(cache.iconFileName)
-
-                let appExists = FileManager.default.fileExists(atPath: appPath)
-                let iconExists = FileManager.default.fileExists(atPath: iconURL.path)
-
-                if appExists && iconExists {
-                    if let image = NSImage(contentsOf: iconURL) {
-                        if let appInfo = appMap[appPath] {
-                            try applyIcon(image, to: appInfo)
-                            result.restored += 1
-                        } else {
-                            result.skippedNotInstalled += 1
-                        }
-                    } else {
-                        IconCacheManager.shared.removeCachedIcon(for: appPath)
-                        throw RestoreError.iconFileNotFound(cache.appName)
-                    }
-                } else if !appExists {
+                guard FileManager.default.fileExists(atPath: appPath) else {
                     result.skippedNotInstalled += 1
-                    IconCacheManager.shared.removeCachedIcon(for: appPath)
-                } else {
-                    IconCacheManager.shared.removeCachedIcon(for: appPath)
-                    throw RestoreError.iconFileNotFound(cache.appName)
+                    continue
+                }
+                let app = AppItem(
+                    name: appName,
+                    url: URL(fileURLWithPath: appPath),
+                    originalAppInfo: nil
+                )
+                if try applyBestCachedIcon(for: app) {
+                    result.restored += 1
                 }
             } catch {
-                logger.error("Failed to restore icon for \(cache.appName): \(error.localizedDescription)")
-                result.failed.append((cache.appName, error))
+                logger.error("Failed to restore icon for \(appName): \(error.localizedDescription)")
+                result.failed.append((appName, error))
             }
+        }
+
+        if result.restored > 0 {
+            _ = await DockRefreshService.refreshTwice()
         }
 
         await MainActor.run {
@@ -502,6 +474,64 @@ class IconManager: ObservableObject {
         }
 
         return result
+    }
+
+    private func applyBestCachedIcon(for app: AppItem) throws -> Bool {
+        let appPath = app.url.universalPath()
+        let cache = IconCacheManager.shared.getIconCache(for: appPath)
+        let normalURL = cache.map {
+            IconCacheManager.cacheDirectory.appendingPathComponent($0.iconFileName)
+        }
+        let normalAvailable = normalURL.map {
+            FileManager.default.fileExists(atPath: $0.path)
+        } ?? false
+        let storedConfiguration = AppearanceIconStore.shared.configuration(for: appPath)
+        let configuration = storedConfiguration.flatMap { candidate -> AppearanceIconConfiguration? in
+            guard candidate.isComplete,
+                  IconAppearance.allCases.allSatisfy({ appearance in
+                      AppearanceIconStore.shared.iconURL(
+                          for: appPath,
+                          appearance: appearance
+                      ).map { FileManager.default.fileExists(atPath: $0.path) } ?? false
+                  }) else {
+                return nil
+            }
+            return candidate
+        }
+        let currentAppearance = SystemAppearanceMonitor.readAppearance()
+        let choice = IconAppearancePolicy.restoreChoice(
+            configuration: configuration,
+            normalIconAvailable: normalAvailable,
+            switchingEnabled: UserDefaults.standard.bool(forKey: "enableAppearanceIconSwitching"),
+            currentAppearance: currentAppearance
+        )
+
+        switch choice {
+        case .appearance(let appearance):
+            guard let iconURL = AppearanceIconStore.shared.iconURL(
+                for: appPath,
+                appearance: appearance
+            ), let image = NSImage(contentsOf: iconURL) else {
+                throw RestoreError.iconFileNotFound(app.name)
+            }
+            try applyIcon(image, to: app)
+            AppearanceIconStore.shared.markApplied(appearance, for: appPath)
+        case .normal:
+            guard let normalURL, let image = NSImage(contentsOf: normalURL) else {
+                throw RestoreError.iconFileNotFound(app.name)
+            }
+            try applyIcon(image, to: app)
+            IconCacheManager.shared.updateTimestamp(for: appPath)
+            AppearanceIconStore.shared.resetAppliedAppearance(for: appPath)
+        case .none:
+            return false
+        }
+
+        Task { @MainActor in
+            AppIconCache.shared.remove(for: app.url)
+            self.iconRefreshTrigger = UUID()
+        }
+        return true
     }
     
     func getIconInPath(_ url: URL) -> [URL] {
@@ -721,20 +751,41 @@ class IconManager: ObservableObject {
     }
     
     func runHelperTool(appPath: String, imagePath: String) throws {
+        try runHelper(
+            arguments: [fileiconURL.path, appPath, imagePath],
+            operation: "set",
+            appPath: appPath
+        )
+    }
+
+    private func runHelperRemove(appPath: String) throws {
+        try runHelper(
+            arguments: ["--remove", fileiconURL.path, appPath],
+            operation: "remove",
+            appPath: appPath
+        )
+    }
+
+    private func runHelper(
+        arguments: [String],
+        operation: String,
+        appPath: String
+    ) throws {
         let helperToolPath = self.helperScriptURL.path
-        let fileiconPath = self.fileiconURL.path
 
         let task = Process()
         let outPipe = Pipe()
         let errPipe = Pipe()
 
         task.executableURL = URL(fileURLWithPath: "/usr/bin/sudo")
-        task.arguments = ["-n", helperToolPath, fileiconPath, appPath, imagePath]
+        task.arguments = ["-n", helperToolPath] + arguments
         task.standardOutput = outPipe
         task.standardError = errPipe
         task.standardInput = nil
 
-        logger.debug("Executing: sudo -n \(helperToolPath) \(fileiconPath) \(appPath) \(imagePath)")
+        logger.debug(
+            "Executing privileged icon \(operation, privacy: .public) for \(appPath, privacy: .private)"
+        )
 
         // Read pipes concurrently to avoid deadlock when buffers fill up
         var outputData = Data()

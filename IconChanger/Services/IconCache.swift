@@ -46,11 +46,15 @@ class IconCacheManager {
     /// Must be called outside the lock. Pass a snapshot of cachedIcons.
     private func persistCache(_ snapshot: [String: IconCache]) {
         do {
-            let encoded = try JSONEncoder().encode(snapshot)
-            UserDefaults.standard.set(encoded, forKey: cacheKey)
+            try persistCacheOrThrow(snapshot)
         } catch {
             logger.error("Failed to persist icon cache metadata: \(error.localizedDescription, privacy: .public)")
         }
+    }
+
+    private func persistCacheOrThrow(_ snapshot: [String: IconCache]) throws {
+        let encoded = try JSONEncoder().encode(snapshot)
+        UserDefaults.standard.set(encoded, forKey: cacheKey)
     }
 
     func cacheIcon(image: NSImage, for appPath: String, appName: String) throws -> URL {
@@ -162,6 +166,60 @@ class IconCacheManager {
             return cachedIcons
         }()
         persistCache(snapshot)
+    }
+
+    /// Imports a cache entry without replacing an existing entry for the app.
+    /// The icon file and metadata are committed together; a metadata failure
+    /// removes the newly written file.
+    @discardableResult
+    func importIconData(
+        _ data: Data,
+        appPath: String,
+        appName: String,
+        appVersion: String?
+    ) throws -> Bool {
+        guard let image = NSImage(data: data) else {
+            throw IconManager.ImageSaveError.cgImageConversionFailed
+        }
+
+        lock.lock()
+        let alreadyExists = cachedIcons[appPath] != nil
+        lock.unlock()
+        guard !alreadyExists else { return false }
+
+        let iconFileName = "\(UUID().uuidString).png"
+        let iconURL = Self.cacheDirectory.appendingPathComponent(iconFileName)
+        if let saveError = IconManager.saveImage(image, atUrl: iconURL) {
+            throw saveError
+        }
+
+        lock.lock()
+        if cachedIcons[appPath] != nil {
+            lock.unlock()
+            try? FileManager.default.removeItem(at: iconURL)
+            return false
+        }
+
+        let cache = IconCache(
+            appPath: appPath,
+            iconFileName: iconFileName,
+            appName: appName,
+            timestamp: Date(),
+            appVersion: appVersion ?? IconCache.currentVersion(for: appPath)
+        )
+        var snapshot = cachedIcons
+        snapshot[appPath] = cache
+
+        do {
+            try persistCacheOrThrow(snapshot)
+            cachedIcons = snapshot
+            lock.unlock()
+            return true
+        } catch {
+            lock.unlock()
+            try? FileManager.default.removeItem(at: iconURL)
+            throw error
+        }
     }
 }
 

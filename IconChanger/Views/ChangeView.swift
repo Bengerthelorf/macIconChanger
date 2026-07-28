@@ -550,10 +550,7 @@ struct ChangeView: View {
     }
     
     static func friendlyErrorMessage(_ raw: String) -> String {
-        if raw.contains("permission") || raw.contains("权限") {
-            return NSLocalizedString("This app may be protected by macOS. Try closing the app first, or the app may not support icon changes.", comment: "Permission error explanation")
-        }
-        return raw
+        RestoreDefaultErrorPolicy.friendlyMessage(raw)
     }
 
     private func updateIconStatus(icon: IconRes, isValid: Bool) {

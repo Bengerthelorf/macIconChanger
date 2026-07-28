@@ -106,6 +106,45 @@ struct IconAppearancePolicyTests {
             "selecting a slot should replace the whole-application selection"
         )
 
+        var completeConfiguration = configuration
+        completeConfiguration.lightIconFileName = lightFileName
+        completeConfiguration.darkIconFileName = darkFileName
+        expect(
+            IconAppearancePolicy.restoreChoice(
+                configuration: completeConfiguration,
+                normalIconAvailable: true,
+                switchingEnabled: true,
+                currentAppearance: .dark
+            ) == .appearance(.dark),
+            "appearance icon should win over normal cache while switching is enabled"
+        )
+        expect(
+            IconAppearancePolicy.restoreChoice(
+                configuration: completeConfiguration,
+                normalIconAvailable: true,
+                switchingEnabled: false,
+                currentAppearance: .dark
+            ) == .normal,
+            "normal cache should be used while appearance switching is disabled"
+        )
+        expect(
+            IconAppearancePolicy.restoreChoice(
+                configuration: completeConfiguration,
+                normalIconAvailable: false,
+                switchingEnabled: false,
+                currentAppearance: .dark
+            ) == .none,
+            "restore should skip apps without an eligible icon"
+        )
+
+        let permissionMessage = RestoreDefaultErrorPolicy.friendlyMessage(
+            "Failed to remove custom icon file: You don’t have permission."
+        )
+        expect(
+            !permissionMessage.localizedCaseInsensitiveContains("closing"),
+            "permission failures must not falsely claim that the app is running"
+        )
+
         print("Icon appearance policy tests passed")
     }
 }

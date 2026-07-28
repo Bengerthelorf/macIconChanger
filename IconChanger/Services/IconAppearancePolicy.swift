@@ -129,4 +129,38 @@ enum IconAppearancePolicy {
             return appPath
         })
     }
+
+    static func restoreChoice(
+        configuration: AppearanceIconConfiguration?,
+        normalIconAvailable: Bool,
+        switchingEnabled: Bool,
+        currentAppearance: IconAppearance
+    ) -> CachedIconRestoreChoice {
+        if switchingEnabled,
+           let configuration,
+           configuration.isComplete,
+           configuration.fileName(for: currentAppearance) != nil {
+            return .appearance(currentAppearance)
+        }
+        return normalIconAvailable ? .normal : .none
+    }
+}
+
+enum CachedIconRestoreChoice: Equatable, Sendable {
+    case appearance(IconAppearance)
+    case normal
+    case none
+}
+
+enum RestoreDefaultErrorPolicy {
+    static func friendlyMessage(_ raw: String) -> String {
+        let lowered = raw.lowercased()
+        if lowered.contains("permission") || raw.contains("权限") {
+            return NSLocalizedString(
+                "IconChanger could not modify this app. Check IconChanger's helper permissions in Settings and try again.",
+                comment: "Permission error explanation"
+            )
+        }
+        return raw
+    }
 }

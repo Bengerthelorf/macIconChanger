@@ -24,6 +24,7 @@ final class AppearanceIconStore {
         self.directory = directory
         self.metadataURL = metadataURL
         self.fileManager = fileManager
+        try? fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
         load()
     }
 
@@ -64,6 +65,7 @@ final class AppearanceIconStore {
         if let saveError = IconManager.saveImage(image, atUrl: newURL) {
             throw saveError
         }
+        try? fileManager.setAttributes([.posixPermissions: 0o600], ofItemAtPath: newURL.path)
 
         lock.lock()
         var updated = configurations[appPath] ?? AppearanceIconConfiguration(
@@ -120,6 +122,114 @@ final class AppearanceIconStore {
         } catch {
             lock.unlock()
             logger.error("Failed to persist applied appearance: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    func resetAppliedAppearance(for appPath: String) {
+        lock.lock()
+        guard var configuration = configurations[appPath],
+              configuration.lastAppliedAppearance != nil else {
+            lock.unlock()
+            return
+        }
+        configuration.lastAppliedAppearance = nil
+        configuration.updatedAt = Date()
+        var snapshot = configurations
+        snapshot[appPath] = configuration
+        do {
+            try persist(snapshot)
+            configurations = snapshot
+            lock.unlock()
+            notifyChange()
+        } catch {
+            lock.unlock()
+            logger.error("Failed to reset applied appearance: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    /// Adds only missing light/dark slots and never overwrites local choices.
+    @discardableResult
+    func importSlots(
+        appPath: String,
+        appName: String,
+        lightIconData: Data?,
+        darkIconData: Data?
+    ) throws -> Int {
+        let candidates: [(IconAppearance, NSImage)] = [
+            lightIconData.flatMap(NSImage.init(data:)).map { (.light, $0) },
+            darkIconData.flatMap(NSImage.init(data:)).map { (.dark, $0) }
+        ].compactMap { $0 }
+        guard !candidates.isEmpty else { return 0 }
+
+        lock.lock()
+        var updated = configurations[appPath] ?? AppearanceIconConfiguration(
+            appPath: appPath,
+            appName: appName,
+            lightIconFileName: nil,
+            darkIconFileName: nil,
+            lastAppliedAppearance: nil,
+            updatedAt: Date()
+        )
+        let missing = candidates.filter { updated.fileName(for: $0.0) == nil }
+        lock.unlock()
+        guard !missing.isEmpty else { return 0 }
+
+        var written: [(IconAppearance, String, URL)] = []
+        do {
+            for (appearance, image) in missing {
+                let fileName = "\(UUID().uuidString).png"
+                let url = directory.appendingPathComponent(fileName)
+                if let error = IconManager.saveImage(image, atUrl: url) {
+                    throw error
+                }
+                try? fileManager.setAttributes([.posixPermissions: 0o600], ofItemAtPath: url.path)
+                written.append((appearance, fileName, url))
+            }
+
+            lock.lock()
+            updated = configurations[appPath] ?? AppearanceIconConfiguration(
+                appPath: appPath,
+                appName: appName,
+                lightIconFileName: nil,
+                darkIconFileName: nil,
+                lastAppliedAppearance: nil,
+                updatedAt: Date()
+            )
+            var accepted = 0
+            for (appearance, fileName, _) in written where updated.fileName(for: appearance) == nil {
+                updated.setFileName(fileName, for: appearance)
+                accepted += 1
+            }
+            updated.appName = appName
+            updated.lastAppliedAppearance = nil
+            updated.updatedAt = Date()
+            var snapshot = configurations
+            snapshot[appPath] = updated
+            do {
+                try persist(snapshot)
+                configurations = snapshot
+                lock.unlock()
+            } catch {
+                lock.unlock()
+                throw error
+            }
+
+            let acceptedNames = Set(IconAppearance.allCases.compactMap {
+                updated.fileName(for: $0)
+            })
+            for (_, name, url) in written where !acceptedNames.contains(name) {
+                try? fileManager.removeItem(at: url)
+            }
+            notifyChange()
+            return accepted
+        } catch {
+            if lock.try() {
+                lock.unlock()
+            }
+            for (_, _, url) in written {
+                try? fileManager.removeItem(at: url)
+            }
+            throw error
         }
     }
 
@@ -222,6 +332,7 @@ final class AppearanceIconStore {
     private func persist(_ snapshot: [String: AppearanceIconConfiguration]) throws {
         let data = try JSONEncoder().encode(snapshot)
         try data.write(to: metadataURL, options: .atomic)
+        try fileManager.setAttributes([.posixPermissions: 0o600], ofItemAtPath: metadataURL.path)
     }
 
     private func notifyChange() {
@@ -288,7 +399,7 @@ final class SystemAppearanceMonitor {
         handler?(appearance)
     }
 
-    static func readAppearance(
+    nonisolated static func readAppearance(
         globalDomain: [String: Any]? = nil
     ) -> IconAppearance {
         let domain = globalDomain ?? UserDefaults.standard.persistentDomain(

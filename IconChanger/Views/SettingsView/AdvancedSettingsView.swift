@@ -95,6 +95,7 @@ struct AdvancedSettingsView: View {
     @State private var showExportPasswordPrompt = false
     @State private var exportPassword = ""
     @State private var usageCount: Int = APIUsageTracker.shared.currentCount
+    @State private var appearanceIconCount = 0
 
     private var aliasCount: Int {
         AliasNames.getAll().count
@@ -262,6 +263,14 @@ struct AdvancedSettingsView: View {
                 } label: {
                     Label("Cached Icons", systemImage: "photo.on.rectangle")
                 }
+
+                LabeledContent {
+                    Text("\(appearanceIconCount)")
+                        .monospacedDigit()
+                        .foregroundColor(.secondary)
+                } label: {
+                    Label("Light / Dark Icons", systemImage: "circle.lefthalf.filled")
+                }
             } header: {
                 Label("Configuration", systemImage: "doc.badge.gearshape")
             }
@@ -272,7 +281,6 @@ struct AdvancedSettingsView: View {
                 } label: {
                     Label("Export Configuration", systemImage: "square.and.arrow.up")
                 }
-                .disabled(aliasCount == 0 && cachedIconsCount == 0)
 
                 Button {
                     ConfigManager.shared.showImportDialog()
@@ -281,8 +289,8 @@ struct AdvancedSettingsView: View {
                 }
             } footer: {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Export your aliases, icon cache, and settings for backup or to use on another Mac.")
-                    Text("Import will only add new items, never replace or remove existing ones.")
+                    Text("Export aliases, cached icons, light/dark icons, and settings for backup or another Mac.")
+                    Text("Import adds missing aliases and icons without replacing local choices, then restores included settings.")
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -290,7 +298,6 @@ struct AdvancedSettingsView: View {
                 SecureField("Password (optional)", text: $exportPassword)
                 Button("Export") {
                     let pw = exportPassword.isEmpty ? nil : exportPassword
-                    _ = ConfigManager.shared.exportConfigurationForCLI()
                     ConfigManager.shared.showExportDialog(password: pw)
                     exportPassword = ""
                 }
@@ -427,12 +434,19 @@ struct AdvancedSettingsView: View {
         .onAppear {
             ConfigManager.shared.checkForCLIImports()
             fetchCacheCount = IconFetchCacheManager.shared.getCacheCount()
+            updateAppearanceIconCount()
         }
         .onReceive(NotificationCenter.default.publisher(for: ConfigManager.didImportNotification)) { _ in
             apiKey = KeychainHelper.load(key: "apiKey") ?? ""
             extraAPIKeys = APIKeyManager.loadExtraKeys().map { IdentifiableKey(value: $0) }
             usageCount = APIUsageTracker.shared.currentCount
             fetchCacheCount = IconFetchCacheManager.shared.getCacheCount()
+            updateAppearanceIconCount()
+        }
+        .onReceive(
+            NotificationCenter.default.publisher(for: .appearanceIconStoreDidChange)
+        ) { _ in
+            updateAppearanceIconCount()
         }
     }
 
@@ -464,6 +478,16 @@ struct AdvancedSettingsView: View {
                     extraKeyTestResults[key.id] = (false, extractErrorMessage(from: error))
                 }
             }
+        }
+    }
+
+    private func updateAppearanceIconCount() {
+        appearanceIconCount = AppearanceIconStore.shared.getAllConfigurations().reduce(0) {
+            count,
+            configuration in
+            count + IconAppearance.allCases.filter {
+                configuration.fileName(for: $0) != nil
+            }.count
         }
     }
 

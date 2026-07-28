@@ -482,6 +482,47 @@ import os
         }
     }
 
+    /// Re-synchronizes observable service state after configuration import.
+    func reloadPersistentSettingsAfterImport() {
+        let defaults = UserDefaults.standard
+
+        runInBackground = defaults.bool(forKey: "runInBackground")
+        showInDock = defaults.object(forKey: "showInDock") as? Bool ?? true
+        showInMenuBar = defaults.object(forKey: "showInMenuBar") as? Bool ?? true
+        if !showInDock && !showInMenuBar {
+            showInMenuBar = true
+        }
+        enableAppearanceIconSwitching = defaults.bool(forKey: "enableAppearanceIconSwitching")
+        enableScheduledRestore = defaults.bool(forKey: "enableScheduledRestore")
+        scheduledRestoreInterval = max(1, defaults.integer(forKey: "scheduledRestoreInterval"))
+        customScheduledRestoreInterval = max(1, defaults.integer(forKey: "customScheduledRestoreInterval"))
+        useCustomScheduledRestoreInterval = defaults.bool(forKey: "useCustomScheduledRestoreInterval")
+        enableAutoRestoreOnUpdate = defaults.bool(forKey: "enableAutoRestoreOnUpdate")
+        autoRestoreCheckInterval = max(1, defaults.integer(forKey: "autoRestoreCheckInterval"))
+        if let raw = defaults.object(forKey: "launchBehavior") as? Int,
+           let behavior = LaunchBehavior(rawValue: raw) {
+            launchBehavior = behavior
+        }
+
+        if runInBackground {
+            if !isRunning {
+                startBackgroundService()
+            } else {
+                if showInMenuBar {
+                    setupStatusBar()
+                } else if let item = statusItem {
+                    NSStatusBar.system.removeStatusItem(item)
+                    statusItem = nil
+                }
+                setupTimers()
+            }
+        } else if isRunning {
+            stopBackgroundService()
+        }
+        updateDockVisibility()
+        updateStatusMenu()
+    }
+
     @objc func toggleMenuBarVisibility() {
         showInMenuBar.toggle()
 
@@ -758,14 +799,18 @@ import os
     }
 
     private func restoreUpdatedApps(_ apps: [AppItem]) async throws {
+        var restored = 0
         for app in apps {
-            let appPath = app.url.universalPath()
-            if let _ = IconCacheManager.shared.getIconCache(for: appPath),
-               let iconURL = IconCacheManager.shared.getCachedIconURL(for: appPath),
-               let image = NSImage(contentsOf: iconURL) {
-                try await iconManager.setIconWithoutCaching(image, app: app, allowRepair: false)
-                IconCacheManager.shared.updateTimestamp(for: appPath)
+            if try await iconManager.restoreCachedIcon(
+                for: app,
+                allowRepair: false,
+                refreshDock: false
+            ) {
+                restored += 1
             }
+        }
+        if restored > 0 {
+            _ = await DockRefreshService.refreshTwice()
         }
     }
 

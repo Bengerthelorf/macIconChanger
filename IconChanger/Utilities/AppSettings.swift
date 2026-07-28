@@ -43,8 +43,21 @@ final class AppSettings: ObservableObject {
         .init(key: "wallpaperBleed",      type: .double(0.0),     flags: .exported),
         .init(key: "wallpaperBlur",       type: .double(0.0),     flags: .exported),
 
-        // Background appearance switching
+        // Background service
+        .init(key: "runInBackground", type: .bool(false), flags: .exported),
+        .init(key: "showInDock", type: .bool(true), flags: .exported),
+        .init(key: "showInMenuBar", type: .bool(true), flags: .exported),
+        .init(key: "launchBehavior", type: .int(0), flags: .exported),
+        .init(key: "enableScheduledRestore", type: .bool(false), flags: .exported),
+        .init(key: "scheduledRestoreInterval", type: .int(24), flags: .exported),
+        .init(key: "customScheduledRestoreInterval", type: .int(36), flags: .exported),
+        .init(key: "useCustomScheduledRestoreInterval", type: .bool(false), flags: .exported),
+        .init(key: "enableAutoRestoreOnUpdate", type: .bool(false), flags: .exported),
+        .init(key: "autoRestoreCheckInterval", type: .int(15), flags: .exported),
         .init(key: "enableAppearanceIconSwitching", type: .bool(false), flags: .exported),
+
+        // Application
+        .init(key: "appLanguage", type: .string("system"), flags: .exported),
 
         // Updates
         .init(key: "enablePreRelease", type: .bool(false), flags: .exported),
@@ -53,7 +66,7 @@ final class AppSettings: ObservableObject {
         .init(key: "apiKey", type: .string(""), flags: [.exported, .secured]),
 
         // Tier 2
-        .init(key: "t2e",    type: .bool(false), flags: .tier2),
+        .init(key: "t2e",    type: .bool(false), flags: [.exported, .tier2]),
         .init(key: "t2k",    type: .string(""),  flags: [.exported, .secured, .tier2]),
         .init(key: "t2ki",   type: .int(0),      flags: .tier2),
     ]
@@ -83,23 +96,37 @@ final class AppSettings: ObservableObject {
 
     // MARK: - Export / Import
 
-    func exportSettings(tier2Enabled: Bool = false) -> [String: Any] {
-        var result: [String: Any] = [:]
+    func exportSettings(
+        tier2Enabled: Bool = false,
+        includeSensitive: Bool = false
+    ) -> [String: ConfigurationValue] {
+        var result: [String: ConfigurationValue] = [:]
         for def in Self.definitions {
             guard def.flags.contains(.exported) else { continue }
             if def.flags.contains(.tier2) && !tier2Enabled { continue }
-            result[def.key] = value(for: def)
+            if def.flags.contains(.secured) && !includeSensitive { continue }
+            if let value = ConfigurationValue(value: value(for: def)) {
+                result[def.key] = value
+            }
         }
         return result
     }
 
-    func importSettings(_ dict: [String: Any]) {
+    func importSettings(
+        _ dict: [String: ConfigurationValue],
+        includeSensitive: Bool = false
+    ) -> Int {
+        var imported = 0
         for def in Self.definitions {
             guard def.flags.contains(.exported) else { continue }
+            if def.flags.contains(.secured) && !includeSensitive { continue }
             guard let val = dict[def.key] else { continue }
-            setValue(val, for: def)
+            guard accepts(val, for: def) else { continue }
+            setValue(val.value, for: def)
+            imported += 1
         }
         objectWillChange.send()
+        return imported
     }
 
     // MARK: - Migration helpers
@@ -117,5 +144,14 @@ final class AppSettings: ObservableObject {
     private func defaultString(_ def: SettingDef) -> String {
         if case .string(let d) = def.type { return d }
         return ""
+    }
+
+    private func accepts(_ value: ConfigurationValue, for def: SettingDef) -> Bool {
+        switch (def.type, value) {
+        case (.bool, .bool), (.int, .int), (.double, .double), (.string, .string):
+            return true
+        default:
+            return false
+        }
     }
 }

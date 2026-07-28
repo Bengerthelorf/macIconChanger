@@ -154,7 +154,7 @@ struct CachedIconsView: View {
             } label: {
                 Label("Restore All", systemImage: "arrow.clockwise")
             }
-            .disabled(items.allSatisfy { $0.cache == nil } || isRestoring)
+            .disabled(items.isEmpty || isRestoring)
 
             Spacer()
 
@@ -292,6 +292,7 @@ struct CachedIconsView: View {
             isRestoring = true
             restoreError = nil
             var failed: [(String, Error)] = []
+            var restoredAny = false
 
             for target in targets {
                 guard let item = items.first(where: { $0.appPath == target.appPath }) else {
@@ -300,19 +301,24 @@ struct CachedIconsView: View {
                 do {
                     switch target {
                     case .application:
-                        if let cache = item.cache {
-                            try await restore(cache: cache)
-                        } else if let current = currentAppearanceForRestore(item) {
-                            try await restore(item: item, appearance: current)
+                        if try await iconManager.restoreCachedIcon(
+                            for: try appItem(path: item.appPath, name: item.appName),
+                            refreshDock: false
+                        ) {
+                            restoredAny = true
                         }
                     case .appearance(_, let appearance):
                         try await restore(item: item, appearance: appearance)
+                        restoredAny = true
                     }
                 } catch {
                     failed.append((item.appName, error))
                 }
             }
 
+            if restoredAny {
+                _ = await DockRefreshService.refreshTwice()
+            }
             isRestoring = false
             if failed.isEmpty {
                 showRestoreSuccess = true
@@ -329,12 +335,16 @@ struct CachedIconsView: View {
             do {
                 if let appearance {
                     try await restore(item: item, appearance: appearance)
-                } else if let cache = item.cache {
-                    try await restore(cache: cache)
-                } else if let current = currentAppearanceForRestore(item) {
-                    try await restore(item: item, appearance: current)
                 } else {
-                    throw RestoreError.iconFileNotFound(item.appName)
+                    let restored = try await iconManager.restoreCachedIcon(
+                        for: try appItem(path: item.appPath, name: item.appName)
+                    )
+                    if !restored {
+                        throw RestoreError.iconFileNotFound(item.appName)
+                    }
+                }
+                if appearance != nil {
+                    _ = await DockRefreshService.refreshTwice()
                 }
                 isRestoring = false
                 showRestoreSuccess = true
@@ -343,19 +353,6 @@ struct CachedIconsView: View {
                 isRestoring = false
             }
         }
-    }
-
-    private func restore(cache: IconCache) async throws {
-        let iconURL = IconCacheManager.cacheDirectory.appendingPathComponent(
-            cache.iconFileName
-        )
-        guard let image = NSImage(contentsOf: iconURL) else {
-            throw RestoreError.iconFileNotFound(cache.appName)
-        }
-        try await iconManager.setIconWithoutCaching(
-            image,
-            app: try appItem(path: cache.appPath, name: cache.appName)
-        )
     }
 
     private func restore(
@@ -385,16 +382,6 @@ struct CachedIconsView: View {
             url: URL(fileURLWithPath: path),
             originalAppInfo: nil
         )
-    }
-
-    private func currentAppearanceForRestore(
-        _ item: CachedIconDisplayItem
-    ) -> IconAppearance? {
-        let current = SystemAppearanceMonitor.shared.currentAppearance
-        if item.iconURL(for: current) != nil {
-            return current
-        }
-        return IconAppearance.allCases.first { item.iconURL(for: $0) != nil }
     }
 
     private func removeApplication(_ appPath: String) {

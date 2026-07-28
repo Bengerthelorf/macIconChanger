@@ -110,7 +110,8 @@ iconchanger restore --force
 
 ### `export`
 
-Export aliases and cached icon configuration to a JSON file.
+Export aliases, normal cached icons, Light/Dark icons, and non-secret settings
+directly to an owner-only JSON file.
 
 ```bash
 iconchanger export <output-path>
@@ -132,7 +133,8 @@ Import a configuration file.
 iconchanger import <input-path>
 ```
 
-Import only adds new items — it never replaces or removes existing entries.
+Import only adds missing aliases and icon slots, never replacing existing icon
+choices. Included settings are restored when IconChanger processes the import.
 
 **Example:**
 

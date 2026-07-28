@@ -42,6 +42,14 @@ private let cacheDir: URL = {
     return url
 }()
 
+private let appearanceIconsDir: URL = {
+    let url = applicationSupportRoot.appendingPathComponent("appearance-icons", isDirectory: true)
+    try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+    return url
+}()
+
+private let appearanceMetadataFile = applicationSupportRoot.appendingPathComponent("appearance-icons.json")
+
 private let helperScript = URL(fileURLWithPath: "/usr/local/lib/iconchanger/helper.sh")
 private let fileicon = URL(fileURLWithPath: "/usr/local/lib/iconchanger/fileicon")
 
@@ -120,6 +128,7 @@ private struct CachedIcon: Codable {
     let iconFileName: String
     let appName: String
     let timestamp: Date
+    let appVersion: String?
 }
 
 private func loadCachedIcons() -> [String: CachedIcon] {
@@ -132,11 +141,64 @@ private func loadCachedIcons() -> [String: CachedIcon] {
 
 // MARK: - Config Validation
 
+private enum ConfigurationValue: Codable {
+    case bool(Bool)
+    case int(Int)
+    case double(Double)
+    case string(String)
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let value = try? container.decode(Bool.self) { self = .bool(value) }
+        else if let value = try? container.decode(Int.self) { self = .int(value) }
+        else if let value = try? container.decode(Double.self) { self = .double(value) }
+        else { self = .string(try container.decode(String.self)) }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .bool(let value): try container.encode(value)
+        case .int(let value): try container.encode(value)
+        case .double(let value): try container.encode(value)
+        case .string(let value): try container.encode(value)
+        }
+    }
+
+    init?(_ value: Any) {
+        switch value {
+        case let value as Bool: self = .bool(value)
+        case let value as Int: self = .int(value)
+        case let value as Double: self = .double(value)
+        case let value as String: self = .string(value)
+        default: return nil
+        }
+    }
+}
+
 private struct AppConfiguration: Codable {
     var appAliases: [AliasConfig] = []
     var cachedIcons: [IconCacheConfig] = []
-    var version: String = "1.0"
+    var appearanceIcons: [AppearanceIconConfig] = []
+    var settings: [String: ConfigurationValue]? = nil
+    var version: String = "3.0"
     var exportDate: Date = Date()
+
+    private enum CodingKeys: String, CodingKey {
+        case appAliases, cachedIcons, appearanceIcons, settings, version, exportDate
+    }
+
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        appAliases = try values.decodeIfPresent([AliasConfig].self, forKey: .appAliases) ?? []
+        cachedIcons = try values.decodeIfPresent([IconCacheConfig].self, forKey: .cachedIcons) ?? []
+        appearanceIcons = try values.decodeIfPresent([AppearanceIconConfig].self, forKey: .appearanceIcons) ?? []
+        settings = try values.decodeIfPresent([String: ConfigurationValue].self, forKey: .settings)
+        version = try values.decodeIfPresent(String.self, forKey: .version) ?? "1.0"
+        exportDate = try values.decodeIfPresent(Date.self, forKey: .exportDate) ?? Date()
+    }
 }
 
 private struct AliasConfig: Codable {
@@ -149,11 +211,129 @@ private struct IconCacheConfig: Codable {
     var appName: String
     var iconFileName: String
     var iconData: Data
+    var appVersion: String?
+}
+
+private struct AppearanceIconConfig: Codable {
+    var appPath: String
+    var appName: String
+    var lightIconData: Data?
+    var darkIconData: Data?
+}
+
+private struct StoredAppearanceIconConfig: Codable {
+    var appPath: String
+    var appName: String
+    var lightIconFileName: String?
+    var darkIconFileName: String?
+    var lastAppliedAppearance: String?
+    var updatedAt: Date
+
+    private enum CodingKeys: String, CodingKey {
+        case appPath, appName, lightIconFileName, darkIconFileName
+        case lastAppliedAppearance, updatedAt
+    }
+
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        appPath = try values.decode(String.self, forKey: .appPath)
+        appName = try values.decode(String.self, forKey: .appName)
+        lightIconFileName = try values.decodeIfPresent(String.self, forKey: .lightIconFileName)
+        darkIconFileName = try values.decodeIfPresent(String.self, forKey: .darkIconFileName)
+        lastAppliedAppearance = try values.decodeIfPresent(
+            String.self,
+            forKey: .lastAppliedAppearance
+        )
+        updatedAt = try values.decodeIfPresent(Date.self, forKey: .updatedAt) ?? Date()
+    }
+}
+
+private func loadAppearanceIcons() -> [String: StoredAppearanceIconConfig] {
+    guard let data = try? Data(contentsOf: appearanceMetadataFile),
+          let decoded = try? JSONDecoder().decode(
+            [String: StoredAppearanceIconConfig].self,
+            from: data
+          ) else {
+        return [:]
+    }
+    return decoded
+}
+
+private func removeCachedConfiguration(for appPath: String) {
+    let fm = FileManager.default
+    var cached = loadCachedIcons()
+    if let removed = cached.removeValue(forKey: appPath) {
+        try? fm.removeItem(at: cacheDir.appendingPathComponent(removed.iconFileName))
+        if let data = try? JSONEncoder().encode(cached),
+           let defaults = UserDefaults(suiteName: appBundleID) {
+            defaults.set(data, forKey: "com.iconchanger.cachedIcons")
+        }
+    }
+
+    var appearances = loadAppearanceIcons()
+    if let removed = appearances.removeValue(forKey: appPath) {
+        for fileName in [removed.lightIconFileName, removed.darkIconFileName].compactMap({ $0 }) {
+            guard fileName.hasSuffix(".png"),
+                  !fileName.contains("/"),
+                  !fileName.contains("\\"),
+                  UUID(uuidString: String(fileName.dropLast(4))) != nil else {
+                continue
+            }
+            try? fm.removeItem(at: appearanceIconsDir.appendingPathComponent(fileName))
+        }
+        if let data = try? JSONEncoder().encode(appearances) {
+            try? data.write(to: appearanceMetadataFile, options: .atomic)
+            try? fm.setAttributes(
+                [.posixPermissions: 0o600],
+                ofItemAtPath: appearanceMetadataFile.path
+            )
+        }
+    }
+}
+
+private func appearanceIconURL(
+    _ config: StoredAppearanceIconConfig,
+    dark: Bool
+) -> URL? {
+    let candidate = dark ? config.darkIconFileName : config.lightIconFileName
+    guard let candidate,
+          candidate.hasSuffix(".png"),
+          !candidate.contains("/"),
+          !candidate.contains("\\"),
+          UUID(uuidString: String(candidate.dropLast(4))) != nil else {
+        return nil
+    }
+    return appearanceIconsDir.appendingPathComponent(candidate)
+}
+
+private func currentSystemUsesDarkAppearance() -> Bool {
+    let global = UserDefaults.standard.persistentDomain(forName: UserDefaults.globalDomain)
+    return (global?["AppleInterfaceStyle"] as? String)?
+        .caseInsensitiveCompare("Dark") == .orderedSame
+}
+
+private func refreshDockTwice() throws {
+    _ = try shell("killall Dock")
+    Thread.sleep(forTimeInterval: 1)
+    _ = try shell("killall Dock")
 }
 
 private func validateConfig(at url: URL) throws -> AppConfiguration {
+    guard let fileSize = try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize,
+          fileSize > 0,
+          fileSize <= 768 * 1_024 * 1_024 else {
+        throw CLIError.invalidConfig("Configuration file exceeds safe size limits")
+    }
     let data = try Data(contentsOf: url)
-    return try JSONDecoder().decode(AppConfiguration.self, from: data)
+    let config = try JSONDecoder().decode(AppConfiguration.self, from: data)
+    let iconData = config.cachedIcons.map(\.iconData)
+        + config.appearanceIcons.flatMap { [$0.lightIconData, $0.darkIconData].compactMap { $0 } }
+    guard iconData.count <= 2_000,
+          iconData.allSatisfy({ $0.count <= 20 * 1_024 * 1_024 }),
+          iconData.reduce(0, { $0 + $1.count }) <= 512 * 1_024 * 1_024 else {
+        throw CLIError.invalidConfig("Configuration icon data exceeds safe size limits")
+    }
+    return config
 }
 
 // MARK: - Shell Helpers
@@ -294,6 +474,9 @@ struct StatusCommand: ParsableCommand {
         // Stats
         let aliases = loadAliases()
         let cached = loadCachedIcons()
+        let appearanceSlots = loadAppearanceIcons().values.reduce(0) {
+            $0 + ($1.lightIconFileName == nil ? 0 : 1) + ($1.darkIconFileName == nil ? 0 : 1)
+        }
 
         print("IconChanger CLI Status")
         print("──────────────────────")
@@ -301,6 +484,7 @@ struct StatusCommand: ParsableCommand {
         print("  Sudo access:   \(sudoersOK ? "✓ Configured" : "✗ Not configured")")
         print("  Aliases:       \(aliases.count)")
         print("  Cached icons:  \(cached.count)")
+        print("  Light/Dark:    \(appearanceSlots) slots")
         print("  Setup:         \(helpersOK && sudoersOK ? "✓ Ready" : "✗ Run IconChanger app to complete setup")")
 
         if verbose {
@@ -366,6 +550,16 @@ struct ListCommand: ParsableCommand {
                     print("  \(icon.appName)\(exists)\(hasIcon)")
                     print("    Path:   \(icon.appPath)")
                     print("    Cached: \(formatter.string(from: icon.timestamp))")
+                }
+            }
+
+            let appearance = loadAppearanceIcons()
+            if !appearance.isEmpty {
+                print("\nLight/Dark Icons (\(appearance.count) apps):")
+                for icon in appearance.values.sorted(by: { $0.appName < $1.appName }) {
+                    let light = icon.lightIconFileName == nil ? "—" : "light"
+                    let dark = icon.darkIconFileName == nil ? "—" : "dark"
+                    print("  \(icon.appName): \(light) / \(dark)")
                 }
             }
         }
@@ -435,39 +629,20 @@ struct RemoveIconCommand: ParsableCommand {
 
     func run() throws {
         let resolvedApp = resolve(path: appPath)
+        let fm = FileManager.default
 
-        guard FileManager.default.fileExists(atPath: resolvedApp) else {
+        guard fm.fileExists(atPath: resolvedApp) else {
             throw CLIError.fileNotFound("App not found: \(resolvedApp)")
         }
-
-        // Read FinderInfo
-        let finderInfoName = "com.apple.FinderInfo"
-        var finderInfo = [UInt8](repeating: 0, count: 32)
-        let size = getxattr(resolvedApp, finderInfoName, &finderInfo, 32, 0, 0)
-
-        if size > 0 && (finderInfo[8] & 0x04 != 0) {
-            // Clear custom icon flag
-            finderInfo[8] = finderInfo[8] & ~0x04
-
-            let allZero = finderInfo.allSatisfy { $0 == 0 }
-            if allZero {
-                removexattr(resolvedApp, finderInfoName, 0)
-            } else {
-                let result = setxattr(resolvedApp, finderInfoName, &finderInfo, 32, 0, 0)
-                if result != 0 {
-                    // Try with sudo
-                    let hexBytes = finderInfo.map { String(format: "%02x", $0) }.joined()
-                    let cmd = "sudo -n python3 -c \"import xattr; xattr.setxattr('\(resolvedApp.shellEscaped)', '\(finderInfoName)', bytes.fromhex('\(hexBytes)'))\""
-                    _ = try? shell(cmd)
-                }
-            }
+        guard fm.fileExists(atPath: helperScript.path),
+              fm.fileExists(atPath: fileicon.path) else {
+            throw CLIError.setupIncomplete(
+                "Helper files not found. Run the IconChanger app to complete setup first."
+            )
         }
-
-        // Remove Icon\r file
-        let iconFile = URL(fileURLWithPath: resolvedApp).appendingPathComponent("Icon\r")
-        if FileManager.default.fileExists(atPath: iconFile.path) {
-            try? FileManager.default.removeItem(at: iconFile)
-        }
+        let command = "sudo -n '\(helperScript.path.shellEscaped)' --remove '\(fileicon.path.shellEscaped)' '\(resolvedApp.shellEscaped)'"
+        try shell(command)
+        removeCachedConfiguration(for: resolvedApp)
 
         let appName = URL(fileURLWithPath: resolvedApp).deletingPathExtension().lastPathComponent
         print("✓ Default icon restored for \(appName)")
@@ -494,8 +669,12 @@ struct RestoreCommand: ParsableCommand {
     func run() throws {
         let fm = FileManager.default
         let cached = loadCachedIcons()
+        let appearances = loadAppearanceIcons()
+        let switchingEnabled = appDefaults()["enableAppearanceIconSwitching"] as? Bool ?? false
+        let dark = currentSystemUsesDarkAppearance()
+        let allPaths = Set(cached.keys).union(appearances.keys)
 
-        guard !cached.isEmpty else {
+        guard !allPaths.isEmpty else {
             print("No cached icons to restore.")
             return
         }
@@ -506,58 +685,74 @@ struct RestoreCommand: ParsableCommand {
             throw CLIError.setupIncomplete("Helper files not found. Run the IconChanger app to complete setup first.")
         }
 
-        // Filter targets
-        let toRestore: [CachedIcon]
-        if let target = target {
+        let selectedPaths: [String]
+        if let target {
             let lowered = target.lowercased()
-            toRestore = cached.values.filter {
-                $0.appName.lowercased().contains(lowered) ||
-                $0.appPath.lowercased().contains(lowered)
+            selectedPaths = allPaths.filter { path in
+                let name = cached[path]?.appName ?? appearances[path]?.appName ?? ""
+                return name.lowercased().contains(lowered) || path.lowercased().contains(lowered)
             }
-            guard !toRestore.isEmpty else {
+            guard !selectedPaths.isEmpty else {
                 throw ValidationError("No cached icon found matching '\(target)'")
             }
         } else {
-            toRestore = Array(cached.values)
+            selectedPaths = Array(allPaths)
         }
 
         var success = 0
         var failed = 0
         var skipped = 0
 
-        for icon in toRestore.sorted(by: { $0.appName < $1.appName }) {
-            let iconFile = cacheDir.appendingPathComponent(icon.iconFileName)
+        for appPath in selectedPaths.sorted() {
+            let normal = cached[appPath]
+            let appearance = appearances[appPath]
+            let appName = normal?.appName ?? appearance?.appName
+                ?? URL(fileURLWithPath: appPath).deletingPathExtension().lastPathComponent
+            let appearanceURL = switchingEnabled
+                ? appearance.flatMap { config -> URL? in
+                    guard config.lightIconFileName != nil, config.darkIconFileName != nil else {
+                        return nil
+                    }
+                    return appearanceIconURL(config, dark: dark)
+                }
+                : nil
+            let iconFile = appearanceURL ?? normal.map {
+                cacheDir.appendingPathComponent($0.iconFileName)
+            }
 
-            guard fm.fileExists(atPath: icon.appPath) else {
-                if verbose { print("  ⊘ \(icon.appName) — app not found at \(icon.appPath)") }
+            guard fm.fileExists(atPath: appPath) else {
+                if verbose { print("  ⊘ \(appName) — app not found at \(appPath)") }
                 skipped += 1
                 continue
             }
 
-            guard fm.fileExists(atPath: iconFile.path) else {
-                if verbose { print("  ⊘ \(icon.appName) — cached icon file missing") }
+            guard let iconFile, fm.fileExists(atPath: iconFile.path) else {
+                if verbose { print("  ⊘ \(appName) — eligible cached icon file missing") }
                 skipped += 1
                 continue
             }
 
             if dryRun {
-                print("  → Would restore \(icon.appName)")
+                print("  → Would restore \(appName)")
                 success += 1
                 continue
             }
 
-            let command = "sudo -n '\(helperScript.path.shellEscaped)' '\(fileicon.path.shellEscaped)' '\(icon.appPath.shellEscaped)' '\(iconFile.path.shellEscaped)'"
+            let command = "sudo -n '\(helperScript.path.shellEscaped)' '\(fileicon.path.shellEscaped)' '\(appPath.shellEscaped)' '\(iconFile.path.shellEscaped)'"
 
             do {
                 try shell(command)
-                if verbose { print("  ✓ \(icon.appName)") }
+                if verbose { print("  ✓ \(appName)") }
                 success += 1
             } catch {
-                if verbose { print("  ✗ \(icon.appName) — \(error.localizedDescription)") }
+                if verbose { print("  ✗ \(appName) — \(error.localizedDescription)") }
                 failed += 1
             }
         }
 
+        if !dryRun, success > 0 {
+            try refreshDockTwice()
+        }
         print("")
         if dryRun {
             print("Dry run: \(success) icon(s) would be restored, \(skipped) skipped")
@@ -601,6 +796,8 @@ struct ImportCommand: ParsableCommand {
         print("Configuration: v\(config.version)")
         print("  Aliases: \(config.appAliases.count)")
         print("  Icons:   \(config.cachedIcons.count)")
+        print("  Light/Dark apps: \(config.appearanceIcons.count)")
+        print("  Settings: \(config.settings?.count ?? 0)")
 
         if dryRun {
             print("\nDry run — no changes made.")
@@ -611,9 +808,17 @@ struct ImportCommand: ParsableCommand {
         let configData = try Data(contentsOf: configURL)
         let importedConfigFile = sharedConfigDir.appendingPathComponent("imported_config.json")
         try configData.write(to: importedConfigFile, options: .atomic)
+        try FileManager.default.setAttributes(
+            [.posixPermissions: 0o600],
+            ofItemAtPath: importedConfigFile.path
+        )
 
         let flagFile = sharedConfigDir.appendingPathComponent("pending_import")
         try Data().write(to: flagFile, options: .atomic)
+        try FileManager.default.setAttributes(
+            [.posixPermissions: 0o600],
+            ofItemAtPath: flagFile.path
+        )
 
         print("\n✓ Configuration staged for import.")
         print("  Restart IconChanger to apply changes.")
@@ -637,13 +842,6 @@ struct ExportCommand: ParsableCommand {
     func run() throws {
         let resolvedOutput = resolve(path: outputPath)
 
-        // Check for latest export from app
-        let latestExportFile = sharedConfigDir.appendingPathComponent("latest_export.json")
-
-        guard FileManager.default.fileExists(atPath: latestExportFile.path) else {
-            throw CLIError.fileNotFound("No exported configuration found.\nUse the IconChanger app to export your configuration first,\nor use: iconchanger export-direct <path>")
-        }
-
         // Check if output file already exists
         if FileManager.default.fileExists(atPath: resolvedOutput) && !force {
             print("File already exists: \(resolvedOutput)")
@@ -651,10 +849,48 @@ struct ExportCommand: ParsableCommand {
             throw ExitCode.failure
         }
 
-        let configData = try Data(contentsOf: latestExportFile)
-
-        // Validate before writing
-        _ = try JSONDecoder().decode(AppConfiguration.self, from: configData)
+        var config = AppConfiguration()
+        config.appAliases = loadAliases().map {
+            AliasConfig(appName: $0.key, aliasName: $0.value)
+        }
+        config.cachedIcons = loadCachedIcons().values.compactMap { icon in
+            let url = cacheDir.appendingPathComponent(icon.iconFileName)
+            guard let data = try? Data(contentsOf: url) else { return nil }
+            return IconCacheConfig(
+                appPath: icon.appPath,
+                appName: icon.appName,
+                iconFileName: icon.iconFileName,
+                iconData: data,
+                appVersion: icon.appVersion
+            )
+        }
+        config.appearanceIcons = loadAppearanceIcons().values.compactMap { icon in
+            let light = appearanceIconURL(icon, dark: false).flatMap { try? Data(contentsOf: $0) }
+            let dark = appearanceIconURL(icon, dark: true).flatMap { try? Data(contentsOf: $0) }
+            guard light != nil || dark != nil else { return nil }
+            return AppearanceIconConfig(
+                appPath: icon.appPath,
+                appName: icon.appName,
+                lightIconData: light,
+                darkIconData: dark
+            )
+        }
+        let exportedSettingKeys: Set<String> = [
+            "apiRetryCount", "apiTimeoutSeconds", "apiMonthlyLimit", "cacheAPIResults",
+            "extendedSearch", "appAppearance", "showCustomIconBadge", "dockPreviewMode",
+            "dockPreviewWallpaper", "dockGlassIntensity", "wallpaperBleed", "wallpaperBlur",
+            "runInBackground", "showInDock", "showInMenuBar", "launchBehavior",
+            "enableScheduledRestore", "scheduledRestoreInterval",
+            "customScheduledRestoreInterval", "useCustomScheduledRestoreInterval",
+            "enableAutoRestoreOnUpdate", "autoRestoreCheckInterval",
+            "enableAppearanceIconSwitching", "appLanguage", "enablePreRelease", "t2e"
+        ]
+        config.settings = appDefaults().reduce(into: [:]) { result, entry in
+            guard exportedSettingKeys.contains(entry.key),
+                  let value = ConfigurationValue(entry.value) else { return }
+            result[entry.key] = value
+        }
+        let configData = try JSONEncoder().encode(config)
 
         let outputURL = URL(fileURLWithPath: resolvedOutput)
 
@@ -663,6 +899,10 @@ struct ExportCommand: ParsableCommand {
         try FileManager.default.createDirectory(at: parentDir, withIntermediateDirectories: true)
 
         try configData.write(to: outputURL, options: .atomic)
+        try FileManager.default.setAttributes(
+            [.posixPermissions: 0o600],
+            ofItemAtPath: outputURL.path
+        )
 
         print("✓ Configuration exported to \(resolvedOutput)")
     }
@@ -726,8 +966,16 @@ struct ValidateCommand: ParsableCommand {
         print("  Export date: \(formatter.string(from: config.exportDate))")
         print("  Aliases:     \(config.appAliases.count)")
         print("  Icons:       \(config.cachedIcons.count)")
+        let appearanceSlotCount = config.appearanceIcons.reduce(0) {
+            $0 + ($1.lightIconData == nil ? 0 : 1) + ($1.darkIconData == nil ? 0 : 1)
+        }
+        print("  Light/Dark:  \(appearanceSlotCount)")
+        print("  Settings:    \(config.settings?.count ?? 0)")
 
         let totalIconSize = config.cachedIcons.reduce(0) { $0 + $1.iconData.count }
+            + config.appearanceIcons.reduce(0) {
+                $0 + ($1.lightIconData?.count ?? 0) + ($1.darkIconData?.count ?? 0)
+            }
         print("  Icon data:   \(ByteCountFormatter.string(fromByteCount: Int64(totalIconSize), countStyle: .file))")
 
         if !warnings.isEmpty {
@@ -872,12 +1120,8 @@ struct RefreshDockCommand: ParsableCommand {
     )
 
     func run() throws {
-        let task = Process()
-        task.executableURL = URL(fileURLWithPath: "/usr/bin/killall")
-        task.arguments = ["Dock"]
-        try task.run()
-        task.waitUntilExit()
-        print("✓ Dock restarted")
+        try refreshDockTwice()
+        print("✓ Dock restarted twice")
     }
 }
 
