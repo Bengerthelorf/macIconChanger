@@ -25,8 +25,8 @@ MARKDOWN
 
 (
     cd "$TEST_DIR"
-    SPARKLE_VERSION="2.0.0" \
-    SPARKLE_BUILD="4000000000" \
+    SPARKLE_VERSION="1.5.0-pre.1" \
+    SPARKLE_BUILD="40105005001" \
     SPARKLE_PUBDATE="Mon, 27 Jul 2026 00:00:00 +0000" \
     SPARKLE_DOWNLOAD_URL="https://example.com/IconChanger.dmg" \
     SPARKLE_ED_SIG="test-signature" \
@@ -37,8 +37,8 @@ MARKDOWN
 
 python3 "$REPO_ROOT/scripts/validate-appcast.py" \
     "$TEST_DIR/IconChanger/Resources/sparkle.xml" \
-    "2.0.0" \
-    "4000000000" \
+    "1.5.0-pre.1" \
+    "40105005001" \
     "test-signature" \
     "1234" \
     "https://example.com/IconChanger.dmg" >/dev/null
