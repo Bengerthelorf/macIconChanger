@@ -97,6 +97,10 @@ fi
     fail "publishing must require a manual dispatch"
 /usr/bin/grep -Fq "actions: write" "$PUBLISH_WORKFLOW" ||
     fail "publishing must be allowed to dispatch the docs workflow"
+/usr/bin/grep -Fq "pages: write" "$PUBLISH_WORKFLOW" ||
+    fail "publishing must be allowed to rebuild the public Sparkle feed"
+/usr/bin/grep -Fq "pages/builds" "$PUBLISH_WORKFLOW" ||
+    fail "publishing must explicitly rebuild GitHub Pages after appcast updates"
 /usr/bin/grep -Fq "candidate_run_id" "$PUBLISH_WORKFLOW" ||
     fail "publishing must promote a specific tested candidate"
 /usr/bin/grep -Fq "I_APPROVE_RELEASE" "$PUBLISH_WORKFLOW" ||

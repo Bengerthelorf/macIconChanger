@@ -15,6 +15,7 @@ on:
 permissions:
   actions: write
   contents: write
+  pages: write
 
 jobs:
   publish:
@@ -167,6 +168,14 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh workflow run docs.yml --repo "${{ github.repository }}"
+
+      - name: Rebuild public Sparkle feed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api \
+            --method POST \
+            "repos/${{ github.repository }}/pages/builds"
 
       - name: Update Homebrew Cask
         if: env.IS_PRERELEASE != 'true'
