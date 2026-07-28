@@ -96,7 +96,7 @@ class IconManager: ObservableObject {
     
     func loadAppItems() -> [AppItem] {
         var allApps: [AppItem] = []
-        
+
         do {
             let helper = try LaunchPadManagerDBHelper()
             let dbApps = try helper.getAllAppInfos()
@@ -1062,7 +1062,7 @@ class IconManager: ObservableObject {
         guard verifyHelperIntegrity() else {
             return .helperFilesOutdated
         }
-        
+
         switch probeSudoPermission() {
         case .authorized:
             return legacySudoersRuleIsActive()
