@@ -50,6 +50,16 @@ fi
 /usr/bin/grep -Fq 'codesign --verify --strict "$SIGNING_PROBE"' \
     "$CANDIDATE_WORKFLOW" ||
     fail "candidate workflow must prove the certificate can sign executable code"
+/usr/bin/grep -Fq 'bash scripts/create-signing-probe.sh "$SIGNING_PROBE"' \
+    "$CI_WORKFLOW" ||
+    fail "manual CI must build its own signing probe"
+/usr/bin/grep -Fq 'bash scripts/create-signing-probe.sh "$SIGNING_PROBE"' \
+    "$CANDIDATE_WORKFLOW" ||
+    fail "candidate workflow must build its own signing probe"
+if /usr/bin/grep -Fq "ditto /usr/bin/true" "$CI_WORKFLOW" ||
+   /usr/bin/grep -Fq "ditto /usr/bin/true" "$CANDIDATE_WORKFLOW"; then
+    fail "signing checks must not copy a SIP-protected system executable"
+fi
 /usr/bin/grep -Fq "select-signing-identity.py" "$CANDIDATE_WORKFLOW" ||
     fail "candidate workflow must reject revoked Apple Development identities"
 /usr/bin/grep -Fq 'CODE_SIGN_IDENTITY="$SIGNING_IDENTITY"' \

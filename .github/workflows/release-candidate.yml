@@ -124,7 +124,7 @@ jobs:
                     -p \
                     "$KEYCHAIN_PATH" > "$CERTIFICATE_PEM" &&
                   openssl x509 -checkend 0 -noout -in "$CERTIFICATE_PEM"; then
-                  ditto /usr/bin/true "$SIGNING_PROBE"
+                  bash scripts/create-signing-probe.sh "$SIGNING_PROBE"
                   if codesign --force \
                       --sign "$SIGNING_IDENTITY" \
                       --keychain "$KEYCHAIN_PATH" \
