@@ -4,6 +4,50 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.5.0-pre.1</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>40105005001</sparkle:version>
+                    <sparkle:shortVersionString>1.5.0-pre.1</sparkle:shortVersionString>
+                    <pubDate>Tue, 28 Jul 2026 13:56:28 +0000</pubDate>
+                    <sparkle:channel>beta</sparkle:channel>
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.5.0-pre.1/IconChanger.dmg"
+                    sparkle:edSignature="Rt8XeZnhwqJRgKOKZjgPrh4o7xynXes7ci0uhulmQTlnCttJfR21QzsAVtdff6v9BFVYk/dsXwuDHSH3Z7oUBQ==" length="8080714"
+                    type="application/octet-stream"/>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.5.0-pre.1</h2>
+                    <ul>
+                        <li>style: remove trailing whitespace</li>
+                        <li>test: align Sparkle fixture with 1.5 prerelease</li>
+                        <li>ci: verify certificate revocation status</li>
+                        <li>ci: build a portable signing probe</li>
+                        <li>ci: reject unusable signing certificates</li>
+                        <li>ci: harden Sparkle release candidates</li>
+                        <li>ci: support free-account release candidates</li>
+                        <li>security: clean up legacy sudoers permission</li>
+                        <li>security: bound remote icon downloads</li>
+                        <li>ci: add gated notarized release workflow</li>
+                        <li>Reapply &quot;Remove irreversible Launchpad deletion (#11)&quot;</li>
+                        <li>Revert &quot;Remove irreversible Launchpad deletion (#11)&quot;</li>
+                        <li>Remove irreversible Launchpad deletion (#11)</li>
+                        <li>Fix sudo permission verification (#30)</li>
+                        <li>Fix explicit icon loading and history reuse (#36)</li>
+                        <li><strong>Fixed:</strong> surface setup failures during background launch (#35)</li>
+                        <li><strong>Fixed:</strong> restore reliable app update detection (#38)</li>
+                        <li>test(security): cover privileged icon path handling</li>
+                        <li><strong>Fixed:</strong> verify setup on launch regardless of window visibility (#35)</li>
+                        <li><strong>Fixed:</strong> run local icon import off the main thread with progress (#32)</li>
+                        <li><strong>Fixed:</strong> restart background timers when restore toggles change (#38)</li>
+                        <li>fix(security): prevent root RCE via AppleScript injection in fileicon</li>
+                        <li>docs(readme): /guide/* is now /docs/*</li>
+                        <li>ci(docs): also rebuild snaix.homes on release publish</li>
+                        <li><strong>Docs:</strong> restore translations in snaix format (ar / cs / da / de / el / es / fi / fr / hi / hu / id / it / ja / ko / ms / nb / nl / pl / pt / ro / ru / sv / th / tr / uk / vi / zh-HK)</li>
+                        <li><strong>Docs:</strong> migrate from VitePress to snaix.homes content format</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
                     <title>Version 1.4.4-pre-9</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>3014470009</sparkle:version>
