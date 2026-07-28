@@ -4,6 +4,28 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.5.0-rc.1</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>40105007001</sparkle:version>
+                    <sparkle:shortVersionString>1.5.0-rc.1</sparkle:shortVersionString>
+                    <pubDate>Tue, 28 Jul 2026 23:20:20 +0000</pubDate>
+                    <sparkle:channel>beta</sparkle:channel>
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.5.0-rc.1/IconChanger.dmg"
+                    sparkle:edSignature="e8nQG59ltIXG3Wq7lpEgqM4hIfu9trUkkJtuKSmW6vtObwiMjJy+324besUorSX5hmD/j+2C4GFLY8clLqrOBg==" length="8424509"
+                    type="application/octet-stream"/>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.5.0-rc.1</h2>
+                    <ul>
+                        <li><strong>Fixed:</strong> remove deprecated plaintext config handoff</li>
+                        <li>test: avoid optional tools in security checks</li>
+                        <li>test: compare canonical helper targets</li>
+                        <li><strong>Fixed:</strong> preserve appearance icons across backup and restore</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
                     <title>Version 1.5.0-pre.2</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>40105005002</sparkle:version>
