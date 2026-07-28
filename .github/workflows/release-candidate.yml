@@ -123,7 +123,13 @@ jobs:
                     -c "Apple Development" \
                     -p \
                     "$KEYCHAIN_PATH" > "$CERTIFICATE_PEM" &&
-                  openssl x509 -checkend 0 -noout -in "$CERTIFICATE_PEM"; then
+                  openssl x509 -checkend 0 -noout -in "$CERTIFICATE_PEM" &&
+                  security verify-cert \
+                    -c "$CERTIFICATE_PEM" \
+                    -p codeSign \
+                    -R ocsp \
+                    -R require \
+                    -k "$KEYCHAIN_PATH"; then
                   bash scripts/create-signing-probe.sh "$SIGNING_PROBE"
                   if codesign --force \
                       --sign "$SIGNING_IDENTITY" \

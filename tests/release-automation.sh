@@ -56,6 +56,14 @@ fi
 /usr/bin/grep -Fq 'bash scripts/create-signing-probe.sh "$SIGNING_PROBE"' \
     "$CANDIDATE_WORKFLOW" ||
     fail "candidate workflow must build its own signing probe"
+/usr/bin/grep -Fq "security verify-cert" "$CI_WORKFLOW" ||
+    fail "manual CI must validate the certificate trust chain"
+/usr/bin/grep -Fq "security verify-cert" "$CANDIDATE_WORKFLOW" ||
+    fail "candidate workflow must validate the certificate trust chain"
+/usr/bin/grep -Fq -- "-R ocsp" "$CI_WORKFLOW" ||
+    fail "manual CI must check Apple certificate revocation status"
+/usr/bin/grep -Fq -- "-R ocsp" "$CANDIDATE_WORKFLOW" ||
+    fail "candidate workflow must check Apple certificate revocation status"
 if /usr/bin/grep -Fq "ditto /usr/bin/true" "$CI_WORKFLOW" ||
    /usr/bin/grep -Fq "ditto /usr/bin/true" "$CANDIDATE_WORKFLOW"; then
     fail "signing checks must not copy a SIP-protected system executable"
