@@ -93,7 +93,12 @@ if existing:
             )
             item = item[:main_enc.start()] + new_enc + item[main_enc.end():]
         item = re.sub(r'<sparkle:version>[^<]*</sparkle:version>', f'<sparkle:version>{build}</sparkle:version>', item)
-        item = re.sub(r'<pubDate>[^<]*</pubDate>', f'<pubDate>{pubdate}</pubDate>', item, count=1)
+        if "<pubDate>" not in item:
+            item = item.replace(
+                "<enclosure ",
+                f"<pubDate>{pubdate}</pubDate>\n                    <enclosure ",
+                1,
+            )
     else:
         enc = (
             f'\n                    <pubDate>{pubdate}</pubDate>'

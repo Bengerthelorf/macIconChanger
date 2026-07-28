@@ -43,6 +43,32 @@ python3 "$REPO_ROOT/scripts/validate-appcast.py" \
     "1234" \
     "https://example.com/IconChanger.dmg" >/dev/null
 
+first_appcast_sha="$(
+    shasum -a 256 "$TEST_DIR/IconChanger/Resources/sparkle.xml" |
+        awk '{print $1}'
+)"
+
+(
+    cd "$TEST_DIR"
+    SPARKLE_VERSION="1.5.0-pre.1" \
+    SPARKLE_BUILD="40105005001" \
+    SPARKLE_PUBDATE="Tue, 28 Jul 2026 00:00:00 +0000" \
+    SPARKLE_DOWNLOAD_URL="https://example.com/IconChanger.dmg" \
+    SPARKLE_ED_SIG="test-signature" \
+    SPARKLE_DMG_SIZE="1234" \
+    SPARKLE_REPO="Bengerthelorf/macIconChanger" \
+    python3 update-sparkle.py >/dev/null
+)
+
+second_appcast_sha="$(
+    shasum -a 256 "$TEST_DIR/IconChanger/Resources/sparkle.xml" |
+        awk '{print $1}'
+)"
+[[ "$second_appcast_sha" == "$first_appcast_sha" ]] || {
+    echo "FAIL: republishing identical metadata changed the appcast" >&2
+    exit 1
+}
+
 if grep -Fq '<script>' "$TEST_DIR/IconChanger/Resources/sparkle.xml"; then
     echo "FAIL: release notes were inserted as executable markup" >&2
     exit 1
