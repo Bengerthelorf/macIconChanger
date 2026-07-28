@@ -5,6 +5,7 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 CI_WORKFLOW="$REPO_ROOT/.github/workflows/build.yml"
 CANDIDATE_WORKFLOW="$REPO_ROOT/.github/workflows/release-candidate.yml"
 PUBLISH_WORKFLOW="$REPO_ROOT/.github/workflows/publish-release.yml"
+SPARKLE_PAGES_WORKFLOW="$REPO_ROOT/.github/workflows/sparkle-pages.yml"
 RELEASE_SCRIPT="$REPO_ROOT/scripts/release.sh"
 DMG_SETTINGS="$REPO_ROOT/scripts/dmg-settings.py"
 DMG_BACKGROUND="$REPO_ROOT/assets/dmg/background.png"
@@ -17,6 +18,8 @@ fail() {
 
 [[ -f "$CANDIDATE_WORKFLOW" ]] || fail "release candidate workflow is missing"
 [[ -f "$PUBLISH_WORKFLOW" ]] || fail "manual publish workflow is missing"
+[[ -f "$SPARKLE_PAGES_WORKFLOW" ]] ||
+    fail "public Sparkle feed deployment workflow is missing"
 [[ -f "$DMG_SETTINGS" ]] || fail "deterministic DMG settings are missing"
 [[ -f "$DMG_BACKGROUND" ]] || fail "DMG background asset is missing"
 [[ -f "$DMG_BACKGROUND_RETINA" ]] || fail "Retina DMG background asset is missing"
@@ -97,10 +100,11 @@ fi
     fail "publishing must require a manual dispatch"
 /usr/bin/grep -Fq "actions: write" "$PUBLISH_WORKFLOW" ||
     fail "publishing must be allowed to dispatch the docs workflow"
-/usr/bin/grep -Fq "pages: write" "$PUBLISH_WORKFLOW" ||
-    fail "publishing must be allowed to rebuild the public Sparkle feed"
-/usr/bin/grep -Fq "pages/builds" "$PUBLISH_WORKFLOW" ||
-    fail "publishing must explicitly rebuild GitHub Pages after appcast updates"
+/usr/bin/grep -Fq "workflow run sparkle-pages.yml" "$PUBLISH_WORKFLOW" ||
+    fail "publishing must dispatch the public Sparkle feed deployment"
+if /usr/bin/grep -Fq "pages/builds" "$PUBLISH_WORKFLOW"; then
+    fail "workflow-based Pages sites must not use the legacy Pages build API"
+fi
 /usr/bin/grep -Fq "candidate_run_id" "$PUBLISH_WORKFLOW" ||
     fail "publishing must promote a specific tested candidate"
 /usr/bin/grep -Fq "I_APPROVE_RELEASE" "$PUBLISH_WORKFLOW" ||
@@ -109,6 +113,17 @@ fi
     fail "publishing must download the exact candidate artifact"
 /usr/bin/grep -Fq 'releases/download/${TAG}/IconChanger.dmg' "$PUBLISH_WORKFLOW" ||
     fail "appcast validation must check the published download URL"
+
+/usr/bin/grep -Fq "workflow_dispatch:" "$SPARKLE_PAGES_WORKFLOW" ||
+    fail "the public Sparkle feed deployment must support explicit dispatch"
+/usr/bin/grep -Fq "pages: write" "$SPARKLE_PAGES_WORKFLOW" ||
+    fail "the Sparkle Pages deployment needs Pages write permission"
+/usr/bin/grep -Fq "id-token: write" "$SPARKLE_PAGES_WORKFLOW" ||
+    fail "the Sparkle Pages deployment needs OIDC permission"
+/usr/bin/grep -Fq "actions/upload-pages-artifact@" "$SPARKLE_PAGES_WORKFLOW" ||
+    fail "the Sparkle Pages deployment must upload a Pages artifact"
+/usr/bin/grep -Fq "actions/deploy-pages@" "$SPARKLE_PAGES_WORKFLOW" ||
+    fail "the Sparkle Pages deployment must deploy the Pages artifact"
 
 if /usr/bin/grep -Eq 'git (tag|push)|gh release create' "$RELEASE_SCRIPT"; then
     fail "local candidate preparation must not tag, push, or publish"
