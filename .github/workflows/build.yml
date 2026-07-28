@@ -33,3 +33,77 @@ jobs:
             -destination "generic/platform=macOS" \
             CODE_SIGNING_ALLOWED=NO \
             -quiet
+
+      - name: Repository Apple Development signing check
+        if: github.event_name == 'workflow_dispatch'
+        continue-on-error: true
+        env:
+          CERTIFICATE_P12: ${{ secrets.CERTIFICATE_P12 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$CERTIFICATE_P12"
+          test -n "$CERTIFICATE_PASSWORD"
+
+          umask 077
+          KEYCHAIN_PATH="$RUNNER_TEMP/iconchanger-signing-check.keychain-db"
+          KEYCHAIN_PASSWORD=$(openssl rand -base64 32)
+          CERTIFICATE_PATH="$RUNNER_TEMP/iconchanger-signing-check.p12"
+          CERTIFICATE_PEM="$RUNNER_TEMP/iconchanger-signing-check.pem"
+
+          cleanup() {
+            rm -f "$CERTIFICATE_PATH" "$CERTIFICATE_PEM"
+            security delete-keychain "$KEYCHAIN_PATH" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          printf '%s' "$CERTIFICATE_P12" |
+            base64 --decode > "$CERTIFICATE_PATH"
+          security import "$CERTIFICATE_PATH" \
+            -P "$CERTIFICATE_PASSWORD" \
+            -A \
+            -t cert \
+            -f pkcs12 \
+            -k "$KEYCHAIN_PATH"
+          security set-key-partition-list \
+            -S apple-tool:,apple: \
+            -k "$KEYCHAIN_PASSWORD" \
+            "$KEYCHAIN_PATH"
+          security list-keychains -d user \
+            -s "$KEYCHAIN_PATH" login.keychain-db
+
+          IDENTITY_REPORT=$(
+            security find-identity -v -p codesigning "$KEYCHAIN_PATH"
+          )
+          SIGNING_IDENTITY=$(
+            printf '%s\n' "$IDENTITY_REPORT" |
+              python3 scripts/select-signing-identity.py \
+                --mode apple-development
+          )
+          security find-certificate \
+            -c "Apple Development" \
+            -p \
+            "$KEYCHAIN_PATH" > "$CERTIFICATE_PEM"
+          openssl x509 -checkend 0 -noout -in "$CERTIFICATE_PEM"
+
+          BUILD_NUMBER=$(python3 scripts/build-number.py 1.5.0-pre.1)
+          xcodebuild build \
+            -project IconChanger.xcodeproj \
+            -scheme IconChanger \
+            -configuration Release \
+            -destination "generic/platform=macOS" \
+            -derivedDataPath build/SigningCheckDerivedData \
+            MARKETING_VERSION="1.5.0-pre.1" \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="$SIGNING_IDENTITY" \
+            OTHER_CODE_SIGN_FLAGS="--keychain $KEYCHAIN_PATH" \
+            -quiet
+
+          APP_PATH=build/SigningCheckDerivedData/Build/Products/Release/IconChanger.app
+          codesign --verify --deep --strict --verbose=4 "$APP_PATH"
+          codesign -dv --verbose=4 "$APP_PATH" 2>&1 |
+            grep -F "Authority=Apple Development:"

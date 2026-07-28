@@ -1,28 +1,49 @@
 #!/usr/bin/env python3
 """
-30VVVTTNNN — semantic build number from MARKETING_VERSION.
+4MMmmppSNNN — ordered Sparkle build number from MARKETING_VERSION.
 
-  1.4.5       -> 3014500000
-  1.4.5-3     -> 3014500003
-  1.4.5-pre-1 -> 3014570001
+  1.5.0-alpha.1 -> 40105001001
+  1.5.0-beta.1  -> 40105003001
+  1.5.0-pre.1   -> 40105005001
+  1.5.0-rc.1    -> 40105007001
+  1.5.0         -> 40105009000
+
+The leading 4 migrates every new build above the currently published
+3014470009. The stage digit keeps prereleases below the stable build for
+the same marketing version while the fixed-width version components keep
+multi-digit minor and patch releases unambiguous.
 """
 
-import re, sys
+import re
+import sys
 
 version = sys.argv[1] if len(sys.argv) > 1 else ""
 if not version:
     sys.exit("Usage: build-number.py <marketing-version>")
 
-m = re.match(r'^(\d+)\.(\d+)\.(\d+)(?:-(pre)-?(\d+)|(?:-(\d+)))?$', version)
+m = re.fullmatch(
+    r"(\d+)\.(\d+)\.(\d+)"
+    r"(?:(?:-(alpha|beta|pre|rc)[.-]?(\d+))|(?:-(\d+)))?",
+    version,
+)
 if not m:
     sys.exit(f"Cannot parse version: {version}")
 
 major, minor, patch = int(m.group(1)), int(m.group(2)), int(m.group(3))
-is_pre = m.group(4) == "pre"
+label = m.group(4)
 seq = int(m.group(5) or m.group(6) or 0)
 
-vvv = major * 100 + minor * 10 + patch
-# TT=70 for pre so pre builds always outrank stable patches within the same version
-tt = 70 if is_pre else 0
+if any(component > 99 for component in (major, minor, patch)):
+    sys.exit("Major, minor, and patch versions must be between 0 and 99")
+if seq > 999:
+    sys.exit("Release sequence must be between 0 and 999")
 
-print(f"30{vvv:03d}{tt:02d}{seq:03d}")
+stage = {
+    "alpha": 1,
+    "beta": 3,
+    "pre": 5,
+    "rc": 7,
+    None: 9,
+}[label]
+
+print(f"4{major:02d}{minor:02d}{patch:02d}{stage}{seq:03d}")

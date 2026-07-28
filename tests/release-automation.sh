@@ -25,11 +25,38 @@ if /usr/bin/grep -Fq "tags:" "$CI_WORKFLOW" ||
    /usr/bin/grep -Fq "action-gh-release" "$CI_WORKFLOW"; then
     fail "ordinary CI must not publish releases from a pushed tag"
 fi
+/usr/bin/grep -Fq "Repository Apple Development signing check" "$CI_WORKFLOW" ||
+    fail "manual CI must test the repository signing certificate"
+/usr/bin/grep -Fq 'CERTIFICATE_P12: ${{ secrets.CERTIFICATE_P12 }}' \
+    "$CI_WORKFLOW" ||
+    fail "manual CI signing check must use the repository certificate secret"
+/usr/bin/grep -Fq "github.event_name == 'workflow_dispatch'" "$CI_WORKFLOW" ||
+    fail "repository signing certificate checks must be manually triggered"
 
 /usr/bin/grep -Fq "workflow_dispatch:" "$CANDIDATE_WORKFLOW" ||
     fail "candidate builds must be manually dispatched"
-/usr/bin/grep -Fq 'CODE_SIGN_IDENTITY="-"' "$CANDIDATE_WORKFLOW" ||
-    fail "candidate workflow must use repeatable local signing"
+/usr/bin/grep -Fq "signing_mode:" "$CANDIDATE_WORKFLOW" ||
+    fail "candidate workflow must expose an explicit signing mode"
+/usr/bin/grep -Fq "default: auto" "$CANDIDATE_WORKFLOW" ||
+    fail "candidate workflow must safely select signing automatically"
+/usr/bin/grep -Fq 'CERTIFICATE_P12: ${{ secrets.CERTIFICATE_P12 }}' \
+    "$CANDIDATE_WORKFLOW" ||
+    fail "candidate workflow must import the existing Apple Development certificate"
+/usr/bin/grep -Fq 'CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}' \
+    "$CANDIDATE_WORKFLOW" ||
+    fail "candidate workflow must unlock the existing signing certificate"
+/usr/bin/grep -Fq "openssl x509 -checkend 0" "$CANDIDATE_WORKFLOW" ||
+    fail "candidate workflow must reject an expired signing certificate"
+/usr/bin/grep -Fq "select-signing-identity.py" "$CANDIDATE_WORKFLOW" ||
+    fail "candidate workflow must reject revoked Apple Development identities"
+/usr/bin/grep -Fq 'CODE_SIGN_IDENTITY="$SIGNING_IDENTITY"' \
+    "$CANDIDATE_WORKFLOW" ||
+    fail "candidate workflow must build with the imported Apple Development identity"
+/usr/bin/grep -Fq -- '--entitlements "$SIGNING_ENTITLEMENTS"' \
+    "$CANDIDATE_WORKFLOW" ||
+    fail "candidate workflow must re-sign the ad-hoc app with release entitlements"
+/usr/bin/grep -Fq "validate-launchable-executable.sh" "$CANDIDATE_WORKFLOW" ||
+    fail "candidate workflow must prove the built application can launch"
 /usr/bin/grep -Fq "codesign --verify" "$CANDIDATE_WORKFLOW" ||
     fail "candidate workflow must verify its app signature"
 /usr/bin/grep -Fq "actions/upload-artifact@" "$CANDIDATE_WORKFLOW" ||
@@ -40,7 +67,7 @@ if /usr/bin/grep -Fq "hide_extensions" "$DMG_SETTINGS"; then
 fi
 
 if /usr/bin/grep -Eq \
-    'notarytool|stapler|APPLE_ID|APPLE_TEAM_ID|CERTIFICATE_P12|Developer ID|spctl' \
+    'notarytool|stapler|APPLE_ID|APPLE_TEAM_ID|Developer ID|spctl' \
     "$CANDIDATE_WORKFLOW"; then
     fail "candidate workflow must not require a paid Apple developer account"
 fi
