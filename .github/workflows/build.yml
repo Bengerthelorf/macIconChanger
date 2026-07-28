@@ -50,9 +50,10 @@ jobs:
           KEYCHAIN_PASSWORD=$(openssl rand -base64 32)
           CERTIFICATE_PATH="$RUNNER_TEMP/iconchanger-signing-check.p12"
           CERTIFICATE_PEM="$RUNNER_TEMP/iconchanger-signing-check.pem"
+          SIGNING_PROBE="$RUNNER_TEMP/iconchanger-signing-check-probe"
 
           cleanup() {
-            rm -f "$CERTIFICATE_PATH" "$CERTIFICATE_PEM"
+            rm -f "$CERTIFICATE_PATH" "$CERTIFICATE_PEM" "$SIGNING_PROBE"
             security delete-keychain "$KEYCHAIN_PATH" 2>/dev/null || true
           }
           trap cleanup EXIT
@@ -88,6 +89,13 @@ jobs:
             -p \
             "$KEYCHAIN_PATH" > "$CERTIFICATE_PEM"
           openssl x509 -checkend 0 -noout -in "$CERTIFICATE_PEM"
+          ditto /usr/bin/true "$SIGNING_PROBE"
+          codesign --force \
+            --sign "$SIGNING_IDENTITY" \
+            --keychain "$KEYCHAIN_PATH" \
+            --timestamp=none \
+            "$SIGNING_PROBE"
+          codesign --verify --strict "$SIGNING_PROBE"
 
           BUILD_NUMBER=$(python3 scripts/build-number.py 1.5.0-pre.1)
           xcodebuild build \

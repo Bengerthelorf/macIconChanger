@@ -47,6 +47,9 @@ fi
     fail "candidate workflow must unlock the existing signing certificate"
 /usr/bin/grep -Fq "openssl x509 -checkend 0" "$CANDIDATE_WORKFLOW" ||
     fail "candidate workflow must reject an expired signing certificate"
+/usr/bin/grep -Fq 'codesign --verify --strict "$SIGNING_PROBE"' \
+    "$CANDIDATE_WORKFLOW" ||
+    fail "candidate workflow must prove the certificate can sign executable code"
 /usr/bin/grep -Fq "select-signing-identity.py" "$CANDIDATE_WORKFLOW" ||
     fail "candidate workflow must reject revoked Apple Development identities"
 /usr/bin/grep -Fq 'CODE_SIGN_IDENTITY="$SIGNING_IDENTITY"' \

@@ -74,6 +74,7 @@ jobs:
           KEYCHAIN_PASSWORD=$(openssl rand -base64 32)
           CERTIFICATE_PATH="$RUNNER_TEMP/iconchanger-signing.p12"
           CERTIFICATE_PEM="$RUNNER_TEMP/iconchanger-signing.pem"
+          SIGNING_PROBE="$RUNNER_TEMP/iconchanger-signing-probe"
           SIGNING_IDENTITY="-"
           SIGNING_KIND="adhoc"
           SIGNING_ENTITLEMENTS="IconChanger/IconChanger.ad-hoc.entitlements"
@@ -117,16 +118,29 @@ jobs:
               )
 
               if [[ "$SIGNING_IDENTITY" != "-" ]]; then
-                security find-certificate \
-                  -c "Apple Development" \
-                  -p \
-                  "$KEYCHAIN_PATH" > "$CERTIFICATE_PEM"
-                if openssl x509 -checkend 0 -noout -in "$CERTIFICATE_PEM"; then
+                certificate_usable=false
+                if security find-certificate \
+                    -c "Apple Development" \
+                    -p \
+                    "$KEYCHAIN_PATH" > "$CERTIFICATE_PEM" &&
+                  openssl x509 -checkend 0 -noout -in "$CERTIFICATE_PEM"; then
+                  ditto /usr/bin/true "$SIGNING_PROBE"
+                  if codesign --force \
+                      --sign "$SIGNING_IDENTITY" \
+                      --keychain "$KEYCHAIN_PATH" \
+                      --timestamp=none \
+                      "$SIGNING_PROBE" &&
+                    codesign --verify --strict "$SIGNING_PROBE"; then
+                    certificate_usable=true
+                  fi
+                fi
+
+                if [[ "$certificate_usable" == "true" ]]; then
                   SIGNING_KIND="apple-development"
                   SIGNING_ENTITLEMENTS="IconChanger/IconChanger.entitlements"
                   SIGNING_KEYCHAIN_FLAGS="--keychain $KEYCHAIN_PATH"
                 elif [[ "$REQUESTED_SIGNING_MODE" == "apple-development" ]]; then
-                  echo "The Apple Development certificate is expired." >&2
+                  echo "The Apple Development certificate cannot sign valid code." >&2
                   exit 1
                 else
                   SIGNING_IDENTITY="-"
@@ -279,7 +293,8 @@ jobs:
         run: |
           rm -f \
             "$RUNNER_TEMP/iconchanger-signing.p12" \
-            "$RUNNER_TEMP/iconchanger-signing.pem"
+            "$RUNNER_TEMP/iconchanger-signing.pem" \
+            "$RUNNER_TEMP/iconchanger-signing-probe"
           if [[ -n "${KEYCHAIN_PATH:-}" ]]; then
             security delete-keychain "$KEYCHAIN_PATH" 2>/dev/null || true
           fi
