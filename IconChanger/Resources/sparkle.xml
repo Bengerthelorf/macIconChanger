@@ -4,6 +4,28 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.5.1-pre.1</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>40105015001</sparkle:version>
+                    <sparkle:shortVersionString>1.5.1-pre.1</sparkle:shortVersionString>
+                    <pubDate>Wed, 29 Jul 2026 13:19:53 +0000</pubDate>
+                    <sparkle:channel>beta</sparkle:channel>
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.5.1-pre.1/IconChanger.dmg"
+                    sparkle:edSignature="8cQIflnpFjVvdBFf0NoX/ZgyXBkmZy4EK0DY5FqH2nAoh9NjepTXRHTwLoRW7RMbG2d1m7ixGhuu1xRbJu0QAw==" length="8626827"
+                    type="application/octet-stream"/>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.5.1-pre.1</h2>
+                    <ul>
+                        <li><strong>New:</strong> add configurable developer diagnostics</li>
+                        <li><strong>Docs:</strong> update Star History chart</li>
+                        <li><strong>Fixed:</strong> authenticate Homebrew release pushes</li>
+                        <li><strong>Fixed:</strong> accept stable release candidates</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
                     <title>Version 1.5.0</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>40105009000</sparkle:version>
