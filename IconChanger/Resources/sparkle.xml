@@ -4,6 +4,25 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.5.1-pre.1.fix.1</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>40105016101</sparkle:version>
+                    <sparkle:shortVersionString>1.5.1-pre.1.fix.1</sparkle:shortVersionString>
+                    <pubDate>Wed, 29 Jul 2026 14:39:11 +0000</pubDate>
+                    <sparkle:channel>beta</sparkle:channel>
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.5.1-pre.1.fix.1/IconChanger.dmg"
+                    sparkle:edSignature="yryihsU6eGjNmB99qLcama0/kIUGJopNY8PIs7t4QGE1NpQt4iLL30ECvkYSQhrWCBonPqoL+8JgTy2xjJbfDA==" length="8630985"
+                    type="application/octet-stream"/>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.5.1-pre.1.fix.1</h2>
+                    <ul>
+                        <li><strong>Fixed:</strong> stop repeated app update restores</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
                     <title>Version 1.5.1-pre.1</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>40105015001</sparkle:version>
