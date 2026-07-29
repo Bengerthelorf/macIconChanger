@@ -4,6 +4,24 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.5.0</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>40105009000</sparkle:version>
+                    <sparkle:shortVersionString>1.5.0</sparkle:shortVersionString>
+                    <pubDate>Wed, 29 Jul 2026 00:11:10 +0000</pubDate>
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.5.0/IconChanger.dmg"
+                    sparkle:edSignature="5MQRLCNtFqf25xi2tJHK8SwYA8h3eOH7+Mt7uTZizcDbNynik8MYs6vVz+pSYo0Lk/2jOFqFAweEJgWDvxH4BQ==" length="8437612"
+                    type="application/octet-stream"/>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.5.0</h2>
+                    <ul>
+                        <li><strong>New:</strong> automatically load remote icons by default</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
                     <title>Version 1.5.0-rc.1</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>40105007001</sparkle:version>
