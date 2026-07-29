@@ -19,24 +19,54 @@ final class SetupMonitor: ObservableObject {
 
     private init() {}
 
-    func check(completion: ((SetupHealth) -> Void)? = nil) {
+    func check(
+        source: DiagnosticsSource = .system,
+        completion: ((SetupHealth) -> Void)? = nil
+    ) {
         checkGeneration += 1
         let generation = checkGeneration
+        let diagnosticsContext = DiagnosticsContext(
+            operation: .setup,
+            source: source
+        )
+        let timer = DiagnosticsTimer()
+        DiagnosticsLogger.shared.log(
+            .operation,
+            phase: "setup_health_check.start",
+            context: diagnosticsContext,
+            details: [
+                "folder_permission_count": String(FolderPermission.shared.permissions.count)
+            ]
+        )
         publish(.checking)
 
         guard FolderPermission.shared.hasPermission else {
+            DiagnosticsLogger.shared.log(
+                .failure,
+                phase: "setup_health_check.folder_permission_missing",
+                context: diagnosticsContext,
+                durationMilliseconds: timer.elapsedMilliseconds
+            )
             finish(.needsFolderPermission, generation: generation, completion: completion)
             return
         }
 
         DispatchQueue.global(qos: .utility).async {
             let iconManager = IconManager.shared
-            let setupStatus = iconManager.checkSetupStatus()
+            let setupStatus = iconManager.checkSetupStatus(
+                diagnosticsContext: diagnosticsContext
+            )
             let result: SetupHealth
+            var details = [
+                "setup_status": Self.setupStatusName(setupStatus)
+            ]
 
             switch setupStatus {
             case .completed:
-                switch iconManager.appManagementStatus() {
+                let appManagementStatus = iconManager.appManagementStatus()
+                details["app_management_status"] =
+                    Self.appManagementStatusName(appManagementStatus)
+                switch appManagementStatus {
                 case .authorized, .unknown:
                     result = .ready
                 case .denied, .notDetermined:
@@ -55,6 +85,13 @@ final class SetupMonitor: ObservableObject {
             }
 
             DispatchQueue.main.async {
+                DiagnosticsLogger.shared.log(
+                    result.needsAttention ? .failure : .operation,
+                    phase: "setup_health_check.completed",
+                    context: diagnosticsContext,
+                    durationMilliseconds: timer.elapsedMilliseconds,
+                    details: details
+                )
                 self.finish(result, generation: generation, completion: completion)
             }
         }
@@ -74,5 +111,37 @@ final class SetupMonitor: ObservableObject {
         guard health != newHealth else { return }
         health = newHealth
         NotificationCenter.default.post(name: .setupHealthDidChange, object: self)
+    }
+
+    nonisolated private static func setupStatusName(_ status: SetupStatus) -> String {
+        switch status {
+        case .completed:
+            return "completed"
+        case .helperFilesMissing:
+            return "helper_files_missing"
+        case .helperFilesOutdated:
+            return "helper_files_outdated"
+        case .sudoersPermissionMissing:
+            return "sudoers_permission_missing"
+        case .legacySudoersPermissionPresent:
+            return "legacy_sudoers_permission_present"
+        case .unknownError:
+            return "unknown_error"
+        }
+    }
+
+    nonisolated private static func appManagementStatusName(
+        _ status: IconManager.AppManagementStatus
+    ) -> String {
+        switch status {
+        case .authorized:
+            return "authorized"
+        case .denied:
+            return "denied"
+        case .notDetermined:
+            return "not_determined"
+        case .unknown:
+            return "unknown"
+        }
     }
 }

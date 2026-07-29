@@ -5,46 +5,6 @@
 
 import SwiftUI
 
-private struct IdentifiableKey: Identifiable {
-    let id = UUID()
-    var value: String
-}
-
-private struct MaskedKeyField: View {
-    @Binding var text: String
-    @State private var isEditing = false
-    @FocusState private var isFocused: Bool
-
-    var body: some View {
-        Group {
-            if isEditing {
-                TextField("API Key", text: $text)
-                    .focused($isFocused)
-                    .onChange(of: isFocused) { focused in
-                        if !focused { isEditing = false }
-                    }
-            } else {
-                Text(maskedText)
-                    .foregroundColor(text.isEmpty ? .secondary : .primary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        isEditing = true
-                        DispatchQueue.main.async { isFocused = true }
-                    }
-            }
-        }
-        .textFieldStyle(.roundedBorder)
-    }
-
-    private var maskedText: String {
-        guard text.count > 10 else { return text.isEmpty ? "API Key" : text }
-        let prefix = String(text.prefix(6))
-        let suffix = String(text.suffix(5))
-        return "\(prefix)...\(suffix)"
-    }
-}
-
 enum AppAppearance: String, CaseIterable, Identifiable {
     case system = "system"
     case light = "light"
@@ -88,13 +48,7 @@ struct AdvancedSettingsView: View {
     @AppStorage(IconFetchInteractionPolicy.automaticallyLoadIconsKey)
     private var automaticallyLoadIcons =
         IconFetchInteractionPolicy.defaultAutomaticallyLoadIcons
-    @AppStorage("t2e") private var t2Enabled = false
     @AppStorage("enablePreRelease") private var enablePreRelease = false
-    @State private var extraAPIKeys: [IdentifiableKey] = APIKeyManager.loadExtraKeys().map { IdentifiableKey(value: $0) }
-    @State private var newAPIKey: String = ""
-    @State private var extraKeyTestResults: [UUID: (success: Bool, message: String)] = [:]
-    @State private var testingKeyIDs: Set<UUID> = []
-    @State private var showDisableConfirmation = false
     @State private var showExportPasswordPrompt = false
     @State private var exportPassword = ""
     @State private var usageCount: Int = APIUsageTracker.shared.currentCount
@@ -387,76 +341,6 @@ struct AdvancedSettingsView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            if t2Enabled {
-                Section {
-                    ForEach($extraAPIKeys) { $key in
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack {
-                                MaskedKeyField(text: $key.value)
-                                    .onChange(of: key.value) { _ in
-                                        syncExtraKeys()
-                                        extraKeyTestResults.removeValue(forKey: key.id)
-                                    }
-                                Button {
-                                    testExtraKey(key)
-                                } label: {
-                                    if testingKeyIDs.contains(key.id) {
-                                        ProgressView().controlSize(.small)
-                                    } else {
-                                        Image(systemName: "play.circle")
-                                    }
-                                }
-                                .buttonStyle(.borderless)
-                                .disabled(key.value.isEmpty || testingKeyIDs.contains(key.id))
-                                Button(role: .destructive) {
-                                    extraAPIKeys.removeAll { $0.id == key.id }
-                                    syncExtraKeys()
-                                } label: {
-                                    Image(systemName: "minus.circle.fill")
-                                }
-                                .buttonStyle(.borderless)
-                            }
-                            if let result = extraKeyTestResults[key.id] {
-                                Label(result.message, systemImage: result.success ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-                                    .font(.caption)
-                                    .foregroundColor(result.success ? .green : .red)
-                            }
-                        }
-                    }
-
-                    HStack {
-                        SecureField("Add API Key...", text: $newAPIKey)
-                            .onSubmit {
-                                addExtraKey()
-                            }
-                        Button {
-                            addExtraKey()
-                        } label: {
-                            Image(systemName: "plus.circle.fill")
-                        }
-                        .buttonStyle(.borderless)
-                        .disabled(newAPIKey.isEmpty)
-                    }
-                    Button(role: .destructive) {
-                        showDisableConfirmation = true
-                    } label: {
-                        Label("Disable Advanced Mode", systemImage: "xmark.circle")
-                    }
-                    .alert("Disable Advanced Mode?", isPresented: $showDisableConfirmation) {
-                        Button("Cancel", role: .cancel) {}
-                        Button("Disable", role: .destructive) {
-                            t2Enabled = false
-                        }
-                    } message: {
-                        Text("Are you sure you want to disable Advanced Mode?")
-                    }
-                } header: {
-                    Label("Advanced Mode", systemImage: "hammer")
-                } footer: {
-                    Text("Additional API keys are rotated automatically to distribute usage across keys.")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            }
         }
         .formStyle(.grouped)
         .onAppear {
@@ -466,7 +350,6 @@ struct AdvancedSettingsView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: ConfigManager.didImportNotification)) { _ in
             apiKey = KeychainHelper.load(key: "apiKey") ?? ""
-            extraAPIKeys = APIKeyManager.loadExtraKeys().map { IdentifiableKey(value: $0) }
             usageCount = APIUsageTracker.shared.currentCount
             fetchCacheCount = IconFetchCacheManager.shared.getCacheCount()
             updateAppearanceIconCount()
@@ -475,37 +358,6 @@ struct AdvancedSettingsView: View {
             NotificationCenter.default.publisher(for: .appearanceIconStoreDidChange)
         ) { _ in
             updateAppearanceIconCount()
-        }
-    }
-
-    private func addExtraKey() {
-        let trimmed = newAPIKey.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
-        extraAPIKeys.append(IdentifiableKey(value: trimmed))
-        syncExtraKeys()
-        newAPIKey = ""
-    }
-
-    private func syncExtraKeys() {
-        APIKeyManager.saveExtraKeys(extraAPIKeys.map(\.value))
-    }
-
-    private func testExtraKey(_ key: IdentifiableKey) {
-        testingKeyIDs.insert(key.id)
-        Task {
-            let controller = MyQueryRequestController()
-            do {
-                let result = try await controller.testAPIConnection(apiKey: key.value)
-                await MainActor.run {
-                    testingKeyIDs.remove(key.id)
-                    extraKeyTestResults[key.id] = (true, result.iconCount > 0 ? "Connected" : "Connected (no results)")
-                }
-            } catch {
-                await MainActor.run {
-                    testingKeyIDs.remove(key.id)
-                    extraKeyTestResults[key.id] = (false, extractErrorMessage(from: error))
-                }
-            }
         }
     }
 

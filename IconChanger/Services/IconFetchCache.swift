@@ -77,7 +77,20 @@ class IconFetchCacheManager {
     }
 
     func saveToDisk(force: Bool = false) {
-        guard force || isPersistenceEnabled else { return }
+        let context = DiagnosticsContext(
+            operation: .cache,
+            iconKind: "search_result_cache",
+            iconPath: Self.persistentCacheFileURL.path
+        )
+        let timer = DiagnosticsTimer()
+        guard force || isPersistenceEnabled else {
+            DiagnosticsLogger.shared.log(
+                .skipped,
+                phase: "search_cache.persist_disabled",
+                context: context
+            )
+            return
+        }
         cacheLock.lock()
         let snapshot = cache
         cacheLock.unlock()
@@ -85,15 +98,53 @@ class IconFetchCacheManager {
         do {
             let data = try JSONEncoder().encode(snapshot)
             try data.write(to: Self.persistentCacheFileURL, options: .atomic)
+            DiagnosticsLogger.shared.log(
+                .performance,
+                phase: "search_cache.persisted",
+                context: context,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: [
+                    "entry_count": String(snapshot.count),
+                    "bytes_written": String(data.count),
+                ]
+            )
         } catch {
             logger.error("Failed to persist icon fetch cache: \(error.localizedDescription)")
+            DiagnosticsLogger.shared.log(
+                .failure,
+                phase: "search_cache.persist_failed",
+                context: context,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: DiagnosticsLogger.errorDetails(error)
+            )
         }
     }
 
     private func loadFromDisk() {
-        guard isPersistenceEnabled else { return }
+        let context = DiagnosticsContext(
+            operation: .cache,
+            source: .startup,
+            iconKind: "search_result_cache",
+            iconPath: Self.persistentCacheFileURL.path
+        )
+        let timer = DiagnosticsTimer()
+        guard isPersistenceEnabled else {
+            DiagnosticsLogger.shared.log(
+                .skipped,
+                phase: "search_cache.load_disabled",
+                context: context
+            )
+            return
+        }
         let url = Self.persistentCacheFileURL
-        guard FileManager.default.fileExists(atPath: url.path) else { return }
+        guard FileManager.default.fileExists(atPath: url.path) else {
+            DiagnosticsLogger.shared.log(
+                .skipped,
+                phase: "search_cache.file_not_found",
+                context: context
+            )
+            return
+        }
 
         do {
             let data = try Data(contentsOf: url)
@@ -104,14 +155,49 @@ class IconFetchCacheManager {
             }
             cacheLock.unlock()
             logger.log("Loaded \(loaded.count) entries from persistent icon fetch cache")
+            DiagnosticsLogger.shared.log(
+                .operation,
+                phase: "search_cache.loaded",
+                context: context,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: ["entry_count": String(loaded.count)]
+            )
         } catch {
             logger.error("Failed to load persistent icon fetch cache: \(error.localizedDescription)")
+            DiagnosticsLogger.shared.log(
+                .failure,
+                phase: "search_cache.load_failed",
+                context: context,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: DiagnosticsLogger.errorDetails(error)
+            )
         }
     }
 
     func deleteDiskCache() {
-        try? FileManager.default.removeItem(at: Self.persistentCacheFileURL)
-        logger.log("Deleted persistent icon fetch cache file")
+        let context = DiagnosticsContext(
+            operation: .cache,
+            iconKind: "search_result_cache",
+            iconPath: Self.persistentCacheFileURL.path
+        )
+        do {
+            if FileManager.default.fileExists(atPath: Self.persistentCacheFileURL.path) {
+                try FileManager.default.removeItem(at: Self.persistentCacheFileURL)
+            }
+            logger.log("Deleted persistent icon fetch cache file")
+            DiagnosticsLogger.shared.log(
+                .operation,
+                phase: "search_cache.disk_file_deleted",
+                context: context
+            )
+        } catch {
+            DiagnosticsLogger.shared.log(
+                .failure,
+                phase: "search_cache.disk_file_delete_failed",
+                context: context,
+                details: DiagnosticsLogger.errorDetails(error)
+            )
+        }
     }
 
     // MARK: - Initialization
@@ -159,6 +245,16 @@ class IconFetchCacheManager {
 
         guard var entry = cache[key] else {
             missCount += 1
+            DiagnosticsLogger.shared.log(
+                .step,
+                phase: "search_cache.miss",
+                context: DiagnosticsContext(
+                    operation: .cache,
+                    appName: appName,
+                    iconKind: "search_result_cache"
+                ),
+                details: ["style": style]
+            )
             return nil
         }
 
@@ -172,9 +268,32 @@ class IconFetchCacheManager {
 
         if validIcons.isEmpty && !entry.icons.isEmpty {
             logger.warning("All cached icons failed validation for \(key)")
+            DiagnosticsLogger.shared.log(
+                .failure,
+                phase: "search_cache.validation_failed",
+                context: DiagnosticsContext(
+                    operation: .cache,
+                    appName: appName,
+                    iconKind: "search_result_cache"
+                ),
+                details: ["stored_result_count": String(entry.icons.count)]
+            )
             return nil
         }
 
+        DiagnosticsLogger.shared.log(
+            .step,
+            phase: "search_cache.hit",
+            context: DiagnosticsContext(
+                operation: .cache,
+                appName: appName,
+                iconKind: "search_result_cache"
+            ),
+            details: [
+                "style": style,
+                "result_count": String(validIcons.count),
+            ]
+        )
         return validIcons
     }
 
@@ -209,7 +328,23 @@ class IconFetchCacheManager {
         }
 
         cache[key] = entry
+        let entryCount = cache.count
         cacheLock.unlock()
+        DiagnosticsLogger.shared.log(
+            .operation,
+            phase: "search_cache.updated",
+            context: DiagnosticsContext(
+                operation: .cache,
+                appName: appName,
+                iconKind: "search_result_cache",
+                iconPath: Self.persistentCacheFileURL.path
+            ),
+            details: [
+                "style": style,
+                "result_count": String(icons.count),
+                "entry_count": String(entryCount),
+            ]
+        )
         saveToDisk()
     }
 
@@ -229,6 +364,15 @@ class IconFetchCacheManager {
         missCount = 0
         evictionCount = 0
         cacheLock.unlock()
+        DiagnosticsLogger.shared.log(
+            .operation,
+            phase: "search_cache.cleared",
+            context: DiagnosticsContext(
+                operation: .cache,
+                iconKind: "search_result_cache",
+                iconPath: Self.persistentCacheFileURL.path
+            )
+        )
         saveToDisk()
     }
 
@@ -246,7 +390,20 @@ class IconFetchCacheManager {
         }
         cacheLock.unlock()
 
-        if !expiredKeys.isEmpty { saveToDisk() }
+        if !expiredKeys.isEmpty {
+            DiagnosticsLogger.shared.log(
+                .operation,
+                phase: "search_cache.expired_entries_removed",
+                context: DiagnosticsContext(
+                    operation: .cache,
+                    source: .scheduled,
+                    iconKind: "search_result_cache",
+                    iconPath: Self.persistentCacheFileURL.path
+                ),
+                details: ["removed_count": String(expiredKeys.count)]
+            )
+            saveToDisk()
+        }
         return expiredKeys.count
     }
 

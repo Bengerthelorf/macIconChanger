@@ -211,9 +211,29 @@ class MyQueryRequestController {
     }
 
     func sendRequest(_ query: String, style: IconStyle = .all, apiKey: String? = nil) async throws -> [IconRes] {
+        let diagnosticsContext = DiagnosticsContext(operation: .network)
+        let diagnosticsTimer = DiagnosticsTimer()
+        DiagnosticsLogger.shared.log(
+            .operation,
+            phase: "icon_search.start",
+            context: diagnosticsContext,
+            details: [
+                "query_length": String(query.count),
+                "style": style.displayName,
+                "retry_count": String(retryCount),
+                "available_key_count": String(APIKeyManager.allKeys.count),
+            ]
+        )
         guard let resolvedKey = IconRemoteRequestPolicy.normalizedAPIKey(
             apiKey ?? APIKeyManager.pickKey()
         ) else {
+            DiagnosticsLogger.shared.log(
+                .failure,
+                phase: "icon_search.api_key_missing",
+                context: diagnosticsContext,
+                durationMilliseconds: diagnosticsTimer.elapsedMilliseconds,
+                details: DiagnosticsLogger.errorDetails(APIError.apiKeyMissing)
+            )
             throw APIError.apiKeyMissing
         }
         let key = "\(query)|\(style.displayName)"
@@ -277,12 +297,58 @@ class MyQueryRequestController {
 
         if !isNew {
             logger.debug("Deduplicating request for '\(query, privacy: .public)'")
+            DiagnosticsLogger.shared.log(
+                .step,
+                phase: "icon_search.request_deduplicated",
+                context: diagnosticsContext
+            )
         }
 
         defer { if isNew { Task { await dedup.remove(key) } } }
 
-        let results = try await task.value
-        return results
+        do {
+            let results = try await task.value
+            DiagnosticsLogger.shared.log(
+                .operation,
+                phase: "icon_search.completed",
+                context: diagnosticsContext,
+                durationMilliseconds: diagnosticsTimer.elapsedMilliseconds,
+                details: ["result_count": String(results.count)]
+            )
+            return results
+        } catch {
+            DiagnosticsLogger.shared.log(
+                .failure,
+                phase: "icon_search.failed",
+                context: diagnosticsContext,
+                durationMilliseconds: diagnosticsTimer.elapsedMilliseconds,
+                details: diagnosticDetails(for: error)
+            )
+            throw error
+        }
+    }
+
+    private func diagnosticDetails(for error: Error) -> [String: String] {
+        var details = DiagnosticsLogger.errorDetails(error)
+        guard let apiError = error as? APIError else { return details }
+        switch apiError {
+        case .rateLimitExceeded(let used, let limit):
+            details["error_kind"] = "rate_limit_exceeded"
+            details["used"] = String(used)
+            details["limit"] = String(limit)
+        case .requestTimeout:
+            details["error_kind"] = "request_timeout"
+        case .apiKeyMissing:
+            details["error_kind"] = "api_key_missing"
+        case .httpError(let statusCode, _):
+            details["error_kind"] = "http_error"
+            details["http_status"] = String(statusCode)
+        case .noResults:
+            details["error_kind"] = "no_results"
+        case .networkError:
+            details["error_kind"] = "network_error"
+        }
+        return details
     }
     
     private func sendRequestToMeilisearch(_ query: String, style: IconStyle, apiKey: String) async throws -> [IconRes] {
@@ -389,72 +455,106 @@ class MyQueryRequestController {
     }
     
     func testAPIConnection(apiKey: String? = nil) async throws -> (success: Bool, iconCount: Int) {
+        let diagnosticsContext = DiagnosticsContext(operation: .network)
+        let diagnosticsTimer = DiagnosticsTimer()
         let testQuery = "test_api_connection"
         logger.debug("Testing API connectivity.")
+        DiagnosticsLogger.shared.log(
+            .operation,
+            phase: "api_connection_test.start",
+            context: diagnosticsContext,
+            details: ["using_explicit_key": String(apiKey != nil)]
+        )
 
-        let session = self.session
+        do {
+            let session = self.session
 
-        let urlString = "\(Self.apiBaseURL)/search"
-        guard let URL = URL(string: urlString) else {
-            throw NSError(domain: "IconChanger", code: 1001, userInfo: [NSLocalizedDescriptionKey: "Invalid API endpoint URL"])
-        }
-
-        var request = URLRequest(url: URL)
-        request.httpMethod = "POST"
-
-        let resolvedKey = apiKey ?? KeychainHelper.load(key: "apiKey") ?? ""
-        if resolvedKey.isEmpty {
-            throw NSError(domain: "IconChanger", code: 1002, userInfo: [NSLocalizedDescriptionKey: "API key not provided"])
-        }
-
-        request.addValue(resolvedKey, forHTTPHeaderField: "x-api-key")
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.addValue("application/json", forHTTPHeaderField: "Accept")
-        
-        let bodyObject: [String: Any] = [
-            "query": testQuery,
-            "searchOptions": [
-                "hitsPerPage": Self.testHitsPerPage,
-                "page": 1,
-                "sort": ["timeStamp:desc"]
-            ]
-        ]
-        
-        let jsonData = try JSONSerialization.data(withJSONObject: bodyObject, options: [])
-        request.httpBody = jsonData
-
-        let (data, response) = try await session.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw NSError(domain: "IconChanger", code: 1003, userInfo: [NSLocalizedDescriptionKey: "Invalid response type"])
-        }
-        
-        if httpResponse.statusCode == 429 {
-            if resolvedKey == APIKeyManager.pickKey() && APIKeyManager.allKeys.count > 1 {
-                APIUsageTracker.shared.markCurrentKeyExhausted()
-                APIKeyManager.rotateToNextKey()
-                APIUsageTracker.shared.resetCount()
+            let urlString = "\(Self.apiBaseURL)/search"
+            guard let URL = URL(string: urlString) else {
+                throw NSError(domain: "IconChanger", code: 1001, userInfo: [NSLocalizedDescriptionKey: "Invalid API endpoint URL"])
             }
-            let message = Self.extractAPIMessage(from: data) ?? "HTTP 429"
-            throw NSError(domain: "IconChanger", code: 429,
-                          userInfo: [NSLocalizedDescriptionKey: message])
-        }
 
-        if httpResponse.statusCode != 200 {
-            let message = Self.extractAPIMessage(from: data) ?? "HTTP \(httpResponse.statusCode)"
-            throw NSError(domain: "IconChanger", code: httpResponse.statusCode,
-                          userInfo: [NSLocalizedDescriptionKey: message])
-        }
-        
-        let json = try JSON(data: data)
+            var request = URLRequest(url: URL)
+            request.httpMethod = "POST"
 
-        guard json["hits"].exists() else {
-            throw NSError(domain: "IconChanger", code: 1004,
-                          userInfo: [NSLocalizedDescriptionKey: "Invalid API response format"])
-        }
+            let resolvedKey = apiKey ?? KeychainHelper.load(key: "apiKey") ?? ""
+            if resolvedKey.isEmpty {
+                throw NSError(domain: "IconChanger", code: 1002, userInfo: [NSLocalizedDescriptionKey: "API key not provided"])
+            }
+
+            request.addValue(resolvedKey, forHTTPHeaderField: "x-api-key")
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.addValue("application/json", forHTTPHeaderField: "Accept")
         
-        let iconCount = json["hits"].arrayValue.count
-        return (true, iconCount)
+            let bodyObject: [String: Any] = [
+                "query": testQuery,
+                "searchOptions": [
+                    "hitsPerPage": Self.testHitsPerPage,
+                    "page": 1,
+                    "sort": ["timeStamp:desc"]
+                ]
+            ]
+        
+            let jsonData = try JSONSerialization.data(withJSONObject: bodyObject, options: [])
+            request.httpBody = jsonData
+
+            let (data, response) = try await session.data(for: request)
+
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw NSError(domain: "IconChanger", code: 1003, userInfo: [NSLocalizedDescriptionKey: "Invalid response type"])
+            }
+        
+            if httpResponse.statusCode == 429 {
+                if resolvedKey == APIKeyManager.pickKey() && APIKeyManager.allKeys.count > 1 {
+                    APIUsageTracker.shared.markCurrentKeyExhausted()
+                    APIKeyManager.rotateToNextKey()
+                    APIUsageTracker.shared.resetCount()
+                }
+                let message = Self.extractAPIMessage(from: data) ?? "HTTP 429"
+                throw NSError(domain: "IconChanger", code: 429,
+                              userInfo: [NSLocalizedDescriptionKey: message])
+            }
+
+            if httpResponse.statusCode != 200 {
+                let message = Self.extractAPIMessage(from: data) ?? "HTTP \(httpResponse.statusCode)"
+                throw NSError(domain: "IconChanger", code: httpResponse.statusCode,
+                              userInfo: [NSLocalizedDescriptionKey: message])
+            }
+        
+            let json = try JSON(data: data)
+
+            guard json["hits"].exists() else {
+                throw NSError(domain: "IconChanger", code: 1004,
+                              userInfo: [NSLocalizedDescriptionKey: "Invalid API response format"])
+            }
+        
+            let iconCount = json["hits"].arrayValue.count
+            DiagnosticsLogger.shared.log(
+                .operation,
+                phase: "api_connection_test.completed",
+                context: diagnosticsContext,
+                durationMilliseconds: diagnosticsTimer.elapsedMilliseconds,
+                details: [
+                    "http_status": String(httpResponse.statusCode),
+                    "result_count": String(iconCount),
+                ]
+            )
+            return (true, iconCount)
+        } catch {
+            var details = DiagnosticsLogger.errorDetails(error)
+            let nsError = error as NSError
+            if (100...599).contains(nsError.code) {
+                details["http_status"] = String(nsError.code)
+            }
+            DiagnosticsLogger.shared.log(
+                .failure,
+                phase: "api_connection_test.failed",
+                context: diagnosticsContext,
+                durationMilliseconds: diagnosticsTimer.elapsedMilliseconds,
+                details: details
+            )
+            throw error
+        }
     }
     
     private func sendBackupRequest(_ query: String, style: IconStyle, apiKey: String) async throws -> [IconRes] {

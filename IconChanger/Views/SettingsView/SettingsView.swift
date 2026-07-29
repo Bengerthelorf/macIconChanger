@@ -147,6 +147,7 @@ class LanguageManager: ObservableObject {
 
 struct SettingsView: View {
     let updater: SPUUpdater
+    @AppStorage("t2e") private var developerModeEnabled = false
 
     var body: some View {
         TabView {
@@ -174,6 +175,13 @@ struct SettingsView: View {
                 .tabItem {
                     Label("Advanced", systemImage: "gearshape.2")
                 }
+
+            if developerModeEnabled {
+                DeveloperSettingsView()
+                    .tabItem {
+                        Label("Developer", systemImage: "hammer")
+                    }
+            }
 
             AboutSettingsView(updater: updater)
                 .tabItem {

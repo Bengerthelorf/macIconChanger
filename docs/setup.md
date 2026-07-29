@@ -22,7 +22,21 @@ IconChanger uses several security measures to protect the helper pipeline:
 - **Root-owned helper directory** — The helper files live in `/usr/local/lib/iconchanger/` with `root:wheel` ownership, preventing unprivileged modification.
 - **SHA-256 integrity verification** — The helper script is verified against a known hash before every execution.
 - **Scoped sudoers rule** — The sudoers entry only grants passwordless access to the specific helper script, not arbitrary commands.
-- **Audit logging** — All icon operations are logged with timestamps for traceability.
+- **Audit logging** — Successful icon changes and restores are appended to
+  `~/Library/Application Support/com.zhuhaoyu.IconChanger/audit.log`.
+- **Developer diagnostics** — After enabling Developer Mode, open the
+  developer-only **Settings → Developer → Diagnostics** tab to independently enable
+  `diagnostics.log`. You can choose which icon operations and event types are
+  recorded, whether application paths are included, and whether restore entries
+  include the selected icon type or its full cache path. Full icon paths are off
+  by default.
+
+The diagnostics log uses JSON Lines so each operation step is independently
+searchable. It includes operation and batch identifiers for correlating a
+restore with helper execution, Dock refreshes, failures, skips, and performance
+timings. The file is owner-only (`0600`), rotates at 5 MiB, and retains three
+archives. Developer Mode and **Enable Diagnostics Log** must both remain
+enabled for diagnostics to be written.
 
 ## Manual Setup
 

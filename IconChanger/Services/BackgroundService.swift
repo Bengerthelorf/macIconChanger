@@ -213,14 +213,36 @@ import os
     }
 
     private func updateLoginItem() {
+        let diagnosticsContext = DiagnosticsContext(
+            operation: .permission,
+            source: .system
+        )
+        let timer = DiagnosticsTimer()
         do {
             if launchAtLogin {
                 try SMAppService.mainApp.register()
             } else {
                 try SMAppService.mainApp.unregister()
             }
+            DiagnosticsLogger.shared.log(
+                .operation,
+                phase: "login_item.updated",
+                context: diagnosticsContext,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: [
+                    "enabled": String(launchAtLogin),
+                    "status": String(describing: SMAppService.mainApp.status),
+                ]
+            )
         } catch {
             logger.error("Failed to update login item: \(error.localizedDescription)")
+            DiagnosticsLogger.shared.log(
+                .failure,
+                phase: "login_item.update_failed",
+                context: diagnosticsContext,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: DiagnosticsLogger.errorDetails(error)
+            )
         }
     }
 
@@ -229,7 +251,18 @@ import os
     }
 
     func startBackgroundService() {
-        guard !isRunning else { return }
+        let diagnosticsContext = DiagnosticsContext(
+            operation: .background,
+            source: .system
+        )
+        guard !isRunning else {
+            DiagnosticsLogger.shared.log(
+                .skipped,
+                phase: "background_service.already_running",
+                context: diagnosticsContext
+            )
+            return
+        }
         isRunning = true
 
         if showInMenuBar {
@@ -240,17 +273,50 @@ import os
         setupTimers()
 
         runInBackground = true
+        DiagnosticsLogger.shared.log(
+            .operation,
+            phase: "background_service.started",
+            context: diagnosticsContext,
+            details: [
+                "menu_bar_enabled": String(showInMenuBar),
+                "dock_enabled": String(showInDock),
+            ]
+        )
     }
 
     private func requestNotificationPermission() {
+        let diagnosticsContext = DiagnosticsContext(
+            operation: .permission,
+            source: .system
+        )
+        let timer = DiagnosticsTimer()
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
             if let error = error {
                 self.logger.error("Error requesting notification permission: \(error.localizedDescription)")
+                DiagnosticsLogger.shared.log(
+                    .failure,
+                    phase: "notification_permission.failed",
+                    context: diagnosticsContext,
+                    durationMilliseconds: timer.elapsedMilliseconds,
+                    details: DiagnosticsLogger.errorDetails(error)
+                )
+            } else {
+                DiagnosticsLogger.shared.log(
+                    granted ? .operation : .failure,
+                    phase: "notification_permission.completed",
+                    context: diagnosticsContext,
+                    durationMilliseconds: timer.elapsedMilliseconds,
+                    details: ["granted": String(granted)]
+                )
             }
         }
     }
 
     func stopBackgroundService() {
+        let diagnosticsContext = DiagnosticsContext(
+            operation: .background,
+            source: .system
+        )
         isRunning = false
 
         if let item = statusItem {
@@ -264,6 +330,11 @@ import os
 
         NSApp.setActivationPolicy(.regular)
         runInBackground = false
+        DiagnosticsLogger.shared.log(
+            .operation,
+            phase: "background_service.stopped",
+            context: diagnosticsContext
+        )
     }
 
     private func setupStatusBar() {
@@ -590,6 +661,10 @@ import os
     }
 
     func setupTimers() {
+        let diagnosticsContext = DiagnosticsContext(
+            operation: .background,
+            source: .system
+        )
         cancelTimer(&scheduledRestoreTimer)
         cancelTimer(&updateCheckTimer)
         cancelTimer(&fetchCacheCleanupTimer)
@@ -631,6 +706,20 @@ import os
                 DispatchQueue.main.async { self?.cleanupFetchCache() }
             }
         }
+        DiagnosticsLogger.shared.log(
+            .operation,
+            phase: "background_timers.configured",
+            context: diagnosticsContext,
+            details: [
+                "scheduled_restore_enabled": String(enableScheduledRestore),
+                "scheduled_restore_interval_hours": String(getActiveRestoreInterval()),
+                "update_detection_enabled": String(enableAutoRestoreOnUpdate),
+                "update_check_interval_minutes": String(autoRestoreCheckInterval),
+                "fetch_cache_cleanup_enabled": String(
+                    IconFetchCacheManager.shared.getCacheCount() > 0
+                ),
+            ]
+        )
     }
 
     private func cancelTimer(_ timer: inout DispatchSourceTimer?) {
@@ -666,43 +755,131 @@ import os
     }
 
     @objc func checkScheduledRestore() {
-        guard enableScheduledRestore else { return }
+        let diagnosticsContext = DiagnosticsContext(
+            operation: .background,
+            source: .scheduled
+        )
+        guard enableScheduledRestore else {
+            DiagnosticsLogger.shared.log(
+                .skipped,
+                phase: "scheduled_restore.disabled",
+                context: diagnosticsContext
+            )
+            return
+        }
 
         let interval = getActiveRestoreInterval()
         let timeInterval = TimeInterval(interval * 3600)
         let nextRestoreTime = lastScheduledRestore.addingTimeInterval(timeInterval)
 
         if Date() >= nextRestoreTime {
+            DiagnosticsLogger.shared.log(
+                .operation,
+                phase: "scheduled_restore.due",
+                context: diagnosticsContext
+            )
             performScheduledRestore()
+        } else {
+            DiagnosticsLogger.shared.log(
+                .skipped,
+                phase: "scheduled_restore.not_due",
+                context: diagnosticsContext,
+                details: [
+                    "seconds_until_due": String(
+                        max(0, Int(nextRestoreTime.timeIntervalSinceNow))
+                    )
+                ]
+            )
         }
     }
 
     @objc func checkForAppUpdates() {
-        guard enableAutoRestoreOnUpdate else { return }
+        let diagnosticsContext = DiagnosticsContext(
+            operation: .background,
+            source: .appUpdate
+        )
+        let timer = DiagnosticsTimer()
+        guard enableAutoRestoreOnUpdate else {
+            DiagnosticsLogger.shared.log(
+                .skipped,
+                phase: "app_update_check.disabled",
+                context: diagnosticsContext
+            )
+            return
+        }
+        DiagnosticsLogger.shared.log(
+            .operation,
+            phase: "app_update_check.start",
+            context: diagnosticsContext,
+            details: [
+                "cached_app_count": String(
+                    IconCacheManager.shared.getCachedIconsCount()
+                )
+            ]
+        )
 
         Task {
             do {
                 let updatedApps = try await checkCachedAppsForUpdates()
+                DiagnosticsLogger.shared.log(
+                    .step,
+                    phase: "app_update_check.scan_completed",
+                    context: diagnosticsContext,
+                    details: ["updated_app_count": String(updatedApps.count)]
+                )
 
                 if !updatedApps.isEmpty {
                     try await restoreUpdatedApps(updatedApps)
                     showUpdateNotification(appCount: updatedApps.count)
+                } else {
+                    DiagnosticsLogger.shared.log(
+                        .skipped,
+                        phase: "app_update_check.no_updates",
+                        context: diagnosticsContext
+                    )
                 }
 
                 await MainActor.run {
                     lastUpdateCheck = Date()
                 }
+                DiagnosticsLogger.shared.log(
+                    .operation,
+                    phase: "app_update_check.completed",
+                    context: diagnosticsContext,
+                    durationMilliseconds: timer.elapsedMilliseconds,
+                    details: ["updated_app_count": String(updatedApps.count)]
+                )
             } catch {
                 logger.error("Error checking for app updates: \(error.localizedDescription)")
+                DiagnosticsLogger.shared.log(
+                    .failure,
+                    phase: "app_update_check.failed",
+                    context: diagnosticsContext,
+                    durationMilliseconds: timer.elapsedMilliseconds,
+                    details: DiagnosticsLogger.errorDetails(error)
+                )
                 handleBackgroundSetupFailure()
             }
         }
     }
 
     private func performScheduledRestore() {
+        let diagnosticsContext = DiagnosticsContext(
+            operation: .background,
+            source: .scheduled
+        )
+        let timer = DiagnosticsTimer()
+        DiagnosticsLogger.shared.log(
+            .operation,
+            phase: "scheduled_restore.start",
+            context: diagnosticsContext
+        )
         Task {
             do {
-                let _ = try await iconManager.restoreAllCachedIcons(allowRepair: false)
+                let result = try await iconManager.restoreAllCachedIcons(
+                    allowRepair: false,
+                    source: .scheduled
+                )
 
                 await MainActor.run {
                     lastScheduledRestore = Date()
@@ -711,8 +888,26 @@ import os
                 }
 
                 showRestoreNotification()
+                DiagnosticsLogger.shared.log(
+                    .operation,
+                    phase: "scheduled_restore.completed",
+                    context: diagnosticsContext,
+                    durationMilliseconds: timer.elapsedMilliseconds,
+                    details: [
+                        "restored": String(result.restored),
+                        "skipped_not_installed": String(result.skippedNotInstalled),
+                        "failed": String(result.failed.count),
+                    ]
+                )
             } catch {
                 logger.error("Scheduled restore failed: \(error.localizedDescription)")
+                DiagnosticsLogger.shared.log(
+                    .failure,
+                    phase: "scheduled_restore.failed",
+                    context: diagnosticsContext,
+                    durationMilliseconds: timer.elapsedMilliseconds,
+                    details: DiagnosticsLogger.errorDetails(error)
+                )
                 handleBackgroundSetupFailure()
             }
         }
@@ -804,7 +999,8 @@ import os
             if try await iconManager.restoreCachedIcon(
                 for: app,
                 allowRepair: false,
-                refreshDock: false
+                refreshDock: false,
+                source: .appUpdate
             ) {
                 restored += 1
             }

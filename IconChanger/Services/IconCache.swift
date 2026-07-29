@@ -37,18 +37,59 @@ class IconCacheManager {
     }
 
     private func loadCache() {
-        if let data = UserDefaults.standard.data(forKey: cacheKey),
-           let decoded = try? JSONDecoder().decode([String: IconCache].self, from: data) {
+        let context = DiagnosticsContext(
+            operation: .cache,
+            source: .startup
+        )
+        guard let data = UserDefaults.standard.data(forKey: cacheKey) else {
+            DiagnosticsLogger.shared.log(
+                .skipped,
+                phase: "icon_cache_metadata.not_found",
+                context: context
+            )
+            return
+        }
+        do {
+            let decoded = try JSONDecoder().decode([String: IconCache].self, from: data)
             cachedIcons = decoded
+            DiagnosticsLogger.shared.log(
+                .operation,
+                phase: "icon_cache_metadata.loaded",
+                context: context,
+                details: ["entry_count": String(decoded.count)]
+            )
+        } catch {
+            DiagnosticsLogger.shared.log(
+                .failure,
+                phase: "icon_cache_metadata.decode_failed",
+                context: context,
+                details: DiagnosticsLogger.errorDetails(error)
+            )
         }
     }
 
     /// Must be called outside the lock. Pass a snapshot of cachedIcons.
     private func persistCache(_ snapshot: [String: IconCache]) {
+        let context = DiagnosticsContext(operation: .cache)
+        let timer = DiagnosticsTimer()
         do {
             try persistCacheOrThrow(snapshot)
+            DiagnosticsLogger.shared.log(
+                .performance,
+                phase: "icon_cache_metadata.persisted",
+                context: context,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: ["entry_count": String(snapshot.count)]
+            )
         } catch {
             logger.error("Failed to persist icon cache metadata: \(error.localizedDescription, privacy: .public)")
+            DiagnosticsLogger.shared.log(
+                .failure,
+                phase: "icon_cache_metadata.persist_failed",
+                context: context,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: DiagnosticsLogger.errorDetails(error)
+            )
         }
     }
 
@@ -60,8 +101,28 @@ class IconCacheManager {
     func cacheIcon(image: NSImage, for appPath: String, appName: String) throws -> URL {
         let iconFileName = "\(UUID().uuidString).png"
         let iconURL = Self.cacheDirectory.appendingPathComponent(iconFileName)
+        let context = DiagnosticsContext(
+            operation: .cache,
+            appName: appName,
+            appPath: appPath,
+            iconKind: "cached_normal",
+            iconPath: iconURL.path
+        )
+        let timer = DiagnosticsTimer()
+        DiagnosticsLogger.shared.log(
+            .operation,
+            phase: "icon_cache_write.start",
+            context: context
+        )
 
         if let saveError = IconManager.saveImage(image, atUrl: iconURL) {
+            DiagnosticsLogger.shared.log(
+                .failure,
+                phase: "icon_cache_write.failed",
+                context: context,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: DiagnosticsLogger.errorDetails(saveError)
+            )
             throw saveError
         }
 
@@ -80,6 +141,17 @@ class IconCacheManager {
             return cachedIcons
         }()
         persistCache(snapshot)
+
+        DiagnosticsLogger.shared.log(
+            .operation,
+            phase: "icon_cache_write.completed",
+            context: context,
+            durationMilliseconds: timer.elapsedMilliseconds,
+            details: [
+                "app_version": iconCache.appVersion ?? "unknown",
+                "entry_count": String(snapshot.count),
+            ]
+        )
 
         return iconURL
     }

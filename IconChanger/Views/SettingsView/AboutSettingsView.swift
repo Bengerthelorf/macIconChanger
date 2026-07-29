@@ -56,7 +56,7 @@ struct AboutSettingsView: View {
             Text("IconChanger")
                 .font(.title.bold())
 
-            Text(showDevUnlocked ? "Developer Options Enabled" : showCopied ? "Copied!" : "Version \(appVersion) (\(buildNumber))")
+            Text(showDevUnlocked ? "Developer Mode Enabled" : showCopied ? "Copied!" : "Version \(appVersion) (\(buildNumber))")
                 .foregroundColor(showDevUnlocked ? .accentColor : showCopied ? .green : .secondary)
                 .animation(.easeInOut, value: showDevUnlocked)
                 .animation(.easeInOut, value: showCopied)

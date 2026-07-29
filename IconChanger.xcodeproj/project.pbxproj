@@ -10,6 +10,7 @@
 		2F13C0752D93266500C645E9 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 2F13C0742D93266500C645E9 /* ArgumentParser */; };
 		2F13C0772D93267B00C645E9 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F13C0762D93267A00C645E9 /* AppKit.framework */; };
 		376160D092C6FA629ED2C69D /* AdvancedSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEB5BAFAAD3719C791F75836 /* AdvancedSettingsView.swift */; };
+		A50000DEVSET0002 /* DeveloperSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50000DEVSET0001 /* DeveloperSettingsView.swift */; };
 		A1B2C3D4E5F60718A9B0C1D3 /* DisplaySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718A9B0C1D2 /* DisplaySettingsView.swift */; };
 		98D43EF2688D11B308487318 /* AboutSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E72D958354FAE1A7C1859454 /* AboutSettingsView.swift */; };
 		2F13C0832D932EDD00C645E9 /* IconChangerCLI in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2F13C06C2D9325B100C645E9 /* IconChangerCLI */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -65,6 +66,7 @@
 		C6E571DA2EA2319C00EC9E5E /* IconImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6E571D92EA2319C00EC9E5E /* IconImageLoader.swift */; };
 		9E409D184D0BFA7ACC289C3A /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 322513C7E4692CC3A6193007 /* KeychainHelper.swift */; };
 		A20000APIKEY0002 /* APIKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000APIKEY0001 /* APIKeyManager.swift */; };
+		A40000DIAGLOG0002 /* DiagnosticsLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40000DIAGLOG0001 /* DiagnosticsLogger.swift */; };
 		A20000010311000100000001 /* IconHistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010311000200000001 /* IconHistoryManager.swift */; };
 		A20000010311000100000002 /* IconFavoriteManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010311000200000002 /* IconFavoriteManager.swift */; };
 		A20000010311000100000003 /* FavoriteImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000010311000200000003 /* FavoriteImageView.swift */; };
@@ -99,6 +101,7 @@
 		2F13C06C2D9325B100C645E9 /* IconChangerCLI */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = IconChangerCLI; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F13C0762D93267A00C645E9 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		AEB5BAFAAD3719C791F75836 /* AdvancedSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsView.swift; sourceTree = "<group>"; };
+		A50000DEVSET0001 /* DeveloperSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperSettingsView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718A9B0C1D2 /* DisplaySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplaySettingsView.swift; sourceTree = "<group>"; };
 		E72D958354FAE1A7C1859454 /* AboutSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutSettingsView.swift; sourceTree = "<group>"; };
 		2FC1315F2D8F7D7D00F60B19 /* CachedIconsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedIconsView.swift; sourceTree = "<group>"; };
@@ -155,6 +158,7 @@
 		C6E571D92EA2319C00EC9E5E /* IconImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconImageLoader.swift; sourceTree = "<group>"; };
 		322513C7E4692CC3A6193007 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		A20000APIKEY0001 /* APIKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIKeyManager.swift; sourceTree = "<group>"; };
+		A40000DIAGLOG0001 /* DiagnosticsLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsLogger.swift; sourceTree = "<group>"; };
 		A20000010311000200000001 /* IconHistoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconHistoryManager.swift; sourceTree = "<group>"; };
 		A20000010311000200000002 /* IconFavoriteManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconFavoriteManager.swift; sourceTree = "<group>"; };
 		A20000010311000200000003 /* FavoriteImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteImageView.swift; sourceTree = "<group>"; };
@@ -223,6 +227,7 @@
 				68431E71D50DCD6E570EC101 /* ApplicationSettingsView.swift */,
 				68431EB0D4F0448EC3F269CE /* ApplicationFolderSettingsView.swift */,
 				AEB5BAFAAD3719C791F75836 /* AdvancedSettingsView.swift */,
+				A50000DEVSET0001 /* DeveloperSettingsView.swift */,
 				A1B2C3D4E5F60718A9B0C1D2 /* DisplaySettingsView.swift */,
 				E72D958354FAE1A7C1859454 /* AboutSettingsView.swift */,
 			);
@@ -343,6 +348,7 @@
 				CBC059F97C128C0CF4CAC7D8 /* AppSettings.swift */,
 				322513C7E4692CC3A6193007 /* KeychainHelper.swift */,
 				A20000APIKEY0001 /* APIKeyManager.swift */,
+				A40000DIAGLOG0001 /* DiagnosticsLogger.swift */,
 				A20000PATH00001 /* AppPaths.swift */,
 			);
 			path = Utilities;
@@ -530,6 +536,7 @@
 				9053434F286B2A6800237F98 /* AutoUpdater.swift in Sources */,
 				D428FC81D231B8B76467CD43 /* ConfigCrypto.swift in Sources */,
 				1466242F19B3C04FD0C1CF1B /* AppSettings.swift in Sources */,
+				A40000DIAGLOG0002 /* DiagnosticsLogger.swift in Sources */,
 				908A79092819840D00951B15 /* ChangeView.swift in Sources */,
 				684314A1977FA2DF04BCD0F2 /* LocalImageView.swift in Sources */,
 				2FC131622D8F7DB000F60B19 /* IconCache.swift in Sources */,
@@ -541,6 +548,7 @@
 				68431F5F90EFAE60C30EF968 /* AliasNameCore.swift in Sources */,
 				684313DDC8758B6A23980300 /* PermissionRequest.swift in Sources */,
 				376160D092C6FA629ED2C69D /* AdvancedSettingsView.swift in Sources */,
+				A50000DEVSET0002 /* DeveloperSettingsView.swift in Sources */,
 				A1B2C3D4E5F60718A9B0C1D3 /* DisplaySettingsView.swift in Sources */,
 				98D43EF2688D11B308487318 /* AboutSettingsView.swift in Sources */,
 				C66396BF2F0EAD0C006729FC /* AppItem.swift in Sources */,

@@ -12,9 +12,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let backgroundService = BackgroundService.shared
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "IconChanger", category: "AppDelegate")
     private let lastKnownSetupReadyKey = "lastKnownSetupReady"
+    private let diagnosticsSessionContext = DiagnosticsContext(
+        operation: .setup,
+        source: .startup,
+        appName: "IconChanger",
+        appPath: Bundle.main.bundlePath
+    )
+    private let diagnosticsSessionTimer = DiagnosticsTimer()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         UNUserNotificationCenter.current().delegate = self
+        DiagnosticsLogger.shared.log(
+            .operation,
+            phase: "app_session.started",
+            context: diagnosticsSessionContext,
+            details: [
+                "system_os_version":
+                    ProcessInfo.processInfo.operatingSystemVersionString,
+                "system_app_version":
+                    Bundle.main.object(
+                        forInfoDictionaryKey: "CFBundleShortVersionString"
+                    ) as? String ?? "unknown",
+                "system_app_build":
+                    Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion")
+                    as? String ?? "unknown",
+                "background_enabled": String(backgroundService.runInBackground),
+            ]
+        )
 
         if backgroundService.runInBackground {
             backgroundService.startBackgroundService()
@@ -44,7 +68,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let defaults = UserDefaults.standard
         let previousReady = defaults.object(forKey: lastKnownSetupReadyKey) as? Bool
 
-        SetupMonitor.shared.check { [weak self] health in
+        SetupMonitor.shared.check(source: .startup) { [weak self] health in
             guard let self else { return }
             defaults.set(health == .ready, forKey: self.lastKnownSetupReadyKey)
 
@@ -86,6 +110,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        DiagnosticsLogger.shared.log(
+            .operation,
+            phase: "app_session.terminated_normally",
+            context: diagnosticsSessionContext,
+            durationMilliseconds: diagnosticsSessionTimer.elapsedMilliseconds
+        )
+        DiagnosticsLogger.shared.flush()
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {

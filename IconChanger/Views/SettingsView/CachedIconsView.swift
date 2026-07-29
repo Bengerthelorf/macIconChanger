@@ -365,7 +365,11 @@ struct CachedIconsView: View {
         }
         try await iconManager.setIconWithoutCaching(
             image,
-            app: try appItem(path: item.appPath, name: item.appName)
+            app: try appItem(path: item.appPath, name: item.appName),
+            diagnosticsOperation: .restore,
+            diagnosticsSource: .manual,
+            diagnosticsIconKind: "appearance_\(appearance.rawValue)",
+            diagnosticsIconPath: iconURL.path
         )
         AppearanceIconStore.shared.markApplied(appearance, for: item.appPath)
     }

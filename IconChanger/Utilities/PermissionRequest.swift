@@ -47,6 +47,18 @@ class FolderPermission: ObservableObject {
     }
 
     private func restoreBookmarks() {
+        let diagnosticsContext = DiagnosticsContext(
+            operation: .permission,
+            source: .startup
+        )
+        let timer = DiagnosticsTimer()
+        let storedBookmarkCount = bookmarks.count
+        DiagnosticsLogger.shared.log(
+            .operation,
+            phase: "folder_bookmarks_restore.start",
+            context: diagnosticsContext,
+            details: ["stored_count": String(storedBookmarkCount)]
+        )
         var validPermissions: [PermissionList] = []
         var validBookmarks: [String: Data] = [:]
         
@@ -64,20 +76,71 @@ class FolderPermission: ObservableObject {
                         let newData = try createBookmark(from: url)
                         validBookmarks[urlString] = newData
                         validPermissions.append(PermissionList(bookmarkedURL: url, originalURLString: urlString))
+                        DiagnosticsLogger.shared.log(
+                            .step,
+                            phase: "folder_bookmark.refreshed_stale",
+                            context: DiagnosticsContext(
+                                operation: .permission,
+                                operationID: diagnosticsContext.operationID,
+                                source: .startup,
+                                appName: url.lastPathComponent,
+                                appPath: url.path
+                            )
+                        )
+                    } else {
+                        DiagnosticsLogger.shared.log(
+                            .failure,
+                            phase: "folder_bookmark.security_scope_denied",
+                            context: DiagnosticsContext(
+                                operation: .permission,
+                                operationID: diagnosticsContext.operationID,
+                                source: .startup,
+                                appName: url.lastPathComponent,
+                                appPath: url.path
+                            )
+                        )
                     }
                 } else {
                     if url.startAccessingSecurityScopedResource() {
                         validBookmarks[urlString] = data
                         validPermissions.append(PermissionList(bookmarkedURL: url, originalURLString: urlString))
+                    } else {
+                        DiagnosticsLogger.shared.log(
+                            .failure,
+                            phase: "folder_bookmark.security_scope_denied",
+                            context: DiagnosticsContext(
+                                operation: .permission,
+                                operationID: diagnosticsContext.operationID,
+                                source: .startup,
+                                appName: url.lastPathComponent,
+                                appPath: url.path
+                            )
+                        )
                     }
                 }
             } catch {
                 logger.error("Error restoring bookmark for \(urlString): \(error.localizedDescription)")
+                DiagnosticsLogger.shared.log(
+                    .failure,
+                    phase: "folder_bookmark.restore_failed",
+                    context: diagnosticsContext,
+                    details: DiagnosticsLogger.errorDetails(error)
+                )
             }
         }
         
         self.bookmarks = validBookmarks
         self.permissions = validPermissions
+        DiagnosticsLogger.shared.log(
+            .operation,
+            phase: "folder_bookmarks_restore.completed",
+            context: diagnosticsContext,
+            durationMilliseconds: timer.elapsedMilliseconds,
+            details: [
+                "valid_count": String(validPermissions.count),
+                "discarded_count": String(max(0, storedBookmarkCount - validPermissions.count)),
+            ]
+        )
     }
 
     func add() {
@@ -90,6 +153,12 @@ class FolderPermission: ObservableObject {
         openPanel.begin { (result) in
             if result == .OK, let url = openPanel.url {
                 self.addBookmark(url)
+            } else {
+                DiagnosticsLogger.shared.log(
+                    .skipped,
+                    phase: "folder_permission_picker.cancelled",
+                    context: DiagnosticsContext(operation: .permission)
+                )
             }
         }
     }
@@ -99,6 +168,15 @@ class FolderPermission: ObservableObject {
         
         // Check if already exists
         if permissions.contains(where: { $0.originalURLString == urlString }) {
+            DiagnosticsLogger.shared.log(
+                .skipped,
+                phase: "folder_bookmark.already_exists",
+                context: DiagnosticsContext(
+                    operation: .permission,
+                    appName: url.lastPathComponent,
+                    appPath: url.path
+                )
+            )
             return
         }
         
@@ -112,8 +190,27 @@ class FolderPermission: ObservableObject {
             
             objectWillChange.send()
             IconManager.shared.refresh()
+            DiagnosticsLogger.shared.log(
+                .operation,
+                phase: "folder_bookmark.added",
+                context: DiagnosticsContext(
+                    operation: .permission,
+                    appName: url.lastPathComponent,
+                    appPath: url.path
+                )
+            )
         } catch {
             logger.error("Error creating bookmark for \(urlString): \(error.localizedDescription)")
+            DiagnosticsLogger.shared.log(
+                .failure,
+                phase: "folder_bookmark.add_failed",
+                context: DiagnosticsContext(
+                    operation: .permission,
+                    appName: url.lastPathComponent,
+                    appPath: url.path
+                ),
+                details: DiagnosticsLogger.errorDetails(error)
+            )
         }
     }
     
@@ -129,6 +226,15 @@ class FolderPermission: ObservableObject {
         
         permission.bookmarkedURL.stopAccessingSecurityScopedResource()
         IconManager.shared.refresh()
+        DiagnosticsLogger.shared.log(
+            .operation,
+            phase: "folder_bookmark.removed",
+            context: DiagnosticsContext(
+                operation: .permission,
+                appName: permission.bookmarkedURL.lastPathComponent,
+                appPath: permission.path
+            )
+        )
     }
 
     func createBookmark(from url: URL) throws -> Data {

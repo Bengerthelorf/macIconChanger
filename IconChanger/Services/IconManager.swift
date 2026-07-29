@@ -21,6 +21,7 @@ enum SetupStatus {
 class IconManager: ObservableObject {
     static let shared = IconManager()
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "IconChanger", category: "IconManager")
+    private let diagnostics = DiagnosticsLogger.shared
     
     @Published var icons = [(String, String)]()
     @Published var apps: [AppItem] = []
@@ -95,18 +96,45 @@ class IconManager: ObservableObject {
     }
     
     func loadAppItems() -> [AppItem] {
+        let diagnosticsContext = DiagnosticsContext(
+            operation: .discovery,
+            source: .system
+        )
+        let timer = DiagnosticsTimer()
+        diagnostics.log(
+            .operation,
+            phase: "app_discovery.start",
+            context: diagnosticsContext,
+            details: [
+                "folder_permission_count": String(FolderPermission.shared.permissions.count)
+            ]
+        )
         var allApps: [AppItem] = []
+        var launchpadCount = 0
 
         do {
             let helper = try LaunchPadManagerDBHelper()
             let dbApps = try helper.getAllAppInfos()
             let dbAppItems = dbApps.map { AppItem(name: $0.name, url: $0.url, originalAppInfo: $0) }
             allApps.append(contentsOf: dbAppItems)
+            launchpadCount = dbAppItems.count
+            diagnostics.log(
+                .step,
+                phase: "app_discovery.launchpad_loaded",
+                context: diagnosticsContext,
+                details: ["count": String(launchpadCount)]
+            )
         } catch {
             logger.error("Error fetching LaunchPad apps: \(error.localizedDescription)")
+            diagnostics.log(
+                .failure,
+                phase: "app_discovery.launchpad_failed",
+                context: diagnosticsContext,
+                details: DiagnosticsLogger.errorDetails(error)
+            )
         }
         
-        let localApps = scanLocalApps()
+        let localApps = scanLocalApps(diagnosticsContext: diagnosticsContext)
 
         let existingPaths = Set(allApps.map { $0.id })
         for localApp in localApps {
@@ -115,10 +143,26 @@ class IconManager: ObservableObject {
             }
         }
         
-        return allApps.sorted(by: { $0.name.localizedStandardCompare($1.name) == .orderedAscending })
+        let result = allApps.sorted(by: {
+            $0.name.localizedStandardCompare($1.name) == .orderedAscending
+        })
+        diagnostics.log(
+            .operation,
+            phase: "app_discovery.completed",
+            context: diagnosticsContext,
+            durationMilliseconds: timer.elapsedMilliseconds,
+            details: [
+                "launchpad_count": String(launchpadCount),
+                "folder_scan_count": String(localApps.count),
+                "combined_count": String(result.count),
+            ]
+        )
+        return result
     }
     
-    func scanLocalApps() -> [AppItem] {
+    func scanLocalApps(
+        diagnosticsContext: DiagnosticsContext? = nil
+    ) -> [AppItem] {
         let fileManager = FileManager.default
         var appItems = [AppItem]()
         
@@ -132,6 +176,19 @@ class IconManager: ObservableObject {
                 includingPropertiesForKeys: [.isDirectoryKey],
                 options: [.skipsHiddenFiles, .skipsPackageDescendants]
             ) else {
+                if let diagnosticsContext {
+                    diagnostics.log(
+                        .failure,
+                        phase: "app_discovery.folder_enumerator_failed",
+                        context: DiagnosticsContext(
+                            operation: .discovery,
+                            operationID: diagnosticsContext.operationID,
+                            source: diagnosticsContext.source,
+                            appName: dir.lastPathComponent,
+                            appPath: dir.path
+                        )
+                    )
+                }
                 continue
             }
             
@@ -148,17 +205,48 @@ class IconManager: ObservableObject {
                 }
             }
         }
+
+        if let diagnosticsContext {
+            diagnostics.log(
+                .step,
+                phase: "app_discovery.folder_scan_completed",
+                context: diagnosticsContext,
+                details: [
+                    "folder_count": String(permissions.count),
+                    "app_count": String(appItems.count),
+                ]
+            )
+        }
         
         return appItems
     }
     
     func ensureHelperFilesCopied() {
+        let diagnosticsContext = DiagnosticsContext(operation: .setup)
+        let timer = DiagnosticsTimer()
+        diagnostics.log(
+            .operation,
+            phase: "helper_install_check.start",
+            context: diagnosticsContext
+        )
         guard let fileiconBundlePath = Bundle.main.path(forResource: "fileicon", ofType: nil) else {
             logger.error("Cannot find 'fileicon' in bundle.")
+            diagnostics.log(
+                .failure,
+                phase: "helper_install_check.bundled_fileicon_missing",
+                context: diagnosticsContext,
+                durationMilliseconds: timer.elapsedMilliseconds
+            )
             return
         }
         guard let helperBundlePath = Bundle.main.path(forResource: "helper", ofType: "sh") else {
             logger.error("Cannot find 'helper.sh' in bundle.")
+            diagnostics.log(
+                .failure,
+                phase: "helper_install_check.bundled_helper_missing",
+                context: diagnosticsContext,
+                durationMilliseconds: timer.elapsedMilliseconds
+            )
             return
         }
 
@@ -168,6 +256,12 @@ class IconManager: ObservableObject {
 
         if verifyHelperIntegrity() {
             logger.debug("Helper files are up to date, skipping install.")
+            diagnostics.log(
+                .skipped,
+                phase: "helper_install_check.already_current",
+                context: diagnosticsContext,
+                durationMilliseconds: timer.elapsedMilliseconds
+            )
             return
         }
 
@@ -199,15 +293,38 @@ class IconManager: ObservableObject {
             task.waitUntilExit()
         } catch {
             logger.error("Failed to launch osascript for helper install: \(error.localizedDescription)")
+            diagnostics.log(
+                .failure,
+                phase: "helper_install.launch_failed",
+                context: diagnosticsContext,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: DiagnosticsLogger.errorDetails(error)
+            )
             return
         }
 
         if task.terminationStatus != 0 {
             let errMsg = String(data: errPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
             logger.error("Helper file install failed (status \(task.terminationStatus)): \(errMsg)")
+            diagnostics.log(
+                .failure,
+                phase: "helper_install.failed",
+                context: diagnosticsContext,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: [
+                    "exit_status": String(task.terminationStatus),
+                    "process_stderr": errMsg,
+                ]
+            )
         } else {
             logger.log("Helper files installed successfully at \(helperDir).")
             cleanupLegacyHelperFiles()
+            diagnostics.log(
+                .operation,
+                phase: "helper_install.completed",
+                context: diagnosticsContext,
+                durationMilliseconds: timer.elapsedMilliseconds
+            )
         }
     }
 
@@ -319,35 +436,88 @@ class IconManager: ObservableObject {
         }
     }
 
-    private func applyIcon(_ image: NSImage, to app: AppItem) throws {
+    private func applyIcon(
+        _ image: NSImage,
+        to app: AppItem,
+        diagnosticsContext: DiagnosticsContext
+    ) throws {
         let tempDir = FileManager.default.temporaryDirectory
         let imageURL = tempDir.appendingPathComponent("icon_\(UUID().uuidString).png")
+        let encodeTimer = DiagnosticsTimer()
 
+        diagnostics.log(
+            .step,
+            phase: "image_encode.start",
+            context: diagnosticsContext
+        )
         if let saveError = Self.saveImage(image, atUrl: imageURL) {
+            diagnostics.log(
+                .failure,
+                phase: "image_encode.failed",
+                context: diagnosticsContext,
+                durationMilliseconds: encodeTimer.elapsedMilliseconds,
+                details: DiagnosticsLogger.errorDetails(saveError)
+            )
             throw saveError
         }
+        diagnostics.log(
+            .performance,
+            phase: "image_encode.finish",
+            context: diagnosticsContext,
+            durationMilliseconds: encodeTimer.elapsedMilliseconds
+        )
         defer { try? FileManager.default.removeItem(at: imageURL) }
 
-        try runHelperTool(appPath: app.url.universalPath(), imagePath: imageURL.path)
+        try runHelperTool(
+            appPath: app.url.universalPath(),
+            imagePath: imageURL.path,
+            diagnosticsContext: diagnosticsContext
+        )
     }
 
     func removeIcon(from app: AppItem) throws {
         let appPath = app.url.universalPath()
+        let context = DiagnosticsContext(
+            operation: .remove,
+            appName: app.name,
+            appPath: appPath
+        )
+        let timer = DiagnosticsTimer()
         logger.log("removeIcon called for app: \(app.name) at \(appPath)")
+        diagnostics.log(.operation, phase: "remove.start", context: context)
 
-        try ensureSetupCompleted()
-        try runHelperRemove(appPath: appPath)
+        do {
+            diagnostics.log(.step, phase: "setup_check.start", context: context)
+            try ensureSetupCompleted()
+            diagnostics.log(.step, phase: "setup_check.finish", context: context)
+            try runHelperRemove(appPath: appPath, diagnosticsContext: context)
 
-        IconCacheManager.shared.removeCachedIcon(for: appPath)
-        AppearanceIconStore.shared.removeConfiguration(for: appPath)
+            IconCacheManager.shared.removeCachedIcon(for: appPath)
+            AppearanceIconStore.shared.removeConfiguration(for: appPath)
 
-        Task { @MainActor in
-            AppIconCache.shared.remove(for: app.url)
-            self.iconRefreshTrigger = UUID()
+            Task { @MainActor in
+                AppIconCache.shared.remove(for: app.url)
+                self.iconRefreshTrigger = UUID()
+            }
+
+            auditLog(operation: "remove_icon", appName: app.name, appPath: appPath)
+            diagnostics.log(
+                .operation,
+                phase: "remove.completed",
+                context: context,
+                durationMilliseconds: timer.elapsedMilliseconds
+            )
+            logger.log("Icon restored to default for \(app.name)")
+        } catch {
+            diagnostics.log(
+                .failure,
+                phase: "remove.failed",
+                context: context,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: DiagnosticsLogger.errorDetails(error)
+            )
+            throw error
         }
-
-        auditLog(operation: "remove_icon", appName: app.name, appPath: appPath)
-        logger.log("Icon restored to default for \(app.name)")
     }
 
     func setImage(
@@ -355,43 +525,141 @@ class IconManager: ObservableObject {
         app: AppItem,
         source: IconApplicationSource = .local
     ) throws {
+        let appPath = app.url.universalPath()
+        let sourceName: String
+        switch source {
+        case .local: sourceName = "local"
+        case .remote: sourceName = "remote"
+        case .favorite: sourceName = "favorite"
+        case .history: sourceName = "history"
+        }
+        let context = DiagnosticsContext(
+            operation: .replace,
+            appName: app.name,
+            appPath: appPath,
+            iconKind: sourceName
+        )
+        let timer = DiagnosticsTimer()
         logger.log("setImage called for app: \(app.name)")
+        diagnostics.log(.operation, phase: "replace.start", context: context)
 
-        _ = try IconCacheManager.shared.cacheIcon(image: image, for: app.url.universalPath(), appName: app.name)
-        logger.log("Icon cached for \(app.name)")
-
-        try ensureSetupCompleted()
-        try applyIcon(image, to: app)
-
-        auditLog(operation: "set_icon", appName: app.name, appPath: app.url.universalPath())
-
-        if IconApplicationPolicy.shouldRecordHistory(source: source) {
-            IconHistoryManager.shared.addEntry(
+        do {
+            let cacheTimer = DiagnosticsTimer()
+            diagnostics.log(.step, phase: "cache_write.start", context: context)
+            _ = try IconCacheManager.shared.cacheIcon(
                 image: image,
-                for: app.url.universalPath(),
+                for: appPath,
                 appName: app.name
             )
-        }
+            diagnostics.log(
+                .performance,
+                phase: "cache_write.finish",
+                context: context,
+                durationMilliseconds: cacheTimer.elapsedMilliseconds
+            )
+            logger.log("Icon cached for \(app.name)")
 
-        Task { @MainActor in
-            AppIconCache.shared.remove(for: app.url)
-            self.iconRefreshTrigger = UUID()
+            diagnostics.log(.step, phase: "setup_check.start", context: context)
+            try ensureSetupCompleted()
+            diagnostics.log(.step, phase: "setup_check.finish", context: context)
+            try applyIcon(image, to: app, diagnosticsContext: context)
+
+            auditLog(operation: "set_icon", appName: app.name, appPath: appPath)
+
+            if IconApplicationPolicy.shouldRecordHistory(source: source) {
+                diagnostics.log(.step, phase: "history_write.start", context: context)
+                IconHistoryManager.shared.addEntry(
+                    image: image,
+                    for: appPath,
+                    appName: app.name
+                )
+                diagnostics.log(.step, phase: "history_write.finish", context: context)
+            }
+
+            Task { @MainActor in
+                AppIconCache.shared.remove(for: app.url)
+                self.iconRefreshTrigger = UUID()
+            }
+            diagnostics.log(
+                .operation,
+                phase: "replace.completed",
+                context: context,
+                durationMilliseconds: timer.elapsedMilliseconds
+            )
+        } catch {
+            diagnostics.log(
+                .failure,
+                phase: "replace.failed",
+                context: context,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: DiagnosticsLogger.errorDetails(error)
+            )
+            throw error
         }
     }
 
     func setIconWithoutCaching(
         _ image: NSImage,
         app: AppItem,
-        allowRepair: Bool = true
+        allowRepair: Bool = true,
+        diagnosticsOperation: DiagnosticsOperation = .restore,
+        diagnosticsSource: DiagnosticsSource = .manual,
+        diagnosticsIconKind: String? = nil,
+        diagnosticsIconPath: String? = nil,
+        diagnosticsBatchID: UUID? = nil
     ) async throws {
+        let context = DiagnosticsContext(
+            operation: diagnosticsOperation,
+            batchID: diagnosticsBatchID,
+            source: diagnosticsSource,
+            appName: app.name,
+            appPath: app.url.universalPath(),
+            iconKind: diagnosticsIconKind,
+            iconPath: diagnosticsIconPath
+        )
+        let timer = DiagnosticsTimer()
         logger.log("setIconWithoutCaching called for app: \(app.name)")
+        diagnostics.log(
+            .operation,
+            phase: "\(diagnosticsOperation.rawValue).start",
+            context: context
+        )
 
-        try ensureSetupCompleted(allowRepair: allowRepair)
-        try applyIcon(image, to: app)
+        do {
+            diagnostics.log(.step, phase: "setup_check.start", context: context)
+            try ensureSetupCompleted(allowRepair: allowRepair)
+            diagnostics.log(.step, phase: "setup_check.finish", context: context)
+            try applyIcon(image, to: app, diagnosticsContext: context)
 
-        await MainActor.run {
-            AppIconCache.shared.remove(for: app.url)
-            self.iconRefreshTrigger = UUID()
+            await MainActor.run {
+                AppIconCache.shared.remove(for: app.url)
+                self.iconRefreshTrigger = UUID()
+            }
+
+            let auditOperation = diagnosticsOperation == .appearance
+                ? "appearance_switch"
+                : "restore_icon"
+            auditLog(
+                operation: auditOperation,
+                appName: app.name,
+                appPath: app.url.universalPath(),
+                detail: diagnosticsIconKind.map { "icon_kind=\($0)" } ?? ""
+            )
+            diagnostics.log(
+                .operation,
+                phase: "\(diagnosticsOperation.rawValue).completed",
+                context: context,
+                durationMilliseconds: timer.elapsedMilliseconds
+            )
+        } catch {
+            diagnostics.log(
+                .failure,
+                phase: "\(diagnosticsOperation.rawValue).failed",
+                context: context,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: DiagnosticsLogger.errorDetails(error)
+            )
+            throw error
         }
     }
 
@@ -405,19 +673,94 @@ class IconManager: ObservableObject {
     func restoreCachedIcon(
         for app: AppItem,
         allowRepair: Bool = true,
-        refreshDock: Bool = true
+        refreshDock: Bool = true,
+        source: DiagnosticsSource = .manual
     ) async throws -> Bool {
-        try ensureSetupCompleted(allowRepair: allowRepair)
-        let restored = try applyBestCachedIcon(for: app)
-        if restored, refreshDock {
-            _ = await DockRefreshService.refreshTwice()
+        let context = DiagnosticsContext(
+            operation: .restore,
+            source: source,
+            appName: app.name,
+            appPath: app.url.universalPath()
+        )
+        let timer = DiagnosticsTimer()
+        diagnostics.log(.operation, phase: "restore.start", context: context)
+
+        do {
+            diagnostics.log(.step, phase: "setup_check.start", context: context)
+            try ensureSetupCompleted(allowRepair: allowRepair)
+            diagnostics.log(.step, phase: "setup_check.finish", context: context)
+            guard
+                let restoredContext = try applyBestCachedIcon(
+                    for: app,
+                    diagnosticsContext: context
+                )
+            else {
+                diagnostics.log(
+                    .skipped,
+                    phase: "restore.no_eligible_icon",
+                    context: context,
+                    durationMilliseconds: timer.elapsedMilliseconds
+                )
+                return false
+            }
+            if refreshDock {
+                _ = await DockRefreshService.refreshTwice(
+                    diagnosticsContext: restoredContext
+                )
+            }
+            auditLog(
+                operation: "restore_icon",
+                appName: app.name,
+                appPath: app.url.universalPath(),
+                detail: restoredContext.iconKind.map { "icon_kind=\($0)" } ?? ""
+            )
+            diagnostics.log(
+                .operation,
+                phase: "restore.completed",
+                context: restoredContext,
+                durationMilliseconds: timer.elapsedMilliseconds
+            )
+            return true
+        } catch {
+            diagnostics.log(
+                .failure,
+                phase: "restore.failed",
+                context: context,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: DiagnosticsLogger.errorDetails(error)
+            )
+            throw error
         }
-        return restored
     }
 
-    func restoreAllCachedIcons(allowRepair: Bool = true) async throws -> RestoreResult {
+    func restoreAllCachedIcons(
+        allowRepair: Bool = true,
+        source: DiagnosticsSource = .manual
+    ) async throws -> RestoreResult {
+        let batchID = UUID()
+        let batchContext = DiagnosticsContext(
+            operation: .restore,
+            batchID: batchID,
+            source: source
+        )
+        let batchTimer = DiagnosticsTimer()
         logger.log("Starting restoreAllCachedIcons...")
-        try ensureSetupCompleted(allowRepair: allowRepair)
+        diagnostics.log(.operation, phase: "restore_batch.start", context: batchContext)
+
+        do {
+            diagnostics.log(.step, phase: "setup_check.start", context: batchContext)
+            try ensureSetupCompleted(allowRepair: allowRepair)
+            diagnostics.log(.step, phase: "setup_check.finish", context: batchContext)
+        } catch {
+            diagnostics.log(
+                .failure,
+                phase: "restore_batch.setup_failed",
+                context: batchContext,
+                durationMilliseconds: batchTimer.elapsedMilliseconds,
+                details: DiagnosticsLogger.errorDetails(error)
+            )
+            throw error
+        }
 
         let cachedIcons = IconCacheManager.shared.getAllCachedIcons()
         let appearanceConfigurations = AppearanceIconStore.shared.getAllConfigurations()
@@ -442,9 +785,25 @@ class IconManager: ObservableObject {
                 restoringAppName = appName
             }
 
+            let appContext = DiagnosticsContext(
+                operation: .restore,
+                batchID: batchID,
+                source: source,
+                appName: appName,
+                appPath: appPath
+            )
+            let appTimer = DiagnosticsTimer()
+            diagnostics.log(.operation, phase: "restore.start", context: appContext)
+
             do {
                 guard FileManager.default.fileExists(atPath: appPath) else {
                     result.skippedNotInstalled += 1
+                    diagnostics.log(
+                        .skipped,
+                        phase: "restore.app_not_installed",
+                        context: appContext,
+                        durationMilliseconds: appTimer.elapsedMilliseconds
+                    )
                     continue
                 }
                 let app = AppItem(
@@ -452,17 +811,48 @@ class IconManager: ObservableObject {
                     url: URL(fileURLWithPath: appPath),
                     originalAppInfo: nil
                 )
-                if try applyBestCachedIcon(for: app) {
+                if let restoredContext = try applyBestCachedIcon(
+                    for: app,
+                    diagnosticsContext: appContext
+                ) {
                     result.restored += 1
+                    auditLog(
+                        operation: "restore_icon",
+                        appName: appName,
+                        appPath: appPath,
+                        detail: restoredContext.iconKind.map { "icon_kind=\($0)" } ?? ""
+                    )
+                    diagnostics.log(
+                        .operation,
+                        phase: "restore.completed",
+                        context: restoredContext,
+                        durationMilliseconds: appTimer.elapsedMilliseconds
+                    )
+                } else {
+                    diagnostics.log(
+                        .skipped,
+                        phase: "restore.no_eligible_icon",
+                        context: appContext,
+                        durationMilliseconds: appTimer.elapsedMilliseconds
+                    )
                 }
             } catch {
                 logger.error("Failed to restore icon for \(appName): \(error.localizedDescription)")
                 result.failed.append((appName, error))
+                diagnostics.log(
+                    .failure,
+                    phase: "restore.failed",
+                    context: appContext,
+                    durationMilliseconds: appTimer.elapsedMilliseconds,
+                    details: DiagnosticsLogger.errorDetails(error)
+                )
             }
         }
 
         if result.restored > 0 {
-            _ = await DockRefreshService.refreshTwice()
+            _ = await DockRefreshService.refreshTwice(
+                diagnosticsContext: batchContext
+            )
         }
 
         await MainActor.run {
@@ -473,10 +863,28 @@ class IconManager: ObservableObject {
             iconRefreshTrigger = UUID()
         }
 
+        diagnostics.log(
+            .operation,
+            phase: "restore_batch.completed",
+            context: batchContext,
+            durationMilliseconds: batchTimer.elapsedMilliseconds,
+            details: [
+                "restored": String(result.restored),
+                "skipped": String(
+                    max(0, allPaths.count - result.restored - result.failed.count)
+                ),
+                "skipped_not_installed": String(result.skippedNotInstalled),
+                "failed": String(result.failed.count),
+                "total": String(allPaths.count),
+            ]
+        )
         return result
     }
 
-    private func applyBestCachedIcon(for app: AppItem) throws -> Bool {
+    private func applyBestCachedIcon(
+        for app: AppItem,
+        diagnosticsContext: DiagnosticsContext
+    ) throws -> DiagnosticsContext? {
         let appPath = app.url.universalPath()
         let cache = IconCacheManager.shared.getIconCache(for: appPath)
         let normalURL = cache.map {
@@ -514,24 +922,54 @@ class IconManager: ObservableObject {
             ), let image = NSImage(contentsOf: iconURL) else {
                 throw RestoreError.iconFileNotFound(app.name)
             }
-            try applyIcon(image, to: app)
+            let restoredContext = diagnosticsContext.withIcon(
+                kind: "appearance_\(appearance.rawValue)",
+                path: iconURL.path
+            )
+            diagnostics.log(
+                .step,
+                phase: "restore.icon_selected",
+                context: restoredContext
+            )
+            try applyIcon(
+                image,
+                to: app,
+                diagnosticsContext: restoredContext
+            )
             AppearanceIconStore.shared.markApplied(appearance, for: appPath)
+            Task { @MainActor in
+                AppIconCache.shared.remove(for: app.url)
+                self.iconRefreshTrigger = UUID()
+            }
+            return restoredContext
         case .normal:
             guard let normalURL, let image = NSImage(contentsOf: normalURL) else {
                 throw RestoreError.iconFileNotFound(app.name)
             }
-            try applyIcon(image, to: app)
+            let restoredContext = diagnosticsContext.withIcon(
+                kind: "cached_normal",
+                path: normalURL.path
+            )
+            diagnostics.log(
+                .step,
+                phase: "restore.icon_selected",
+                context: restoredContext
+            )
+            try applyIcon(
+                image,
+                to: app,
+                diagnosticsContext: restoredContext
+            )
             IconCacheManager.shared.updateTimestamp(for: appPath)
             AppearanceIconStore.shared.resetAppliedAppearance(for: appPath)
+            Task { @MainActor in
+                AppIconCache.shared.remove(for: app.url)
+                self.iconRefreshTrigger = UUID()
+            }
+            return restoredContext
         case .none:
-            return false
+            return nil
         }
-
-        Task { @MainActor in
-            AppIconCache.shared.remove(for: app.url)
-            self.iconRefreshTrigger = UUID()
-        }
-        return true
     }
     
     func getIconInPath(_ url: URL) -> [URL] {
@@ -598,9 +1036,20 @@ class IconManager: ObservableObject {
                           userInfo: [NSLocalizedDescriptionKey: "Could not find the bundled icon for \(app.name)."])
         }
 
+        let context = DiagnosticsContext(
+            operation: .replace,
+            appName: app.name,
+            appPath: app.url.universalPath(),
+            iconKind: "bundled_icon",
+            iconPath: iconURL.path
+        )
         try ensureSetupCompleted()
         // Pass the .icns file directly to fileicon to preserve all resolutions
-        try runHelperTool(appPath: app.url.universalPath(), imagePath: iconURL.path)
+        try runHelperTool(
+            appPath: app.url.universalPath(),
+            imagePath: iconURL.path,
+            diagnosticsContext: context
+        )
 
         auditLog(operation: "escape_squircle", appName: app.name, appPath: app.url.universalPath())
         logger.log("Escaped squircle jail for \(app.name)")
@@ -750,28 +1199,47 @@ class IconManager: ObservableObject {
         return (plist?["CFBundleDisplayName"] as? String) ?? (plist?["CFBundleName"] as? String)
     }
     
-    func runHelperTool(appPath: String, imagePath: String) throws {
+    func runHelperTool(
+        appPath: String,
+        imagePath: String,
+        diagnosticsContext: DiagnosticsContext? = nil
+    ) throws {
+        let context =
+            diagnosticsContext
+            ?? DiagnosticsContext(
+                operation: .replace,
+                appPath: appPath,
+                iconKind: "file",
+                iconPath: imagePath
+            )
         try runHelper(
             arguments: [fileiconURL.path, appPath, imagePath],
             operation: "set",
-            appPath: appPath
+            appPath: appPath,
+            diagnosticsContext: context
         )
     }
 
-    private func runHelperRemove(appPath: String) throws {
+    private func runHelperRemove(
+        appPath: String,
+        diagnosticsContext: DiagnosticsContext
+    ) throws {
         try runHelper(
             arguments: ["--remove", fileiconURL.path, appPath],
             operation: "remove",
-            appPath: appPath
+            appPath: appPath,
+            diagnosticsContext: diagnosticsContext
         )
     }
 
     private func runHelper(
         arguments: [String],
         operation: String,
-        appPath: String
+        appPath: String,
+        diagnosticsContext: DiagnosticsContext
     ) throws {
         let helperToolPath = self.helperScriptURL.path
+        let helperTimer = DiagnosticsTimer()
 
         let task = Process()
         let outPipe = Pipe()
@@ -785,6 +1253,30 @@ class IconManager: ObservableObject {
 
         logger.debug(
             "Executing privileged icon \(operation, privacy: .public) for \(appPath, privacy: .private)"
+        )
+        let targetURL = URL(fileURLWithPath: appPath)
+        let resourceValues = try? targetURL.resourceValues(
+            forKeys: [.volumeIsInternalKey, .isWritableKey]
+        )
+        let targetRunning = NSWorkspace.shared.runningApplications.contains {
+            $0.bundleURL?.standardizedFileURL.path
+                == targetURL.standardizedFileURL.path
+        }
+        diagnostics.log(
+            .step,
+            phase: "helper.start",
+            context: diagnosticsContext,
+            details: [
+                "mode": operation,
+                "target_exists": String(
+                    FileManager.default.fileExists(atPath: appPath)
+                ),
+                "target_running": String(targetRunning),
+                "target_user_writable": String(resourceValues?.isWritable ?? false),
+                "target_volume_internal": String(
+                    resourceValues?.volumeIsInternal ?? false
+                ),
+            ]
         )
 
         // Read pipes concurrently to avoid deadlock when buffers fill up
@@ -813,6 +1305,13 @@ class IconManager: ObservableObject {
         do {
             try task.run()
         } catch {
+            diagnostics.log(
+                .failure,
+                phase: "helper.launch_failed",
+                context: diagnosticsContext,
+                durationMilliseconds: helperTimer.elapsedMilliseconds,
+                details: DiagnosticsLogger.errorDetails(error)
+            )
             throw NSError(domain: "IconManager", code: 15,
                           userInfo: [NSLocalizedDescriptionKey: "Failed to start helper tool process: \(error.localizedDescription)"])
         }
@@ -828,11 +1327,28 @@ class IconManager: ObservableObject {
         let errorOutput = String(data: errorData, encoding: .utf8) ?? ""
 
         if timedOut {
+            diagnostics.log(
+                .failure,
+                phase: "helper.timed_out",
+                context: diagnosticsContext,
+                durationMilliseconds: helperTimer.elapsedMilliseconds
+            )
             throw NSError(domain: "IconManager", code: 14,
                           userInfo: [NSLocalizedDescriptionKey: "Helper tool timed out"])
         }
 
         if task.terminationStatus != 0 {
+            diagnostics.log(
+                .failure,
+                phase: "helper.failed",
+                context: diagnosticsContext,
+                durationMilliseconds: helperTimer.elapsedMilliseconds,
+                details: [
+                    "exit_status": String(task.terminationStatus),
+                    "process_stdout": output,
+                    "process_stderr": errorOutput,
+                ]
+            )
             let combined = "Stdout:\n\(output)\nStderr:\n\(errorOutput)".trimmingCharacters(in: .whitespacesAndNewlines)
             throw NSError(domain: "IconManager", code: 10,
                           userInfo: [NSLocalizedDescriptionKey: "Helper tool failed (status: \(task.terminationStatus)): \(combined.isEmpty ? "No output" : combined)"])
@@ -840,9 +1356,44 @@ class IconManager: ObservableObject {
 
         let combinedLower = (output + errorOutput).lowercased()
         if combinedLower.contains("incorrect password") || combinedLower.contains("try again") {
+            diagnostics.log(
+                .failure,
+                phase: "helper.unexpected_password_prompt",
+                context: diagnosticsContext,
+                durationMilliseconds: helperTimer.elapsedMilliseconds
+            )
             throw NSError(domain: "IconManager", code: 16,
                           userInfo: [NSLocalizedDescriptionKey: "Helper tool unexpectedly asked for a password: \(output)\(errorOutput)"])
         }
+
+        let app = AppItem(
+            name: diagnosticsContext.appName ?? targetURL.deletingPathExtension().lastPathComponent,
+            url: targetURL,
+            originalAppInfo: nil
+        )
+        let customIconPresent = hasCustomIcon(app: app)
+        let postconditionSatisfied =
+            operation == "remove" ? !customIconPresent : customIconPresent
+        diagnostics.log(
+            postconditionSatisfied ? .step : .failure,
+            phase: "helper.postcondition_checked",
+            context: diagnosticsContext,
+            details: [
+                "custom_icon_present": String(customIconPresent),
+                "expected_custom_icon": String(operation != "remove"),
+            ]
+        )
+        diagnostics.log(
+            .performance,
+            phase: "helper.finish",
+            context: diagnosticsContext,
+            durationMilliseconds: helperTimer.elapsedMilliseconds,
+            details: [
+                "exit_status": String(task.terminationStatus),
+                "process_stdout": output,
+                "process_stderr": errorOutput,
+            ]
+        )
     }
     
     enum ShellError: Error, LocalizedError {
@@ -1002,11 +1553,32 @@ class IconManager: ObservableObject {
     }
 
     func configureSudoers() throws {
+        let diagnosticsContext = DiagnosticsContext(operation: .setup)
+        let timer = DiagnosticsTimer()
+        diagnostics.log(
+            .operation,
+            phase: "sudoers_configuration.start",
+            context: diagnosticsContext
+        )
         let helperPath = self.helperScriptURL.path
         let username = NSUserName()
         guard username.range(of: "^[a-zA-Z0-9._-]+$", options: .regularExpression) != nil else {
-            throw NSError(domain: "IconManager", code: 22,
-                          userInfo: [NSLocalizedDescriptionKey: "Username '\(username)' contains characters not safe for sudoers configuration."])
+            let error = NSError(
+                domain: "IconManager",
+                code: 22,
+                userInfo: [
+                    NSLocalizedDescriptionKey:
+                        "Username contains characters not safe for sudoers configuration."
+                ]
+            )
+            diagnostics.log(
+                .failure,
+                phase: "sudoers_configuration.invalid_username",
+                context: diagnosticsContext,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: DiagnosticsLogger.errorDetails(error)
+            )
+            throw error
         }
         let sudoersLine = "\(username) ALL=(ALL) NOPASSWD: \(helperPath)"
         let sudoersFile = "/etc/sudoers.d/iconchanger"
@@ -1044,7 +1616,18 @@ class IconManager: ObservableObject {
         task.standardOutput = Pipe()
         task.standardError = errorPipe
 
-        try task.run()
+        do {
+            try task.run()
+        } catch {
+            diagnostics.log(
+                .failure,
+                phase: "sudoers_configuration.launch_failed",
+                context: diagnosticsContext,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: DiagnosticsLogger.errorDetails(error)
+            )
+            throw error
+        }
         task.waitUntilExit()
 
         let errorOutput = String(data: errorPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
@@ -1052,18 +1635,56 @@ class IconManager: ObservableObject {
         if task.terminationStatus != 0 {
             if errorOutput.contains("User canceled") || errorOutput.contains("-128") {
                 logger.log("User canceled the admin password dialog.")
-                throw NSError(domain: "IconManager", code: 20,
-                              userInfo: [NSLocalizedDescriptionKey: NSLocalizedString("Setup was canceled.", comment: "User canceled admin dialog")])
+                let error = NSError(
+                    domain: "IconManager",
+                    code: 20,
+                    userInfo: [
+                        NSLocalizedDescriptionKey:
+                            NSLocalizedString("Setup was canceled.", comment: "User canceled admin dialog")
+                    ]
+                )
+                diagnostics.log(
+                    .skipped,
+                    phase: "sudoers_configuration.cancelled",
+                    context: diagnosticsContext,
+                    durationMilliseconds: timer.elapsedMilliseconds
+                )
+                throw error
             }
             logger.error("Sudoers configuration failed: \(errorOutput)")
-            throw NSError(domain: "IconManager", code: 21,
-                          userInfo: [NSLocalizedDescriptionKey: String(format: NSLocalizedString("Failed to configure permissions: %@", comment: "Sudoers config error"), errorOutput)])
+            let error = NSError(
+                domain: "IconManager",
+                code: 21,
+                userInfo: [
+                    NSLocalizedDescriptionKey: String(
+                        format: NSLocalizedString(
+                            "Failed to configure permissions: %@",
+                            comment: "Sudoers config error"
+                        ),
+                        errorOutput
+                    )
+                ]
+            )
+            diagnostics.log(
+                .failure,
+                phase: "sudoers_configuration.failed",
+                context: diagnosticsContext,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: [
+                    "exit_status": String(task.terminationStatus),
+                    "process_stderr": errorOutput,
+                    "error_domain": error.domain,
+                    "error_code": String(error.code),
+                    "error_message": error.localizedDescription,
+                ]
+            )
+            throw error
         }
 
         switch probeSudoPermission() {
         case .authorized:
             guard !legacySudoersRuleIsActive() else {
-                throw NSError(
+                let error = NSError(
                     domain: "IconManager",
                     code: 25,
                     userInfo: [
@@ -1071,9 +1692,17 @@ class IconManager: ObservableObject {
                             "The current helper is authorized, but the legacy user-writable sudoers rule could not be removed."
                     ]
                 )
+                diagnostics.log(
+                    .failure,
+                    phase: "sudoers_configuration.legacy_rule_remaining",
+                    context: diagnosticsContext,
+                    durationMilliseconds: timer.elapsedMilliseconds,
+                    details: DiagnosticsLogger.errorDetails(error)
+                )
+                throw error
             }
         case .permissionMissing:
-            throw NSError(
+            let error = NSError(
                 domain: "IconManager",
                 code: 23,
                 userInfo: [
@@ -1081,8 +1710,16 @@ class IconManager: ObservableObject {
                         "The sudoers rule was installed, but the exact helper command still requires a password. A managed Mac policy may be overriding it."
                 ]
             )
+            diagnostics.log(
+                .failure,
+                phase: "sudoers_configuration.permission_missing_after_install",
+                context: diagnosticsContext,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: DiagnosticsLogger.errorDetails(error)
+            )
+            throw error
         case .helperFailed(let detail):
-            throw NSError(
+            let error = NSError(
                 domain: "IconManager",
                 code: 24,
                 userInfo: [
@@ -1090,13 +1727,41 @@ class IconManager: ObservableObject {
                         "The sudoers rule was installed, but the helper self-test failed: \(detail)"
                 ]
             )
+            diagnostics.log(
+                .failure,
+                phase: "sudoers_configuration.helper_self_test_failed",
+                context: diagnosticsContext,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: DiagnosticsLogger.errorDetails(error)
+            )
+            throw error
         }
+        diagnostics.log(
+            .operation,
+            phase: "sudoers_configuration.completed",
+            context: diagnosticsContext,
+            durationMilliseconds: timer.elapsedMilliseconds
+        )
     }
 
-    func checkSetupStatus() -> SetupStatus {
+    func checkSetupStatus(
+        diagnosticsContext: DiagnosticsContext? = nil
+    ) -> SetupStatus {
         var missingFiles: [String] = []
         let helperExists = FileManager.default.fileExists(atPath: self.helperScriptURL.path)
         let fileiconExists = FileManager.default.fileExists(atPath: self.fileiconURL.path)
+
+        if let diagnosticsContext {
+            diagnostics.log(
+                .step,
+                phase: "setup.helper_files_checked",
+                context: diagnosticsContext,
+                details: [
+                    "helper_exists": String(helperExists),
+                    "fileicon_exists": String(fileiconExists),
+                ]
+            )
+        }
         
         if !helperExists {
             missingFiles.append(helperScriptURL.lastPathComponent)
@@ -1108,22 +1773,198 @@ class IconManager: ObservableObject {
         }
         
         if !missingFiles.isEmpty {
+            if let diagnosticsContext {
+                diagnostics.log(
+                    .failure,
+                    phase: "setup.helper_files_missing",
+                    context: diagnosticsContext,
+                    details: ["missing_files": missingFiles.joined(separator: ",")]
+                )
+            }
             return .helperFilesMissing(missingFiles: missingFiles)
         }
 
-        guard verifyHelperIntegrity() else {
+        let integrityVerified = verifyHelperIntegrity()
+        if let diagnosticsContext {
+            diagnostics.log(
+                integrityVerified ? .step : .failure,
+                phase: "setup.helper_integrity_checked",
+                context: diagnosticsContext,
+                details: ["integrity_verified": String(integrityVerified)]
+            )
+        }
+        guard integrityVerified else {
             return .helperFilesOutdated
         }
 
-        switch probeSudoPermission() {
+        let sudoProbe = probeSudoPermission()
+        switch sudoProbe {
         case .authorized:
-            return legacySudoersRuleIsActive()
-                ? .legacySudoersPermissionPresent
-                : .completed
+            if let diagnosticsContext {
+                diagnostics.log(
+                    .step,
+                    phase: "setup.sudo_helper_probe",
+                    context: diagnosticsContext,
+                    details: ["authorization": "authorized"]
+                )
+            }
+            let legacyRuleActive = legacySudoersRuleIsActive()
+            if let diagnosticsContext {
+                diagnostics.log(
+                    legacyRuleActive ? .failure : .step,
+                    phase: "setup.legacy_sudoers_checked",
+                    context: diagnosticsContext,
+                    details: ["legacy_rule_active": String(legacyRuleActive)]
+                )
+            }
+            return legacyRuleActive ? .legacySudoersPermissionPresent : .completed
         case .permissionMissing:
+            if let diagnosticsContext {
+                diagnostics.log(
+                    .failure,
+                    phase: "setup.sudo_helper_probe",
+                    context: diagnosticsContext,
+                    details: ["authorization": "password_required"]
+                )
+            }
             return .sudoersPermissionMissing
         case .helperFailed(let detail):
+            if let diagnosticsContext {
+                diagnostics.log(
+                    .failure,
+                    phase: "setup.sudo_helper_probe",
+                    context: diagnosticsContext,
+                    details: [
+                        "authorization": "helper_failed",
+                        "error_message": detail,
+                    ]
+                )
+            }
             return .unknownError("Privileged helper self-test failed: \(detail)")
+        }
+    }
+
+    func recordDiagnosticsSnapshot(source: DiagnosticsSource = .manual) {
+        let context = DiagnosticsContext(
+            operation: .setup,
+            source: source,
+            appName: "IconChanger",
+            appPath: Bundle.main.bundlePath
+        )
+        let timer = DiagnosticsTimer()
+        diagnostics.log(
+            .operation,
+            phase: "diagnostic_snapshot.start",
+            context: context
+        )
+
+        let fileManager = FileManager.default
+        let helperAttributes = try? fileManager.attributesOfItem(
+            atPath: helperScriptURL.path
+        )
+        let fileiconAttributes = try? fileManager.attributesOfItem(
+            atPath: fileiconURL.path
+        )
+        let setupStatus = checkSetupStatus(diagnosticsContext: context)
+        let appManagement = appManagementStatus()
+
+        #if arch(arm64)
+        let architecture = "arm64"
+        #elseif arch(x86_64)
+        let architecture = "x86_64"
+        #else
+        let architecture = "unknown"
+        #endif
+
+        var details: [String: String] = [
+            "setup_status": diagnosticName(for: setupStatus),
+            "app_management_status": diagnosticName(for: appManagement),
+            "folder_permission_count": String(FolderPermission.shared.permissions.count),
+            "icon_cache_count": String(IconCacheManager.shared.getCachedIconsCount()),
+            "application_support_writable": String(
+                fileManager.isWritableFile(atPath: AppPaths.applicationSupportRoot.path)
+            ),
+            "cache_root_writable": String(
+                fileManager.isWritableFile(atPath: AppPaths.cachesRoot.path)
+            ),
+            "helper_owner_uid": String(
+                (helperAttributes?[.ownerAccountID] as? NSNumber)?.intValue ?? -1
+            ),
+            "helper_owner_gid": String(
+                (helperAttributes?[.groupOwnerAccountID] as? NSNumber)?.intValue ?? -1
+            ),
+            "helper_mode": String(
+                format: "%o",
+                (helperAttributes?[.posixPermissions] as? NSNumber)?.intValue ?? 0
+            ),
+            "fileicon_owner_uid": String(
+                (fileiconAttributes?[.ownerAccountID] as? NSNumber)?.intValue ?? -1
+            ),
+            "fileicon_owner_gid": String(
+                (fileiconAttributes?[.groupOwnerAccountID] as? NSNumber)?.intValue ?? -1
+            ),
+            "fileicon_mode": String(
+                format: "%o",
+                (fileiconAttributes?[.posixPermissions] as? NSNumber)?.intValue ?? 0
+            ),
+            "system_os_version": ProcessInfo.processInfo.operatingSystemVersionString,
+            "system_architecture": architecture,
+            "system_app_version":
+                Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString")
+                as? String ?? "unknown",
+            "system_app_build":
+                Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion")
+                as? String ?? "unknown",
+            "system_installed_in_applications": String(
+                Bundle.main.bundlePath.hasPrefix("/Applications/")
+            ),
+        ]
+        details["background_enabled"] = String(
+            UserDefaults.standard.bool(forKey: "runInBackground")
+        )
+        details["scheduled_restore_enabled"] = String(
+            UserDefaults.standard.bool(forKey: "enableScheduledRestore")
+        )
+        details["app_update_detection_enabled"] = String(
+            UserDefaults.standard.bool(forKey: "enableAutoRestoreOnUpdate")
+        )
+
+        diagnostics.log(
+            setupStatus.isDiagnosticsReady ? .operation : .failure,
+            phase: "diagnostic_snapshot.completed",
+            context: context,
+            durationMilliseconds: timer.elapsedMilliseconds,
+            details: details
+        )
+    }
+
+    private func diagnosticName(for status: SetupStatus) -> String {
+        switch status {
+        case .completed:
+            return "completed"
+        case .helperFilesMissing:
+            return "helper_files_missing"
+        case .helperFilesOutdated:
+            return "helper_files_outdated"
+        case .sudoersPermissionMissing:
+            return "sudoers_permission_missing"
+        case .legacySudoersPermissionPresent:
+            return "legacy_sudoers_permission_present"
+        case .unknownError:
+            return "unknown_error"
+        }
+    }
+
+    private func diagnosticName(for status: AppManagementStatus) -> String {
+        switch status {
+        case .authorized:
+            return "authorized"
+        case .denied:
+            return "denied"
+        case .notDetermined:
+            return "not_determined"
+        case .unknown:
+            return "unknown"
         }
     }
 
@@ -1164,8 +2005,31 @@ class IconManager: ObservableObject {
 
     // Triggers the system TCC prompt if status is notDetermined.
     func requestAppManagementPermission(completion: @escaping (Bool) -> Void) {
-        guard let request = Self.tccRequest else { completion(false); return }
+        let context = DiagnosticsContext(operation: .permission)
+        let timer = DiagnosticsTimer()
+        diagnostics.log(
+            .operation,
+            phase: "app_management_request.start",
+            context: context
+        )
+        guard let request = Self.tccRequest else {
+            diagnostics.log(
+                .failure,
+                phase: "app_management_request.unavailable",
+                context: context,
+                durationMilliseconds: timer.elapsedMilliseconds
+            )
+            completion(false)
+            return
+        }
         request(Self.tccServiceAppBundles, nil) { granted in
+            DiagnosticsLogger.shared.log(
+                granted ? .operation : .failure,
+                phase: "app_management_request.completed",
+                context: context,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: ["granted": String(granted)]
+            )
             DispatchQueue.main.async { completion(granted) }
         }
     }
@@ -1174,6 +2038,15 @@ class IconManager: ObservableObject {
 extension LaunchPadManagerDBHelper.AppInfo: @retroactive Identifiable {
     public var id: URL {
         url
+    }
+}
+
+private extension SetupStatus {
+    var isDiagnosticsReady: Bool {
+        if case .completed = self {
+            return true
+        }
+        return false
     }
 }
 

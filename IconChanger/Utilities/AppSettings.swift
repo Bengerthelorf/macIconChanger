@@ -74,6 +74,37 @@ final class AppSettings: ObservableObject {
         .init(key: "t2e",    type: .bool(false), flags: [.exported, .tier2]),
         .init(key: "t2k",    type: .string(""),  flags: [.exported, .secured, .tier2]),
         .init(key: "t2ki",   type: .int(0),      flags: .tier2),
+
+        // Developer diagnostics
+        .init(key: DiagnosticsSettings.enabled, type: .bool(false), flags: [.exported, .tier2]),
+        .init(key: DiagnosticsSettings.recordReplace, type: .bool(true), flags: [.exported, .tier2]),
+        .init(key: DiagnosticsSettings.recordRestore, type: .bool(true), flags: [.exported, .tier2]),
+        .init(key: DiagnosticsSettings.recordRemove, type: .bool(true), flags: [.exported, .tier2]),
+        .init(
+            key: DiagnosticsSettings.recordAppearance, type: .bool(true), flags: [.exported, .tier2]),
+        .init(key: DiagnosticsSettings.recordSetup, type: .bool(true), flags: [.exported, .tier2]),
+        .init(key: DiagnosticsSettings.recordPermission, type: .bool(true), flags: [.exported, .tier2]),
+        .init(key: DiagnosticsSettings.recordBackground, type: .bool(true), flags: [.exported, .tier2]),
+        .init(key: DiagnosticsSettings.recordDiscovery, type: .bool(true), flags: [.exported, .tier2]),
+        .init(key: DiagnosticsSettings.recordCache, type: .bool(true), flags: [.exported, .tier2]),
+        .init(key: DiagnosticsSettings.recordNetwork, type: .bool(true), flags: [.exported, .tier2]),
+        .init(key: DiagnosticsSettings.recordSteps, type: .bool(true), flags: [.exported, .tier2]),
+        .init(
+            key: DiagnosticsSettings.recordPerformance, type: .bool(true), flags: [.exported, .tier2]),
+        .init(key: DiagnosticsSettings.recordFailures, type: .bool(true), flags: [.exported, .tier2]),
+        .init(key: DiagnosticsSettings.recordSkipped, type: .bool(true), flags: [.exported, .tier2]),
+        .init(key: DiagnosticsSettings.includeAppNames, type: .bool(true), flags: [.exported, .tier2]),
+        .init(key: DiagnosticsSettings.includeAppPaths, type: .bool(true), flags: [.exported, .tier2]),
+        .init(
+            key: DiagnosticsSettings.includeIconDetails, type: .bool(false), flags: [.exported, .tier2]),
+        .init(
+            key: DiagnosticsSettings.includeIconPaths, type: .bool(false), flags: [.exported, .tier2]),
+        .init(
+            key: DiagnosticsSettings.includeErrorMessages, type: .bool(true), flags: [.exported, .tier2]),
+        .init(
+            key: DiagnosticsSettings.includeProcessOutput, type: .bool(false), flags: [.exported, .tier2]),
+        .init(
+            key: DiagnosticsSettings.includeSystemInfo, type: .bool(true), flags: [.exported, .tier2]),
     ]
 
     // MARK: - Read / Write

@@ -413,13 +413,36 @@ final class SystemAppearanceMonitor {
 enum DockRefreshService {
     static let intervalNanoseconds: UInt64 = 1_000_000_000
 
-    static func refreshTwice() async -> Bool {
+    static func refreshTwice(
+        diagnosticsContext: DiagnosticsContext? = nil
+    ) async -> Bool {
+        let timer = DiagnosticsTimer()
+        if let diagnosticsContext {
+            DiagnosticsLogger.shared.log(
+                .step,
+                phase: "dock_refresh.start",
+                context: diagnosticsContext
+            )
+        }
         let firstSucceeded = await restartOnce()
         guard !Task.isCancelled else { return false }
         try? await Task.sleep(nanoseconds: intervalNanoseconds)
         guard !Task.isCancelled else { return false }
         let secondSucceeded = await restartOnce()
-        return firstSucceeded && secondSucceeded
+        let succeeded = firstSucceeded && secondSucceeded
+        if let diagnosticsContext {
+            DiagnosticsLogger.shared.log(
+                .performance,
+                phase: succeeded ? "dock_refresh.finish" : "dock_refresh.partial_failure",
+                context: diagnosticsContext,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: [
+                    "first_restart": String(firstSucceeded),
+                    "second_restart": String(secondSucceeded),
+                ]
+            )
+        }
+        return succeeded
     }
 
     private static func restartOnce() async -> Bool {
@@ -507,9 +530,25 @@ final class IconAppearanceSwitchService: ObservableObject {
               monitor.currentAppearance == appearance else {
             return
         }
-        try await iconManager.setIconWithoutCaching(image, app: app)
+        let iconURL = store.iconURL(for: appPath, appearance: appearance)
+        try await iconManager.setIconWithoutCaching(
+            image,
+            app: app,
+            diagnosticsOperation: .appearance,
+            diagnosticsSource: .appearanceChange,
+            diagnosticsIconKind: "appearance_\(appearance.rawValue)",
+            diagnosticsIconPath: iconURL?.path
+        )
         store.markApplied(appearance, for: appPath)
-        _ = await DockRefreshService.refreshTwice()
+        let context = DiagnosticsContext(
+            operation: .appearance,
+            source: .appearanceChange,
+            appName: app.name,
+            appPath: appPath,
+            iconKind: "appearance_\(appearance.rawValue)",
+            iconPath: iconURL?.path
+        )
+        _ = await DockRefreshService.refreshTwice(diagnosticsContext: context)
     }
 
     func removeAppearanceConfiguration(for appPath: String) {
@@ -532,25 +571,68 @@ final class IconAppearanceSwitchService: ObservableObject {
         isSwitching = true
         defer { isSwitching = false }
 
+        let batchID = UUID()
+        let batchContext = DiagnosticsContext(
+            operation: .appearance,
+            batchID: batchID,
+            source: .appearanceChange,
+            iconKind: "appearance_\(appearance.rawValue)"
+        )
+        let batchTimer = DiagnosticsTimer()
+        DiagnosticsLogger.shared.log(
+            .operation,
+            phase: "appearance_batch.start",
+            context: batchContext
+        )
+
         var failures = 0
         var changedCount = 0
         let configurations = store.getAllConfigurations()
 
         for configuration in configurations {
             guard !Task.isCancelled else { return }
+            let appContext = DiagnosticsContext(
+                operation: .appearance,
+                batchID: batchID,
+                source: .appearanceChange,
+                appName: configuration.appName,
+                appPath: configuration.appPath,
+                iconKind: "appearance_\(appearance.rawValue)"
+            )
             guard let fileName = IconAppearancePolicy.iconFileName(
                 for: appearance,
                 configuration: configuration,
                 switchingEnabled: switchingEnabled
             ) else {
+                DiagnosticsLogger.shared.log(
+                    .skipped,
+                    phase: "appearance.no_change_needed",
+                    context: appContext
+                )
                 continue
             }
 
             let appURL = URL(fileURLWithPath: configuration.appPath)
             let iconURL = AppPaths.appearanceIconsDirectory.appendingPathComponent(fileName)
-            guard FileManager.default.fileExists(atPath: appURL.path),
-                  let image = NSImage(contentsOf: iconURL) else {
+            guard FileManager.default.fileExists(atPath: appURL.path) else {
                 failures += 1
+                DiagnosticsLogger.shared.log(
+                    .failure,
+                    phase: "appearance.app_not_installed",
+                    context: appContext
+                )
+                continue
+            }
+            guard let image = NSImage(contentsOf: iconURL) else {
+                failures += 1
+                DiagnosticsLogger.shared.log(
+                    .failure,
+                    phase: "appearance.icon_unreadable",
+                    context: appContext.withIcon(
+                        kind: "appearance_\(appearance.rawValue)",
+                        path: iconURL.path
+                    )
+                )
                 continue
             }
 
@@ -564,7 +646,12 @@ final class IconAppearanceSwitchService: ObservableObject {
                 try await iconManager.setIconWithoutCaching(
                     image,
                     app: app,
-                    allowRepair: false
+                    allowRepair: false,
+                    diagnosticsOperation: .appearance,
+                    diagnosticsSource: .appearanceChange,
+                    diagnosticsIconKind: "appearance_\(appearance.rawValue)",
+                    diagnosticsIconPath: iconURL.path,
+                    diagnosticsBatchID: batchID
                 )
                 store.markApplied(appearance, for: configuration.appPath)
                 changedCount += 1
@@ -578,7 +665,26 @@ final class IconAppearanceSwitchService: ObservableObject {
 
         failedApplicationCount = failures
         if changedCount > 0, !Task.isCancelled {
-            _ = await DockRefreshService.refreshTwice()
+            let context = DiagnosticsContext(
+                operation: .appearance,
+                batchID: batchID,
+                source: .appearanceChange,
+                iconKind: "appearance_\(appearance.rawValue)"
+            )
+            _ = await DockRefreshService.refreshTwice(
+                diagnosticsContext: context
+            )
         }
+        DiagnosticsLogger.shared.log(
+            .operation,
+            phase: "appearance_batch.completed",
+            context: batchContext,
+            durationMilliseconds: batchTimer.elapsedMilliseconds,
+            details: [
+                "changed": String(changedCount),
+                "failed": String(failures),
+                "total": String(configurations.count),
+            ]
+        )
     }
 }
