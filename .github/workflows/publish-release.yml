@@ -182,6 +182,7 @@ jobs:
           DMG_SHA256=$(shasum -a 256 candidate/IconChanger.dmg | awk '{print $1}')
           TAP_DIR="$RUNNER_TEMP/homebrew-tap"
 
+          gh auth setup-git
           gh repo clone Bengerthelorf/homebrew-tap "$TAP_DIR"
           mkdir -p "$TAP_DIR/Casks"
 
