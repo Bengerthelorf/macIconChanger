@@ -58,7 +58,7 @@ jobs:
           EXPECTED_SHA=$(jq -er '.sha256' candidate/candidate.json)
           DMG_SIZE=$(jq -er '.dmg_size' candidate/candidate.json)
           ED_SIGNATURE=$(jq -er '.ed_signature' candidate/candidate.json)
-          IS_PRERELEASE=$(jq -er '.prerelease' candidate/candidate.json)
+          IS_PRERELEASE=$(jq -er '.prerelease | tostring' candidate/candidate.json)
 
           ACTUAL_SHA=$(shasum -a 256 candidate/IconChanger.dmg | awk '{print $1}')
           ACTUAL_SIZE=$(stat -f%z candidate/IconChanger.dmg)

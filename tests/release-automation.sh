@@ -111,6 +111,8 @@ fi
     fail "publishing must require explicit confirmation"
 /usr/bin/grep -Fq "actions/download-artifact@" "$PUBLISH_WORKFLOW" ||
     fail "publishing must download the exact candidate artifact"
+/usr/bin/grep -Fq "jq -er '.prerelease | tostring'" "$PUBLISH_WORKFLOW" ||
+    fail "publishing must accept a stable candidate with prerelease=false"
 /usr/bin/grep -Fq 'releases/download/${TAG}/IconChanger.dmg' "$PUBLISH_WORKFLOW" ||
     fail "appcast validation must check the published download URL"
 
