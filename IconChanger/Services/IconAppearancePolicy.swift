@@ -144,6 +144,19 @@ enum IconAppearancePolicy {
         }
         return normalIconAvailable ? .normal : .none
     }
+
+    static func shouldAcknowledgeAppUpdate(
+        after choice: CachedIconRestoreChoice,
+        hasCachedMetadata: Bool
+    ) -> Bool {
+        guard hasCachedMetadata else { return false }
+        switch choice {
+        case .appearance, .normal:
+            return true
+        case .none:
+            return false
+        }
+    }
 }
 
 enum CachedIconRestoreChoice: Equatable, Sendable {

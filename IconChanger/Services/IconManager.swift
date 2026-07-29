@@ -914,6 +914,7 @@ class IconManager: ObservableObject {
             currentAppearance: currentAppearance
         )
 
+        let restoredContext: DiagnosticsContext
         switch choice {
         case .appearance(let appearance):
             guard let iconURL = AppearanceIconStore.shared.iconURL(
@@ -922,7 +923,7 @@ class IconManager: ObservableObject {
             ), let image = NSImage(contentsOf: iconURL) else {
                 throw RestoreError.iconFileNotFound(app.name)
             }
-            let restoredContext = diagnosticsContext.withIcon(
+            restoredContext = diagnosticsContext.withIcon(
                 kind: "appearance_\(appearance.rawValue)",
                 path: iconURL.path
             )
@@ -937,16 +938,11 @@ class IconManager: ObservableObject {
                 diagnosticsContext: restoredContext
             )
             AppearanceIconStore.shared.markApplied(appearance, for: appPath)
-            Task { @MainActor in
-                AppIconCache.shared.remove(for: app.url)
-                self.iconRefreshTrigger = UUID()
-            }
-            return restoredContext
         case .normal:
             guard let normalURL, let image = NSImage(contentsOf: normalURL) else {
                 throw RestoreError.iconFileNotFound(app.name)
             }
-            let restoredContext = diagnosticsContext.withIcon(
+            restoredContext = diagnosticsContext.withIcon(
                 kind: "cached_normal",
                 path: normalURL.path
             )
@@ -960,16 +956,22 @@ class IconManager: ObservableObject {
                 to: app,
                 diagnosticsContext: restoredContext
             )
-            IconCacheManager.shared.updateTimestamp(for: appPath)
             AppearanceIconStore.shared.resetAppliedAppearance(for: appPath)
-            Task { @MainActor in
-                AppIconCache.shared.remove(for: app.url)
-                self.iconRefreshTrigger = UUID()
-            }
-            return restoredContext
         case .none:
             return nil
         }
+
+        if IconAppearancePolicy.shouldAcknowledgeAppUpdate(
+            after: choice,
+            hasCachedMetadata: cache != nil
+        ) {
+            IconCacheManager.shared.updateTimestamp(for: appPath)
+        }
+        Task { @MainActor in
+            AppIconCache.shared.remove(for: app.url)
+            self.iconRefreshTrigger = UUID()
+        }
+        return restoredContext
     }
     
     func getIconInPath(_ url: URL) -> [URL] {

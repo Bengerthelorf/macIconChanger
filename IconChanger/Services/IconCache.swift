@@ -16,7 +16,46 @@ struct IconCache: Codable, Identifiable {
     var appVersion: String?
 
     static func currentVersion(for appPath: String) -> String? {
-        Bundle(path: appPath)?.object(forInfoDictionaryKey: "CFBundleVersion") as? String
+        let bundle = Bundle(path: appPath)
+        return CachedAppVersionPolicy.preferredVersion(
+            bundleVersion: bundle?.object(forInfoDictionaryKey: "CFBundleVersion") as? String,
+            shortVersion: bundle?.object(
+                forInfoDictionaryKey: "CFBundleShortVersionString"
+            ) as? String
+        )
+    }
+
+    static func updateReferenceModificationDate(for appPath: String) -> Date? {
+        let fileManager = FileManager.default
+        let appURL = URL(fileURLWithPath: appPath)
+        let rootModifiedAt = (
+            try? fileManager.attributesOfItem(atPath: appPath)[.modificationDate]
+        ) as? Date
+        let isApplicationBundle = appURL.pathExtension.caseInsensitiveCompare("app")
+            == .orderedSame
+        guard isApplicationBundle else { return rootModifiedAt }
+
+        let infoPlistPath = appURL
+            .appendingPathComponent("Contents")
+            .appendingPathComponent("Info.plist")
+            .path
+        let infoPlistModifiedAt = (
+            try? fileManager.attributesOfItem(atPath: infoPlistPath)[.modificationDate]
+        ) as? Date
+        let executableModifiedAt = Bundle(path: appPath)?.executableURL.flatMap { executableURL in
+            (
+                try? fileManager.attributesOfItem(
+                    atPath: executableURL.path
+                )[.modificationDate]
+            ) as? Date
+        }
+
+        return CachedAppUpdatePolicy.referenceModificationDate(
+            isApplicationBundle: true,
+            rootModifiedAt: rootModifiedAt,
+            infoPlistModifiedAt: infoPlistModifiedAt,
+            executableModifiedAt: executableModifiedAt
+        )
     }
 }
 

@@ -87,6 +87,26 @@ enum BackgroundScheduleTests {
             "legacy caches should fall back to modification date"
         )
 
+        assertStringEqual(
+            CachedAppVersionPolicy.preferredVersion(
+                bundleVersion: nil,
+                shortVersion: "5.1.3"
+            ),
+            "5.1.3",
+            "apps without CFBundleVersion should use CFBundleShortVersionString"
+        )
+
+        assertEqual(
+            CachedAppUpdatePolicy.referenceModificationDate(
+                isApplicationBundle: true,
+                rootModifiedAt: Date(timeIntervalSince1970: 3_000),
+                infoPlistModifiedAt: Date(timeIntervalSince1970: 1_500),
+                executableModifiedAt: Date(timeIntervalSince1970: 2_000)
+            )?.timeIntervalSince1970 ?? -1,
+            2_000,
+            "app update fallback must ignore root metadata changed by custom icons"
+        )
+
         print("PASS: background update checks resume from persisted state")
     }
 
@@ -110,5 +130,19 @@ enum BackgroundScheduleTests {
 
     private static func assertFalse(_ value: Bool, _ message: String) {
         assertTrue(!value, message)
+    }
+
+    private static func assertStringEqual(
+        _ actual: String?,
+        _ expected: String?,
+        _ message: String
+    ) {
+        guard actual == expected else {
+            fputs(
+                "FAIL: \(message); expected \(expected ?? "nil"), got \(actual ?? "nil")\n",
+                stderr
+            )
+            exit(1)
+        }
     }
 }

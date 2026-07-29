@@ -20,6 +20,21 @@ enum BackgroundSchedulePolicy {
     }
 }
 
+enum CachedAppVersionPolicy {
+    static func preferredVersion(
+        bundleVersion: String?,
+        shortVersion: String?
+    ) -> String? {
+        for candidate in [bundleVersion, shortVersion] {
+            let trimmed = candidate?.trimmingCharacters(in: .whitespacesAndNewlines)
+            if let trimmed, !trimmed.isEmpty {
+                return trimmed
+            }
+        }
+        return nil
+    }
+}
+
 enum CachedAppUpdatePolicy {
     static func hasUpdate(
         cachedVersion: String?,
@@ -34,5 +49,17 @@ enum CachedAppUpdatePolicy {
 
         guard let modifiedAt else { return false }
         return modifiedAt > cachedAt
+    }
+
+    static func referenceModificationDate(
+        isApplicationBundle: Bool,
+        rootModifiedAt: Date?,
+        infoPlistModifiedAt: Date?,
+        executableModifiedAt: Date?
+    ) -> Date? {
+        guard isApplicationBundle else { return rootModifiedAt }
+        return [infoPlistModifiedAt, executableModifiedAt]
+            .compactMap { $0 }
+            .max()
     }
 }

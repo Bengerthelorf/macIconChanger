@@ -974,13 +974,13 @@ import os
             let appPath = cache.appPath
             guard FileManager.default.fileExists(atPath: appPath) else { return nil }
 
-            let attributes = try? FileManager.default.attributesOfItem(atPath: appPath)
-            let modificationDate = attributes?[.modificationDate] as? Date
             guard CachedAppUpdatePolicy.hasUpdate(
                 cachedVersion: cache.appVersion,
                 currentVersion: IconCache.currentVersion(for: appPath),
                 cachedAt: cache.timestamp,
-                modifiedAt: modificationDate
+                modifiedAt: IconCache.updateReferenceModificationDate(
+                    for: appPath
+                )
             ) else { return nil }
 
             return AppItem(

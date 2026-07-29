@@ -137,6 +137,28 @@ struct IconAppearancePolicyTests {
             "restore should skip apps without an eligible icon"
         )
 
+        expect(
+            IconAppearancePolicy.shouldAcknowledgeAppUpdate(
+                after: .appearance(.dark),
+                hasCachedMetadata: true
+            ),
+            "appearance restores must advance cached app update metadata"
+        )
+        expect(
+            IconAppearancePolicy.shouldAcknowledgeAppUpdate(
+                after: .normal,
+                hasCachedMetadata: true
+            ),
+            "normal restores must advance cached app update metadata"
+        )
+        expect(
+            !IconAppearancePolicy.shouldAcknowledgeAppUpdate(
+                after: .none,
+                hasCachedMetadata: true
+            ),
+            "skipped restores must not advance cached app update metadata"
+        )
+
         let permissionMessage = RestoreDefaultErrorPolicy.friendlyMessage(
             "Failed to remove custom icon file: You don’t have permission."
         )

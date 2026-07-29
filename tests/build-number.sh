@@ -19,6 +19,8 @@ build() {
     fail "beta build number is not encoded in the expected stage"
 [[ "$(build 1.5.0-pre.1)" == "40105005001" ]] ||
     fail "pre build number is not encoded in the expected stage"
+[[ "$(build 1.5.1-pre.1.fix.1)" == "40105016101" ]] ||
+    fail "preview hotfix build number is not encoded after the preview stage"
 [[ "$(build 1.5.0-rc.1)" == "40105007001" ]] ||
     fail "release candidate build number is not encoded in the expected stage"
 [[ "$(build 1.5.0)" == "40105009000" ]] ||
@@ -37,6 +39,14 @@ next_patch="$(build 1.5.1-alpha.1)"
 (( rc < stable )) || fail "release candidate must sort before stable"
 (( stable < next_patch )) || fail "stable must sort before the next patch prerelease"
 (( 3014470009 < alpha )) || fail "new scheme must migrate above the current public build"
+
+preview_fix="$(build 1.5.1-pre.1.fix.1)"
+preview_base="$(build 1.5.1-pre.1)"
+preview_rc="$(build 1.5.1-rc.1)"
+(( preview_base < preview_fix )) ||
+    fail "preview hotfix must sort after its published preview"
+(( preview_fix < preview_rc )) ||
+    fail "preview hotfix must sort before the release candidate"
 
 [[ "$(build 1.5.0-pre-1)" == "$pre" ]] ||
     fail "legacy pre separator must remain accepted"
