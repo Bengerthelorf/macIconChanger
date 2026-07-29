@@ -76,8 +76,12 @@ MIT License. See [LICENSE](LICENSE) for details.
 
 ---
 
-<div align="center">
+## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Bengerthelorf/macIconChanger&type=Timeline)](https://www.star-history.com/#Bengerthelorf/macIconChanger&Timeline)
-
-</div>
+<a href="https://www.star-history.com/?type=timeline&repos=Bengerthelorf%2FmacIconChanger">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=Bengerthelorf/macIconChanger&type=timeline&theme=dark&legend=top-left&sealed_token=YSTlu_3sCqN96oY1Q-0xSX9UeSsSg_t8GV098HLbvUs9BKJIi4e11f-TLJlL5bntyvGthlFgJB7GkPp9rdOqsS2R14KaPhzG1yewAZAkgh63zXHlpS1wVw" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=Bengerthelorf/macIconChanger&type=timeline&legend=top-left&sealed_token=YSTlu_3sCqN96oY1Q-0xSX9UeSsSg_t8GV098HLbvUs9BKJIi4e11f-TLJlL5bntyvGthlFgJB7GkPp9rdOqsS2R14KaPhzG1yewAZAkgh63zXHlpS1wVw" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=Bengerthelorf/macIconChanger&type=timeline&legend=top-left&sealed_token=YSTlu_3sCqN96oY1Q-0xSX9UeSsSg_t8GV098HLbvUs9BKJIi4e11f-TLJlL5bntyvGthlFgJB7GkPp9rdOqsS2R14KaPhzG1yewAZAkgh63zXHlpS1wVw" />
+ </picture>
+</a>
