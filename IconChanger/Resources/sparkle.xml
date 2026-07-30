@@ -4,6 +4,25 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.5.1-pre.1.fix.3</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>40105016103</sparkle:version>
+                    <sparkle:shortVersionString>1.5.1-pre.1.fix.3</sparkle:shortVersionString>
+                    <pubDate>Thu, 30 Jul 2026 17:45:14 +0000</pubDate>
+                    <sparkle:channel>beta</sparkle:channel>
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.5.1-pre.1.fix.3/IconChanger.dmg"
+                    sparkle:edSignature="LQ8sLxIB/sqzdR9G5OL/+DkV6KLA2Yobz8hlxlvfOofxUwaeYb/26DyR/NFannRv+6swzew1ygCxq91ZUXH5AQ==" length="8677667"
+                    type="application/octet-stream"/>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.5.1-pre.1.fix.3</h2>
+                    <ul>
+                        <li><strong>Fixed:</strong> present manual mode alert reliably</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
                     <title>Version 1.5.1-pre.1.fix.2</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>40105016102</sparkle:version>
