@@ -195,7 +195,11 @@ struct ContentView: View {
             }
         }
         .onAppear {
+            presentManualModeAlertIfNeeded(setupMonitor.health)
             checkFullSetup()
+        }
+        .onChange(of: setupMonitor.health) { health in
+            presentManualModeAlertIfNeeded(health)
         }
         .onChange(of: folderPermission.hasPermission) { _ in
              checkFullSetup()
@@ -251,10 +255,14 @@ struct ContentView: View {
 
     func checkFullSetup() {
         setupMonitor.check { health in
-            if case .manualMode = health, !hasPresentedManualModeAlert {
-                hasPresentedManualModeAlert = true
-                showManualModeAlert = true
-            }
+            presentManualModeAlertIfNeeded(health)
+        }
+    }
+
+    private func presentManualModeAlertIfNeeded(_ health: SetupHealth) {
+        if case .manualMode = health, !hasPresentedManualModeAlert {
+            hasPresentedManualModeAlert = true
+            showManualModeAlert = true
         }
     }
 

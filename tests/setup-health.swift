@@ -26,6 +26,21 @@ enum SetupHealthTests {
             "manual mode must pause root-required background automation"
         )
 
+        let contentViewSource = try! String(
+            contentsOfFile: "IconChanger/App/ContentView.swift",
+            encoding: .utf8
+        )
+        precondition(
+            contentViewSource.contains(".onChange(of: setupMonitor.health)"),
+            "manual mode alerts must observe the shared health state instead of relying on one check completion"
+        )
+        precondition(
+            contentViewSource.contains(
+                "presentManualModeAlertIfNeeded(setupMonitor.health)"
+            ),
+            "manual mode must also be presented when the view appears after health was already published"
+        )
+
         assertTrue(
             SetupNotificationPolicy.shouldNotify(
                 previousReady: nil,
