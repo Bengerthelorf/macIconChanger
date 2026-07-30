@@ -417,7 +417,19 @@ class IconManager: ObservableObject {
         }
 
         let status = checkSetupStatus()
-        guard case .completed = status else {
+        if case .completed = status {
+            return
+        }
+        if case .sudoersPermissionMissing = status, allowRepair {
+            diagnostics.log(
+                .step,
+                phase: "setup_check.manual_authorization_available",
+                context: DiagnosticsContext(operation: .permission),
+                details: ["background_automation": "paused"]
+            )
+            return
+        }
+        do {
             logger.error("Setup incomplete: \(String(describing: status))")
             let errorDescription: String
             switch status {
@@ -426,7 +438,7 @@ class IconManager: ObservableObject {
             case .helperFilesOutdated:
                 errorDescription = "Installed helper files are outdated or failed integrity verification. Please repair setup."
             case .sudoersPermissionMissing:
-                errorDescription = "Sudo permission for helper script is missing or incorrect. Please check setup."
+                errorDescription = "Background automation is paused until permanent helper permission is repaired."
             case .legacySudoersPermissionPresent:
                 errorDescription = "A legacy user-writable sudoers rule must be removed before changing icons. Please repair permissions."
             default:
@@ -1325,8 +1337,9 @@ class IconManager: ObservableObject {
         }
 
         pipeGroup.wait()
-        let output = String(data: outputData, encoding: .utf8) ?? ""
-        let errorOutput = String(data: errorData, encoding: .utf8) ?? ""
+        var output = String(data: outputData, encoding: .utf8) ?? ""
+        var errorOutput = String(data: errorData, encoding: .utf8) ?? ""
+        var exitStatus = task.terminationStatus
 
         if timedOut {
             diagnostics.log(
@@ -1339,21 +1352,53 @@ class IconManager: ObservableObject {
                           userInfo: [NSLocalizedDescriptionKey: "Helper tool timed out"])
         }
 
-        if task.terminationStatus != 0 {
-            diagnostics.log(
-                .failure,
-                phase: "helper.failed",
-                context: diagnosticsContext,
-                durationMilliseconds: helperTimer.elapsedMilliseconds,
-                details: [
-                    "exit_status": String(task.terminationStatus),
-                    "process_stdout": output,
-                    "process_stderr": errorOutput,
-                ]
+        if exitStatus != 0 {
+            let permissionResult = SudoPermissionProbePolicy.classify(
+                exitStatus: exitStatus,
+                output: output + "\n" + errorOutput
             )
-            let combined = "Stdout:\n\(output)\nStderr:\n\(errorOutput)".trimmingCharacters(in: .whitespacesAndNewlines)
-            throw NSError(domain: "IconManager", code: 10,
-                          userInfo: [NSLocalizedDescriptionKey: "Helper tool failed (status: \(task.terminationStatus)): \(combined.isEmpty ? "No output" : combined)"])
+            if permissionResult == .permissionMissing,
+               diagnosticsContext.source == .manual {
+                diagnostics.log(
+                    .step,
+                    phase: "helper.manual_authorization_requested",
+                    context: diagnosticsContext,
+                    durationMilliseconds: helperTimer.elapsedMilliseconds,
+                    details: ["initial_exit_status": String(exitStatus)]
+                )
+                output = try runHelperWithAdministratorPrivileges(
+                    arguments: arguments,
+                    diagnosticsContext: diagnosticsContext
+                )
+                errorOutput = ""
+                exitStatus = 0
+            } else {
+                diagnostics.log(
+                    .failure,
+                    phase: "helper.failed",
+                    context: diagnosticsContext,
+                    durationMilliseconds: helperTimer.elapsedMilliseconds,
+                    details: [
+                        "exit_status": String(exitStatus),
+                        "process_stdout": output,
+                        "process_stderr": errorOutput,
+                        "interactive_authorization_allowed":
+                            String(diagnosticsContext.source == .manual),
+                    ]
+                )
+                let combined = "Stdout:\n\(output)\nStderr:\n\(errorOutput)".trimmingCharacters(in: .whitespacesAndNewlines)
+                let message: String
+                if permissionResult == .permissionMissing {
+                    message = "Background automation is paused until permanent helper permission is repaired."
+                } else {
+                    message = "Helper tool failed (status: \(exitStatus)): \(combined.isEmpty ? "No output" : combined)"
+                }
+                throw NSError(
+                    domain: "IconManager",
+                    code: 10,
+                    userInfo: [NSLocalizedDescriptionKey: message]
+                )
+            }
         }
 
         let combinedLower = (output + errorOutput).lowercased()
@@ -1391,11 +1436,98 @@ class IconManager: ObservableObject {
             context: diagnosticsContext,
             durationMilliseconds: helperTimer.elapsedMilliseconds,
             details: [
-                "exit_status": String(task.terminationStatus),
+                "exit_status": String(exitStatus),
+                "authorization_mode":
+                    diagnosticsContext.source == .manual && task.terminationStatus != 0
+                    ? "interactive"
+                    : "permanent",
                 "process_stdout": output,
                 "process_stderr": errorOutput,
             ]
         )
+    }
+
+    private func runHelperWithAdministratorPrivileges(
+        arguments: [String],
+        diagnosticsContext: DiagnosticsContext
+    ) throws -> String {
+        let command = (
+            ["/usr/bin/env", "SUDO_UID=\(getuid())", helperScriptURL.path]
+            + arguments
+        )
+            .map { "'\($0.shellEscaped)'" }
+            .joined(separator: " ")
+        let escapedCommand = command
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\"", with: "\\\"")
+        let appleScript =
+            "do shell script \"\(escapedCommand)\" with administrator privileges"
+        let task = Process()
+        let outputPipe = Pipe()
+        let errorPipe = Pipe()
+        task.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
+        task.arguments = ["-e", appleScript]
+        task.standardOutput = outputPipe
+        task.standardError = errorPipe
+        task.standardInput = nil
+
+        do {
+            try task.run()
+        } catch {
+            diagnostics.log(
+                .failure,
+                phase: "helper.manual_authorization_launch_failed",
+                context: diagnosticsContext,
+                details: DiagnosticsLogger.errorDetails(error)
+            )
+            throw error
+        }
+        task.waitUntilExit()
+
+        let output = String(
+            data: outputPipe.fileHandleForReading.readDataToEndOfFile(),
+            encoding: .utf8
+        ) ?? ""
+        let errorOutput = String(
+            data: errorPipe.fileHandleForReading.readDataToEndOfFile(),
+            encoding: .utf8
+        ) ?? ""
+
+        guard task.terminationStatus == 0 else {
+            let cancelled =
+                errorOutput.contains("User canceled")
+                || errorOutput.contains("-128")
+            diagnostics.log(
+                cancelled ? .skipped : .failure,
+                phase: cancelled
+                    ? "helper.manual_authorization_cancelled"
+                    : "helper.manual_authorization_failed",
+                context: diagnosticsContext,
+                details: [
+                    "exit_status": String(task.terminationStatus),
+                    "process_stderr": errorOutput,
+                ]
+            )
+            throw NSError(
+                domain: "IconManager",
+                code: cancelled ? 27 : 28,
+                userInfo: [
+                    NSLocalizedDescriptionKey: cancelled
+                        ? NSLocalizedString(
+                            "Administrator approval was canceled.",
+                            comment: "Manual helper authorization canceled"
+                        )
+                        : "Administrator approval failed: \(errorOutput)"
+                ]
+            )
+        }
+
+        diagnostics.log(
+            .operation,
+            phase: "helper.manual_authorization_completed",
+            context: diagnosticsContext
+        )
+        return output
     }
     
     enum ShellError: Error, LocalizedError {
@@ -1505,7 +1637,7 @@ class IconManager: ObservableObject {
         do {
             _ = try Self.runProcess(
                 executableURL: URL(fileURLWithPath: "/usr/bin/sudo"),
-                arguments: ["-n", "--", helperScriptURL.path, "--self-test"],
+                arguments: ["-k", "-n", "--", helperScriptURL.path, "--self-test"],
                 timeout: 5.0
             )
             return .authorized
@@ -1554,13 +1686,18 @@ class IconManager: ObservableObject {
         )
     }
 
-    func configureSudoers() throws {
+    func configureSudoers(
+        allowManagedCompatibility: Bool = false
+    ) throws -> SudoersConfigurationResult {
         let diagnosticsContext = DiagnosticsContext(operation: .setup)
         let timer = DiagnosticsTimer()
         diagnostics.log(
             .operation,
             phase: "sudoers_configuration.start",
-            context: diagnosticsContext
+            context: diagnosticsContext,
+            details: [
+                "managed_compatibility_allowed": String(allowManagedCompatibility)
+            ]
         )
         let helperPath = self.helperScriptURL.path
         let username = NSUserName()
@@ -1582,40 +1719,160 @@ class IconManager: ObservableObject {
             )
             throw error
         }
-        let sudoersLine = "\(username) ALL=(ALL) NOPASSWD: \(helperPath)"
-        let sudoersFile = "/etc/sudoers.d/iconchanger"
+        guard let bundledHelper = Bundle.main.path(forResource: "helper", ofType: "sh"),
+              let bundledFileicon = Bundle.main.path(forResource: "fileicon", ofType: nil),
+              let helperHash = sha256(of: bundledHelper),
+              let fileiconHash = sha256(of: bundledFileicon) else {
+            throw NSError(
+                domain: "IconManager",
+                code: 26,
+                userInfo: [
+                    NSLocalizedDescriptionKey:
+                        "Could not verify the bundled privileged helper files."
+                ]
+            )
+        }
+
+        let sudoersLine = SudoersRulePolicy.currentRule(
+            username: username,
+            helperPath: helperPath
+        )
         let homeDirectory = FileManager.default.homeDirectoryForCurrentUser.path
         let legacyLines = LegacySudoersPolicy.exactLegacyLines(
             username: username,
             homeDirectory: homeDirectory
         )
         let legacyFileiconPath = "\(homeDirectory)/.iconchanger/fileicon"
+        let compatibilityFlag = allowManagedCompatibility ? "1" : "0"
+        let commands = """
+        set -eu
+        DROPIN='/private/etc/sudoers.d/iconchanger'
+        HELPER='\(helperPath.shellEscaped)'
+        FILEICON='\(fileiconURL.path.shellEscaped)'
+        USER_NAME='\(username.shellEscaped)'
+        RULE='\(sudoersLine.shellEscaped)'
+        RULE_TMP=''
+        MAIN_TMP=''
+        MAIN_BACKUP=$(/usr/bin/mktemp /tmp/iconchanger-main-backup.XXXXXX)
+        DROPIN_BACKUP=$(/usr/bin/mktemp /tmp/iconchanger-dropin-backup.XXXXXX)
+        DROPIN_EXISTED=0
+        BACKUP_READY=0
+        COMMITTED=0
+        rollback_iconchanger() {
+          [ "$BACKUP_READY" -eq 1 ] || return 0
+          ROLLBACK_MAIN=$(/usr/bin/mktemp /private/etc/sudoers.iconchanger.rollback.XXXXXX)
+          /bin/cp "$MAIN_BACKUP" "$ROLLBACK_MAIN"
+          /usr/sbin/chown root:wheel "$ROLLBACK_MAIN"
+          /bin/chmod 0440 "$ROLLBACK_MAIN"
+          /bin/mv "$ROLLBACK_MAIN" /private/etc/sudoers
+          if [ "$DROPIN_EXISTED" -eq 1 ]; then
+            /bin/mkdir -p /private/etc/sudoers.d
+            ROLLBACK_DROPIN=$(/usr/bin/mktemp /private/etc/sudoers.d/iconchanger.rollback.XXXXXX)
+            /bin/cp "$DROPIN_BACKUP" "$ROLLBACK_DROPIN"
+            /usr/sbin/chown root:wheel "$ROLLBACK_DROPIN"
+            /bin/chmod 0440 "$ROLLBACK_DROPIN"
+            /bin/mv "$ROLLBACK_DROPIN" "$DROPIN"
+          else
+            /bin/rm -f "$DROPIN"
+          fi
+        }
+        finish_iconchanger() {
+          status=$?
+          trap - EXIT HUP INT TERM
+          if [ "$COMMITTED" -ne 1 ]; then
+            rollback_iconchanger
+          fi
+          [ -z "$RULE_TMP" ] || /bin/rm -f "$RULE_TMP"
+          [ -z "$MAIN_TMP" ] || /bin/rm -f "$MAIN_TMP"
+          /bin/rm -f "$MAIN_BACKUP" "$DROPIN_BACKUP"
+          exit "$status"
+        }
+        trap finish_iconchanger EXIT HUP INT TERM
 
-        let commands = [
-            "RULE_TMP=$(mktemp /tmp/iconchanger_sudoers.XXXXXX)",
-            "MAIN_TMP=$(mktemp /etc/sudoers.iconchanger.XXXXXX)",
-            "trap 'rm -f \"$RULE_TMP\" \"$MAIN_TMP\"' EXIT",
-            "echo '\(sudoersLine.shellEscaped)' > \"$RULE_TMP\"",
-            "awk -v old_all='\(legacyLines[0].shellEscaped)' -v old_user='\(legacyLines[1].shellEscaped)' '$0 != old_all && $0 != old_user { print }' /etc/sudoers > \"$MAIN_TMP\"",
-            "chmod 0440 \"$RULE_TMP\" \"$MAIN_TMP\"",
-            "chown root:wheel \"$RULE_TMP\" \"$MAIN_TMP\"",
-            "visudo -c -f \"$RULE_TMP\"",
-            "visudo -c -f \"$MAIN_TMP\"",
-            "if cmp -s /etc/sudoers \"$MAIN_TMP\"; then rm -f \"$MAIN_TMP\"; else mv \"$MAIN_TMP\" /etc/sudoers; fi",
-            "mv \"$RULE_TMP\" '\(sudoersFile.shellEscaped)'",
-            "rm -f '\(legacyHelperScriptPath.shellEscaped)' '\(legacyFileiconPath.shellEscaped)'",
-            "chmod 0440 '\(sudoersFile.shellEscaped)'",
-            "chown root:wheel '\(sudoersFile.shellEscaped)'"
-        ].joined(separator: " && ")
+        /usr/sbin/visudo -c
+        /bin/cp /private/etc/sudoers "$MAIN_BACKUP"
+        if [ -e "$DROPIN" ]; then
+          DROPIN_EXISTED=1
+          /bin/cp "$DROPIN" "$DROPIN_BACKUP"
+        fi
+        BACKUP_READY=1
+        /bin/mkdir -p /private/etc/sudoers.d
+        RULE_TMP=$(/usr/bin/mktemp /private/etc/sudoers.d/iconchanger.XXXXXX)
+        MAIN_TMP=$(/usr/bin/mktemp /private/etc/sudoers.iconchanger.XXXXXX)
+
+        [ -f "$HELPER" ] && [ ! -L "$HELPER" ]
+        [ -f "$FILEICON" ] && [ ! -L "$FILEICON" ]
+        [ "$(/usr/bin/stat -f '%Su:%Sg:%Lp' "$HELPER")" = 'root:wheel:755' ]
+        [ "$(/usr/bin/stat -f '%Su:%Sg:%Lp' "$FILEICON")" = 'root:wheel:755' ]
+        [ "$(/usr/bin/shasum -a 256 "$HELPER" | /usr/bin/awk '{print $1}')" = '\(helperHash)' ]
+        [ "$(/usr/bin/shasum -a 256 "$FILEICON" | /usr/bin/awk '{print $1}')" = '\(fileiconHash)' ]
+
+        /usr/bin/printf '%s\\n' "$RULE" > "$RULE_TMP"
+        /bin/chmod 0440 "$RULE_TMP"
+        /usr/sbin/chown root:wheel "$RULE_TMP"
+        /usr/sbin/visudo -c -f "$RULE_TMP"
+
+        /usr/bin/awk \
+          -v old_all='\(legacyLines[0].shellEscaped)' \
+          -v old_user='\(legacyLines[1].shellEscaped)' \
+          -v block_begin='\(SudoersRulePolicy.managedBlockBegin)' \
+          -v block_end='\(SudoersRulePolicy.managedBlockEnd)' \
+          'BEGIN { skip = 0 }
+           $0 == block_begin { skip = 1; next }
+           $0 == block_end { skip = 0; next }
+           skip == 1 { next }
+           $0 != old_all && $0 != old_user { print }' \
+          /private/etc/sudoers > "$MAIN_TMP"
+        /bin/chmod 0440 "$MAIN_TMP"
+        /usr/sbin/chown root:wheel "$MAIN_TMP"
+        /usr/sbin/visudo -c -f "$MAIN_TMP"
+
+        /bin/mv "$RULE_TMP" "$DROPIN"
+        /usr/sbin/chown root:wheel "$DROPIN"
+        /bin/chmod 0440 "$DROPIN"
+
+        LIST_OUTPUT=$(/usr/bin/sudo -U "$USER_NAME" -l 2>&1 || true)
+        if ! /usr/bin/printf '%s\\n' "$LIST_OUTPUT" | /usr/bin/grep -F 'NOPASSWD:' | /usr/bin/grep -F "$HELPER" >/dev/null; then
+          if [ '\(compatibilityFlag)' -ne 1 ]; then
+            /usr/bin/printf '%s\\n' 'ICONCHANGER_MANAGED_COMPATIBILITY_REQUIRED'
+            exit 0
+          fi
+          /usr/bin/printf '\\n%s\\n%s\\n%s\\n' \
+            '\(SudoersRulePolicy.managedBlockBegin)' \
+            "$RULE" \
+            '\(SudoersRulePolicy.managedBlockEnd)' >> "$MAIN_TMP"
+          /usr/sbin/visudo -c -f "$MAIN_TMP"
+          /bin/mv "$MAIN_TMP" /private/etc/sudoers
+          /usr/sbin/chown root:wheel /private/etc/sudoers
+          /bin/chmod 0440 /private/etc/sudoers
+          /bin/rm -f "$DROPIN"
+          /usr/bin/printf '%s\\n' 'ICONCHANGER_CONFIGURATION_MODE=main_file'
+        else
+          if ! /usr/bin/cmp -s /private/etc/sudoers "$MAIN_TMP"; then
+            /bin/mv "$MAIN_TMP" /private/etc/sudoers
+            /usr/sbin/chown root:wheel /private/etc/sudoers
+            /bin/chmod 0440 /private/etc/sudoers
+          fi
+          /usr/bin/printf '%s\\n' 'ICONCHANGER_CONFIGURATION_MODE=drop_in'
+        fi
+
+        /usr/sbin/visudo -c
+        LIST_OUTPUT=$(/usr/bin/sudo -U "$USER_NAME" -l 2>&1 || true)
+        /usr/bin/printf '%s\\n' "$LIST_OUTPUT" | /usr/bin/grep -F 'NOPASSWD:' | /usr/bin/grep -F "$HELPER" >/dev/null
+        /usr/bin/sudo -u "$USER_NAME" /usr/bin/sudo -k -n -- "$HELPER" --self-test
+        /bin/rm -f '\(legacyHelperScriptPath.shellEscaped)' '\(legacyFileiconPath.shellEscaped)'
+        COMMITTED=1
+        """
 
         logger.log("Running sudoers configuration via osascript...")
 
         let task = Process()
+        let outputPipe = Pipe()
         let errorPipe = Pipe()
         task.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
         let appleScript = "do shell script \"\(commands.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\""))\" with administrator privileges"
         task.arguments = ["-e", appleScript]
-        task.standardOutput = Pipe()
+        task.standardOutput = outputPipe
         task.standardError = errorPipe
 
         do {
@@ -1632,6 +1889,10 @@ class IconManager: ObservableObject {
         }
         task.waitUntilExit()
 
+        let output = String(
+            data: outputPipe.fileHandleForReading.readDataToEndOfFile(),
+            encoding: .utf8
+        ) ?? ""
         let errorOutput = String(data: errorPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
 
         if task.terminationStatus != 0 {
@@ -1683,33 +1944,33 @@ class IconManager: ObservableObject {
             throw error
         }
 
+        if output.contains("ICONCHANGER_MANAGED_COMPATIBILITY_REQUIRED") {
+            diagnostics.log(
+                .step,
+                phase: "sudoers_configuration.dropin_ineffective",
+                context: diagnosticsContext,
+                durationMilliseconds: timer.elapsedMilliseconds,
+                details: [
+                    "probe_source": "sudo_-U",
+                    "rollback": "completed",
+                ]
+            )
+            return .managedCompatibilityRequired
+        }
+
+        let configurationMode = output.contains("ICONCHANGER_CONFIGURATION_MODE=main_file")
+            ? "main_file"
+            : "drop_in"
         switch probeSudoPermission() {
         case .authorized:
-            guard !legacySudoersRuleIsActive() else {
-                let error = NSError(
-                    domain: "IconManager",
-                    code: 25,
-                    userInfo: [
-                        NSLocalizedDescriptionKey:
-                            "The current helper is authorized, but the legacy user-writable sudoers rule could not be removed."
-                    ]
-                )
-                diagnostics.log(
-                    .failure,
-                    phase: "sudoers_configuration.legacy_rule_remaining",
-                    context: diagnosticsContext,
-                    durationMilliseconds: timer.elapsedMilliseconds,
-                    details: DiagnosticsLogger.errorDetails(error)
-                )
-                throw error
-            }
+            break
         case .permissionMissing:
             let error = NSError(
                 domain: "IconManager",
                 code: 23,
                 userInfo: [
                     NSLocalizedDescriptionKey:
-                        "The sudoers rule was installed, but the exact helper command still requires a password. A managed Mac policy may be overriding it."
+                        "The permission configuration passed validation but the cache-independent runtime self-test still requires a password."
                 ]
             )
             diagnostics.log(
@@ -1742,8 +2003,14 @@ class IconManager: ObservableObject {
             .operation,
             phase: "sudoers_configuration.completed",
             context: diagnosticsContext,
-            durationMilliseconds: timer.elapsedMilliseconds
+            durationMilliseconds: timer.elapsedMilliseconds,
+            details: [
+                "configuration_mode": configurationMode,
+                "probe_source": "sudo_-k_-n",
+                "rollback": "not_needed",
+            ]
         )
+        return .configured
     }
 
     func checkSetupStatus(

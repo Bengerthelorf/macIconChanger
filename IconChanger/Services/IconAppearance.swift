@@ -568,6 +568,19 @@ final class IconAppearanceSwitchService: ObservableObject {
     }
 
     private func apply(_ appearance: IconAppearance) async {
+        guard SetupMonitor.shared.health.backgroundAutomationAvailable else {
+            DiagnosticsLogger.shared.log(
+                .skipped,
+                phase: "appearance_batch.permission_paused",
+                context: DiagnosticsContext(
+                    operation: .appearance,
+                    source: .appearanceChange,
+                    iconKind: "appearance_\(appearance.rawValue)"
+                ),
+                details: ["permission_mode": "manual"]
+            )
+            return
+        }
         isSwitching = true
         defer { isSwitching = false }
 

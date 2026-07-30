@@ -11,7 +11,7 @@ enum SetupHealth: Equatable {
     case needsFolderPermission
     case missingHelperFiles([String])
     case outdatedHelperFiles
-    case needsSudoersPermission
+    case manualMode
     case needsLegacyPermissionCleanup
     case needsAppManagementPermission
     case error(String)
@@ -23,6 +23,13 @@ enum SetupHealth: Equatable {
         default:
             return true
         }
+    }
+
+    var backgroundAutomationAvailable: Bool {
+        if case .ready = self {
+            return true
+        }
+        return false
     }
 
     var statusSymbolName: String {
@@ -48,8 +55,8 @@ enum SetupHealth: Equatable {
             return NSLocalizedString("Helper files missing", comment: "Setup health status")
         case .outdatedHelperFiles:
             return NSLocalizedString("Helper files need an update", comment: "Setup health status")
-        case .needsSudoersPermission:
-            return NSLocalizedString("Administrator permission setup required", comment: "Setup health status")
+        case .manualMode:
+            return NSLocalizedString("Manual mode — background automation paused", comment: "Setup health status")
         case .needsLegacyPermissionCleanup:
             return NSLocalizedString("Legacy administrator permission cleanup required", comment: "Setup health status")
         case .needsAppManagementPermission:

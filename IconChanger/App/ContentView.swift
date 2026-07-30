@@ -13,6 +13,10 @@ struct ContentView: View {
     @State private var showSetupOKAlert = false
     @State private var isConfiguring = false
     @State private var configError: String?
+    @State private var showManagedCompatibilityAlert = false
+    @State private var showManualModeAlert = false
+    @State private var hasPresentedManualModeAlert = false
+    @State private var showPermissionRepairError = false
 
     var body: some View {
         Group {
@@ -84,40 +88,8 @@ struct ContentView: View {
                  }
                  .padding()
 
-            case .needsSudoersPermission:
-                 VStack(spacing: 15) {
-                      Image(systemName: "lock.shield.fill")
-                          .resizable().scaledToFit().frame(width: 40, height: 40).foregroundColor(.orange)
-                          .padding(.bottom, 5)
-                     Text("Permission Setup")
-                         .font(.title2.bold())
-                     Text("IconChanger needs administrator privileges to change app icons.\nClick the button below and enter your password to complete setup.")
-                          .multilineTextAlignment(.center)
-                          .foregroundColor(.secondary)
-                         .padding(.horizontal)
-
-                     if isConfiguring {
-                         ProgressView("Configuring...")
-                             .padding(.top)
-                     } else {
-                         Button {
-                             configurePermissions()
-                         } label: {
-                             Label("Configure Permissions", systemImage: "lock.open.fill")
-                         }
-                         .controlSize(.large)
-                         .padding(.top)
-                     }
-
-                     if let configError {
-                         Text(configError)
-                             .foregroundColor(.red)
-                             .font(.caption)
-                             .multilineTextAlignment(.center)
-                             .padding(.horizontal)
-                     }
-                 }
-                 .padding()
+            case .manualMode:
+                IconList()
 
             case .needsLegacyPermissionCleanup:
                  VStack(spacing: 15) {
@@ -239,16 +211,51 @@ struct ContentView: View {
                    }
               }
          }
-         .alert("Setup Status", isPresented: $showSetupOKAlert) {
+        .alert("Setup Status", isPresented: $showSetupOKAlert) {
              Button("OK", role: .cancel) { }
          } message: {
              Text("Everything is set up correctly.")
          }
+        .alert(
+            "Managed Mac Compatibility",
+            isPresented: $showManagedCompatibilityAlert
+        ) {
+            Button("Use Manual Mode", role: .cancel) {}
+            Button("Install Compatibility Rule") {
+                configurePermissions(allowManagedCompatibility: true)
+            }
+        } message: {
+            Text("This Mac does not apply IconChanger's validated /etc/sudoers.d rule. Compatibility mode adds one marked rule to /etc/sudoers for the fixed, root-owned helper only. The complete file is validated before it replaces the current configuration.")
+        }
+        .alert(
+            "Background Automation Paused",
+            isPresented: $showManualModeAlert
+        ) {
+            Button("Continue in Manual Mode", role: .cancel) {}
+            Button("Repair Permissions") {
+                configurePermissions()
+            }
+        } message: {
+            Text("Manual icon changes are still available and will request administrator approval when needed. Scheduled restore, update restore, and automatic appearance changes remain paused until permanent helper permission is repaired.")
+        }
+        .alert(
+            "Unable to Repair Permissions",
+            isPresented: $showPermissionRepairError
+        ) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(configError ?? "An unknown permission error occurred.")
+        }
 
     }
 
     func checkFullSetup() {
-        setupMonitor.check()
+        setupMonitor.check { health in
+            if case .manualMode = health, !hasPresentedManualModeAlert {
+                hasPresentedManualModeAlert = true
+                showManualModeAlert = true
+            }
+        }
     }
 
     private func repairHelperFiles() {
@@ -260,25 +267,32 @@ struct ContentView: View {
         }
     }
 
-    private func configurePermissions() {
+    private func configurePermissions(allowManagedCompatibility: Bool = false) {
         configError = nil
         isConfiguring = true
         DispatchQueue.global(qos: .userInitiated).async {
             do {
-                try iconManager.configureSudoers()
+                let result = try iconManager.configureSudoers(
+                    allowManagedCompatibility: allowManagedCompatibility
+                )
                 DispatchQueue.main.async {
                     isConfiguring = false
-                    checkFullSetup()
+                    switch result {
+                    case .configured:
+                        checkFullSetup()
+                    case .managedCompatibilityRequired:
+                        showManagedCompatibilityAlert = true
+                    }
                 }
             } catch {
                 DispatchQueue.main.async {
                     isConfiguring = false
                     configError = error.localizedDescription
+                    showPermissionRepairError = true
                 }
             }
         }
     }
-
 }
 
 struct ContentView_Previews: PreviewProvider {

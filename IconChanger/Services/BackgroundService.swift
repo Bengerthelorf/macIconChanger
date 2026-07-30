@@ -363,6 +363,9 @@ import os
             )
             button.contentTintColor = health.needsAttention ? .systemOrange : nil
         }
+        if isRunning {
+            setupTimers()
+        }
         updateStatusMenu()
     }
 
@@ -668,8 +671,10 @@ import os
         cancelTimer(&scheduledRestoreTimer)
         cancelTimer(&updateCheckTimer)
         cancelTimer(&fetchCacheCleanupTimer)
+        let backgroundAutomationAvailable =
+            SetupMonitor.shared.health.backgroundAutomationAvailable
 
-        if enableScheduledRestore {
+        if enableScheduledRestore && backgroundAutomationAvailable {
             let intervalHours = getActiveRestoreInterval()
             let intervalSeconds = TimeInterval(intervalHours * 3600)
             let delay = BackgroundSchedulePolicy.nextDelay(
@@ -686,7 +691,7 @@ import os
             }
         }
 
-        if enableAutoRestoreOnUpdate {
+        if enableAutoRestoreOnUpdate && backgroundAutomationAvailable {
             let timeInterval = Double(autoRestoreCheckInterval * 60)
             let delay = BackgroundSchedulePolicy.nextDelay(
                 interval: timeInterval,
@@ -718,6 +723,13 @@ import os
                 "fetch_cache_cleanup_enabled": String(
                     IconFetchCacheManager.shared.getCacheCount() > 0
                 ),
+                "background_automation_available":
+                    String(backgroundAutomationAvailable),
+                "root_automation_paused":
+                    String(
+                        !backgroundAutomationAvailable
+                        && (enableScheduledRestore || enableAutoRestoreOnUpdate)
+                    ),
             ]
         )
     }

@@ -23,6 +23,13 @@ final class SetupMonitor: ObservableObject {
         source: DiagnosticsSource = .system,
         completion: ((SetupHealth) -> Void)? = nil
     ) {
+#if DEBUG
+        if ProcessInfo.processInfo.environment["ICONCHANGER_PREVIEW_MANUAL_MODE"] == "1" {
+            publish(.manualMode)
+            completion?(.manualMode)
+            return
+        }
+#endif
         checkGeneration += 1
         let generation = checkGeneration
         let diagnosticsContext = DiagnosticsContext(
@@ -77,7 +84,15 @@ final class SetupMonitor: ObservableObject {
             case .helperFilesOutdated:
                 result = .outdatedHelperFiles
             case .sudoersPermissionMissing:
-                result = .needsSudoersPermission
+                let appManagementStatus = iconManager.appManagementStatus()
+                details["app_management_status"] =
+                    Self.appManagementStatusName(appManagementStatus)
+                switch appManagementStatus {
+                case .authorized, .unknown:
+                    result = .manualMode
+                case .denied, .notDetermined:
+                    result = .needsAppManagementPermission
+                }
             case .legacySudoersPermissionPresent:
                 result = .needsLegacyPermissionCleanup
             case .unknownError(let message):

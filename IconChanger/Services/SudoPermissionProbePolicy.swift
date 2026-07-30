@@ -25,6 +25,29 @@ enum SudoPermissionProbePolicy {
     }
 }
 
+enum SudoersConfigurationResult: Equatable {
+    case configured
+    case managedCompatibilityRequired
+}
+
+enum SudoersRulePolicy {
+    static let managedBlockBegin = "# BEGIN IconChanger managed helper"
+    static let managedBlockEnd = "# END IconChanger managed helper"
+
+    static func currentRule(username: String, helperPath: String) -> String {
+        "\(username) ALL=(root) NOPASSWD: \(helperPath)"
+    }
+
+    static func effectiveRuleIsPresent(
+        in sudoListOutput: String,
+        helperPath: String
+    ) -> Bool {
+        sudoListOutput.split(whereSeparator: \.isNewline).contains { line in
+            line.contains("NOPASSWD:") && line.contains(helperPath)
+        }
+    }
+}
+
 enum LegacySudoersPolicy {
     static func legacyHelperPath(homeDirectory: String) -> String {
         "\(homeDirectory)/.iconchanger/helper.sh"

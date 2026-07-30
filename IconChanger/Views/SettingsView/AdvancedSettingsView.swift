@@ -53,6 +53,18 @@ struct AdvancedSettingsView: View {
     @State private var exportPassword = ""
     @State private var usageCount: Int = APIUsageTracker.shared.currentCount
     @State private var appearanceIconCount = 0
+    @StateObject private var setupMonitor = SetupMonitor.shared
+    @StateObject private var iconManager = IconManager.shared
+    @State private var isRepairingPermission = false
+    @State private var permissionRepairError: String?
+    @State private var showManagedCompatibilityAlert = false
+
+    private var isManualMode: Bool {
+        if case .manualMode = setupMonitor.health {
+            return true
+        }
+        return false
+    }
 
     private var aliasCount: Int {
         AliasNames.getAll().count
@@ -64,6 +76,58 @@ struct AdvancedSettingsView: View {
 
     var body: some View {
         Form {
+            Section {
+                LabeledContent {
+                    Label(
+                        isManualMode ? "Manual Mode" : "Ready",
+                        systemImage: isManualMode
+                            ? "pause.circle.fill"
+                            : "checkmark.circle.fill"
+                    )
+                    .foregroundStyle(isManualMode ? .orange : .green)
+                } label: {
+                    Text("Permission Status")
+                }
+
+                if isManualMode {
+                    Button {
+                        repairBackgroundPermission()
+                    } label: {
+                        if isRepairingPermission {
+                            HStack(spacing: 6) {
+                                ProgressView()
+                                    .controlSize(.small)
+                                Text("Repairing Permissions…")
+                            }
+                        } else {
+                            Label(
+                                "Repair Background Permission",
+                                systemImage: "lock.open"
+                            )
+                        }
+                    }
+                    .disabled(isRepairingPermission)
+                }
+
+                if let permissionRepairError {
+                    Label(
+                        permissionRepairError,
+                        systemImage: "exclamationmark.triangle"
+                    )
+                    .foregroundStyle(.red)
+                }
+            } header: {
+                Label("Administrator Access", systemImage: "lock.shield")
+            } footer: {
+                if isManualMode {
+                    Text("Manual icon changes remain available and request administrator approval when needed. Scheduled restore, update restore, and automatic appearance changes are paused until permanent permission is repaired.")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                } else {
+                    Text("The protected helper is authorized for both manual changes and background automation.")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+
             // MARK: - API
             Section {
                 SecureField(NSLocalizedString("API Key: ", comment: "API settings"), text: $apiKey)
@@ -344,6 +408,7 @@ struct AdvancedSettingsView: View {
         }
         .formStyle(.grouped)
         .onAppear {
+            setupMonitor.check()
             ConfigManager.shared.checkForCLIImports()
             fetchCacheCount = IconFetchCacheManager.shared.getCacheCount()
             updateAppearanceIconCount()
@@ -358,6 +423,45 @@ struct AdvancedSettingsView: View {
             NotificationCenter.default.publisher(for: .appearanceIconStoreDidChange)
         ) { _ in
             updateAppearanceIconCount()
+        }
+        .alert(
+            "Managed Mac Compatibility",
+            isPresented: $showManagedCompatibilityAlert
+        ) {
+            Button("Keep Manual Mode", role: .cancel) {}
+            Button("Install Compatibility Rule") {
+                repairBackgroundPermission(allowManagedCompatibility: true)
+            }
+        } message: {
+            Text("This Mac does not apply IconChanger's validated /etc/sudoers.d rule. Compatibility mode adds one marked rule to /etc/sudoers for the fixed, root-owned helper only. The complete file is validated before replacement.")
+        }
+    }
+
+    private func repairBackgroundPermission(
+        allowManagedCompatibility: Bool = false
+    ) {
+        permissionRepairError = nil
+        isRepairingPermission = true
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                let result = try iconManager.configureSudoers(
+                    allowManagedCompatibility: allowManagedCompatibility
+                )
+                DispatchQueue.main.async {
+                    isRepairingPermission = false
+                    switch result {
+                    case .configured:
+                        setupMonitor.check()
+                    case .managedCompatibilityRequired:
+                        showManagedCompatibilityAlert = true
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    isRepairingPermission = false
+                    permissionRepairError = error.localizedDescription
+                }
+            }
         }
     }
 

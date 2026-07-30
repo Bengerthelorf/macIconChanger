@@ -4,7 +4,7 @@ import Foundation
 enum SetupHealthTests {
     static func main() {
         assertEqual(SetupHealth.ready.statusSymbolName, "app.badge.checkmark.fill")
-        assertEqual(SetupHealth.needsSudoersPermission.statusSymbolName, "exclamationmark.triangle.fill")
+        assertEqual(SetupHealth.manualMode.statusSymbolName, "exclamationmark.triangle.fill")
         assertFalse(
             SetupHealth.checking.needsAttention,
             "checking is a transient state, not a failure"
@@ -16,6 +16,14 @@ enum SetupHealthTests {
         assertTrue(
             SetupHealth.needsLegacyPermissionCleanup.needsAttention,
             "a legacy user-writable sudoers rule requires explicit cleanup"
+        )
+        assertTrue(
+            SetupHealth.ready.backgroundAutomationAvailable,
+            "healthy setup enables background automation"
+        )
+        assertFalse(
+            SetupHealth.manualMode.backgroundAutomationAvailable,
+            "manual mode must pause root-required background automation"
         )
 
         assertTrue(
