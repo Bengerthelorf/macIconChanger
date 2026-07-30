@@ -4,6 +4,25 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.5.1-pre.1.fix.2</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>40105016102</sparkle:version>
+                    <sparkle:shortVersionString>1.5.1-pre.1.fix.2</sparkle:shortVersionString>
+                    <pubDate>Thu, 30 Jul 2026 17:02:44 +0000</pubDate>
+                    <sparkle:channel>beta</sparkle:channel>
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.5.1-pre.1.fix.2/IconChanger.dmg"
+                    sparkle:edSignature="hlZ7rsQDsIVkrGqVRvpmZZZMfeXwicR3chiDN+C0o5jpdOvpjjEs9JQZTZW2c9bh2k4HI54ole+yOSzRx5mJCA==" length="8675223"
+                    type="application/octet-stream"/>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.5.1-pre.1.fix.2</h2>
+                    <ul>
+                        <li><strong>Fixed:</strong> support managed Mac helper permissions</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
                     <title>Version 1.5.1-pre.1.fix.1</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>40105016101</sparkle:version>
