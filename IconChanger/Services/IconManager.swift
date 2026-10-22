@@ -457,6 +457,11 @@ class IconManager: ObservableObject {
         }
     }
 
+    private func ensureSetupCompleted(for app: AppItem, allowRepair: Bool = true) throws {
+        guard app.url.pathExtension.lowercased() == "app" else { return }
+        try ensureSetupCompleted(allowRepair: allowRepair)
+    }
+
     private func applyIcon(
         _ image: NSImage,
         to app: AppItem,
@@ -509,7 +514,7 @@ class IconManager: ObservableObject {
     }
 
     func restoreUndoSnapshot(_ snapshot: IconUndoSnapshot, app: AppItem) throws {
-        try ensureSetupCompleted()
+        try ensureSetupCompleted(for: app)
         let context = DiagnosticsContext(operation: .replace, appName: app.name, appPath: app.id)
         if snapshot.hadCustomIcon {
             try applyIcon(snapshot.image, to: app, diagnosticsContext: context)
@@ -537,7 +542,7 @@ class IconManager: ObservableObject {
 
         do {
             diagnostics.log(.step, phase: "setup_check.start", context: context)
-            try ensureSetupCompleted()
+            try ensureSetupCompleted(for: app)
             diagnostics.log(.step, phase: "setup_check.finish", context: context)
             try runHelperRemove(appPath: appPath, diagnosticsContext: context)
 
@@ -594,7 +599,7 @@ class IconManager: ObservableObject {
 
         do {
             diagnostics.log(.step, phase: "setup_check.start", context: context)
-            try ensureSetupCompleted()
+            try ensureSetupCompleted(for: app)
             diagnostics.log(.step, phase: "setup_check.finish", context: context)
             let cache = IconCacheManager.shared
             try IconApplicationTransaction.perform(
@@ -667,7 +672,7 @@ class IconManager: ObservableObject {
 
         do {
             diagnostics.log(.step, phase: "setup_check.start", context: context)
-            try ensureSetupCompleted(allowRepair: allowRepair)
+            try ensureSetupCompleted(for: app, allowRepair: allowRepair)
             diagnostics.log(.step, phase: "setup_check.finish", context: context)
             try applyIcon(image, to: app, diagnosticsContext: context)
 
@@ -727,7 +732,7 @@ class IconManager: ObservableObject {
 
         do {
             diagnostics.log(.step, phase: "setup_check.start", context: context)
-            try ensureSetupCompleted(allowRepair: allowRepair)
+            try ensureSetupCompleted(for: app, allowRepair: allowRepair)
             diagnostics.log(.step, phase: "setup_check.finish", context: context)
             guard
                 let restoredContext = try applyBestCachedIcon(
@@ -1253,6 +1258,13 @@ class IconManager: ObservableObject {
         imagePath: String,
         diagnosticsContext: DiagnosticsContext? = nil
     ) throws {
+        if URL(fileURLWithPath: appPath).pathExtension.lowercased() != "app" {
+            guard let image = NSImage(contentsOfFile: imagePath) else {
+                throw ImageSaveError.cgImageConversionFailed
+            }
+            try setFolderIcon(image, at: URL(fileURLWithPath: appPath))
+            return
+        }
         let context =
             diagnosticsContext
             ?? DiagnosticsContext(
@@ -1273,12 +1285,37 @@ class IconManager: ObservableObject {
         appPath: String,
         diagnosticsContext: DiagnosticsContext
     ) throws {
+        if URL(fileURLWithPath: appPath).pathExtension.lowercased() != "app" {
+            try setFolderIcon(nil, at: URL(fileURLWithPath: appPath))
+            return
+        }
         try runHelper(
             arguments: ["--remove", fileiconURL.path, appPath],
             operation: "remove",
             appPath: appPath,
             diagnosticsContext: diagnosticsContext
         )
+    }
+
+    /// User-selected folders use the public API with the user's existing access.
+    /// The administrator helper remains restricted to application bundles.
+    private func setFolderIcon(_ image: NSImage?, at url: URL) throws {
+        try UIReviewMode.requireLiveApplication()
+        let scoped = url.startAccessingSecurityScopedResource()
+        defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+        let values = try url.resourceValues(forKeys: [.isDirectoryKey, .isSymbolicLinkKey])
+        guard values.isDirectory == true, values.isSymbolicLink != true else {
+            throw NSError(domain: "IconManager", code: 41, userInfo: [
+                NSLocalizedDescriptionKey: NSLocalizedString("Select an existing folder to change its icon.", comment: "Invalid folder icon target")
+            ])
+        }
+        guard NSWorkspace.shared.setIcon(image, forFile: url.path, options: []) else {
+            throw NSError(domain: "IconManager", code: 42, userInfo: [
+                NSLocalizedDescriptionKey: NSLocalizedString("macOS could not change this folder's icon. Check that the folder is writable and its disk supports custom icons.", comment: "Folder icon write failure")
+            ])
+        }
+        let folder = AppItem(name: url.lastPathComponent, url: url, originalAppInfo: nil)
+        try IconWriteVerification.verify(removing: image == nil, hasCustomIcon: hasCustomIcon(app: folder))
     }
 
     private func runHelper(
@@ -1466,6 +1503,7 @@ class IconManager: ObservableObject {
                 "expected_custom_icon": String(operation != "remove"),
             ]
         )
+        try IconWriteVerification.verify(removing: operation == "remove", hasCustomIcon: customIconPresent)
         diagnostics.log(
             .performance,
             phase: "helper.finish",

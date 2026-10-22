@@ -3,6 +3,63 @@ import Foundation
 @main
 enum BackgroundScheduleTests {
     static func main() {
+        assertTrue(
+            BackgroundVisibilityPolicy.resolved(
+                showInDock: false,
+                showInMenuBar: false,
+                changedPreference: .dock
+            ) == .init(showInDock: false, showInMenuBar: true),
+            "hiding the last Dock entry must leave a menu-bar entry"
+        )
+        assertTrue(
+            BackgroundVisibilityPolicy.resolved(
+                showInDock: false,
+                showInMenuBar: false,
+                changedPreference: .menuBar
+            ) == .init(showInDock: true, showInMenuBar: false),
+            "hiding the last menu-bar entry must leave a Dock entry"
+        )
+        assertTrue(
+            BackgroundVisibilityPolicy.resolved(
+                showInDock: true,
+                showInMenuBar: true,
+                changedPreference: .menuBar
+            ) == .init(showInDock: true, showInMenuBar: true),
+            "valid visibility preferences must remain unchanged"
+        )
+        assertTrue(
+            BackgroundSchedulePolicy.validRestoreInterval("8760") == 8760,
+            "a custom restore interval may span up to one year"
+        )
+        assertTrue(
+            BackgroundSchedulePolicy.validRestoreInterval(String(Int.max)) == nil,
+            "an overflowing custom restore interval must not be accepted"
+        )
+        assertTrue(
+            BackgroundSchedulePolicy.validCheckInterval("525600") == 525600,
+            "a custom update-check interval may span up to one year"
+        )
+        assertTrue(
+            BackgroundSchedulePolicy.validCheckInterval(String(Int.max)) == nil,
+            "an overflowing custom check interval must not be accepted"
+        )
+        assertTrue(
+            BackgroundSchedulePolicy.validRestoreInterval("0") == nil
+                && BackgroundSchedulePolicy.validCheckInterval("-1") == nil
+                && BackgroundSchedulePolicy.validCheckInterval("abc") == nil,
+            "custom scheduling requires a positive whole-number interval"
+        )
+        assertTrue(
+            BackgroundSchedulePolicy.normalizedRestoreIntervalHours(Int.max) == 8760
+                && BackgroundSchedulePolicy.normalizedCheckIntervalMinutes(Int.max) == 525600,
+            "out-of-range persisted settings must use a safe maximum"
+        )
+        assertTrue(
+            BackgroundSchedulePolicy.normalizedRestoreIntervalHours(0) == 1
+                && BackgroundSchedulePolicy.normalizedCheckIntervalMinutes(-1) == 1,
+            "out-of-range persisted settings must use a safe minimum"
+        )
+
         assertEqual(
             BackgroundSchedulePolicy.nextDelay(
                 interval: 15 * 60,
@@ -107,7 +164,7 @@ enum BackgroundScheduleTests {
             "app update fallback must ignore root metadata changed by custom icons"
         )
 
-        print("PASS: background update checks resume from persisted state")
+        print("PASS: background visibility and interval safety; update checks resume from persisted state")
     }
 
     private static func assertEqual(

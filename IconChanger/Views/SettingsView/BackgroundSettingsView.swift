@@ -99,13 +99,7 @@ struct BackgroundSettingsView: View {
             if backgroundService.runInBackground {
                 Section {
                     Toggle("Show in Menu Bar", isOn: $backgroundService.showInMenuBar)
-                        .onChange(of: backgroundService.showInMenuBar) { _ in
-                            handleVisibilityChange()
-                        }
                     Toggle("Show in Dock", isOn: $backgroundService.showInDock)
-                        .onChange(of: backgroundService.showInDock) { _ in
-                            handleVisibilityChange()
-                        }
                 } header: {
                     Label("App Visibility", systemImage: "eye")
                 }
@@ -266,25 +260,29 @@ struct BackgroundSettingsView: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
+            Text("1–8,760 hours")
+                .font(.caption)
+                .foregroundColor(.secondary)
 
             HStack(spacing: 20) {
                 Button("Cancel") {
                     showCustomRestoreIntervalDialog = false
                 }
+                .keyboardShortcut(.cancelAction)
 
                 Button("Save") {
-                    if let hours = Int(temporaryCustomRestoreInterval), hours > 0 {
+                    if let hours = BackgroundSchedulePolicy.validRestoreInterval(temporaryCustomRestoreInterval) {
                         backgroundService.customScheduledRestoreInterval = hours
                         backgroundService.useCustomScheduledRestoreInterval = true
                     }
                     showCustomRestoreIntervalDialog = false
                 }
                 .keyboardShortcut(.defaultAction)
-                .disabled((Int(temporaryCustomRestoreInterval) ?? 0) <= 0)
+                .disabled(BackgroundSchedulePolicy.validRestoreInterval(temporaryCustomRestoreInterval) == nil)
             }
         }
         .padding()
-        .frame(width: 350, height: 200)
+        .frame(width: 350)
     }
 
     private var customCheckIntervalDialog: some View {
@@ -303,24 +301,28 @@ struct BackgroundSettingsView: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
+            Text("1–525,600 minutes")
+                .font(.caption)
+                .foregroundColor(.secondary)
 
             HStack(spacing: 20) {
                 Button("Cancel") {
                     showCustomCheckIntervalDialog = false
                 }
+                .keyboardShortcut(.cancelAction)
 
                 Button("Save") {
-                    if let minutes = Int(temporaryCustomCheckInterval), minutes > 0 {
+                    if let minutes = BackgroundSchedulePolicy.validCheckInterval(temporaryCustomCheckInterval) {
                         backgroundService.autoRestoreCheckInterval = minutes
                     }
                     showCustomCheckIntervalDialog = false
                 }
                 .keyboardShortcut(.defaultAction)
-                .disabled((Int(temporaryCustomCheckInterval) ?? 0) <= 0)
+                .disabled(BackgroundSchedulePolicy.validCheckInterval(temporaryCustomCheckInterval) == nil)
             }
         }
         .padding()
-        .frame(width: 350, height: 200)
+        .frame(width: 350)
     }
 
     private static let shortDateFormatter: DateFormatter = {
@@ -342,22 +344,8 @@ struct BackgroundSettingsView: View {
         let interval = backgroundService.useCustomScheduledRestoreInterval ?
             backgroundService.customScheduledRestoreInterval : backgroundService.scheduledRestoreInterval
 
-        let nextRestoreDate = backgroundService.lastScheduledRestore.addingTimeInterval(TimeInterval(interval * 3600))
+        let nextRestoreDate = backgroundService.lastScheduledRestore.addingTimeInterval(TimeInterval(interval) * 3600)
         return Self.shortDateFormatter.string(from: nextRestoreDate)
     }
 
-    private func handleVisibilityChange() {
-        if !backgroundService.showInMenuBar && !backgroundService.showInDock {
-            DispatchQueue.main.async {
-                backgroundService.showInMenuBar = true
-            }
-
-            let alert = NSAlert()
-            alert.messageText = NSLocalizedString("Visibility Required", comment: "Alert title")
-            alert.informativeText = NSLocalizedString("IconChanger needs to be visible in either the menu bar or the dock when running in the background.", comment: "Alert body")
-            alert.alertStyle = .informational
-            alert.addButton(withTitle: NSLocalizedString("OK", comment: "Alert button"))
-            alert.runModal()
-        }
-    }
 }

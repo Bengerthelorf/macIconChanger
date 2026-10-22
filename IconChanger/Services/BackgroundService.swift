@@ -46,12 +46,14 @@ import os
     @Published var showInDock: Bool {
         didSet {
             UserDefaults.standard.set(showInDock, forKey: "showInDock")
+            if showInDock != oldValue { applyVisibility(changedPreference: .dock) }
         }
     }
 
     @Published var showInMenuBar: Bool {
         didSet {
             UserDefaults.standard.set(showInMenuBar, forKey: "showInMenuBar")
+            if showInMenuBar != oldValue { applyVisibility(changedPreference: .menuBar) }
         }
     }
 
@@ -74,6 +76,11 @@ import os
 
     @Published var scheduledRestoreInterval: Int {
         didSet {
+            let normalized = BackgroundSchedulePolicy.normalizedRestoreIntervalHours(scheduledRestoreInterval)
+            if scheduledRestoreInterval != normalized {
+                scheduledRestoreInterval = normalized
+                return
+            }
             UserDefaults.standard.set(scheduledRestoreInterval, forKey: "scheduledRestoreInterval")
             rescheduleIfRunning(changed: scheduledRestoreInterval != oldValue)
         }
@@ -81,6 +88,11 @@ import os
 
     @Published var customScheduledRestoreInterval: Int {
         didSet {
+            let normalized = BackgroundSchedulePolicy.normalizedRestoreIntervalHours(customScheduledRestoreInterval)
+            if customScheduledRestoreInterval != normalized {
+                customScheduledRestoreInterval = normalized
+                return
+            }
             UserDefaults.standard.set(customScheduledRestoreInterval, forKey: "customScheduledRestoreInterval")
             rescheduleIfRunning(changed: customScheduledRestoreInterval != oldValue)
         }
@@ -108,6 +120,11 @@ import os
 
     @Published var autoRestoreCheckInterval: Int {
         didSet {
+            let normalized = BackgroundSchedulePolicy.normalizedCheckIntervalMinutes(autoRestoreCheckInterval)
+            if autoRestoreCheckInterval != normalized {
+                autoRestoreCheckInterval = normalized
+                return
+            }
             UserDefaults.standard.set(autoRestoreCheckInterval, forKey: "autoRestoreCheckInterval")
             rescheduleIfRunning(changed: autoRestoreCheckInterval != oldValue)
         }
@@ -158,6 +175,11 @@ import os
             self.showInMenuBar = UserDefaults.standard.bool(forKey: "showInMenuBar")
         }
 
+        if !showInDock && !showInMenuBar {
+            self.showInMenuBar = true
+            UserDefaults.standard.set(true, forKey: "showInMenuBar")
+        }
+
         self.enableAppearanceIconSwitching = UserDefaults.standard.bool(
             forKey: "enableAppearanceIconSwitching"
         )
@@ -167,14 +189,14 @@ import os
         if UserDefaults.standard.object(forKey: "scheduledRestoreInterval") != nil {
             let interval = UserDefaults.standard.integer(forKey: "scheduledRestoreInterval")
             if interval > 0 {
-                self.scheduledRestoreInterval = interval
+                self.scheduledRestoreInterval = BackgroundSchedulePolicy.normalizedRestoreIntervalHours(interval)
             }
         }
 
         if UserDefaults.standard.object(forKey: "customScheduledRestoreInterval") != nil {
             let interval = UserDefaults.standard.integer(forKey: "customScheduledRestoreInterval")
             if interval > 0 {
-                self.customScheduledRestoreInterval = interval
+                self.customScheduledRestoreInterval = BackgroundSchedulePolicy.normalizedRestoreIntervalHours(interval)
             }
         }
 
@@ -189,7 +211,7 @@ import os
         if UserDefaults.standard.object(forKey: "autoRestoreCheckInterval") != nil {
             let interval = UserDefaults.standard.integer(forKey: "autoRestoreCheckInterval")
             if interval > 0 {
-                self.autoRestoreCheckInterval = interval
+                self.autoRestoreCheckInterval = BackgroundSchedulePolicy.normalizedCheckIntervalMinutes(interval)
             }
         }
 
@@ -267,9 +289,7 @@ import os
         }
         isRunning = true
 
-        if showInMenuBar {
-            setupStatusBar()
-        }
+        applyVisibility(changedPreference: .dock)
 
         requestNotificationPermission()
         setupTimers()
@@ -558,6 +578,32 @@ import os
         }
     }
 
+    private func applyVisibility(changedPreference: BackgroundVisibilityPolicy.Preference) {
+        let visibility = BackgroundVisibilityPolicy.resolved(
+            showInDock: showInDock,
+            showInMenuBar: showInMenuBar,
+            changedPreference: changedPreference
+        )
+        if visibility.showInDock != showInDock {
+            showInDock = visibility.showInDock
+            return
+        }
+        if visibility.showInMenuBar != showInMenuBar {
+            showInMenuBar = visibility.showInMenuBar
+            return
+        }
+
+        guard !UIReviewMode.isEnabled else { return }
+        if isRunning && showInMenuBar {
+            setupStatusBar()
+        } else if let item = statusItem {
+            NSStatusBar.system.removeStatusItem(item)
+            statusItem = nil
+        }
+        updateDockVisibility()
+        updateStatusMenu()
+    }
+
     /// Re-synchronizes observable service state after configuration import.
     func reloadPersistentSettingsAfterImport() {
         let defaults = UserDefaults.standard
@@ -601,34 +647,10 @@ import os
 
     @objc func toggleMenuBarVisibility() {
         showInMenuBar.toggle()
-
-        if showInMenuBar {
-            setupStatusBar()
-        } else {
-            if let item = statusItem {
-                NSStatusBar.system.removeStatusItem(item)
-                statusItem = nil
-            }
-
-            if !showInDock {
-                showInDock = true
-                updateDockVisibility()
-            }
-        }
-
-        updateStatusMenu()
     }
 
     @objc func toggleDockVisibility() {
         showInDock.toggle()
-
-        if !showInDock && !showInMenuBar {
-            showInMenuBar = true
-            setupStatusBar()
-        }
-
-        updateDockVisibility()
-        updateStatusMenu()
     }
 
     @objc func toggleScheduledRestore() {
@@ -678,7 +700,7 @@ import os
 
         if enableScheduledRestore && backgroundAutomationAvailable {
             let intervalHours = getActiveRestoreInterval()
-            let intervalSeconds = TimeInterval(intervalHours * 3600)
+            let intervalSeconds = TimeInterval(intervalHours) * 3600
             let delay = BackgroundSchedulePolicy.nextDelay(
                 interval: intervalSeconds,
                 lastRun: lastScheduledRestore,
@@ -694,7 +716,7 @@ import os
         }
 
         if enableAutoRestoreOnUpdate && backgroundAutomationAvailable {
-            let timeInterval = Double(autoRestoreCheckInterval * 60)
+            let timeInterval = TimeInterval(autoRestoreCheckInterval) * 60
             let delay = BackgroundSchedulePolicy.nextDelay(
                 interval: timeInterval,
                 lastRun: lastUpdateCheck,
@@ -783,7 +805,7 @@ import os
         }
 
         let interval = getActiveRestoreInterval()
-        let timeInterval = TimeInterval(interval * 3600)
+        let timeInterval = TimeInterval(interval) * 3600
         let nextRestoreTime = lastScheduledRestore.addingTimeInterval(timeInterval)
 
         if Date() >= nextRestoreTime {
@@ -843,8 +865,11 @@ import os
                 )
 
                 if !updatedApps.isEmpty {
-                    try await restoreUpdatedApps(updatedApps)
-                    showUpdateNotification(appCount: updatedApps.count)
+                    let result = await restoreUpdatedApps(updatedApps)
+                    showUpdateNotification(restored: result.restored, failed: result.failed.count)
+                    if !result.failed.isEmpty {
+                        handleBackgroundSetupFailure()
+                    }
                 } else {
                     DiagnosticsLogger.shared.log(
                         .skipped,
@@ -901,7 +926,10 @@ import os
                     setupTimers()
                 }
 
-                showRestoreNotification()
+                showRestoreNotification(result: result)
+                if !result.failed.isEmpty {
+                    handleBackgroundSetupFailure()
+                }
                 DiagnosticsLogger.shared.log(
                     .operation,
                     phase: "scheduled_restore.completed",
@@ -959,12 +987,12 @@ import os
     @objc func restoreCachedIcons() {
         Task {
             do {
-                let _ = try await iconManager.restoreAllCachedIcons()
+                let result = try await iconManager.restoreAllCachedIcons()
                 await MainActor.run {
                     lastScheduledRestore = Date()
                 }
                 updateStatusMenu()
-                showRestoreNotification()
+                showRestoreNotification(result: result)
             } catch {
                 logger.error("Manual restore failed: \(error.localizedDescription)")
 
@@ -1007,27 +1035,41 @@ import os
         return updatedApps
     }
 
-    private func restoreUpdatedApps(_ apps: [AppItem]) async throws {
-        var restored = 0
+    private func restoreUpdatedApps(_ apps: [AppItem]) async -> IconManager.RestoreResult {
+        var result = IconManager.RestoreResult()
         for app in apps {
-            if try await iconManager.restoreCachedIcon(
-                for: app,
-                allowRepair: false,
-                refreshDock: false,
-                source: .appUpdate
-            ) {
-                restored += 1
+            do {
+                if try await iconManager.restoreCachedIcon(
+                    for: app,
+                    allowRepair: false,
+                    refreshDock: false,
+                    source: .appUpdate
+                ) {
+                    result.restored += 1
+                }
+            } catch {
+                result.failed.append((app.name, error))
+                logger.error("Failed to restore updated app icon for \(app.name): \(error.localizedDescription)")
             }
         }
-        if restored > 0 {
+        if result.restored > 0 {
             _ = await DockRefreshService.refreshTwice()
         }
+        return result
     }
 
-    private func showRestoreNotification() {
+    private func showRestoreNotification(result: IconManager.RestoreResult) {
+        guard result.restored > 0 || result.skippedNotInstalled > 0 || !result.failed.isEmpty else { return }
         let content = UNMutableNotificationContent()
-        content.title = NSLocalizedString("Icons Restored", comment: "Notification title")
-        content.body = NSLocalizedString("All cached app icons have been successfully restored.", comment: "Notification body")
+        content.title = NSLocalizedString(result.failed.isEmpty ? "Icons Restored" : "Icon Restoration Failed", comment: "Notification title")
+        var messages = [String(format: NSLocalizedString("%lld icons restored.", comment: ""), result.restored)]
+        if result.skippedNotInstalled > 0 {
+            messages.append(String(format: NSLocalizedString("%lld skipped (app not installed).", comment: ""), result.skippedNotInstalled))
+        }
+        if !result.failed.isEmpty {
+            messages.append(String(format: NSLocalizedString("%lld failed.", comment: ""), result.failed.count))
+        }
+        content.body = messages.joined(separator: "\n")
         content.sound = UNNotificationSound.default
 
         let request = UNNotificationRequest(
@@ -1043,10 +1085,14 @@ import os
         }
     }
 
-    private func showUpdateNotification(appCount: Int) {
+    private func showUpdateNotification(restored: Int, failed: Int) {
+        guard restored > 0 || failed > 0 else { return }
         let content = UNMutableNotificationContent()
-        content.title = NSLocalizedString("App Icons Restored", comment: "Notification title")
-        content.body = String(format: NSLocalizedString("%lld updated app(s) had their custom icons restored.", comment: "Notification body"), appCount)
+        content.title = NSLocalizedString(failed == 0 ? "App Icons Restored" : "Icon Restoration Failed", comment: "Notification title")
+        content.body = String(format: NSLocalizedString("%lld updated app(s) had their custom icons restored.", comment: "Notification body"), restored)
+        if failed > 0 {
+            content.body += "\n" + String(format: NSLocalizedString("%lld failed.", comment: ""), failed)
+        }
         content.sound = UNNotificationSound.default
 
         let request = UNNotificationRequest(

@@ -1,6 +1,238 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "1–525,600 minutes" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1–525,600 minutes"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1–525,600 分鐘"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1–525,600 分钟"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1–525,600 分鐘"
+          }
+        }
+      }
+    },
+    "1–8,760 hours" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1–8,760 hours"
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1–8,760 小時"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1–8,760 小时"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1–8,760 小時"
+          }
+        }
+      }
+    },
+    "IconChanger could not modify this app or folder. Check App Management access in System Settings and the helper status in IconChanger Settings, then try again." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IconChanger could not modify this app or folder. Check App Management access in System Settings and the helper status in IconChanger Settings, then try again."
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IconChanger 無法修改此應用程式或資料夾。請檢查系統設定中的「App 管理」權限，以及 IconChanger 設定中的輔助工具狀態，然後重試。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IconChanger 无法修改此应用或文件夹。请检查系统设置中的“应用管理”权限，以及 IconChanger 设置中的辅助工具状态，然后重试。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IconChanger 無法修改此應用程式或資料夾。請檢查系統設定中的「App 管理」權限，以及 IconChanger 設定中的輔助工具狀態，然後重試。"
+          }
+        }
+      }
+    },
+    "Select an existing folder to change its icon." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select an existing folder to change its icon."
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請選擇現有資料夾來更改圖示。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请选择现有文件夹来更改图标。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請選擇現有資料夾來更改圖示。"
+          }
+        }
+      }
+    },
+    "This app or folder is on a read-only disk or is protected by macOS. Choose a writable target for custom icons." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This app or folder is on a read-only disk or is protected by macOS. Choose a writable target for custom icons."
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此應用程式或資料夾位於唯讀磁碟，或受 macOS 保護。請選擇可寫入的目標來自訂圖示。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此应用或文件夹位于只读磁盘，或受 macOS 保护。请选择可写入的目标来自定义图标。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此應用程式或資料夾位於唯讀磁碟，或受 macOS 保護。請選擇可寫入的目標來自訂圖示。"
+          }
+        }
+      }
+    },
+    "macOS could not change this folder's icon. Check that the folder is writable and its disk supports custom icons." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS could not change this folder's icon. Check that the folder is writable and its disk supports custom icons."
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS 無法更改此資料夾的圖示。請確認資料夾可寫入，且所在磁碟支援自訂圖示。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS 无法更改此文件夹的图标。请确认文件夹可写入，且所在磁盘支持自定义图标。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS 無法更改此資料夾的圖示。請確認資料夾可寫入，且所在磁碟支援自訂圖示。"
+          }
+        }
+      }
+    },
+    "macOS could not store the custom icon. Check access to the app or folder, use a valid image, and make sure the disk supports custom icons." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS could not store the custom icon. Check access to the app or folder, use a valid image, and make sure the disk supports custom icons."
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS 無法儲存自訂圖示。請檢查應用程式或資料夾的存取權限，使用有效影像，並確認磁碟支援自訂圖示。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS 无法保存自定义图标。请检查应用或文件夹的访问权限，使用有效图像，并确认磁盘支持自定义图标。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS 無法儲存自訂圖示。請檢查應用程式或資料夾的存取權限，使用有效影像，並確認磁碟支援自訂圖示。"
+          }
+        }
+      }
+    },
+    "macOS did not retain the requested icon change. This app may be protected or may manage its own icon." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS did not retain the requested icon change. This app may be protected or may manage its own icon."
+          }
+        },
+        "zh-HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS 未保留此次圖示更改。此應用程式可能受系統保護，或自行管理圖示。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS 未保留此次图标更改。此应用可能受系统保护，或自行管理图标。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS 未保留此次圖示更改。此應用程式可能受系統保護，或自行管理圖示。"
+          }
+        }
+      }
+    },
     "Icon Appearance" : {
       "localizations" : {
         "zh-Hans" : {

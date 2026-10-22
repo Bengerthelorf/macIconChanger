@@ -56,30 +56,32 @@ struct AboutSettingsView: View {
             Text("IconChanger")
                 .font(.title.bold())
 
-            Text(showDevUnlocked ? "Developer Mode Enabled" : showCopied ? "Copied!" : "Version \(appVersion) (\(buildNumber))")
-                .foregroundColor(showDevUnlocked ? .accentColor : showCopied ? .green : .secondary)
-                .animation(.easeInOut, value: showDevUnlocked)
-                .animation(.easeInOut, value: showCopied)
-                .onTapGesture {
-                    NSPasteboard.general.clearContents()
-                    NSPasteboard.general.setString("IconChanger \(appVersion) (\(buildNumber))", forType: .string)
-                    copiedWorkItem?.cancel()
-                    showCopied = true
-                    let item = DispatchWorkItem { showCopied = false }
-                    copiedWorkItem = item
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: item)
+            Button {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString("IconChanger \(appVersion) (\(buildNumber))", forType: .string)
+                copiedWorkItem?.cancel()
+                showCopied = true
+                let item = DispatchWorkItem { showCopied = false }
+                copiedWorkItem = item
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: item)
 
-                    if t2Enabled { return }
-                    if NSApp.currentEvent?.modifierFlags.contains(.option) == true {
+                if t2Enabled { return }
+                if NSApp.currentEvent?.modifierFlags.contains(.option) == true {
+                    unlockDeveloperOptions()
+                } else {
+                    versionTapCount += 1
+                    if versionTapCount >= 7 {
                         unlockDeveloperOptions()
-                    } else {
-                        versionTapCount += 1
-                        if versionTapCount >= 7 {
-                            unlockDeveloperOptions()
-                        }
                     }
                 }
-                .help("Click to copy version")
+            } label: {
+                Text(showDevUnlocked ? "Developer Mode Enabled" : showCopied ? "Copied!" : "Version \(appVersion) (\(buildNumber))")
+                    .foregroundColor(showDevUnlocked ? .accentColor : showCopied ? .green : .secondary)
+                    .animation(.easeInOut, value: showDevUnlocked)
+                    .animation(.easeInOut, value: showCopied)
+            }
+            .buttonStyle(.plain)
+            .help("Click to copy version")
 
             VStack(spacing: 6) {
                 Link("GitHub Repository", destination: URL(string: "https://github.com/Bengerthelorf/macIconChanger")!)

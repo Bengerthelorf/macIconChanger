@@ -791,16 +791,18 @@ struct DockPreviewBar: View {
                 ScrollView(.horizontal, showsIndicators: true) {
                     HStack(spacing: 0) {
                         ForEach(apps.pinned) { app in
-                            DockPreviewIcon(
-                                app: app,
-                                refreshTrigger: refreshTrigger,
-                                isRunning: dockLayout.runningPaths.contains(app.id)
-                            )
-                            .onTapGesture { onSelectApp?(app) }
-                            .accessibilityElement(children: .ignore)
+                            Button {
+                                onSelectApp?(app)
+                            } label: {
+                                DockPreviewIcon(
+                                    app: app,
+                                    refreshTrigger: refreshTrigger,
+                                    isRunning: dockLayout.runningPaths.contains(app.id)
+                                )
+                            }
+                            .buttonStyle(.plain)
                             .accessibilityLabel(app.name)
-                            .accessibilityAddTraits(.isButton)
-                            .accessibilityAction { onSelectApp?(app) }
+                            .help(app.name)
                             .padding(.horizontal, 6)
                         }
 
@@ -812,16 +814,18 @@ struct DockPreviewBar: View {
                         }
 
                         ForEach(apps.runningOnly) { app in
-                            DockPreviewIcon(
-                                app: app,
-                                refreshTrigger: refreshTrigger,
-                                isRunning: true
-                            )
-                            .onTapGesture { onSelectApp?(app) }
-                            .accessibilityElement(children: .ignore)
+                            Button {
+                                onSelectApp?(app)
+                            } label: {
+                                DockPreviewIcon(
+                                    app: app,
+                                    refreshTrigger: refreshTrigger,
+                                    isRunning: true
+                                )
+                            }
+                            .buttonStyle(.plain)
                             .accessibilityLabel(app.name)
-                            .accessibilityAddTraits(.isButton)
-                            .accessibilityAction { onSelectApp?(app) }
+                            .help(app.name)
                             .padding(.horizontal, 6)
                         }
                     }

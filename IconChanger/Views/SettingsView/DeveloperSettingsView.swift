@@ -10,41 +10,6 @@ private struct DeveloperAPIKey: Identifiable {
     var value: String
 }
 
-private struct DeveloperMaskedKeyField: View {
-    @Binding var text: String
-    @State private var isEditing = false
-    @FocusState private var isFocused: Bool
-
-    var body: some View {
-        Group {
-            if isEditing {
-                TextField("API Key", text: $text)
-                    .focused($isFocused)
-                    .onChange(of: isFocused) { focused in
-                        if !focused { isEditing = false }
-                    }
-            } else {
-                Text(maskedText)
-                    .foregroundColor(text.isEmpty ? .secondary : .primary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        isEditing = true
-                        DispatchQueue.main.async { isFocused = true }
-                    }
-            }
-        }
-        .textFieldStyle(.roundedBorder)
-    }
-
-    private var maskedText: String {
-        guard text.count > 10 else {
-            return text.isEmpty ? "API Key" : text
-        }
-        return "\(text.prefix(6))...\(text.suffix(5))"
-    }
-}
-
 struct DeveloperSettingsView: View {
     @AppStorage("t2e") private var developerModeEnabled = false
     @AppStorage(DiagnosticsSettings.enabled) private var diagnosticsEnabled = false
@@ -176,7 +141,7 @@ struct DeveloperSettingsView: View {
                 ForEach($extraAPIKeys) { $key in
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
-                            DeveloperMaskedKeyField(text: $key.value)
+                            SecureField("API Key", text: $key.value)
                                 .onChange(of: key.value) { _ in
                                     syncExtraKeys()
                                     keyTestResults.removeValue(forKey: key.id)

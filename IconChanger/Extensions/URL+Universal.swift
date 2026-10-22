@@ -11,7 +11,9 @@ extension URL {
     }
 
     func universalPath() -> String {
-        return self.path.removingPercentEncoding ?? self.path
+        // URL.path is already decoded. Decoding it again changes literal %xx
+        // names and can redirect an icon write to a different sibling.
+        return self.path
     }
     
     func displayPath() -> String {

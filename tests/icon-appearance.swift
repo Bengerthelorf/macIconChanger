@@ -162,6 +162,13 @@ struct IconAppearancePolicyTests {
         let permissionMessage = RestoreDefaultErrorPolicy.friendlyMessage(
             "Failed to remove custom icon file: You don’t have permission."
         )
+        for raw in ["Operation not permitted", "EPERM", "Failed to create resource fork", "Read-only file system"] {
+            let message = RestoreDefaultErrorPolicy.friendlyMessage(raw, appPath: "/System/Applications/Mail.app")
+            expect(message.contains("system app"), "protected system apps must not suggest a repeated helper repair")
+        }
+        let diskMessage = RestoreDefaultErrorPolicy.friendlyMessage("Read-only file system", appPath: "/Applications/Safari.app")
+        expect(diskMessage.contains("read-only"), "read-only targets outside /System need accurate guidance")
+        expect(RestoreDefaultErrorPolicy.friendlyMessage("Administrator approval was canceled.", appPath: "/System/Applications/Mail.app").contains("canceled"), "cancellation must not be mislabeled as OS protection")
         expect(
             !permissionMessage.localizedCaseInsensitiveContains("closing"),
             "permission failures must not falsely claim that the app is running"

@@ -6,6 +6,30 @@
 import Foundation
 
 enum BackgroundSchedulePolicy {
+    // Keep timers and date formatting within a useful, representable range.
+    static let restoreIntervalHoursRange = 1...(24 * 365)
+    static let checkIntervalMinutesRange = 1...(60 * 24 * 365)
+
+    static func validRestoreInterval(_ text: String) -> Int? {
+        guard let value = Int(text.trimmingCharacters(in: .whitespacesAndNewlines)),
+              restoreIntervalHoursRange.contains(value) else { return nil }
+        return value
+    }
+
+    static func validCheckInterval(_ text: String) -> Int? {
+        guard let value = Int(text.trimmingCharacters(in: .whitespacesAndNewlines)),
+              checkIntervalMinutesRange.contains(value) else { return nil }
+        return value
+    }
+
+    static func normalizedRestoreIntervalHours(_ value: Int) -> Int {
+        min(max(value, restoreIntervalHoursRange.lowerBound), restoreIntervalHoursRange.upperBound)
+    }
+
+    static func normalizedCheckIntervalMinutes(_ value: Int) -> Int {
+        min(max(value, checkIntervalMinutesRange.lowerBound), checkIntervalMinutesRange.upperBound)
+    }
+
     static func nextDelay(
         interval: TimeInterval,
         lastRun: Date,
@@ -17,6 +41,34 @@ enum BackgroundSchedulePolicy {
 
         let nextRun = lastRun.addingTimeInterval(interval)
         return max(minimumDelay, nextRun.timeIntervalSince(now))
+    }
+}
+
+enum BackgroundVisibilityPolicy {
+    enum Preference {
+        case dock
+        case menuBar
+    }
+
+    struct Visibility: Equatable {
+        let showInDock: Bool
+        let showInMenuBar: Bool
+    }
+
+    static func resolved(
+        showInDock: Bool,
+        showInMenuBar: Bool,
+        changedPreference: Preference
+    ) -> Visibility {
+        guard !showInDock && !showInMenuBar else {
+            return Visibility(showInDock: showInDock, showInMenuBar: showInMenuBar)
+        }
+        switch changedPreference {
+        case .dock:
+            return Visibility(showInDock: false, showInMenuBar: true)
+        case .menuBar:
+            return Visibility(showInDock: true, showInMenuBar: false)
+        }
     }
 }
 

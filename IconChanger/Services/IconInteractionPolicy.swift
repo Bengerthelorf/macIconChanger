@@ -1,3 +1,5 @@
+import Foundation
+
 enum IconFetchInteractionEvent {
     case viewAppeared
     case styleChanged
@@ -96,5 +98,18 @@ enum IconApplicationTransaction {
 enum DockPreviewPolicy {
     static func shouldShow(mode: String, isDockFilter: Bool, isFolderFilter: Bool) -> Bool {
         !isFolderFilter && mode != "never" && (mode == "always" || isDockFilter)
+    }
+}
+
+/// A successful process exit alone must not commit an icon the OS did not retain.
+enum IconWriteVerification {
+    struct Failure: LocalizedError {
+        var errorDescription: String? {
+            NSLocalizedString("macOS did not retain the requested icon change. This app may be protected or may manage its own icon.", comment: "Icon write verification failure")
+        }
+    }
+
+    static func verify(removing: Bool, hasCustomIcon: Bool) throws {
+        guard hasCustomIcon == !removing else { throw Failure() }
     }
 }

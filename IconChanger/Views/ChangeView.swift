@@ -399,7 +399,7 @@ struct ChangeView: View {
                 )) {
                     Button("OK", role: .cancel) { }
                 } message: {
-                    Text(Self.friendlyErrorMessage(restoreError ?? ""))
+                    Text(Self.friendlyErrorMessage(restoreError ?? "", appPath: setPath.id))
                 }
                 .alert("Failed to Set Icon", isPresented: Binding(
                     get: { setIconError != nil },
@@ -407,7 +407,7 @@ struct ChangeView: View {
                 )) {
                     Button("OK", role: .cancel) { }
                 } message: {
-                    Text(Self.friendlyErrorMessage(setIconError ?? ""))
+                    Text(Self.friendlyErrorMessage(setIconError ?? "", appPath: setPath.id))
                 }
                 .overlay {
                     if showProgress {
@@ -641,10 +641,7 @@ struct ChangeView: View {
     }
     
     static func friendlyErrorMessage(_ raw: String, appPath: String? = nil) -> String {
-        if appPath?.hasPrefix("/System/") == true && raw.lowercased().contains("permission") {
-            return NSLocalizedString("macOS may restrict changes to this system app. If helper setup is ready, this app may not support custom icons on your macOS version.", comment: "System app modification restriction")
-        }
-        return RestoreDefaultErrorPolicy.friendlyMessage(raw)
+        RestoreDefaultErrorPolicy.friendlyMessage(raw, appPath: appPath)
     }
 
     private func updateIconStatus(icon: IconRes, isValid: Bool) {

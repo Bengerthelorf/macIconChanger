@@ -166,11 +166,21 @@ enum CachedIconRestoreChoice: Equatable, Sendable {
 }
 
 enum RestoreDefaultErrorPolicy {
-    static func friendlyMessage(_ raw: String) -> String {
+    static func friendlyMessage(_ raw: String, appPath: String? = nil) -> String {
         let lowered = raw.lowercased()
-        if lowered.contains("permission") || raw.contains("权限") {
+        let denied = ["permission", "operation not permitted", "eperm", "eacces", "read-only", "read only", "resource fork"].contains(where: lowered.contains) || raw.contains("权限")
+        if appPath?.hasPrefix("/System/") == true && denied {
+            return NSLocalizedString("macOS may restrict changes to this system app. If helper setup is ready, this app may not support custom icons on your macOS version.", comment: "System app modification restriction")
+        }
+        if lowered.contains("read-only") || lowered.contains("read only") {
+            return NSLocalizedString("This app or folder is on a read-only disk or is protected by macOS. Choose a writable target for custom icons.", comment: "Read-only icon target")
+        }
+        if lowered.contains("resource fork") {
+            return NSLocalizedString("macOS could not store the custom icon. Check access to the app or folder, use a valid image, and make sure the disk supports custom icons.", comment: "Custom icon storage failure")
+        }
+        if denied {
             return NSLocalizedString(
-                "IconChanger could not modify this app. Check IconChanger's helper permissions in Settings and try again.",
+                "IconChanger could not modify this app or folder. Check App Management access in System Settings and the helper status in IconChanger Settings, then try again.",
                 comment: "Permission error explanation"
             )
         }

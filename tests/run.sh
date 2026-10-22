@@ -6,6 +6,9 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 bash "$REPO_ROOT/tests/security-fileicon.sh"
 bash "$REPO_ROOT/tests/security-helper.sh"
 bash "$REPO_ROOT/tests/background-schedule.sh"
+bash "$REPO_ROOT/tests/app-version-metadata.sh"
+bash "$REPO_ROOT/tests/background-restore.sh"
+bash "$REPO_ROOT/tests/background-interval-observers.sh"
 bash "$REPO_ROOT/tests/setup-health.sh"
 bash "$REPO_ROOT/tests/icon-interactions.sh"
 bash "$REPO_ROOT/tests/icon-appearance.sh"
@@ -15,6 +18,7 @@ bash "$REPO_ROOT/tests/config-crypto.sh"
 bash "$REPO_ROOT/tests/sudo-permission-probe.sh"
 (cd "$REPO_ROOT" && python3 tests/sudoers-repair.py)
 (cd "$REPO_ROOT" && python3 tests/undo-resolution.py)
+(cd "$REPO_ROOT" && python3 tests/folder-icon.py)
 bash "$REPO_ROOT/tests/no-launchpad-mutation.sh"
 bash "$REPO_ROOT/tests/build-number.sh"
 bash "$REPO_ROOT/tests/signing-selection.sh"
@@ -25,6 +29,11 @@ bash "$REPO_ROOT/tests/sparkle-update.sh"
 bash "$REPO_ROOT/tests/remote-image-policy.sh"
 bash "$REPO_ROOT/tests/diagnostics-logging.sh"
 bash "$REPO_ROOT/tests/developer-settings.sh"
+
+PATH_TEST_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/iconchanger-path-test.XXXXXX")"
+swiftc "$REPO_ROOT/IconChanger/Extensions/URL+Universal.swift" "$REPO_ROOT/tests/file-paths.swift" -o "$PATH_TEST_ROOT/test"
+"$PATH_TEST_ROOT/test"
+rm -rf "$PATH_TEST_ROOT"
 
 ALIAS_TEST_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/iconchanger-alias-test.XXXXXX")"
 trap 'rm -rf "$ALIAS_TEST_ROOT"' EXIT

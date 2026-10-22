@@ -132,6 +132,16 @@ enum IconInteractionTests {
         assertTrue(DockPreviewPolicy.shouldShow(mode: "always", isDockFilter: false, isFolderFilter: false), "Always shows the preview for applications")
         assertFalse(DockPreviewPolicy.shouldShow(mode: "always", isDockFilter: false, isFolderFilter: true), "folder browsing never shows the Dock")
 
+        try! IconWriteVerification.verify(removing: false, hasCustomIcon: true)
+        try! IconWriteVerification.verify(removing: true, hasCustomIcon: false)
+        for removing in [false, true] {
+            do {
+                try IconWriteVerification.verify(removing: removing, hasCustomIcon: removing)
+                preconditionFailure("an unretained OS write must fail before committing cache/history")
+            } catch is IconWriteVerification.Failure { }
+            catch { preconditionFailure("unexpected verification error") }
+        }
+
         enum ApplyFailure: Error { case denied }
         var cached = "previous-success"
         var discarded = false

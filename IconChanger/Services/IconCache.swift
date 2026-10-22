@@ -16,12 +16,21 @@ struct IconCache: Codable, Identifiable {
     var appVersion: String?
 
     static func currentVersion(for appPath: String) -> String? {
-        let bundle = Bundle(path: appPath)
+        // Bundle caches Info.plist values while IconChanger stays running.
+        // Read the file again so background checks see an app replaced in place.
+        let infoPlistURL = URL(fileURLWithPath: appPath, isDirectory: true)
+            .appendingPathComponent("Contents/Info.plist")
+        guard let data = try? Data(contentsOf: infoPlistURL),
+              let info = try? PropertyListSerialization.propertyList(
+                from: data,
+                options: [],
+                format: nil
+              ) as? [String: Any] else {
+            return nil
+        }
         return CachedAppVersionPolicy.preferredVersion(
-            bundleVersion: bundle?.object(forInfoDictionaryKey: "CFBundleVersion") as? String,
-            shortVersion: bundle?.object(
-                forInfoDictionaryKey: "CFBundleShortVersionString"
-            ) as? String
+            bundleVersion: info["CFBundleVersion"] as? String,
+            shortVersion: info["CFBundleShortVersionString"] as? String
         )
     }
 
