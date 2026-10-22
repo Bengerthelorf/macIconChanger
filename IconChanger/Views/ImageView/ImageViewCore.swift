@@ -10,125 +10,138 @@ import QuartzCore
 struct ImageViewCore: View {
     @Binding var nsimage: NSImage?
     let setPath: AppItem
-    @State private var isTaskRunning = false
-    @State private var task: Task<Void, Never>? = nil
+    @State private var showPreview = false
     @Binding var isLoading: Bool
     let applicationSource: IconApplicationSource
-
-    @State var showSnackbar = false
-    @State var isSuccessful = true
-    @State var failureMessage = NSLocalizedString("Failed to load data.", comment: "Default error message")
+    let iconDescription: String
 
     init(
         nsimage: Binding<NSImage?>,
         setPath: AppItem,
         isLoading: Binding<Bool> = .constant(true),
-        applicationSource: IconApplicationSource = .local
+        applicationSource: IconApplicationSource = .local,
+        iconDescription: String = ""
     ) {
         self._nsimage = nsimage
         self.setPath = setPath
         self._isLoading = isLoading
         self.applicationSource = applicationSource
+        self.iconDescription = iconDescription
     }
 
     var body: some View {
         Group {
-                if let nsimage = nsimage {
-                    Image(nsImage: nsimage)
-                            .resizable()
-                            .scaledToFit()
-                            .onTapGesture {
-                                changeIcon(image: nsimage)
-                            }
-                            .onAppear {
-                                isLoading = false
-                            }
-                } else if isLoading {
-                    Image("Unknown")
-                            .resizable()
-                            .scaledToFit()
-                            .overlay {
-                                ProgressView()
-                            }
-                            .onAppear {
-                                Task { @MainActor in
-                                    try? await Task.sleep(nanoseconds: 3_000_000_000)
-                                    if nsimage == nil {
-                                        isLoading = false
-                                    }
-                                }
-                            }
-                } else {
-                    VStack {
-                        Text("No Icon")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .padding()
-                    }
-                    .frame(minWidth: 80, minHeight: 80)
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(10)
+            if let image = nsimage {
+                Button { showPreview = true } label: {
+                    Image(nsImage: image).resizable().scaledToFit()
+                        .contentShape(Rectangle())
                 }
-
-            }        .overlay(
-                        Group {
-                            if showSnackbar {
-                                SnackbarView(isPresented: $showSnackbar,
-                                             isSuccessful: isSuccessful,
-                                             failureMessage: failureMessage
-                                ).frame(maxWidth: .infinity, maxHeight: .infinity)
-                            }
-                        }.ignoresSafeArea()
-                )
-                    .sheet(isPresented: $isTaskRunning) {
-                        VStack {
-                            ProgressView() {
-                                Text("Changing the icon...")
-                                        .font(.title2)
-                                        .fontWeight(.semibold)
-                            }
-                                    .padding(.bottom, 5)
-                            Button(action: {
-                                task?.cancel()
-                                isTaskRunning = false
-                            }) {
-                                Text("Cancel")
-                            }
-                        }.padding(20).frame(minWidth: 250, minHeight: 100)
-                    }
-    }
-    func changeIcon(image: NSImage) {
-        task = Task.detached {
-            do {
-                await MainActor.run {
-                    isTaskRunning = true
-                }
-                
-                // Create a local copy of the image for memory safety
-                guard let imageCopy = image.copy() as? NSImage else { return }
-                try IconManager.shared.setImage(
-                    imageCopy,
-                    app: setPath,
-                    source: applicationSource
-                )
-                
-                await MainActor.run {
-                    isTaskRunning = false
-                    failureMessage = NSLocalizedString("Icon changed successfully.", comment: "Success message")
-                    isSuccessful = true
-                    showSnackbar = true
-                }
-            } catch {
-                await MainActor.run {
-                    isTaskRunning = false
-                    failureMessage = String(format: NSLocalizedString("Failed to change the icon: %@", comment: "Error message with details"), error.localizedDescription)
-                    isSuccessful = false
-                    showSnackbar = true
-                }
+                .buttonStyle(.plain)
+                .help("Preview this icon before applying it")
+                .accessibilityLabel(Text(iconDescription.isEmpty
+                    ? String(format: NSLocalizedString("Preview icon for %@", comment: "Icon button"), setPath.name)
+                    : iconDescription))
+                .accessibilityHint("Opens a preview. Your icon will not change until you choose Apply.")
+            } else if isLoading {
+                ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .accessibilityLabel("Loading icon")
+            } else {
+                Label("No Icon", systemImage: "photo")
+                    .font(.caption).foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+            }
+        }
+        .sheet(isPresented: $showPreview) {
+            if let image = nsimage {
+                IconApplicationPreview(image: image, app: setPath, source: applicationSource)
             }
         }
     }
+}
 
+/// All input routes share the same preview and explicit application action.
+struct IconApplicationPreview: View {
+    let image: NSImage
+    let app: AppItem
+    var source: IconApplicationSource = .local
+    @Environment(\.dismiss) private var dismiss
+    @State private var isApplying = false
+    @State private var didApply = false
+    @State private var errorMessage: String?
+    @State private var snapshot: IconUndoSnapshot?
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text(app.name).font(.title2.bold()).lineLimit(2)
+            HStack(spacing: 32) {
+                VStack(spacing: 8) {
+                    Image(nsImage: snapshot?.image ?? NSWorkspace.shared.icon(forFile: app.url.path))
+                        .resizable().scaledToFit().frame(width: 96, height: 96)
+                    Text("Current").foregroundStyle(.secondary)
+                }
+                Image(systemName: "arrow.right").foregroundStyle(.secondary)
+                VStack(spacing: 8) {
+                    Image(nsImage: image).resizable().scaledToFit().frame(width: 96, height: 96)
+                    Text("Selected").foregroundStyle(.secondary)
+                }
+            }
+            Text(didApply ? "Icon applied successfully." : "Preview only. Choose Apply to change this icon.")
+                .font(.callout).foregroundStyle(.secondary)
+            if let errorMessage {
+                Text(errorMessage).foregroundStyle(.red).font(.callout)
+                    .textSelection(.enabled).fixedSize(horizontal: false, vertical: true)
+            }
+            if isApplying {
+                ProgressView("Applying icon…")
+                Text("Please wait for the current operation to finish.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            HStack {
+                Button(didApply ? "Done" : "Cancel") { dismiss() }
+                    .keyboardShortcut(.cancelAction)
+                if didApply, snapshot != nil {
+                    Button("Undo") { apply(undo: true) }
+                }
+                Spacer()
+                if !didApply {
+                    Button("Apply Icon") { apply(undo: false) }
+                        .keyboardShortcut(.defaultAction)
+                        .buttonStyle(.borderedProminent)
+                }
+            }
+            .disabled(isApplying)
+        }
+        .padding(24)
+        .frame(width: 420)
+        .interactiveDismissDisabled(isApplying)
+    }
+
+    private func apply(undo: Bool) {
+        guard !isApplying else { return }
+        isApplying = true
+        errorMessage = nil
+        if !undo { snapshot = IconManager.shared.captureUndoSnapshot(for: app) }
+        let original = snapshot
+        Task {
+            do {
+                try await Task.detached(priority: .userInitiated) {
+                    if undo, let original {
+                        try IconManager.shared.restoreUndoSnapshot(original, app: app)
+                    } else {
+                        try IconManager.shared.setImage(image, app: app, source: source)
+                    }
+                }.value
+                didApply = !undo
+                if undo { snapshot = nil }
+            } catch {
+                errorMessage = (error as NSError).domain == "IconChanger.UIReview"
+                    ? error.localizedDescription
+                    : ChangeView.friendlyErrorMessage(error.localizedDescription, appPath: app.id)
+            }
+            isApplying = false
+        }
+    }
 }
 
 struct AppearanceIconContextMenuItems: View {

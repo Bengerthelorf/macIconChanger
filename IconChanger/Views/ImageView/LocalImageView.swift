@@ -16,7 +16,7 @@ struct LocalImageView: View {
     var onFavorite: ((NSImage) -> Void)? = nil
 
     var body: some View {
-        ImageViewCore(nsimage: $nsimage, setPath: setPath, isLoading: $isLoading)
+        ImageViewCore(nsimage: $nsimage, setPath: setPath, isLoading: $isLoading, iconDescription: url.lastPathComponent)
             .contextMenu {
                 Button {
                     if let image = nsimage {

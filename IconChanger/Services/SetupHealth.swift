@@ -16,6 +16,22 @@ enum SetupHealth: Equatable {
     case needsAppManagementPermission
     case error(String)
 
+    var allowsIconBrowsing: Bool {
+        switch self {
+        case .ready, .manualMode: return true
+        default: return false
+        }
+    }
+
+    var permissionStatusTitle: String {
+        switch self {
+        case .ready: return NSLocalizedString("Ready", comment: "Permission status")
+        case .manualMode: return NSLocalizedString("Manual Mode", comment: "Permission status")
+        case .checking: return NSLocalizedString("Checking…", comment: "Permission status")
+        default: return NSLocalizedString("Needs Attention", comment: "Permission status")
+        }
+    }
+
     var needsAttention: Bool {
         switch self {
         case .checking, .ready:
@@ -75,5 +91,27 @@ enum SetupNotificationPolicy {
     ) -> Bool {
         guard current.needsAttention else { return false }
         return launchedHidden || previousReady == true
+    }
+}
+
+/// A request received during a check must validate a fresh state before callbacks run.
+struct SetupCheckQueue {
+    private(set) var isChecking = false
+    private var needsRecheck = false
+
+    mutating func request() -> Bool {
+        guard !isChecking else {
+            needsRecheck = true
+            return false
+        }
+        isChecking = true
+        return true
+    }
+
+    mutating func finish() -> Bool {
+        isChecking = false
+        let recheck = needsRecheck
+        needsRecheck = false
+        return recheck
     }
 }

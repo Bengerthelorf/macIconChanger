@@ -39,6 +39,11 @@ actor IconImageLoader {
     }
 
     func image(for url: URL) async throws -> NSImage? {
+        if UIReviewMode.isEnabled && url.host == "ui-review.invalid" {
+            let samples = ["/System/Applications/Notes.app", "/System/Applications/Calendar.app", "/System/Applications/Mail.app"]
+            let index = Int(url.deletingPathExtension().lastPathComponent) ?? 0
+            return NSWorkspace.shared.icon(forFile: samples[index % samples.count])
+        }
         let nsURL = url as NSURL
 
         if let cachedImage = cache.object(forKey: nsURL) {

@@ -26,6 +26,19 @@ enum SetupHealthTests {
             "manual mode must pause root-required background automation"
         )
 
+        assertTrue(SetupHealth.manualMode.allowsIconBrowsing, "manual mode must retain the same browsing view")
+        assertFalse(SetupHealth.needsAppManagementPermission.allowsIconBrowsing, "missing app management permission blocks changes")
+        assertEqual(SetupHealth.ready.permissionStatusTitle, NSLocalizedString("Ready", comment: ""))
+        assertEqual(SetupHealth.checking.permissionStatusTitle, NSLocalizedString("Checking…", comment: ""))
+        assertFalse(SetupHealth.missingHelperFiles(["helper.sh"]).permissionStatusTitle == SetupHealth.ready.permissionStatusTitle, "missing helpers must never be displayed as ready")
+
+        var queue = SetupCheckQueue()
+        assertTrue(queue.request(), "the first request starts a check")
+        assertFalse(queue.request(), "in-flight requests queue a fresh check")
+        assertTrue(queue.finish(), "a state change during a check requires a new snapshot")
+        assertTrue(queue.request(), "the queued check can start")
+        assertFalse(queue.finish(), "the latest result can be published when no recheck is pending")
+
         let contentViewSource = try! String(
             contentsOfFile: "IconChanger/App/ContentView.swift",
             encoding: .utf8

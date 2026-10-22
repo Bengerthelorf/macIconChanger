@@ -21,6 +21,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let diagnosticsSessionTimer = DiagnosticsTimer()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        if UIReviewMode.isEnabled {
+            NSApp.setActivationPolicy(.regular)
+            SetupMonitor.shared.check(source: .startup)
+            return
+        }
         UNUserNotificationCenter.current().delegate = self
         DiagnosticsLogger.shared.log(
             .operation,

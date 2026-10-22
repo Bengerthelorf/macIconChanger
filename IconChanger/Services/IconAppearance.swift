@@ -416,6 +416,7 @@ enum DockRefreshService {
     static func refreshTwice(
         diagnosticsContext: DiagnosticsContext? = nil
     ) async -> Bool {
+        guard !UIReviewMode.isEnabled else { return true }
         let timer = DiagnosticsTimer()
         if let diagnosticsContext {
             DiagnosticsLogger.shared.log(
@@ -490,6 +491,7 @@ final class IconAppearanceSwitchService: ObservableObject {
     }
 
     func setEnabled(_ enabled: Bool) {
+        guard !UIReviewMode.isEnabled else { return }
         guard switchingEnabled != enabled else {
             if enabled {
                 scheduleSwitch(to: monitor.currentAppearance, debounce: false)

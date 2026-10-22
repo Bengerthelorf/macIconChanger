@@ -27,7 +27,7 @@ struct IconChangerApp: App {
 
         AppPaths.migrateLegacyDirectoryIfNeeded()
 
-        updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: updaterDelegate, userDriverDelegate: nil)
+        updaterController = SPUStandardUpdaterController(startingUpdater: !UIReviewMode.isEnabled, updaterDelegate: updaterDelegate, userDriverDelegate: nil)
         APIKeyManager.migrateIfNeeded()
         migrateAPIKeyToKeychain()
         setupDefaultAliasNames()
@@ -36,12 +36,14 @@ struct IconChangerApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .frame(minWidth: folderPermission.hasPermission ? 900 : 500,
-                       minHeight: folderPermission.hasPermission ? 500 : 300)
+                .frame(minWidth: (folderPermission.hasPermission || UIReviewMode.isEnabled) ? 900 : 500,
+                       minHeight: (folderPermission.hasPermission || UIReviewMode.isEnabled) ? 550 : 300)
                 .animation(.easeInOut, value: folderPermission.hasPermission)
                 .onAppear {
-                    cliManager.checkInstallation()
-                    ConfigManager.shared.checkForCLIImports()
+                    if !UIReviewMode.isEnabled {
+                        cliManager.checkInstallation()
+                        ConfigManager.shared.checkForCLIImports()
+                    }
                     let saved = AppAppearance(rawValue: UserDefaults.standard.string(forKey: "appAppearance") ?? "") ?? .system
                     AppAppearance.apply(saved)
                 }

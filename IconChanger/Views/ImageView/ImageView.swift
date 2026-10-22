@@ -21,7 +21,8 @@ struct ImageView: View {
             nsimage: $preview,
             setPath: setPath,
             isLoading: $isLoading,
-            applicationSource: .remote
+            applicationSource: .remote,
+            iconDescription: String(format: NSLocalizedString("%@, %d downloads", comment: "Icon accessibility description"), icon.appName, icon.downloads)
         )
             .contextMenu {
                 Button {

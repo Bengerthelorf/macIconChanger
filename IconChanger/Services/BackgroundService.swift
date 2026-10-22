@@ -213,6 +213,7 @@ import os
     }
 
     private func updateLoginItem() {
+        guard !UIReviewMode.isEnabled else { return }
         let diagnosticsContext = DiagnosticsContext(
             operation: .permission,
             source: .system
@@ -251,6 +252,7 @@ import os
     }
 
     func startBackgroundService() {
+        guard !UIReviewMode.isEnabled else { return }
         let diagnosticsContext = DiagnosticsContext(
             operation: .background,
             source: .system

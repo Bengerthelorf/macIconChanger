@@ -105,6 +105,12 @@ enum SudoPermissionProbeTests {
             "sudoers drop-in replacement must use a same-directory temporary file"
         )
 
+        let installDropIn = iconManagerSource.range(of: "/bin/mv \"$RULE_TMP\" \"$DROPIN\"")!
+        let firstProbe = iconManagerSource.range(of: "LIST_OUTPUT=$(/usr/bin/sudo -U", range: installDropIn.upperBound..<iconManagerSource.endIndex)!
+        let cleanMainInstall = iconManagerSource.range(of: "/bin/mv \"$MAIN_TMP\" /private/etc/sudoers", range: installDropIn.upperBound..<firstProbe.lowerBound)
+        precondition(cleanMainInstall != nil, "the cleaned main configuration must be active before probing the drop-in")
+        precondition(iconManagerSource.contains("ICONCHANGER_UNRECOGNIZED_LEGACY_RULE"), "unrecognized legacy rules need an explicit diagnosis instead of a repair loop")
+
         print("PASS: sudo permission checks distinguish authorization from helper failures")
     }
 

@@ -79,12 +79,10 @@ struct AdvancedSettingsView: View {
             Section {
                 LabeledContent {
                     Label(
-                        isManualMode ? "Manual Mode" : "Ready",
-                        systemImage: isManualMode
-                            ? "pause.circle.fill"
-                            : "checkmark.circle.fill"
+                        setupMonitor.health.permissionStatusTitle,
+                        systemImage: setupMonitor.health.statusSymbolName
                     )
-                    .foregroundStyle(isManualMode ? .orange : .green)
+                    .foregroundStyle(setupMonitor.health == .ready ? .green : .orange)
                 } label: {
                     Text("Permission Status")
                 }
@@ -119,7 +117,10 @@ struct AdvancedSettingsView: View {
             } header: {
                 Label("Administrator Access", systemImage: "lock.shield")
             } footer: {
-                if isManualMode {
+                if !setupMonitor.health.allowsIconBrowsing {
+                    Text(setupMonitor.health.statusDescription)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                } else if isManualMode {
                     Text("Manual icon changes remain available and request administrator approval when needed. Scheduled restore, update restore, and automatic appearance changes are paused until permanent permission is repaired.")
                         .frame(maxWidth: .infinity, alignment: .leading)
                 } else {
@@ -211,14 +212,14 @@ struct AdvancedSettingsView: View {
                             .foregroundColor(remaining > 10 ? .secondary : .orange)
                     }
                 } label: {
-                    Label(NSLocalizedString("Monthly Usage", comment: "API setting"), systemImage: "chart.bar")
+                    Label(NSLocalizedString("Estimated Monthly Usage", comment: "API setting"), systemImage: "chart.bar")
                 }
 
                 Button(role: .destructive) {
                     APIUsageTracker.shared.resetCount()
                     usageCount = 0
                 } label: {
-                    Label(NSLocalizedString("Reset Usage Counter", comment: "API setting"), systemImage: "arrow.counterclockwise")
+                    Label(NSLocalizedString("Reset Local Counter", comment: "API setting"), systemImage: "arrow.counterclockwise")
                 }
                 Toggle(isOn: $extendedSearch) {
                     Label(NSLocalizedString("Extended Search", comment: "API setting"), systemImage: "text.magnifyingglass")
@@ -226,7 +227,7 @@ struct AdvancedSettingsView: View {
             } header: {
                 Label(NSLocalizedString("API Settings", comment: "Settings section"), systemImage: "gearshape")
             } footer: {
-                Text(NSLocalizedString("Retry count controls how many times a failed request is retried. Timeout applies to each individual request attempt.\n\nExtended Search uses multiple queries per search to find more icons. This uses 2–3× more API calls.", comment: "API settings description"))
+                Text(NSLocalizedString("Usage is estimated on this Mac. Resetting the local counter does not reset your provider quota.\n\nRetry count controls how many times a failed request is retried. Timeout applies to each individual request attempt.\n\nExtended Search uses multiple queries per search to find more icons. This uses 2–3× more API calls.", comment: "API settings description"))
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 

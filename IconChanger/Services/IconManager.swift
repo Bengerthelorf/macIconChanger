@@ -96,6 +96,13 @@ class IconManager: ObservableObject {
     }
     
     func loadAppItems() -> [AppItem] {
+        if UIReviewMode.isEnabled {
+            return ["/System/Applications/Notes.app", "/System/Applications/Mail.app", "/System/Applications/Calendar.app", "/Applications/Safari.app", "/Applications/Arc.app"]
+                .filter { FileManager.default.fileExists(atPath: $0) }
+                .map { AppItem(name: URL(fileURLWithPath: $0).deletingPathExtension().lastPathComponent,
+                               url: URL(fileURLWithPath: $0), originalAppInfo: nil) }
+                .sorted { $0.name < $1.name }
+        }
         let diagnosticsContext = DiagnosticsContext(
             operation: .discovery,
             source: .system
@@ -222,6 +229,7 @@ class IconManager: ObservableObject {
     }
     
     func ensureHelperFilesCopied() {
+        guard !UIReviewMode.isEnabled else { return }
         let diagnosticsContext = DiagnosticsContext(operation: .setup)
         let timer = DiagnosticsTimer()
         diagnostics.log(
@@ -412,6 +420,7 @@ class IconManager: ObservableObject {
     }
 
     private func ensureSetupCompleted(allowRepair: Bool = true) throws {
+        if UIReviewMode.isEnabled { return }
         if allowRepair {
             ensureHelperFilesCopied()
         }
@@ -487,6 +496,34 @@ class IconManager: ObservableObject {
         )
     }
 
+    func captureUndoSnapshot(for app: AppItem) -> IconUndoSnapshot {
+        let image = NSWorkspace.shared.icon(forFile: app.url.path).copy() as! NSImage
+        let width = max(image.representations.map(\.pixelsWide).max() ?? 0, Int(image.size.width), 1)
+        let height = max(image.representations.map(\.pixelsHigh).max() ?? 0, Int(image.size.height), 1)
+        image.size = NSSize(width: width, height: height)
+        return IconUndoSnapshot(
+            image: image,
+            hadCustomIcon: hasCustomIcon(app: app),
+            cache: IconCacheManager.shared.getIconCache(for: app.id)
+        )
+    }
+
+    func restoreUndoSnapshot(_ snapshot: IconUndoSnapshot, app: AppItem) throws {
+        try ensureSetupCompleted()
+        let context = DiagnosticsContext(operation: .replace, appName: app.name, appPath: app.id)
+        if snapshot.hadCustomIcon {
+            try applyIcon(snapshot.image, to: app, diagnosticsContext: context)
+        } else {
+            try runHelperRemove(appPath: app.id, diagnosticsContext: context)
+        }
+        try IconCacheManager.shared.restoreRecord(snapshot.cache, for: app.id)
+        auditLog(operation: "undo_icon", appName: app.name, appPath: app.id)
+        Task { @MainActor in
+            AppIconCache.shared.remove(for: app.url)
+            self.iconRefreshTrigger = UUID()
+        }
+    }
+
     func removeIcon(from app: AppItem) throws {
         let appPath = app.url.universalPath()
         let context = DiagnosticsContext(
@@ -556,25 +593,16 @@ class IconManager: ObservableObject {
         diagnostics.log(.operation, phase: "replace.start", context: context)
 
         do {
-            let cacheTimer = DiagnosticsTimer()
-            diagnostics.log(.step, phase: "cache_write.start", context: context)
-            _ = try IconCacheManager.shared.cacheIcon(
-                image: image,
-                for: appPath,
-                appName: app.name
-            )
-            diagnostics.log(
-                .performance,
-                phase: "cache_write.finish",
-                context: context,
-                durationMilliseconds: cacheTimer.elapsedMilliseconds
-            )
-            logger.log("Icon cached for \(app.name)")
-
             diagnostics.log(.step, phase: "setup_check.start", context: context)
             try ensureSetupCompleted()
             diagnostics.log(.step, phase: "setup_check.finish", context: context)
-            try applyIcon(image, to: app, diagnosticsContext: context)
+            let cache = IconCacheManager.shared
+            try IconApplicationTransaction.perform(
+                prepare: { try cache.prepareIcon(image: image, for: appPath, appName: app.name) },
+                apply: { _ in try self.applyIcon(image, to: app, diagnosticsContext: context) },
+                commit: { try cache.commitPreparedIcon($0) },
+                discard: { cache.discardPreparedIcon($0) }
+            )
 
             auditLog(operation: "set_icon", appName: app.name, appPath: appPath)
 
@@ -1124,6 +1152,13 @@ class IconManager: ObservableObject {
     }
 
     func getIcons(_ app: AppItem, style: IconStyle = .all, forceRefresh: Bool = false) async throws -> [IconRes] {
+        if UIReviewMode.isEnabled {
+            return (1...18).compactMap { index in
+                IconRes(appName: app.name + " \(index)",
+                        icnsUrl: URL(string: "https://ui-review.invalid/\(index).icns")!,
+                        lowResPngUrl: URL(string: "https://ui-review.invalid/\(index).png")!, downloads: index * 10)
+            }
+        }
         let appName = app.name
         let urlName = app.url.deletingPathExtension().lastPathComponent
         let bundleName = try getAppBundleName(app)
@@ -1252,6 +1287,7 @@ class IconManager: ObservableObject {
         appPath: String,
         diagnosticsContext: DiagnosticsContext
     ) throws {
+        try UIReviewMode.requireLiveApplication()
         let helperToolPath = self.helperScriptURL.path
         let helperTimer = DiagnosticsTimer()
 
@@ -1689,6 +1725,7 @@ class IconManager: ObservableObject {
     func configureSudoers(
         allowManagedCompatibility: Bool = false
     ) throws -> SudoersConfigurationResult {
+        try UIReviewMode.requireLiveApplication()
         let diagnosticsContext = DiagnosticsContext(operation: .setup)
         let timer = DiagnosticsTimer()
         diagnostics.log(
@@ -1831,7 +1868,18 @@ class IconManager: ObservableObject {
         /usr/sbin/chown root:wheel "$DROPIN"
         /bin/chmod 0440 "$DROPIN"
 
+        # Probe the cleaned candidate, never a stale managed rule in the old main file.
+        /bin/mv "$MAIN_TMP" /private/etc/sudoers
+        MAIN_TMP=$(/usr/bin/mktemp /private/etc/sudoers.iconchanger.XXXXXX)
+        /bin/cp /private/etc/sudoers "$MAIN_TMP"
+        /bin/chmod 0440 "$MAIN_TMP"
+        /usr/sbin/chown root:wheel "$MAIN_TMP"
+
         LIST_OUTPUT=$(/usr/bin/sudo -U "$USER_NAME" -l 2>&1 || true)
+        if /usr/bin/printf '%s\\n' "$LIST_OUTPUT" | /usr/bin/grep -F 'NOPASSWD:' | /usr/bin/grep -F '\(legacyHelperScriptPath.shellEscaped)' >/dev/null; then
+          /usr/bin/printf '%s\\n' 'ICONCHANGER_UNRECOGNIZED_LEGACY_RULE'
+          exit 0
+        fi
         if ! /usr/bin/printf '%s\\n' "$LIST_OUTPUT" | /usr/bin/grep -F 'NOPASSWD:' | /usr/bin/grep -F "$HELPER" >/dev/null; then
           if [ '\(compatibilityFlag)' -ne 1 ]; then
             /usr/bin/printf '%s\\n' 'ICONCHANGER_MANAGED_COMPATIBILITY_REQUIRED'
@@ -1942,6 +1990,15 @@ class IconManager: ObservableObject {
                 ]
             )
             throw error
+        }
+
+        if output.contains("ICONCHANGER_UNRECOGNIZED_LEGACY_RULE") {
+            throw NSError(domain: "IconManager", code: 28, userInfo: [
+                NSLocalizedDescriptionKey: NSLocalizedString(
+                    "An unrecognized legacy administrator rule is still active. No permission changes were saved. Ask your administrator to review old IconChanger rules in /etc/sudoers and /etc/sudoers.d, then retry.",
+                    comment: "Unrecognized legacy sudoers rule"
+                )
+            ])
         }
 
         if output.contains("ICONCHANGER_MANAGED_COMPATIBILITY_REQUIRED") {
@@ -2274,6 +2331,7 @@ class IconManager: ObservableObject {
 
     // Triggers the system TCC prompt if status is notDetermined.
     func requestAppManagementPermission(completion: @escaping (Bool) -> Void) {
+        guard !UIReviewMode.isEnabled else { completion(false); return }
         let context = DiagnosticsContext(operation: .permission)
         let timer = DiagnosticsTimer()
         diagnostics.log(

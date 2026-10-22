@@ -50,17 +50,18 @@ struct ContentView: View {
                      .padding()
                  }
 
-            case .missingHelperFiles(let missingFiles):
+            case .missingHelperFiles:
                  VStack {
                      Image(systemName: "exclamationmark.triangle.fill")
                          .resizable().scaledToFit().frame(width: 40, height: 40).foregroundColor(.orange)
                          .padding(.bottom)
-                     Text("Helper Files Missing")
+                     Text("Finish Setup")
                          .font(.title2.bold())
-                     Text(String(format: NSLocalizedString("helper_files_missing_message_format", comment: "Message shown when helper files are missing. %@ is the list of files."), missingFiles.joined(separator: "\n")))                         .multilineTextAlignment(.center)
+                     Text("Install IconChanger's helper to enable icon changes. macOS will ask for administrator approval.")
+                         .multilineTextAlignment(.center)
                          .foregroundColor(.secondary)
                          .padding()
-                      Button("Retry Setup Check") {
+                      Button("Install Helper Files") {
                            repairHelperFiles()
                       }
                       .padding(.top)
@@ -87,9 +88,6 @@ struct ContentView: View {
                      .padding(.top)
                  }
                  .padding()
-
-            case .manualMode:
-                IconList()
 
             case .needsLegacyPermissionCleanup:
                  VStack(spacing: 15) {
@@ -169,7 +167,7 @@ struct ContentView: View {
                  }
                  .padding()
 
-            case .ready:
+            case .ready, .manualMode:
                 IconList()
 
             case .error(let errorMessage):
@@ -196,7 +194,9 @@ struct ContentView: View {
         }
         .onAppear {
             presentManualModeAlertIfNeeded(setupMonitor.health)
-            checkFullSetup()
+            if setupMonitor.health == .checking && !setupMonitor.isChecking {
+                checkFullSetup()
+            }
         }
         .onChange(of: setupMonitor.health) { health in
             presentManualModeAlertIfNeeded(health)

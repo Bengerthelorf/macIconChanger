@@ -59,6 +59,17 @@ struct IconCache: Codable, Identifiable {
     }
 }
 
+struct IconUndoSnapshot {
+    let image: NSImage
+    let hadCustomIcon: Bool
+    let cache: IconCache?
+}
+
+struct PreparedIconCache {
+    let record: IconCache
+    let url: URL
+}
+
 class IconCacheManager {
     static let shared = IconCacheManager()
 
@@ -137,7 +148,7 @@ class IconCacheManager {
         UserDefaults.standard.set(encoded, forKey: cacheKey)
     }
 
-    func cacheIcon(image: NSImage, for appPath: String, appName: String) throws -> URL {
+    func prepareIcon(image: NSImage, for appPath: String, appName: String) throws -> PreparedIconCache {
         let iconFileName = "\(UUID().uuidString).png"
         let iconURL = Self.cacheDirectory.appendingPathComponent(iconFileName)
         let context = DiagnosticsContext(
@@ -173,26 +184,29 @@ class IconCacheManager {
             appVersion: IconCache.currentVersion(for: appPath)
         )
 
-        let snapshot: [String: IconCache] = {
-            lock.lock()
-            defer { lock.unlock() }
-            cachedIcons[appPath] = iconCache
-            return cachedIcons
-        }()
-        persistCache(snapshot)
+        return PreparedIconCache(record: iconCache, url: iconURL)
+    }
 
-        DiagnosticsLogger.shared.log(
-            .operation,
-            phase: "icon_cache_write.completed",
-            context: context,
-            durationMilliseconds: timer.elapsedMilliseconds,
-            details: [
-                "app_version": iconCache.appVersion ?? "unknown",
-                "entry_count": String(snapshot.count),
-            ]
-        )
+    func commitPreparedIcon(_ prepared: PreparedIconCache) throws {
+        lock.lock()
+        defer { lock.unlock() }
+        var snapshot = cachedIcons
+        snapshot[prepared.record.appPath] = prepared.record
+        try persistCacheOrThrow(snapshot)
+        cachedIcons = snapshot
+    }
 
-        return iconURL
+    func restoreRecord(_ record: IconCache?, for appPath: String) throws {
+        lock.lock()
+        defer { lock.unlock() }
+        var snapshot = cachedIcons
+        snapshot[appPath] = record
+        try persistCacheOrThrow(snapshot)
+        cachedIcons = snapshot
+    }
+
+    func discardPreparedIcon(_ prepared: PreparedIconCache) {
+        try? FileManager.default.removeItem(at: prepared.url)
     }
 
     func getIconCache(for appPath: String) -> IconCache? {

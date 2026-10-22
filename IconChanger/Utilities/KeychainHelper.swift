@@ -10,6 +10,7 @@ enum KeychainHelper {
     private static let service = "com.zhuhaoyu.IconChanger"
 
     static func save(key: String, value: String) {
+        guard !UIReviewMode.isEnabled else { return }
         guard let data = value.data(using: .utf8) else { return }
 
         let query: [String: Any] = [
@@ -26,6 +27,7 @@ enum KeychainHelper {
     }
 
     static func load(key: String) -> String? {
+        guard !UIReviewMode.isEnabled else { return nil }
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
@@ -42,6 +44,7 @@ enum KeychainHelper {
     }
 
     static func delete(key: String) {
+        guard !UIReviewMode.isEnabled else { return }
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,

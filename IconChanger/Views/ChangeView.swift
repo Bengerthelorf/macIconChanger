@@ -27,6 +27,9 @@ struct ChangeView: View {
     @State var isExpanded: Bool = false
 
     @State var importedImageURL: URL? = nil
+    @State private var importedPreview: NSImage?
+    @State private var showImportedPreview = false
+    @State private var showClearHistoryConfirm = false
 
     @State var setAlias: String? = nil
 
@@ -41,6 +44,7 @@ struct ChangeView: View {
     @State private var fetchError: String? = nil
     @State private var appFavorites: [FavoriteIcon] = []
     @State private var appHistory: [IconHistoryEntry] = []
+    @State private var appearanceConfiguration: AppearanceIconConfiguration?
     @State private var isHistoryExpanded = false
     @State private var hasLoadedLocalIcons = false
     @State private var hasRequestedIcons = false
@@ -51,7 +55,7 @@ struct ChangeView: View {
 
     var body: some View {
         GeometryReader { geometry in
-            let computedColumns = Int((geometry.size.width - 2 * minGridSpacing) / (imageSize + minGridSpacing))
+            let computedColumns = Int((max(0, geometry.size.width - 32) + minGridSpacing) / (imageSize + minGridSpacing))
             let numberOfColumns = max(1, computedColumns)
             let columns = Array(repeating: GridItem(.fixed(imageSize), spacing: minGridSpacing), count: numberOfColumns)
 
@@ -76,6 +80,18 @@ struct ChangeView: View {
                         .help("Restore the original app icon")
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
+
+                    DisclosureGroup("Light and Dark Icons") {
+                        HStack(spacing: 20) {
+                            Label(appearanceConfiguration?.lightIconFileName == nil ? "Light: Not Set" : "Light: Configured", systemImage: "sun.max")
+                            Label(appearanceConfiguration?.darkIconFileName == nil ? "Dark: Not Set" : "Dark: Configured", systemImage: "moon")
+                        }
+                        .font(.caption).foregroundStyle(.secondary).padding(.vertical, 6)
+                        Text("Right-click an icon and choose Set as Light or Dark Icon to configure automatic appearance switching.")
+                            .font(.caption).foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .padding(.bottom, 8)
 
                     // MARK: - Favorites
                     if !appFavorites.isEmpty {
@@ -103,7 +119,7 @@ struct ChangeView: View {
                         Text("Local")
                                 .font(.headline)
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                        Button("Choose from the Local") {
+                        Button("Choose Image…") {
                             chooseLocalIcon()
                         }
                         .keyboardShortcut("o", modifiers: .command)
@@ -154,7 +170,7 @@ struct ChangeView: View {
 
                         if !isLoadingIcons && successIconsCount > 0 {
                             HStack(spacing: 4) {
-                                Text("\(successIconsCount)/\(totalIconsCount)")
+                                Text(String(format: NSLocalizedString("%d of %d icons", comment: "Loaded icon count"), successIconsCount, totalIconsCount))
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
@@ -166,12 +182,22 @@ struct ChangeView: View {
                             )
                         } label: {
                             Label(
-                                hasRequestedIcons ? "Refresh" : "Load Icons",
+                                hasRequestedIcons ? NSLocalizedString("Refresh", comment: "Remote icons") : NSLocalizedString("Load Icons", comment: "Remote icons"),
                                 systemImage: hasRequestedIcons ? "arrow.clockwise" : "icloud.and.arrow.down"
                             )
                         }
                         .disabled(isLoadingIcons)
                     }
+
+                    HStack {
+                        Toggle("Auto-load", isOn: $automaticallyLoadIcons)
+                            .toggleStyle(.checkbox)
+                        Spacer()
+                        Text("Online searches use your API allowance.")
+                            .foregroundStyle(.secondary)
+                    }
+                    .font(.caption)
+                    .padding(.vertical, 4)
 
                     if isLoadingIcons {
                         VStack {
@@ -245,8 +271,7 @@ struct ChangeView: View {
                                 .font(.headline)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             Button(role: .destructive) {
-                                IconHistoryManager.shared.clearHistory(for: setPath.url.universalPath())
-                                refreshHistory()
+                                showClearHistoryConfirm = true
                             } label: {
                                 Text("Clear")
                                     .font(.caption)
@@ -299,30 +324,31 @@ struct ChangeView: View {
                         setIconError = NSLocalizedString("The selected file is not a valid image.", comment: "Local icon load error")
                         return
                     }
-                    showProgress = true
-                    Task.detached {
-                        defer {
-                            if isTempDrop { try? FileManager.default.removeItem(at: url) }
-                        }
-                        do {
-                            guard let imageCopy = nsimage.copy() as? NSImage else { return }
-                            try IconManager.shared.setImage(imageCopy, app: setPath)
-                            await MainActor.run { showProgress = false }
-                        } catch {
-                            await MainActor.run {
-                                showProgress = false
-                                setIconError = error.localizedDescription
-                            }
-                        }
-                    }
+                    importedPreview = nsimage
+                    if isTempDrop { try? FileManager.default.removeItem(at: url) }
+                    showImportedPreview = true
                 }
                 .padding(10)
+                .sheet(isPresented: $showImportedPreview) {
+                    if let image = importedPreview {
+                        IconApplicationPreview(image: image, app: setPath)
+                    }
+                }
+                .confirmationDialog("Clear icon history?", isPresented: $showClearHistoryConfirm) {
+                    Button("Clear History", role: .destructive) {
+                        IconHistoryManager.shared.clearHistory(for: setPath.id)
+                        refreshHistory()
+                    }
+                } message: {
+                    Text("This removes saved history for this app. Its current icon will not change.")
+                }
                 .onAppear {
                     inIcons = iconManager.getIconInPath(setPath.url)
                     hasLoadedLocalIcons = true
                     hasDuplicateName = iconManager.apps.contains { $0.name == setPath.name && $0.id != setPath.id }
                     refreshFavorites()
                     refreshHistory()
+                    appearanceConfiguration = AppearanceIconStore.shared.configuration(for: setPath.id)
                     handleIconFetchEvent(.viewAppeared)
                 }
                 .sheet(isPresented: Binding(
@@ -332,6 +358,9 @@ struct ChangeView: View {
                     if let alias = setAlias {
                         SetAliasNameView(raw: alias, lastText: AliasName.getName(for: alias) ?? "")
                     }
+                }
+                .onReceive(NotificationCenter.default.publisher(for: .appearanceIconStoreDidChange)) { _ in
+                    appearanceConfiguration = AppearanceIconStore.shared.configuration(for: setPath.id)
                 }
                 .onDisappear {
                     cancelIncompleteIconLoad()
@@ -611,8 +640,11 @@ struct ChangeView: View {
         }
     }
     
-    static func friendlyErrorMessage(_ raw: String) -> String {
-        RestoreDefaultErrorPolicy.friendlyMessage(raw)
+    static func friendlyErrorMessage(_ raw: String, appPath: String? = nil) -> String {
+        if appPath?.hasPrefix("/System/") == true && raw.lowercased().contains("permission") {
+            return NSLocalizedString("macOS may restrict changes to this system app. If helper setup is ready, this app may not support custom icons on your macOS version.", comment: "System app modification restriction")
+        }
+        return RestoreDefaultErrorPolicy.friendlyMessage(raw)
     }
 
     private func updateIconStatus(icon: IconRes, isValid: Bool) {

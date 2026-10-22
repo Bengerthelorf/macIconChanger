@@ -6,12 +6,12 @@
 import Foundation
 
 struct AliasName: Identifiable {
-    let id: String
+    let id: UUID
     var appName: String
     var aliasName: String
 
     init(appName: String, aliasName: String) {
-        self.id = appName
+        self.id = UUID()
         self.appName = appName
         self.aliasName = aliasName
     }

@@ -43,6 +43,13 @@ class FolderPermission: ObservableObject {
     }
 
     init() {
+        if UIReviewMode.isEnabled {
+            permissions = ["/Applications", "/System/Applications"].map {
+                let url = URL(fileURLWithPath: $0)
+                return PermissionList(bookmarkedURL: url, originalURLString: url.absoluteString)
+            }
+            return
+        }
         restoreBookmarks()
     }
 

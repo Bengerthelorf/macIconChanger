@@ -25,6 +25,7 @@ import Foundation
     }
     
     func installCLI() {
+        guard !UIReviewMode.isEnabled else { return }
         isInstalling = true
         lastError = nil
 
@@ -64,6 +65,7 @@ import Foundation
     }
     
     func uninstallCLI() {
+        guard !UIReviewMode.isEnabled else { return }
         isInstalling = true
         lastError = nil
 

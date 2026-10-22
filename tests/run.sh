@@ -13,6 +13,8 @@ bash "$REPO_ROOT/tests/configuration-archive.sh"
 bash "$REPO_ROOT/tests/configuration-security.sh"
 bash "$REPO_ROOT/tests/config-crypto.sh"
 bash "$REPO_ROOT/tests/sudo-permission-probe.sh"
+(cd "$REPO_ROOT" && python3 tests/sudoers-repair.py)
+(cd "$REPO_ROOT" && python3 tests/undo-resolution.py)
 bash "$REPO_ROOT/tests/no-launchpad-mutation.sh"
 bash "$REPO_ROOT/tests/build-number.sh"
 bash "$REPO_ROOT/tests/signing-selection.sh"
@@ -23,3 +25,8 @@ bash "$REPO_ROOT/tests/sparkle-update.sh"
 bash "$REPO_ROOT/tests/remote-image-policy.sh"
 bash "$REPO_ROOT/tests/diagnostics-logging.sh"
 bash "$REPO_ROOT/tests/developer-settings.sh"
+
+ALIAS_TEST_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/iconchanger-alias-test.XXXXXX")"
+trap 'rm -rf "$ALIAS_TEST_ROOT"' EXIT
+swiftc "$REPO_ROOT/IconChanger/AliasName/AliasNameCore.swift" "$REPO_ROOT/tests/alias-identity.swift" -o "$ALIAS_TEST_ROOT/test"
+"$ALIAS_TEST_ROOT/test"

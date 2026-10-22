@@ -13,6 +13,29 @@ import os
 /// - User data: `~/Library/Application Support/<bundleID>/`
 ///
 /// Legacy layout at `~/.iconchanger/` is migrated on first launch.
+/// Debug-only, separately identified UI build: no credentials or privileged writes.
+enum UIReviewMode {
+    static var isEnabled: Bool {
+#if DEBUG
+        return Bundle.main.bundleIdentifier?.hasSuffix(".UIReview") == true
+#else
+        return false
+#endif
+    }
+
+    static var storageRoot: URL {
+        FileManager.default.temporaryDirectory.appendingPathComponent("IconChanger-UIReview", isDirectory: true)
+    }
+
+    static func requireLiveApplication() throws {
+        if isEnabled {
+            throw NSError(domain: "IconChanger.UIReview", code: 1, userInfo: [
+                NSLocalizedDescriptionKey: "UI review mode does not modify applications or administrator permissions."
+            ])
+        }
+    }
+}
+
 enum AppPaths {
     static let bundleID = "com.zhuhaoyu.IconChanger"
 
@@ -21,14 +44,20 @@ enum AppPaths {
     // MARK: - Roots
 
     static var cachesRoot: URL {
-        ensureDirectory(
+        if UIReviewMode.isEnabled {
+            return ensureDirectory(UIReviewMode.storageRoot.appendingPathComponent("Caches"))
+        }
+        return ensureDirectory(
             FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
                 .appendingPathComponent(bundleID, isDirectory: true)
         )
     }
 
     static var applicationSupportRoot: URL {
-        ensureDirectory(
+        if UIReviewMode.isEnabled {
+            return ensureDirectory(UIReviewMode.storageRoot.appendingPathComponent("Support"))
+        }
+        return ensureDirectory(
             FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
                 .appendingPathComponent(bundleID, isDirectory: true)
         )
@@ -80,6 +109,7 @@ enum AppPaths {
     /// Moves legacy `~/.iconchanger/` data and pre-bundle-id Application Support contents
     /// to standard macOS locations. Idempotent and safe to call on every launch.
     static func migrateLegacyDirectoryIfNeeded() {
+        guard !UIReviewMode.isEnabled else { return }
         migrateDotFolderRoot()
         migrateApplicationSupportRoot()
     }

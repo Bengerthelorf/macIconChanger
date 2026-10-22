@@ -73,3 +73,28 @@ enum IconApplicationPolicy {
         source != .history
     }
 }
+
+/// Keep the last successful cache until the helper has accepted the new icon.
+enum IconApplicationTransaction {
+    static func perform<Prepared>(
+        prepare: () throws -> Prepared,
+        apply: (Prepared) throws -> Void,
+        commit: (Prepared) throws -> Void,
+        discard: (Prepared) -> Void
+    ) throws {
+        let prepared = try prepare()
+        do {
+            try apply(prepared)
+            try commit(prepared)
+        } catch {
+            discard(prepared)
+            throw error
+        }
+    }
+}
+
+enum DockPreviewPolicy {
+    static func shouldShow(mode: String, isDockFilter: Bool, isFolderFilter: Bool) -> Bool {
+        !isFolderFilter && mode != "never" && (mode == "always" || isDockFilter)
+    }
+}

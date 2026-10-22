@@ -42,7 +42,7 @@ struct IconList: View {
     @State private var dockBarHeight: CGFloat = 0
 
     private var shouldShowDockPreview: Bool {
-        appFilter != .folders && (dockPreviewMode == "always" || appFilter == .dock)
+        DockPreviewPolicy.shouldShow(mode: dockPreviewMode, isDockFilter: appFilter == .dock, isFolderFilter: appFilter == .folders)
     }
 
     private var availableFilters: [AppFilter] {
@@ -178,7 +178,19 @@ struct IconList: View {
                 }
             }
                     .listStyle(.sidebar)
-                    .frame(minWidth: 200, idealWidth: 300)
+                    .overlay {
+                        if filteredApps.isEmpty && !searchText.isEmpty {
+                            VStack(spacing: 10) {
+                                Image(systemName: "magnifyingglass").font(.title2)
+                                Text("No Matches").font(.headline)
+                                Text("Try another name or clear the search.")
+                                    .font(.caption).multilineTextAlignment(.center)
+                                Button("Clear Search") { searchText = "" }
+                            }
+                            .foregroundStyle(.secondary).padding()
+                        }
+                    }
+                    .frame(minWidth: 200, idealWidth: 250, maxWidth: 360)
                     .modifier(HideSidebarToggle())
         } detail: {
             ZStack(alignment: .top) {
@@ -223,11 +235,17 @@ struct IconList: View {
                                     folderManager.addFolderViaPanel()
                                 }
                             }
-                        } else if !shouldShowDockPreview {
-                            Text(appFilter == .folders
-                                 ? "Select a folder to customize its icon"
-                                 : "Select an app to see its details")
-                                .foregroundColor(.secondary)
+                        } else {
+                            VStack(spacing: 12) {
+                                Image(systemName: appFilter == .folders ? "folder" : "app.dashed")
+                                    .font(.system(size: 36)).foregroundStyle(.secondary)
+                                Text(appFilter == .folders
+                                     ? "Select a folder to customize its icon"
+                                     : "Select an app to customize its icon")
+                                    .font(.title3).foregroundStyle(.secondary)
+                                Text("Choose an item in the sidebar to get started.")
+                                    .font(.callout).foregroundStyle(.secondary)
+                            }
                         }
                         Spacer()
                     }
@@ -257,19 +275,36 @@ struct IconList: View {
                         SetAliasNameView(raw: alias, lastText: AliasName.getName(for: alias) ?? "")
                     }
                 }
-                .searchable(text: $searchText)
+                .searchable(text: $searchText, prompt: Text("Search apps and folders"))
                 .toolbar {
                     ToolbarItem(placement: .automatic) {
-                        Picker("Filter", selection: $appFilter) {
+                        Menu {
                             ForEach(availableFilters) { filter in
-                                Text(NSLocalizedString(filter.rawValue, comment: "App filter option"))
-                                    .tag(filter)
+                                Button { appFilter = filter } label: {
+                                    if appFilter == filter {
+                                        Label(NSLocalizedString(filter.rawValue, comment: "App filter option"), systemImage: "checkmark")
+                                    } else {
+                                        Text(NSLocalizedString(filter.rawValue, comment: "App filter option"))
+                                    }
+                                }
                             }
+                        } label: {
+                            HStack(spacing: 6) {
+                                Image(systemName: "line.3.horizontal.decrease.circle")
+                                Text(NSLocalizedString(appFilter.rawValue, comment: "App filter option"))
+                            }
+                            .fixedSize()
                         }
-                        .pickerStyle(.menu)
+                        .help("Filter apps and folders")
+                        .accessibilityLabel("Filter")
+                        .accessibilityValue(Text(NSLocalizedString(appFilter.rawValue, comment: "App filter option")))
                         .onChange(of: appFilter) { newFilter in
                             if newFilter == .dock || dockPreviewMode == "always" {
                                 dockLayout = Self.loadDockLayout()
+                            }
+                            if let selectedApp,
+                               !filteredApps.contains(where: { $0.id == selectedApp.id }) {
+                                self.selectedApp = nil
                             }
                         }
                         .onChange(of: dockPreviewMode) { _ in
@@ -743,6 +778,9 @@ struct DockPreviewBar: View {
                 .buttonStyle(.borderless)
                 .help("Restart the Dock to refresh all icons")
             }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
 
             if apps.pinned.isEmpty && apps.runningOnly.isEmpty {
                 Text("No Dock apps found")
@@ -750,7 +788,7 @@ struct DockPreviewBar: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding()
             } else {
-                ScrollView(.horizontal, showsIndicators: false) {
+                ScrollView(.horizontal, showsIndicators: true) {
                     HStack(spacing: 0) {
                         ForEach(apps.pinned) { app in
                             DockPreviewIcon(
@@ -759,6 +797,10 @@ struct DockPreviewBar: View {
                                 isRunning: dockLayout.runningPaths.contains(app.id)
                             )
                             .onTapGesture { onSelectApp?(app) }
+                            .accessibilityElement(children: .ignore)
+                            .accessibilityLabel(app.name)
+                            .accessibilityAddTraits(.isButton)
+                            .accessibilityAction { onSelectApp?(app) }
                             .padding(.horizontal, 6)
                         }
 
@@ -776,6 +818,10 @@ struct DockPreviewBar: View {
                                 isRunning: true
                             )
                             .onTapGesture { onSelectApp?(app) }
+                            .accessibilityElement(children: .ignore)
+                            .accessibilityLabel(app.name)
+                            .accessibilityAddTraits(.isButton)
+                            .accessibilityAction { onSelectApp?(app) }
                             .padding(.horizontal, 6)
                         }
                     }
@@ -786,8 +832,8 @@ struct DockPreviewBar: View {
                 .modifier(DockGlassModifier())
             }
         }
-        .padding()
-        .padding()
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
     }
 }
 

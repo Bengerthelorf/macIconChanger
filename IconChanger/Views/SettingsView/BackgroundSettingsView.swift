@@ -7,6 +7,7 @@ import SwiftUI
 import UserNotifications
 
 struct BackgroundSettingsView: View {
+    @StateObject private var setupMonitor = SetupMonitor.shared
     @StateObject private var backgroundService = BackgroundService.shared
     @StateObject private var appearanceSwitchService = IconAppearanceSwitchService.shared
 
@@ -222,9 +223,9 @@ struct BackgroundSettingsView: View {
                 Section {
                     LabeledContent {
                         HStack(spacing: 6) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
-                            Text("Running")
+                            Image(systemName: setupMonitor.health.statusSymbolName)
+                                .foregroundColor(setupMonitor.health.backgroundAutomationAvailable ? .green : .orange)
+                            Text(setupMonitor.health.backgroundAutomationAvailable ? NSLocalizedString("Running", comment: "Service status") : setupMonitor.health.statusDescription)
                                 .foregroundColor(.secondary)
                         }
                     } label: {

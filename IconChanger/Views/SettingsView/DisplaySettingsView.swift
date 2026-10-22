@@ -50,6 +50,7 @@ struct DisplaySettingsView: View {
                 Picker(selection: $dockPreviewMode) {
                     Text(NSLocalizedString("Only When Dock Filter", comment: "Dock preview option")).tag("dockOnly")
                     Text(NSLocalizedString("Always", comment: "Dock preview option")).tag("always")
+                    Text(NSLocalizedString("Never", comment: "Dock preview option")).tag("never")
                 } label: {
                     Label(NSLocalizedString("Dock Preview", comment: "Display setting"), systemImage: "dock.rectangle")
                 }
@@ -68,6 +69,8 @@ struct DisplaySettingsView: View {
                         Image(systemName: "arrow.up.left.and.arrow.down.right")
                             .foregroundColor(.secondary)
                     }
+                    .accessibilityLabel("Wallpaper Spread")
+                    .accessibilityValue(Text("\(Int(wallpaperBleed))"))
 
                     Slider(value: $wallpaperBlur, in: 28...40, step: 2) {
                         Label(NSLocalizedString("Wallpaper Blur", comment: "Display setting"), systemImage: "aqi.medium")
@@ -78,6 +81,8 @@ struct DisplaySettingsView: View {
                         Image(systemName: "aqi.medium")
                             .foregroundColor(.secondary)
                     }
+                    .accessibilityLabel("Wallpaper Blur")
+                    .accessibilityValue(Text("\(Int(wallpaperBlur))"))
                 }
 
                 if #available(macOS 26, *) {
@@ -90,6 +95,8 @@ struct DisplaySettingsView: View {
                         Image(systemName: "cube.transparent.fill")
                             .foregroundColor(.secondary)
                     }
+                    .accessibilityLabel("Dock Glass Intensity")
+                    .accessibilityValue(Text("\(Int(dockGlassIntensity * 100))%"))
                 }
             } header: {
                 Label(NSLocalizedString("Dock Preview", comment: "Settings section"), systemImage: "dock.rectangle")
