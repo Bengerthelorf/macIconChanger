@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 """
-4MMmmppSNNN — ordered Sparkle build number from MARKETING_VERSION.
+5MMmmppSNNNFF — ordered Sparkle build number from MARKETING_VERSION.
 
-  1.5.0-alpha.1 -> 40105001001
-  1.5.0-beta.1  -> 40105003001
-  1.5.0-pre.1   -> 40105005001
-  1.5.1-pre.1.fix.1 -> 40105016101
-  1.5.0-rc.1    -> 40105007001
-  1.5.0         -> 40105009000
+  1.5.0-alpha.1 -> 5010500100100
+  1.5.0-beta.1  -> 5010500300100
+  1.5.0-pre.1   -> 5010500500100
+  1.5.1-pre.1.fix.3 -> 5010501500103
+  1.5.1-pre.2   -> 5010501500200
+  1.5.0-rc.1    -> 5010500700100
+  1.5.0         -> 5010500900000
 
-The leading 4 migrates every new build above the currently published
-3014470009. The stage digit keeps prereleases below the stable build for
-the same marketing version while the fixed-width version components keep
-multi-digit minor and patch releases unambiguous.
+The leading 5 migrates new releases above the published 4-prefixed scheme.
+Separate sequence and fix fields keep pre.1 < pre.1.fix.3 < pre.2, without
+moving hotfixes into the next stage. Published tags retain their original
+build numbers and must not be rebuilt. All values fit in a signed 64-bit
+integer; fixed-width fields preserve version, stage, sequence, and fix order.
 """
 
 import re
@@ -48,14 +50,12 @@ stage = {
 }[label]
 
 if fix_seq is not None:
-    if base_seq < 1 or base_seq > 9:
-        sys.exit("Hotfix base sequence must be between 1 and 9")
+    if base_seq < 1 or base_seq > 999:
+        sys.exit("Hotfix base sequence must be between 1 and 999")
     if fix_seq < 1 or fix_seq > 99:
         sys.exit("Hotfix sequence must be between 1 and 99")
-    stage += 1
-    seq = base_seq * 100 + fix_seq
 
 if seq > 999:
     sys.exit("Release sequence must be between 0 and 999")
 
-print(f"4{major:02d}{minor:02d}{patch:02d}{stage}{seq:03d}")
+print(f"5{major:02d}{minor:02d}{patch:02d}{stage}{seq:03d}{fix_seq or 0:02d}")
