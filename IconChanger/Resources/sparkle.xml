@@ -4,6 +4,27 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.5.1-pre.2</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>5010501500200</sparkle:version>
+                    <sparkle:shortVersionString>1.5.1-pre.2</sparkle:shortVersionString>
+                    <pubDate>Thu, 22 Oct 2026 12:28:47 +0000</pubDate>
+                    <sparkle:channel>beta</sparkle:channel>
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.5.1-pre.2/IconChanger.dmg"
+                    sparkle:edSignature="XYj5L1djMr7nBc5r+04V2GVmxmBudWhIK8SaDMswsABOUonfax3JzsCq/+CV7HIOtwLnxPStg9Cx1KIwisYdDQ==" length="8634004"
+                    type="application/octet-stream"/>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.5.1-pre.2</h2>
+                    <ul>
+                        <li><strong>Fixed:</strong> lock release dependencies to the tested package graph</li>
+                        <li><strong>Fixed:</strong> preserve prerelease update ordering after hotfixes</li>
+                        <li><strong>Fixed:</strong> improve icon preview safety and UI reliability</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
                     <title>Version 1.5.1-pre.1.fix.3</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>40105016103</sparkle:version>
