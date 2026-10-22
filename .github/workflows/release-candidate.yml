@@ -170,6 +170,7 @@ jobs:
           xcodebuild -resolvePackageDependencies \
             -project IconChanger.xcodeproj \
             -scheme IconChanger \
+            -onlyUsePackageVersionsFromResolvedFile \
             -derivedDataPath build/DerivedData
 
       - name: Build candidate app
@@ -181,6 +182,7 @@ jobs:
             -scheme IconChanger \
             -configuration Release \
             -destination "generic/platform=macOS" \
+            -onlyUsePackageVersionsFromResolvedFile \
             -derivedDataPath build/DerivedData \
             MARKETING_VERSION="$VERSION" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \

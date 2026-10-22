@@ -10,6 +10,7 @@ BUILD_DIR="${ICONCHANGER_REVIEW_DERIVED_DATA:-$OUTPUT_DIR/Build}"
 
 xcodebuild -project "$REPO_ROOT/IconChanger.xcodeproj" -scheme IconChanger \
     -configuration Debug -derivedDataPath "$BUILD_DIR" \
+    -onlyUsePackageVersionsFromResolvedFile \
     CODE_SIGNING_ALLOWED=NO ENABLE_DEBUG_DYLIB=NO build > "$OUTPUT_DIR/build.log" 2>&1 || {
     tail -n 60 "$OUTPUT_DIR/build.log"
     exit 1

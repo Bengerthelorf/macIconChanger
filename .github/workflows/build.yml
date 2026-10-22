@@ -22,7 +22,7 @@ jobs:
         run: bash tests/run.sh
 
       - name: Resolve packages
-        run: xcodebuild -resolvePackageDependencies -project IconChanger.xcodeproj -scheme IconChanger
+        run: xcodebuild -resolvePackageDependencies -project IconChanger.xcodeproj -scheme IconChanger -onlyUsePackageVersionsFromResolvedFile
 
       - name: Build
         run: |
@@ -31,6 +31,7 @@ jobs:
             -scheme IconChanger \
             -configuration Release \
             -destination "generic/platform=macOS" \
+            -onlyUsePackageVersionsFromResolvedFile \
             CODE_SIGNING_ALLOWED=NO \
             -quiet
 
@@ -109,6 +110,7 @@ jobs:
             -scheme IconChanger \
             -configuration Release \
             -destination "generic/platform=macOS" \
+            -onlyUsePackageVersionsFromResolvedFile \
             -derivedDataPath build/SigningCheckDerivedData \
             MARKETING_VERSION="1.5.0-pre.1" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \

@@ -16,6 +16,26 @@ fail() {
     exit 1
 }
 
+PACKAGE_LOCK="$REPO_ROOT/IconChanger.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+[[ -f "$PACKAGE_LOCK" ]] || fail "release dependency versions must be locked"
+if git -C "$REPO_ROOT" check-ignore -q "$PACKAGE_LOCK"; then
+    fail "the release dependency lock must not be ignored"
+fi
+python3 - "$PACKAGE_LOCK" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as handle:
+    lock = json.load(handle)
+pins = {pin["identity"]: pin["state"] for pin in lock["pins"]}
+assert pins["sqlite.swift"]["version"] == "0.15.3", "SQLite must retain the tested macOS-compatible version"
+assert all(len(pin["revision"]) == 40 for pin in pins.values()), "dependencies must pin exact commits"
+PY
+for workflow in "$CI_WORKFLOW" "$CANDIDATE_WORKFLOW"; do
+    /usr/bin/grep -Fq -- '-onlyUsePackageVersionsFromResolvedFile' "$workflow" ||
+        fail "CI and release builds must enforce the dependency lock"
+done
+
 [[ -f "$CANDIDATE_WORKFLOW" ]] || fail "release candidate workflow is missing"
 [[ -f "$PUBLISH_WORKFLOW" ]] || fail "manual publish workflow is missing"
 [[ -f "$SPARKLE_PAGES_WORKFLOW" ]] ||
