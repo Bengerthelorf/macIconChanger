@@ -117,15 +117,14 @@ struct AdvancedSettingsView: View {
             } header: {
                 Label("Administrator Access", systemImage: "lock.shield")
             } footer: {
-                if !setupMonitor.health.allowsIconBrowsing {
-                    Text(setupMonitor.health.statusDescription)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                } else if isManualMode {
-                    Text("Manual icon changes remain available and request administrator approval when needed. Scheduled restore, update restore, and automatic appearance changes are paused until permanent permission is repaired.")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                } else {
-                    Text("The protected helper is authorized for both manual changes and background automation.")
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                SettingsFooter {
+                    if !setupMonitor.health.allowsIconBrowsing {
+                        Text(setupMonitor.health.statusDescription)
+                    } else if isManualMode {
+                        Text("Manual icon changes remain available and request administrator approval when needed. Scheduled restore, update restore, and automatic appearance changes are paused until permanent permission is repaired.")
+                    } else {
+                        Text("The protected helper is authorized for both manual changes and background automation.")
+                    }
                 }
             }
 
@@ -138,8 +137,9 @@ struct AdvancedSettingsView: View {
             } header: {
                 Label(NSLocalizedString("API Key", comment: "Settings section"), systemImage: "key")
             } footer: {
-                Text(NSLocalizedString("You need to obtain an API key from macosicons.com", comment: "API settings instruction"))
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                SettingsFooter {
+                    Text(NSLocalizedString("You need to obtain an API key from macosicons.com", comment: "API settings instruction"))
+                }
             }
 
             Section {
@@ -227,8 +227,9 @@ struct AdvancedSettingsView: View {
             } header: {
                 Label(NSLocalizedString("API Settings", comment: "Settings section"), systemImage: "gearshape")
             } footer: {
-                Text(NSLocalizedString("Usage is estimated on this Mac. Resetting the local counter does not reset your provider quota.\n\nRetry count controls how many times a failed request is retried. Timeout applies to each individual request attempt.\n\nExtended Search uses multiple queries per search to find more icons. This uses 2–3× more API calls.", comment: "API settings description"))
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                SettingsFooter {
+                    Text(NSLocalizedString("Usage is estimated on this Mac. Resetting the local counter does not reset your provider quota.\n\nRetry count controls how many times a failed request is retried. Timeout applies to each individual request attempt.\n\nExtended Search uses multiple queries per search to find more icons. This uses 2–3× more API calls.", comment: "API settings description"))
+                }
             }
 
             Section {
@@ -247,13 +248,14 @@ struct AdvancedSettingsView: View {
                     systemImage: "square.grid.2x2"
                 )
             } footer: {
-                Text(
-                    NSLocalizedString(
-                        "Automatically loads macOSicons.com results when you open an app or change the icon style. Cached results are used when available, but loading may use your monthly API allowance.",
-                        comment: "Icon loading setting description"
+                SettingsFooter {
+                    Text(
+                        NSLocalizedString(
+                            "Automatically loads macOSicons.com results when you open an app or change the icon style. Cached results are used when available, but loading may use your monthly API allowance.",
+                            comment: "Icon loading setting description"
+                        )
                     )
-                )
-                .frame(maxWidth: .infinity, alignment: .leading)
+                }
             }
 
             // MARK: - Icon Search Cache
@@ -289,8 +291,9 @@ struct AdvancedSettingsView: View {
             } header: {
                 Label(NSLocalizedString("Icon Search Cache", comment: "Settings section"), systemImage: "magnifyingglass")
             } footer: {
-                Text(NSLocalizedString("When enabled, icon search results are saved to disk and persist across app restarts. Use the refresh button to fetch fresh results.", comment: "Cache setting description"))
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                SettingsFooter {
+                    Text(NSLocalizedString("When enabled, icon search results are saved to disk and persist across app restarts. Use the refresh button to fetch fresh results.", comment: "Cache setting description"))
+                }
             }
 
             // MARK: - Configuration
@@ -335,11 +338,12 @@ struct AdvancedSettingsView: View {
                     Label("Import Configuration", systemImage: "square.and.arrow.down")
                 }
             } footer: {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Export aliases, cached icons, light/dark icons, and settings for backup or another Mac.")
-                    Text("Import adds missing aliases and icons without replacing local choices, then restores included settings.")
+                SettingsFooter {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Export aliases, cached icons, light/dark icons, and settings for backup or another Mac.")
+                        Text("Import adds missing aliases and icons without replacing local choices, then restores included settings.")
+                    }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .alert("Export Configuration", isPresented: $showExportPasswordPrompt) {
                 SecureField("Password (optional)", text: $exportPassword)
@@ -393,8 +397,9 @@ struct AdvancedSettingsView: View {
             } header: {
                 Label("Command Line Tool", systemImage: "terminal")
             } footer: {
-                Text("Install path: \(cliManager.installLocation)")
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                SettingsFooter {
+                    Text("Install path: \(cliManager.installLocation)")
+                }
             }
 
             Section {
@@ -402,8 +407,9 @@ struct AdvancedSettingsView: View {
             } header: {
                 Label("Updates", systemImage: "arrow.triangle.2.circlepath")
             } footer: {
-                Text("Receive beta versions before they are officially released.")
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                SettingsFooter {
+                    Text("Receive beta versions before they are officially released.")
+                }
             }
 
         }

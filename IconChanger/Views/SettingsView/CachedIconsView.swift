@@ -148,36 +148,45 @@ struct CachedIconsView: View {
     }
 
     private var actionBar: some View {
-        HStack {
-            Button {
-                restoreAllIcons()
-            } label: {
-                Label("Restore All", systemImage: "arrow.clockwise")
+        ViewThatFits(in: .horizontal) {
+            HStack {
+                cacheActions
             }
-            .disabled(items.isEmpty || isRestoring)
+            .fixedSize(horizontal: true, vertical: false)
 
-            Spacer()
-
-            Button {
-                restoreSelected()
-            } label: {
-                Label("Restore Selected", systemImage: "arrow.clockwise.circle")
+            VStack(alignment: .leading, spacing: 8) {
+                cacheActions
             }
-            .disabled(selection.isEmpty || isRestoring)
-
-            Spacer()
-
-            Button(role: .destructive) {
-                showDeleteConfirmation = true
-            } label: {
-                Label(
-                    isAllSelected ? "Clear All Cache" : "Remove Selected",
-                    systemImage: "trash"
-                )
-            }
-            .disabled(selection.isEmpty)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
+    }
+
+    @ViewBuilder
+    private var cacheActions: some View {
+        Button {
+            restoreAllIcons()
+        } label: {
+            Label("Restore All", systemImage: "arrow.clockwise")
+        }
+        .disabled(items.isEmpty || isRestoring)
+
+        Button {
+            restoreSelected()
+        } label: {
+            Label("Restore Selected", systemImage: "arrow.clockwise.circle")
+        }
+        .disabled(selection.isEmpty || isRestoring)
+
+        Button(role: .destructive) {
+            showDeleteConfirmation = true
+        } label: {
+            Label(
+                isAllSelected ? "Clear All Cache" : "Remove Selected",
+                systemImage: "trash"
+            )
+        }
+        .disabled(selection.isEmpty)
     }
 
     private var restoreProgress: some View {

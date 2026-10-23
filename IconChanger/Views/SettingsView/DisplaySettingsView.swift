@@ -41,8 +41,9 @@ struct DisplaySettingsView: View {
             } header: {
                 Label(NSLocalizedString("Appearance", comment: "Settings section"), systemImage: "paintbrush")
             } footer: {
-                Text(NSLocalizedString("Show a green checkmark badge on apps with custom icons in the sidebar.", comment: "Display setting description"))
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                SettingsFooter {
+                    Text(NSLocalizedString("Show a green checkmark badge on apps with custom icons in the sidebar.", comment: "Display setting description"))
+                }
             }
 
             // MARK: - Dock Preview
@@ -118,8 +119,9 @@ struct DisplaySettingsView: View {
             } header: {
                 Label(NSLocalizedString("Language", comment: "Settings section title"), systemImage: "globe")
             } footer: {
-                Label(NSLocalizedString("Changes will take full effect after restarting the app", comment: "Language settings instruction"), systemImage: "info.circle")
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                SettingsFooter {
+                    Label(NSLocalizedString("Changes will take full effect after restarting the app", comment: "Language settings instruction"), systemImage: "info.circle")
+                }
             }
         }
         .formStyle(.grouped)

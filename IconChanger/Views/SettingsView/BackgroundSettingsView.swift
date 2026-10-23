@@ -93,7 +93,9 @@ struct BackgroundSettingsView: View {
             } header: {
                 Label("Icon Appearance", systemImage: "circle.lefthalf.filled")
             } footer: {
-                Text("Apps with both Light and Dark icons switch automatically while IconChanger is running. The Dock refreshes after a successful switch.")
+                SettingsFooter {
+                    Text("Apps with both Light and Dark icons switch automatically while IconChanger is running. The Dock refreshes after a successful switch.")
+                }
             }
 
             if backgroundService.runInBackground {
@@ -208,9 +210,10 @@ struct BackgroundSettingsView: View {
                 } header: {
                     Label("App Update Detection", systemImage: "arrow.triangle.2.circlepath")
                 } footer: {
-                    if backgroundService.enableAutoRestoreOnUpdate {
-                        Text("The app will monitor your cached applications for updates and automatically restore their custom icons when updates are detected.")
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                    SettingsFooter {
+                        if backgroundService.enableAutoRestoreOnUpdate {
+                            Text("The app will monitor your cached applications for updates and automatically restore their custom icons when updates are detected.")
+                        }
                     }
                 }
 

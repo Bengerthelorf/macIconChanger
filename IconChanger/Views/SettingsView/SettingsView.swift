@@ -191,5 +191,57 @@ struct SettingsView: View {
         .padding()
         .frame(width: 500)
         .frame(minHeight: 540, idealHeight: 620)
+        .background(SettingsToolbarSizing())
+    }
+}
+
+/// Preserve access to every pane when translated titles outgrow the compact window.
+/// AppKit keeps the localized labels as tooltips and accessibility names in icon mode.
+private struct SettingsToolbarSizing: NSViewRepresentable {
+    func makeNSView(context: Context) -> ToolbarSizingView { ToolbarSizingView() }
+
+    func updateNSView(_ view: ToolbarSizingView, context: Context) {
+        view.scheduleToolbarLayout()
+    }
+
+    final class ToolbarSizingView: NSView {
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            scheduleToolbarLayout()
+        }
+
+        override func layout() {
+            super.layout()
+            scheduleToolbarLayout()
+        }
+
+        func scheduleToolbarLayout() {
+            DispatchQueue.main.async { [weak self] in
+                guard let toolbar = self?.window?.toolbar,
+                      let visibleItems = toolbar.visibleItems else { return }
+                let visibleIDs = Set(visibleItems.map(\.itemIdentifier))
+                let spacers: Set<NSToolbarItem.Identifier> = [.space, .flexibleSpace]
+                if toolbar.items.contains(where: {
+                    !spacers.contains($0.itemIdentifier) && !visibleIDs.contains($0.itemIdentifier)
+                }) {
+                    toolbar.displayMode = .iconOnly
+                }
+            }
+        }
+    }
+}
+
+/// Keep descriptive text independent of the grouped Form's platform defaults.
+/// Leading alignment follows the language direction, including right-to-left text.
+struct SettingsFooter<Content: View>: View {
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        content
+            .font(.callout)
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(.leading)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

@@ -131,10 +131,11 @@ struct DeveloperSettingsView: View {
             } header: {
                 Label("Diagnostics", systemImage: "stethoscope")
             } footer: {
-                Text(
-                    "Diagnostics require both Developer Mode and this switch. Helper output and icon file paths are off by default because they may contain sensitive local information."
-                )
-                .frame(maxWidth: .infinity, alignment: .leading)
+                SettingsFooter {
+                    Text(
+                        "Diagnostics require both Developer Mode and this switch. Helper output and icon file paths are off by default because they may contain sensitive local information."
+                    )
+                }
             }
 
             Section {
@@ -194,8 +195,9 @@ struct DeveloperSettingsView: View {
             } header: {
                 Label("Additional API Keys", systemImage: "key.horizontal")
             } footer: {
-                Text("Additional API keys are rotated automatically to distribute usage.")
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                SettingsFooter {
+                    Text("Additional API keys are rotated automatically to distribute usage.")
+                }
             }
 
             Section {
