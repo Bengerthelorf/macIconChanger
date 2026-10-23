@@ -4,6 +4,28 @@
     <channel>
         <title>IconChanger</title>
         <item>
+                    <title>Version 1.5.1-pre.3.fix.1</title>
+                    <link>https://github.com/Bengerthelorf/macIconChanger</link>
+                    <sparkle:version>5010501500301</sparkle:version>
+                    <sparkle:shortVersionString>1.5.1-pre.3.fix.1</sparkle:shortVersionString>
+                    <pubDate>Fri, 23 Oct 2026 09:10:17 +0000</pubDate>
+                    <sparkle:channel>beta</sparkle:channel>
+                    <enclosure url="https://github.com/Bengerthelorf/macIconChanger/releases/download/v1.5.1-pre.3.fix.1/IconChanger.dmg"
+                    sparkle:edSignature="xe89aEloZ/uvzP3/j5BmKsvIFsOoesn+RoNFIK+xvkkd+eb3f/NMGzBsIt/Jihu6JxPde7UzvqH3p7SxKxZzDA==" length="8656306"
+                    type="application/octet-stream"/>
+                    <description>
+                        <![CDATA[
+                    <h2>Version 1.5.1-pre.3.fix.1</h2>
+                    <ul>
+                        <li><strong>Fixed:</strong> preserve localized settings toolbar tooltips</li>
+                        <li><strong>Docs:</strong> record settings layout checks across all languages</li>
+                        <li><strong>Fixed:</strong> follow selected language direction in settings</li>
+                        <li><strong>Fixed:</strong> align settings descriptions and fit localized controls</li>
+                    </ul>
+                        ]]>
+                    </description>
+                </item>
+        <item>
                     <title>Version 1.5.1-pre.3</title>
                     <link>https://github.com/Bengerthelorf/macIconChanger</link>
                     <sparkle:version>5010501500300</sparkle:version>
