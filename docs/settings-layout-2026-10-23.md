@@ -1,5 +1,7 @@
 # Compact settings verification
 
+Follow-up: the original review missed footer paragraph alignment and localized control truncation. See [the hotfix verification](settings-layout-hotfix-2026-10-23.md) for the corrected 30-language checks and fixes.
+
 The settings window returns to its original 500-point width. Its existing minimum/ideal height stays 540/620 points, and long Form pages keep native vertical scrolling. The Settings scene uses content-size constraints so a previously saved wider frame cannot override the compact width. The main window and all icon reliability fixes are retained.
 
 Long application and alias names keep native single-row editing/list behavior and expose the complete value in a help tooltip.
