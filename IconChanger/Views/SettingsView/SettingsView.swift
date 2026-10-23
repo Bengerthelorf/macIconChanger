@@ -229,6 +229,9 @@ private struct SettingsToolbarSizing: NSViewRepresentable {
                       let visibleItems = toolbar.visibleItems else { return }
                 let visibleIDs = Set(visibleItems.map(\.itemIdentifier))
                 let spacers: Set<NSToolbarItem.Identifier> = [.space, .flexibleSpace]
+                for item in toolbar.items where !spacers.contains(item.itemIdentifier) {
+                    item.toolTip = item.label
+                }
                 if toolbar.items.contains(where: {
                     !spacers.contains($0.itemIdentifier) && !visibleIDs.contains($0.itemIdentifier)
                 }) {

@@ -57,9 +57,8 @@ Host runtime: macOS 27.0.1, local Xcode 27.1. Runtime behavior on Ventura/Sequoi
 ## Candidate verification
 
 - Local `bash tests/run.sh` passed after the footer, toolbar and cache-action changes.
-- Final source `f67b0a289bf97aba7f73804bff4555ad8352ead9` passed full regressions, Release build and launch smoke test in candidate run [39926547703](https://github.com/Bengerthelorf/macIconChanger/actions/runs/39926547703).
-- Downloaded exact candidate: `IconChanger.dmg`, 8,654,949 bytes, SHA-256 `9c8a78f8b2e308fce26a7240284b776326a4eddae285cf10638e93a477f12bff`.
-- DMG integrity, readonly-mounted layout, deep/strict code signatures, exact bundle version/build, GUI/CLI universal architectures, CLI launch and Ed25519 update signature verified locally.
-- An earlier candidate run `39926094831` predates the writing-direction correction and is not the release candidate to promote.
+- Release candidates run full regressions, a universal Release build and launch smoke test in GitHub Actions. The final candidate source, run ID and hashes are kept in the downloaded manifest and verification receipt alongside the native screenshots.
+- Before promotion, verify DMG integrity, readonly-mounted layout, deep/strict code signatures, exact bundle version/build, GUI/CLI universal architectures, CLI launch and the Ed25519 update signature.
+- Promote the final tested artifact through Publish Tested Release; earlier layout checkpoints are not promoted. The published version is [v1.5.1-pre.3.fix.1](https://github.com/Bengerthelorf/macIconChanger/releases/tag/v1.5.1-pre.3.fix.1).
 
 Evidence: sibling directory `macIconChanger-audit-20261023/settings-hotfix/`, including `screenshots/`, `language-checks.json`, per-language overviews, CI/local logs and candidate verification receipt.
