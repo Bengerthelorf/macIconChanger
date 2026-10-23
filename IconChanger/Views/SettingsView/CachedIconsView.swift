@@ -452,6 +452,7 @@ private struct CachedIconRow: View {
                         Text(item.appName)
                             .font(.headline)
                             .lineLimit(1)
+                            .help(item.appName)
 
                         Label(
                             Self.dateFormatter.string(from: item.timestamp),

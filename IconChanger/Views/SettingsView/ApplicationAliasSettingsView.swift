@@ -58,6 +58,7 @@ struct ApplicationAliasSettingsView: View {
                                 }
                             }
                     ))
+                    .help(row.appName)
                 }
                 TableColumn("Alias Name", value: \.aliasName) { row in
                     TextField("Alias Name", text: Binding(
@@ -69,6 +70,7 @@ struct ApplicationAliasSettingsView: View {
                                 }
                             }
                     ))
+                    .help(row.aliasName)
                 }
             }
                     .onAppear { aliasNames.sort(using: sortOrder) }

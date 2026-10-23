@@ -133,6 +133,7 @@ struct IconChangerApp: App {
         Settings {
             SettingsView(updater: updaterController.updater)
         }
+        .windowResizability(.contentSize)
     }
 
     private func migrateAPIKeyToKeychain() {
