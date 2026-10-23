@@ -148,6 +148,12 @@ class LanguageManager: ObservableObject {
 struct SettingsView: View {
     let updater: SPUUpdater
     @AppStorage("t2e") private var developerModeEnabled = false
+    @ObservedObject private var languageManager = LanguageManager.shared
+
+    private var layoutDirection: LayoutDirection {
+        Locale.Language(identifier: languageManager.currentLanguage.locale.identifier)
+            .characterDirection == .rightToLeft ? .rightToLeft : .leftToRight
+    }
 
     var body: some View {
         TabView {
@@ -192,6 +198,8 @@ struct SettingsView: View {
         .frame(width: 500)
         .frame(minHeight: 540, idealHeight: 620)
         .background(SettingsToolbarSizing())
+        .environment(\.locale, languageManager.currentLanguage.locale)
+        .environment(\.layoutDirection, layoutDirection)
     }
 }
 
