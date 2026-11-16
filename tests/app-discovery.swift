@@ -29,11 +29,20 @@ enum AppDiscoveryTests {
         let found = AppDiscoveryPolicy.scan(roots: [root, nested, missing]) { url, _ in
             failures.append(url)
         }
-        let discoveredPaths = found.map { $0.url.path }
-        require(Set(discoveredPaths) == Set([app.path, copy.path, boundary.path]),
-                "scan yields valid bundles including distinct installations with the same ID")
+        // Foundation can enumerate /var and /tmp through their /private paths.
+        let expected = [app, copy, boundary]
+        let expectedPaths = expected.map(AppDiscoveryPolicy.comparisonPath)
+        require(Set(found.map(\.comparisonPath)) == Set(expectedPaths),
+                """
+                scan yields valid bundles including distinct installations with the same ID
+                Fixture: \(fixture.path)
+                Expected: \(expected.map(\.path))
+                Found: \(found.map { $0.url.path })
+                Scan errors: \(failures.map(\.path))
+                """)
         require(found.count == 3, "overlapping roots do not repeat an application")
-        require(failures.map(\.path).contains(missing.path), "missing roots report a read failure")
+        require(failures.map(AppDiscoveryPolicy.comparisonPath).contains(AppDiscoveryPolicy.comparisonPath(for: missing)),
+                "missing root did not report a read failure: \(missing.path), errors: \(failures.map(\.path))")
         for rejected in [fake, malformed, symlink, hidden, embedded, missing] {
             require(AppDiscoveryPolicy.application(at: rejected) == nil,
                     "unusable discovery record rejected: \(rejected.lastPathComponent)")
@@ -46,7 +55,8 @@ enum AppDiscoveryTests {
         require(merged.map(\.path) == [pathVariant.path, copy.path],
                 "merging path variants keeps the first write target and distinct installs")
 
-        let metadata = found.first { $0.url.path == app.path }!
+        let appComparisonPath = AppDiscoveryPolicy.comparisonPath(for: app)
+        let metadata = found.first { $0.comparisonPath == appComparisonPath }!
         let fields = ["Renamed", "Workspace Editor"] + metadata.names
         let queries = [" Café  \n 示  ", "EDITOR com.example.fixture", "Fixture Workspace", app.path]
         for query in queries {
