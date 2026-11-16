@@ -98,9 +98,16 @@ class IconManager: ObservableObject {
     func loadAppItems() -> [AppItem] {
         if UIReviewMode.isEnabled {
             return ["/System/Applications/Notes.app", "/System/Applications/Mail.app", "/System/Applications/Calendar.app", "/Applications/Safari.app", "/Applications/Arc.app"]
-                .filter { FileManager.default.fileExists(atPath: $0) }
-                .map { AppItem(name: URL(fileURLWithPath: $0).deletingPathExtension().lastPathComponent,
-                               url: URL(fileURLWithPath: $0), originalAppInfo: nil) }
+                .compactMap { path in
+                    let url = URL(fileURLWithPath: path)
+                    guard FileManager.default.fileExists(atPath: path) else { return nil }
+                    return AppItem(
+                        name: url.deletingPathExtension().lastPathComponent,
+                        url: url,
+                        originalAppInfo: nil,
+                        discovery: AppDiscoveryPolicy.application(at: url)
+                    )
+                }
                 .sorted { $0.name < $1.name }
         }
         let diagnosticsContext = DiagnosticsContext(
@@ -116,20 +123,22 @@ class IconManager: ObservableObject {
                 "folder_permission_count": String(FolderPermission.shared.permissions.count)
             ]
         )
-        var allApps: [AppItem] = []
+        var launchpadApps: [AppItem] = []
         var launchpadCount = 0
 
         do {
             let helper = try LaunchPadManagerDBHelper()
             let dbApps = try helper.getAllAppInfos()
-            let dbAppItems = dbApps.map { AppItem(name: $0.name, url: $0.url, originalAppInfo: $0) }
-            allApps.append(contentsOf: dbAppItems)
-            launchpadCount = dbAppItems.count
+            launchpadCount = dbApps.count
+            launchpadApps = dbApps.compactMap { entry in
+                guard let discovery = AppDiscoveryPolicy.application(at: entry.url) else { return nil }
+                return AppItem(name: entry.name, url: entry.url, originalAppInfo: entry, discovery: discovery)
+            }
             diagnostics.log(
                 .step,
                 phase: "app_discovery.launchpad_loaded",
                 context: diagnosticsContext,
-                details: ["count": String(launchpadCount)]
+                details: ["count": String(launchpadCount), "valid_count": String(launchpadApps.count)]
             )
         } catch {
             logger.error("Error fetching LaunchPad apps: \(error.localizedDescription)")
@@ -143,16 +152,11 @@ class IconManager: ObservableObject {
         
         let localApps = scanLocalApps(diagnosticsContext: diagnosticsContext)
 
-        let existingPaths = Set(allApps.map { $0.id })
-        for localApp in localApps {
-            if !existingPaths.contains(localApp.id) {
-                allApps.append(localApp)
+        let result = AppDiscoveryPolicy.uniqueByPath(launchpadApps + localApps, path: \.comparisonPath)
+            .sorted {
+                let byName = $0.name.localizedStandardCompare($1.name)
+                return byName == .orderedSame ? $0.id < $1.id : byName == .orderedAscending
             }
-        }
-        
-        let result = allApps.sorted(by: {
-            $0.name.localizedStandardCompare($1.name) == .orderedAscending
-        })
         diagnostics.log(
             .operation,
             phase: "app_discovery.completed",
@@ -167,65 +171,42 @@ class IconManager: ObservableObject {
         return result
     }
     
-    func scanLocalApps(
-        diagnosticsContext: DiagnosticsContext? = nil
-    ) -> [AppItem] {
-        let fileManager = FileManager.default
-        var appItems = [AppItem]()
-        
-        let permissions = FolderPermission.shared.permissions
-        let maxDepth = 5
-
-        for permission in permissions {
-            let dir = permission.bookmarkedURL
-            guard let enumerator = fileManager.enumerator(
-                at: dir,
-                includingPropertiesForKeys: [.isDirectoryKey],
-                options: [.skipsHiddenFiles, .skipsPackageDescendants]
-            ) else {
-                if let diagnosticsContext {
-                    diagnostics.log(
-                        .failure,
-                        phase: "app_discovery.folder_enumerator_failed",
-                        context: DiagnosticsContext(
-                            operation: .discovery,
-                            operationID: diagnosticsContext.operationID,
-                            source: diagnosticsContext.source,
-                            appName: dir.lastPathComponent,
-                            appPath: dir.path
-                        )
-                    )
-                }
-                continue
-            }
-            
-            for case let url as URL in enumerator {
-                if enumerator.level > maxDepth {
-                    enumerator.skipDescendants()
-                    continue
-                }
-                
-                if url.pathExtension == "app" {
-                    let name = url.deletingPathExtension().lastPathComponent
-                    appItems.append(AppItem(name: name, url: url, originalAppInfo: nil))
-                    enumerator.skipDescendants()
-                }
-            }
-        }
-
-        if let diagnosticsContext {
+    private func scanLocalApps(diagnosticsContext: DiagnosticsContext) -> [AppItem] {
+        let standardRoots = [
+            URL(fileURLWithPath: "/Applications", isDirectory: true),
+            FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Applications", isDirectory: true),
+            URL(fileURLWithPath: "/System/Applications", isDirectory: true),
+        ].filter { FileManager.default.isReadableFile(atPath: $0.path) }
+        let grantedRoots = FolderPermission.shared.permissions.map(\.bookmarkedURL)
+        let roots = grantedRoots + standardRoots
+        let discovered = AppDiscoveryPolicy.scan(roots: roots) { [diagnostics] url, error in
             diagnostics.log(
-                .step,
-                phase: "app_discovery.folder_scan_completed",
-                context: diagnosticsContext,
-                details: [
-                    "folder_count": String(permissions.count),
-                    "app_count": String(appItems.count),
-                ]
+                .failure,
+                phase: "app_discovery.folder_enumerator_failed",
+                context: DiagnosticsContext(
+                    operation: .discovery,
+                    operationID: diagnosticsContext.operationID,
+                    source: diagnosticsContext.source,
+                    appName: url.lastPathComponent,
+                    appPath: url.path
+                ),
+                details: DiagnosticsLogger.errorDetails(error)
             )
         }
-        
-        return appItems
+        diagnostics.log(
+            .step,
+            phase: "app_discovery.folder_scan_completed",
+            context: diagnosticsContext,
+            details: ["folder_count": String(roots.count), "app_count": String(discovered.count)]
+        )
+        return discovered.map { app in
+            AppItem(
+                name: app.url.deletingPathExtension().lastPathComponent,
+                url: app.url,
+                originalAppInfo: nil,
+                discovery: app
+            )
+        }
     }
     
     func ensureHelperFilesCopied() {
@@ -1164,86 +1145,27 @@ class IconManager: ObservableObject {
                         lowResPngUrl: URL(string: "https://ui-review.invalid/\(index).png")!, downloads: index * 10)
             }
         }
-        let appName = app.name
-        let urlName = app.url.deletingPathExtension().lastPathComponent
-        let bundleName = try getAppBundleName(app)
-        let aliasName = AliasName.getName(for: app.url.deletingPathExtension().lastPathComponent)
-
+        let extendedSearch = UserDefaults.standard.bool(forKey: "extendedSearch")
+        let queries = IconSearchCoordinator.queries(
+            appName: app.name,
+            fileName: AliasName.key(for: app.url),
+            bundleName: try getAppBundleName(app),
+            alias: AliasName.getName(for: app.url),
+            isFolder: app.url.pathExtension.lowercased() != "app"
+        )
+        let cache = IconFetchCacheManager.shared
         if !forceRefresh,
-           let cachedIcons = IconFetchCacheManager.shared.getCachedIcons(
-            appName: appName,
-            bundleName: bundleName,
-            aliasName: aliasName,
-            style: style.rawValue
-        ) {
-            logger.log("Using cached icon fetch results for \(appName)")
+           let cachedIcons = cache.getCachedIcons(queries: queries, style: style.rawValue, extendedSearch: extendedSearch) {
             return cachedIcons
         }
 
-        if forceRefresh {
-            logger.log("Force refresh, fetching icons from network for \(appName)")
-        } else {
-            logger.log("Cache miss, fetching icons from network for \(appName)")
+        let result = try await IconSearchCoordinator.fetch(queries: queries, extendedSearch: extendedSearch) { query in
+            try await MyQueryRequestController.shared.sendRequest(query, style: style)
         }
-
-        let queryController = MyQueryRequestController.shared
-        var orderedQueries: [String] = []
-        var seenQueries = Set<String>()
-
-        func appendQuery(_ value: String?) {
-            guard let value = value, !value.isEmpty else { return }
-            let lowered = value.lowercased()
-            if seenQueries.insert(lowered).inserted {
-                orderedQueries.append(lowered)
-            }
+        if result.isComplete {
+            cache.cacheIcons(result.icons, queries: queries, style: style.rawValue, extendedSearch: extendedSearch)
         }
-
-        let isFolder = app.url.pathExtension != "app"
-        let extendedSearch = UserDefaults.standard.bool(forKey: "extendedSearch")
-
-        if isFolder {
-            appendQuery("folder \(appName)")
-            if extendedSearch {
-                appendQuery(appName)
-            }
-        } else {
-            appendQuery(appName)
-            if extendedSearch {
-                appendQuery(urlName)
-                appendQuery(bundleName)
-            }
-        }
-        appendQuery(aliasName)
-
-        let selectedKey = APIKeyManager.pickKey()
-        let fetchedIcons: [IconRes] = try await withThrowingTaskGroup(of: [IconRes].self) { group in
-            for query in orderedQueries {
-                group.addTask {
-                    try Task.checkCancellation()
-                    return try await queryController.sendRequest(query, style: style, apiKey: selectedKey)
-                }
-            }
-
-            var aggregated: [IconRes] = []
-            for try await icons in group {
-                aggregated.append(contentsOf: icons)
-            }
-            return aggregated
-        }
-
-        let uniqueRes = Set(fetchedIcons).map { $0 }.sorted { first, second in
-            first.downloads > second.downloads
-        }
-
-        IconFetchCacheManager.shared.cacheIcons(
-            uniqueRes,
-            appName: appName,
-            bundleName: bundleName,
-            aliasName: aliasName,
-            style: style.rawValue
-        )
-
-        return uniqueRes
+        return result.icons
     }
     
     func getAppBundleName(_ app: AppItem) throws -> String? {

@@ -34,10 +34,10 @@ struct ApplicationAliasSettingsView: View {
                     let removed = aliasNames.filter { selectedAlias.contains($0.id) }
                     aliasNames.removeAll { selectedAlias.contains($0.id) }
                     selectedAlias.removeAll()
-                    persistAliases()
                     for alias in removed where !alias.appName.isEmpty {
                         AliasName.trackRemoval(for: alias.appName)
                     }
+                    persistAliases()
                 }) {
                     Image(systemName: "minus")
                 }

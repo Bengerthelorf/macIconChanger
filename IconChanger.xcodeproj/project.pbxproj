@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A61011160000000300000002 /* IconSearchCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A61011160000000300000001 /* IconSearchCoordinator.swift */; };
+		A61011160000000200000002 /* IconSearchPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = A61011160000000200000001 /* IconSearchPolicy.swift */; };
+		A61011160000000100000002 /* AppDiscoveryPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = A61011160000000100000001 /* AppDiscoveryPolicy.swift */; };
 		2F13C0752D93266500C645E9 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 2F13C0742D93266500C645E9 /* ArgumentParser */; };
 		2F13C0772D93267B00C645E9 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F13C0762D93267A00C645E9 /* AppKit.framework */; };
 		376160D092C6FA629ED2C69D /* AdvancedSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEB5BAFAAD3719C791F75836 /* AdvancedSettingsView.swift */; };
@@ -98,6 +101,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A61011160000000300000001 /* IconSearchCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconSearchCoordinator.swift; sourceTree = "<group>"; };
+		A61011160000000200000001 /* IconSearchPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconSearchPolicy.swift; sourceTree = "<group>"; };
+		A61011160000000100000001 /* AppDiscoveryPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDiscoveryPolicy.swift; sourceTree = "<group>"; };
 		2F13C06C2D9325B100C645E9 /* IconChangerCLI */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = IconChangerCLI; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F13C0762D93267A00C645E9 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		AEB5BAFAAD3719C791F75836 /* AdvancedSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsView.swift; sourceTree = "<group>"; };
@@ -311,6 +317,9 @@
 				A30000240000000100000002 /* IconAppearance.swift */,
 				2FC131612D8F7DB000F60B19 /* IconCache.swift */,
 				436C564E2E99990F00756BC7 /* IconFetchCache.swift */,
+				A61011160000000300000001 /* IconSearchCoordinator.swift */,
+				A61011160000000200000001 /* IconSearchPolicy.swift */,
+				A61011160000000100000001 /* AppDiscoveryPolicy.swift */,
 				C6E571D92EA2319C00EC9E5E /* IconImageLoader.swift */,
 				908A790A281A128700951B15 /* Request.swift */,
 				A20000010311000200000001 /* IconHistoryManager.swift */,
@@ -562,6 +571,9 @@
 				A30000240000000100000003 /* IconAppearancePolicy.swift in Sources */,
 				A30000240000000100000004 /* IconAppearance.swift in Sources */,
 				436C564F2E99990F00756BC7 /* IconFetchCache.swift in Sources */,
+				A61011160000000300000002 /* IconSearchCoordinator.swift in Sources */,
+				A61011160000000200000002 /* IconSearchPolicy.swift in Sources */,
+				A61011160000000100000002 /* AppDiscoveryPolicy.swift in Sources */,
 				68431D85DB8E44D55E7421B7 /* ApplicationAliasSettingsView.swift in Sources */,
 				684319BAF8AE3F8E503A8FCD /* ApplicationSettingsView.swift in Sources */,
 				9E409D184D0BFA7ACC289C3A /* KeychainHelper.swift in Sources */,

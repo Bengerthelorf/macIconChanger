@@ -4,15 +4,23 @@
 //
 
 import Foundation
-import AppKit
-import SwiftyJSON
+import CoreFoundation
+import CryptoKit
 import os
 
 private actor RequestDeduplicator {
-    private var inflight: [String: Task<[IconRes], Error>] = [:]
+    struct Key: Hashable {
+        let query: String
+        let style: IconStyle
+        let explicitKey: String?
+    }
+
+    private var inflight: [Key: Task<IconSearchResult, Error>] = [:]
 
     /// Atomically returns an existing task or stores a new one.
-    func deduplicate(for key: String, create: @Sendable () -> Task<[IconRes], Error>) -> (task: Task<[IconRes], Error>, isNew: Bool) {
+    func deduplicate(
+        for key: Key, create: @Sendable () -> Task<IconSearchResult, Error>
+    ) -> (task: Task<IconSearchResult, Error>, isNew: Bool) {
         if let existing = inflight[key] {
             return (existing, false)
         }
@@ -21,7 +29,7 @@ private actor RequestDeduplicator {
         return (task, true)
     }
 
-    func remove(_ key: String) {
+    func remove(_ key: Key) {
         inflight.removeValue(forKey: key)
     }
 }
@@ -38,8 +46,10 @@ enum APIError: Error, LocalizedError {
 
     var isNonRetryable: Bool {
         switch self {
-        case .rateLimitExceeded, .apiKeyMissing:
+        case .rateLimitExceeded, .apiKeyMissing, .noResults:
             return true
+        case .httpError(let status, _):
+            return (400..<500).contains(status) && status != 408
         default:
             return false
         }
@@ -71,15 +81,17 @@ enum APIError: Error, LocalizedError {
 class APIUsageTracker {
     static let shared = APIUsageTracker()
 
-    private let countKey = "com.iconchanger.apiQueryCount"
+    private let legacyCountKey = "com.iconchanger.apiQueryCount"
+    private let countsKey = "com.iconchanger.apiKeyQueryCounts"
     private let resetDateKey = "com.iconchanger.apiQueryResetDate"
     private let lock = NSLock()
 
     var currentCount: Int {
         lock.lock()
         defer { lock.unlock() }
-        resetIfNewMonth()
-        return UserDefaults.standard.integer(forKey: countKey)
+        let currentKey = IconRemoteRequestPolicy.normalizedAPIKey(APIKeyManager.pickKey())
+        let counts = currentCounts(selectedKey: currentKey)
+        return currentKey.map { counts[Self.identity($0), default: 0] } ?? 0
     }
 
     var monthlyLimit: Int {
@@ -91,78 +103,72 @@ class APIUsageTracker {
         max(0, monthlyLimit - currentCount)
     }
 
-    func canMakeRequest() -> Bool {
-        lock.lock()
-        resetIfNewMonth()
-        let count = UserDefaults.standard.integer(forKey: countKey)
-        let limit = monthlyLimit
-        lock.unlock()
-
-        if count < limit {
-            return true
-        }
-        if APIKeyManager.allKeys.count > 1 {
-            APIKeyManager.rotateToNextKey()
-            lock.lock()
-            UserDefaults.standard.set(0, forKey: countKey)
-            lock.unlock()
-            return true
-        }
-        return false
-    }
-
-    /// Atomically checks whether a request can be made and records it if so,
-    /// preventing a TOCTOU race between separate check-then-increment calls.
-    func tryRecordRequest() -> Bool {
-        lock.lock()
-        resetIfNewMonth()
-        let count = UserDefaults.standard.integer(forKey: countKey)
-        let limit = monthlyLimit
-        if count < limit {
-            UserDefaults.standard.set(count + 1, forKey: countKey)
-            lock.unlock()
-            return true
-        }
-        lock.unlock()
-
-        if APIKeyManager.allKeys.count > 1 {
-            APIKeyManager.rotateToNextKey()
-            lock.lock()
-            UserDefaults.standard.set(1, forKey: countKey)
-            lock.unlock()
-            return true
-        }
-        return false
-    }
-
-    func recordRequest() {
-        lock.lock()
-        resetIfNewMonth()
-        let current = UserDefaults.standard.integer(forKey: countKey)
-        UserDefaults.standard.set(current + 1, forKey: countKey)
-        lock.unlock()
-    }
-
-    func markCurrentKeyExhausted() {
+    /// Reserves quota for the key used by this HTTP request.
+    func authorizeRequest(explicitKey: String?, excluding exhaustedKeys: Set<String> = []) throws -> String {
         lock.lock()
         defer { lock.unlock() }
-        UserDefaults.standard.set(monthlyLimit, forKey: countKey)
+
+        let selectedKey = IconRemoteRequestPolicy.normalizedAPIKey(APIKeyManager.pickKey())
+        let keys: [String]
+        if let explicitKey {
+            guard let key = IconRemoteRequestPolicy.normalizedAPIKey(explicitKey) else {
+                throw APIError.apiKeyMissing
+            }
+            keys = [key]
+        } else {
+            let configured = APIKeyManager.allKeys.compactMap(IconRemoteRequestPolicy.normalizedAPIKey)
+            guard !configured.isEmpty else { throw APIError.apiKeyMissing }
+            let start = configured.firstIndex(where: { $0 == selectedKey }) ?? 0
+            keys = Array(configured[start...]) + Array(configured[..<start])
+        }
+
+        let limit = monthlyLimit
+        var counts = currentCounts(selectedKey: selectedKey)
+        let candidates = keys.filter { !exhaustedKeys.contains($0) }
+        guard let key = candidates.first(where: { counts[Self.identity($0), default: 0] < limit }) else {
+            let used = candidates.first.map { counts[Self.identity($0), default: 0] } ?? limit
+            throw APIError.rateLimitExceeded(used: used, limit: limit)
+        }
+
+        counts[Self.identity(key), default: 0] += 1
+        UserDefaults.standard.set(counts, forKey: countsKey)
+        if explicitKey == nil && key != selectedKey {
+            for _ in keys {
+                APIKeyManager.rotateToNextKey()
+                if IconRemoteRequestPolicy.normalizedAPIKey(APIKeyManager.pickKey()) == key { break }
+            }
+        }
+        return key
     }
 
     func resetCount() {
         lock.lock()
         defer { lock.unlock() }
-        UserDefaults.standard.set(0, forKey: countKey)
-        UserDefaults.standard.set(Date(), forKey: resetDateKey)
+        let selectedKey = IconRemoteRequestPolicy.normalizedAPIKey(APIKeyManager.pickKey())
+        var counts = currentCounts(selectedKey: selectedKey)
+        if let selectedKey { counts.removeValue(forKey: Self.identity(selectedKey)) }
+        UserDefaults.standard.set(counts, forKey: countsKey)
     }
 
-    private func resetIfNewMonth() {
-        let lastReset = UserDefaults.standard.object(forKey: resetDateKey) as? Date ?? Date.distantPast
-        let calendar = Calendar.current
-        if !calendar.isDate(lastReset, equalTo: Date(), toGranularity: .month) {
-            UserDefaults.standard.set(0, forKey: countKey)
-            UserDefaults.standard.set(Date(), forKey: resetDateKey)
+    private func currentCounts(selectedKey: String?) -> [String: Int] {
+        let defaults = UserDefaults.standard
+        let lastReset = defaults.object(forKey: resetDateKey) as? Date ?? .distantPast
+        if !Calendar.current.isDate(lastReset, equalTo: Date(), toGranularity: .month) {
+            defaults.removeObject(forKey: legacyCountKey)
+            defaults.removeObject(forKey: countsKey)
+            defaults.set(Date(), forKey: resetDateKey)
         }
+        var counts = defaults.dictionary(forKey: countsKey) as? [String: Int] ?? [:]
+        if let selectedKey, let legacyCount = defaults.object(forKey: legacyCountKey) as? Int {
+            counts[Self.identity(selectedKey), default: 0] += max(0, legacyCount)
+            defaults.set(counts, forKey: countsKey)
+            defaults.removeObject(forKey: legacyCountKey)
+        }
+        return counts
+    }
+
+    private static func identity(_ key: String) -> String {
+        Data(SHA256.hash(data: Data(key.utf8))).base64EncodedString()
     }
 }
 
@@ -171,6 +177,7 @@ class MyQueryRequestController {
 
     private static let apiBaseURL = "https://api.macosicons.com/api"
     private static let searchHitsPerPage = 50
+    private static let sufficientSearchResults = 8
     private static let testHitsPerPage = 10
     private static let backupSearchLimit = 50
 
@@ -180,11 +187,6 @@ class MyQueryRequestController {
 
     private var retryCount: Int {
         UserDefaults.standard.integer(forKey: "apiRetryCount")
-    }
-
-    private var timeoutSeconds: Double {
-        let stored = UserDefaults.standard.double(forKey: "apiTimeoutSeconds")
-        return stored > 0 ? stored : 15.0
     }
 
     init(session: URLSession? = nil) {
@@ -206,11 +208,14 @@ class MyQueryRequestController {
             diskCapacity: 30 * 1024 * 1024,
             diskPath: "IconQueryCache"
         )
-        configuration.httpShouldUsePipelining = true
         return URLSession(configuration: configuration)
     }
 
-    func sendRequest(_ query: String, style: IconStyle = .all, apiKey: String? = nil) async throws -> [IconRes] {
+    func sendRequest(_ query: String, style: IconStyle = .all, apiKey: String? = nil) async throws -> IconSearchResult {
+        let query = IconSearchPolicy.normalizedQuery(query)
+        guard !query.isEmpty else { return IconSearchResult(icons: []) }
+        try Task.checkCancellation()
+
         let diagnosticsContext = DiagnosticsContext(operation: .network)
         let diagnosticsTimer = DiagnosticsTimer()
         DiagnosticsLogger.shared.log(
@@ -221,82 +226,17 @@ class MyQueryRequestController {
                 "query_length": String(query.count),
                 "style": style.displayName,
                 "retry_count": String(retryCount),
-                "available_key_count": String(APIKeyManager.allKeys.count),
             ]
         )
-        guard let resolvedKey = IconRemoteRequestPolicy.normalizedAPIKey(
-            apiKey ?? APIKeyManager.pickKey()
-        ) else {
-            DiagnosticsLogger.shared.log(
-                .failure,
-                phase: "icon_search.api_key_missing",
-                context: diagnosticsContext,
-                durationMilliseconds: diagnosticsTimer.elapsedMilliseconds,
-                details: DiagnosticsLogger.errorDetails(APIError.apiKeyMissing)
-            )
-            throw APIError.apiKeyMissing
-        }
-        let key = "\(query)|\(style.displayName)"
 
+        let key = RequestDeduplicator.Key(query: query, style: style, explicitKey: apiKey)
         let (task, isNew) = await dedup.deduplicate(for: key) { [self] in
-            Task<[IconRes], Error> {
-                guard APIUsageTracker.shared.tryRecordRequest() else {
-                    throw APIError.rateLimitExceeded(
-                        used: APIUsageTracker.shared.currentCount,
-                        limit: APIUsageTracker.shared.monthlyLimit
-                    )
-                }
-
-                let maxAttempts = max(1, self.retryCount + 1)
-                var lastError: Error?
-                var currentKey = resolvedKey
-                var keysRotated = 0
-                let totalKeys = APIKeyManager.allKeys.count
-                var attempt = 0
-
-                while attempt < maxAttempts {
-                    attempt += 1
-                    do {
-                        let results = try await self.sendRequestToMeilisearch(query, style: style, apiKey: currentKey)
-                        if results.isEmpty {
-                            self.logger.debug("Meilisearch returned no results for '\(query, privacy: .public)'. Trying backup API.")
-                            return try await self.sendBackupRequest(query, style: style, apiKey: currentKey)
-                        }
-                        return results
-                    } catch is CancellationError {
-                        throw CancellationError()
-                    } catch let error as APIError where error.isNonRetryable {
-                        throw error
-                    } catch let error as APIError {
-                        if case .httpError(let statusCode, _) = error, statusCode == 429, totalKeys > 1, keysRotated < totalKeys - 1 {
-                            keysRotated += 1
-                            APIUsageTracker.shared.markCurrentKeyExhausted()
-                            APIKeyManager.rotateToNextKey()
-                            APIUsageTracker.shared.resetCount()
-                            currentKey = APIKeyManager.pickKey()
-                            self.logger.debug("Rotated to next key (\(keysRotated)/\(totalKeys - 1))")
-                            attempt -= 1
-                            continue
-                        }
-                        lastError = error
-                        if attempt < maxAttempts {
-                            self.logger.debug("Attempt \(attempt) failed for '\(query, privacy: .public)': \(error.localizedDescription, privacy: .public). Retrying...")
-                            try await Task.sleep(nanoseconds: UInt64(attempt) * 500_000_000)
-                        }
-                    } catch {
-                        lastError = error
-                        if attempt < maxAttempts {
-                            self.logger.debug("Attempt \(attempt) failed for '\(query, privacy: .public)': \(error.localizedDescription, privacy: .public). Retrying...")
-                            try await Task.sleep(nanoseconds: UInt64(attempt) * 500_000_000)
-                        }
-                    }
-                }
-                throw lastError ?? APIError.networkError("Unknown error")
+            Task<IconSearchResult, Error> {
+                try await search(query, style: style, apiKey: apiKey)
             }
         }
 
         if !isNew {
-            logger.debug("Deduplicating request for '\(query, privacy: .public)'")
             DiagnosticsLogger.shared.log(
                 .step,
                 phase: "icon_search.request_deduplicated",
@@ -304,19 +244,19 @@ class MyQueryRequestController {
             )
         }
 
-        defer { if isNew { Task { await dedup.remove(key) } } }
-
         do {
             let results = try await task.value
+            if isNew { await dedup.remove(key) }
             DiagnosticsLogger.shared.log(
                 .operation,
                 phase: "icon_search.completed",
                 context: diagnosticsContext,
                 durationMilliseconds: diagnosticsTimer.elapsedMilliseconds,
-                details: ["result_count": String(results.count)]
+                details: ["result_count": String(results.icons.count), "is_complete": String(results.isComplete)]
             )
             return results
         } catch {
+            if isNew { await dedup.remove(key) }
             DiagnosticsLogger.shared.log(
                 .failure,
                 phase: "icon_search.failed",
@@ -351,109 +291,168 @@ class MyQueryRequestController {
         return details
     }
     
-    private func sendRequestToMeilisearch(_ query: String, style: IconStyle, apiKey: String) async throws -> [IconRes] {
-        let query = queryMix(query)
-        logger.debug("Search '\(query, privacy: .public)' style=\(style.displayName, privacy: .public)")
-
-        let session = self.session
-        let urlString = "\(Self.apiBaseURL)/search"
-
-        guard let URL = URL(string: urlString) else {
-            logger.error("Invalid search URL.")
-            throw APIError.networkError("Invalid search URL")
+    private func search(_ query: String, style: IconStyle, apiKey: String?) async throws -> IconSearchResult {
+        let first = try await searchPage(query, style: style, page: 1, apiKey: apiKey)
+        var results = IconSearchPolicy.rankAndDeduplicate(first.icons, queries: [query])
+        if results.count < Self.sufficientSearchResults && first.hasAnotherPage {
+            do {
+                let second = try await searchPage(query, style: style, page: 2, apiKey: apiKey)
+                results = IconSearchPolicy.rankAndDeduplicate(results + second.icons, queries: [query])
+            } catch is CancellationError {
+                throw CancellationError()
+            } catch where !results.isEmpty {
+                logger.debug("Returning first-page results after a later page failed: \(error.localizedDescription, privacy: .public)")
+                return IconSearchResult(icons: results, isComplete: false)
+            }
         }
-        var request = URLRequest(url: URL)
+
+        if !results.isEmpty { return IconSearchResult(icons: results) }
+        let backup = try await sendBackupRequest(query, style: style, apiKey: apiKey)
+        return IconSearchResult(icons: IconSearchPolicy.rankAndDeduplicate(backup, queries: [query]))
+    }
+
+    private func searchPage(
+        _ query: String, style: IconStyle, page: Int, apiKey: String?
+    ) async throws -> (icons: [IconRes], hasAnotherPage: Bool) {
+        var request = URLRequest(url: URL(string: "\(Self.apiBaseURL)/search")!)
         request.httpMethod = "POST"
-
-        if apiKey.isEmpty {
-            logger.warning("API key not configured; search request may be rejected.")
-        }
-
-        if !apiKey.isEmpty {
-            request.addValue(apiKey, forHTTPHeaderField: "x-api-key")
-        }
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.addValue("application/json", forHTTPHeaderField: "Accept")
-
-        var filters: [String] = []
-        if let styleFilter = style.filterQuery {
-            filters.append(styleFilter)
-            logger.debug("Applying style filter '\(styleFilter, privacy: .public)'")
-        }
-
-        let bodyObject: [String : Any] = [
-            "query": query,
-            "searchOptions": [
-                "hitsPerPage": Self.searchHitsPerPage,
-                "page": 1,
-                "offset": 0,
-                "filters": filters,
-                "sort": ["timeStamp:desc", "category:asc"]
-            ]
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        let options: [String: Any] = [
+            "hitsPerPage": Self.searchHitsPerPage,
+            "page": page,
+            "filters": style.filterQuery.map { [$0] } ?? [],
         ]
-        
-        do {
-            let jsonData = try JSONSerialization.data(withJSONObject: bodyObject, options: [])
-            request.httpBody = jsonData
-        } catch {
-            logger.error("Failed to encode search request body: \(error.localizedDescription, privacy: .public)")
-            throw APIError.networkError("Failed to encode request: \(error.localizedDescription)")
+        request.httpBody = try JSONSerialization.data(withJSONObject: ["query": query, "searchOptions": options])
+
+        guard let data = try await requestData(request, apiKey: apiKey),
+              let response = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let hits = response["hits"] as? [Any] else {
+            throw APIError.networkError("Invalid search response: expected a hits array.")
+        }
+        let totalPages = Self.integer(response["totalPages"])
+        let totalHits = Self.integer(response["totalHits"])
+        let responseLimit = Self.integer(response["limit"]).flatMap {
+            (1...Self.searchHitsPerPage).contains($0) ? $0 : nil
+        } ?? Self.searchHitsPerPage
+        let hasAnotherPage = totalPages.map { $0 > page }
+            ?? totalHits.map { $0 > page * responseLimit }
+            ?? false
+        return (Self.decodeIcons(hits, style: style, requireStyleMetadata: false), hasAnotherPage)
+    }
+
+    private func sendBackupRequest(_ query: String, style: IconStyle, apiKey: String?) async throws -> [IconRes] {
+        var components = URLComponents(string: "\(Self.apiBaseURL)/icons")!
+        components.queryItems = [
+            URLQueryItem(name: "q", value: query),
+            URLQueryItem(name: "limit", value: String(Self.backupSearchLimit)),
+        ]
+        // Form-style decoders otherwise treat literal plus signs as spaces.
+        components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
+        guard let url = components.url else {
+            throw APIError.networkError("Invalid backup search URL")
         }
 
-        do {
-            let (data, response) = try await session.data(for: request)
+        guard let data = try await requestData(URLRequest(url: url), apiKey: apiKey, notFoundIsEmpty: true) else {
+            return []
+        }
+        let response = try? JSONSerialization.jsonObject(with: data)
+        let dictionary = response as? [String: Any]
+        guard let hits = dictionary?["data"] as? [Any]
+            ?? dictionary?["icons"] as? [Any]
+            ?? response as? [Any] else {
+            throw APIError.networkError("Invalid backup search response: expected an icons array.")
+        }
+        return Self.decodeIcons(hits, style: style, requireStyleMetadata: true)
+    }
 
-            guard let httpResponse = response as? HTTPURLResponse else {
-                logger.error("Search response was not HTTP.")
-                throw APIError.networkError("Invalid response from server")
+    private static func decodeIcons(_ hits: [Any], style: IconStyle, requireStyleMetadata: Bool) -> [IconRes] {
+        hits.compactMap { value in
+            guard let hit = value as? [String: Any],
+                  let name = hit["appName"] as? String ?? hit["name"] as? String,
+                  let icon = (hit["icnsUrl"] as? String).flatMap(URL.init(string:)),
+                  let preview = (hit["lowResPngUrl"] as? String).flatMap(URL.init(string:)) else {
+                return nil
             }
-
-            if httpResponse.statusCode != 200 {
-                let errorMsg = Self.extractAPIMessage(from: data) ?? "HTTP \(httpResponse.statusCode)"
-                logger.error("Search request failed (\(httpResponse.statusCode)): \(errorMsg, privacy: .public)")
-                throw APIError.httpError(statusCode: httpResponse.statusCode, message: errorMsg)
-            }
-
-            let json = try JSON(data: data)
-
-            if json["hits"].exists() {
-                logger.debug("Received \(json["hits"].arrayValue.count) hits for '\(query, privacy: .public)'")
-            } else {
-                logger.warning("Search response missing 'hits' for '\(query, privacy: .public)'")
-            }
-
-            let res = json["hits"].arrayValue.compactMap { hit in
-                if let lowResPngUrl = hit["lowResPngUrl"].url, let icnsUrl = hit["icnsUrl"].url {
-                    return IconRes(appName: hit["appName"].stringValue, icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: hit["downloads"].intValue)
-                } else {
-                    logger.debug("Search hit missing URLs for '\(hit["appName"].stringValue, privacy: .public)'")
+            if style == .liquidGlass && (requireStyleMetadata || hit["isLiquidGlass"] != nil) {
+                guard let isLiquidGlass = hit["isLiquidGlass"] as? NSNumber,
+                      CFGetTypeID(isLiquidGlass) == CFBooleanGetTypeID(),
+                      isLiquidGlass.boolValue else {
                     return nil
                 }
             }
+            return IconRes(appName: name, icnsUrl: icon, lowResPngUrl: preview, downloads: integer(hit["downloads"]) ?? 0)
+        }
+    }
 
-            let queryWords = query.lowercased().split(separator: " ").map(String.init)
-            let filteredRes = res.filter { icon in
-                let name = icon.appName.lowercased()
-                return queryWords.allSatisfy { name.contains($0) }
-            }
-            logger.debug("Returning \(filteredRes.count) icons after filtering for '\(query, privacy: .public)'")
+    private static func integer(_ value: Any?) -> Int? {
+        (value as? Int) ?? (value as? String).flatMap(Int.init)
+    }
 
-            return filteredRes.sorted { res1, res2 in
-                res1.downloads > res2.downloads
+    private func requestData(
+        _ request: URLRequest, apiKey: String?, notFoundIsEmpty: Bool = false
+    ) async throws -> Data? {
+        var retries = 0
+        var exhaustedKeys = Set<String>()
+        var lastRateError: APIError?
+        let maxRetries = max(0, retryCount)
+
+        while true {
+            try Task.checkCancellation()
+            let key: String
+            do {
+                key = try APIUsageTracker.shared.authorizeRequest(explicitKey: apiKey, excluding: exhaustedKeys)
+            } catch {
+                if let lastRateError { throw lastRateError }
+                throw error
             }
+
+            do {
+                let (data, response) = try await readResponse(request, apiKey: key)
+                if response.statusCode == 404 && notFoundIsEmpty { return nil }
+                guard response.statusCode == 200 else {
+                    let message = Self.extractAPIMessage(from: data) ?? "HTTP \(response.statusCode)"
+                    throw APIError.httpError(statusCode: response.statusCode, message: message)
+                }
+                return data
+            } catch is CancellationError {
+                throw CancellationError()
+            } catch let error as APIError {
+                if case .httpError(statusCode: 429, _) = error, apiKey == nil {
+                    exhaustedKeys.insert(key)
+                    lastRateError = error
+                    continue
+                }
+                guard !error.isNonRetryable, retries < maxRetries else { throw error }
+                retries += 1
+                try await Task.sleep(nanoseconds: UInt64(retries) * 500_000_000)
+            }
+        }
+    }
+
+    private func readResponse(_ request: URLRequest, apiKey: String) async throws -> (Data, HTTPURLResponse) {
+        var request = request
+        request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        do {
+            let (data, response) = try await session.data(for: request)
+            guard let response = response as? HTTPURLResponse else {
+                throw APIError.networkError("Invalid response from server")
+            }
+            return (data, response)
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch let error as URLError where error.code == .cancelled {
+            throw CancellationError()
+        } catch let error as URLError where error.code == .timedOut {
+            throw APIError.requestTimeout
         } catch let error as APIError {
             throw error
         } catch {
-            logger.error("Search request error: \(error.localizedDescription, privacy: .public)")
-            let nsError = error as NSError
-            logger.debug("Search error details domain=\(nsError.domain, privacy: .public) code=\(nsError.code, privacy: .public)")
-            if nsError.code == NSURLErrorTimedOut {
-                throw APIError.requestTimeout
-            }
             throw APIError.networkError(error.localizedDescription)
         }
     }
-    
+
     func testAPIConnection(apiKey: String? = nil) async throws -> (success: Bool, iconCount: Int) {
         let diagnosticsContext = DiagnosticsContext(operation: .network)
         let diagnosticsTimer = DiagnosticsTimer()
@@ -467,8 +466,6 @@ class MyQueryRequestController {
         )
 
         do {
-            let session = self.session
-
             let urlString = "\(Self.apiBaseURL)/search"
             guard let URL = URL(string: urlString) else {
                 throw NSError(domain: "IconChanger", code: 1001, userInfo: [NSLocalizedDescriptionKey: "Invalid API endpoint URL"])
@@ -477,14 +474,13 @@ class MyQueryRequestController {
             var request = URLRequest(url: URL)
             request.httpMethod = "POST"
 
-            let resolvedKey = apiKey ?? KeychainHelper.load(key: "apiKey") ?? ""
-            if resolvedKey.isEmpty {
+            guard let resolvedKey = IconRemoteRequestPolicy.normalizedAPIKey(
+                apiKey ?? KeychainHelper.load(key: "apiKey") ?? ""
+            ) else {
                 throw NSError(domain: "IconChanger", code: 1002, userInfo: [NSLocalizedDescriptionKey: "API key not provided"])
             }
 
-            request.addValue(resolvedKey, forHTTPHeaderField: "x-api-key")
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.addValue("application/json", forHTTPHeaderField: "Accept")
         
             let bodyObject: [String: Any] = [
                 "query": testQuery,
@@ -498,22 +494,8 @@ class MyQueryRequestController {
             let jsonData = try JSONSerialization.data(withJSONObject: bodyObject, options: [])
             request.httpBody = jsonData
 
-            let (data, response) = try await session.data(for: request)
-
-            guard let httpResponse = response as? HTTPURLResponse else {
-                throw NSError(domain: "IconChanger", code: 1003, userInfo: [NSLocalizedDescriptionKey: "Invalid response type"])
-            }
-        
-            if httpResponse.statusCode == 429 {
-                if resolvedKey == APIKeyManager.pickKey() && APIKeyManager.allKeys.count > 1 {
-                    APIUsageTracker.shared.markCurrentKeyExhausted()
-                    APIKeyManager.rotateToNextKey()
-                    APIUsageTracker.shared.resetCount()
-                }
-                let message = Self.extractAPIMessage(from: data) ?? "HTTP 429"
-                throw NSError(domain: "IconChanger", code: 429,
-                              userInfo: [NSLocalizedDescriptionKey: message])
-            }
+            let key = try APIUsageTracker.shared.authorizeRequest(explicitKey: resolvedKey)
+            let (data, httpResponse) = try await readResponse(request, apiKey: key)
 
             if httpResponse.statusCode != 200 {
                 let message = Self.extractAPIMessage(from: data) ?? "HTTP \(httpResponse.statusCode)"
@@ -521,14 +503,13 @@ class MyQueryRequestController {
                               userInfo: [NSLocalizedDescriptionKey: message])
             }
         
-            let json = try JSON(data: data)
-
-            guard json["hits"].exists() else {
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let hits = json["hits"] as? [Any] else {
                 throw NSError(domain: "IconChanger", code: 1004,
                               userInfo: [NSLocalizedDescriptionKey: "Invalid API response format"])
             }
-        
-            let iconCount = json["hits"].arrayValue.count
+
+            let iconCount = hits.count
             DiagnosticsLogger.shared.log(
                 .operation,
                 phase: "api_connection_test.completed",
@@ -557,141 +538,8 @@ class MyQueryRequestController {
         }
     }
     
-    private func sendBackupRequest(_ query: String, style: IconStyle, apiKey: String) async throws -> [IconRes] {
-        let query = queryMix(query)
-        logger.debug("Running backup search for '\(query, privacy: .public)', style=\(style.displayName, privacy: .public)")
-
-        let session = self.session
-
-        let urlString = "\(Self.apiBaseURL)/icons?q=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query)&limit=\(Self.backupSearchLimit)"
-
-        guard let url = URL(string: urlString) else {
-            logger.error("Invalid backup search URL")
-            throw APIError.networkError("Invalid backup search URL")
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-
-        if !apiKey.isEmpty {
-            request.addValue(apiKey, forHTTPHeaderField: "x-api-key")
-        }
-        request.addValue("application/json", forHTTPHeaderField: "Accept")
-
-        do {
-            let (data, response) = try await session.data(for: request)
-
-            guard let httpResponse = response as? HTTPURLResponse else {
-                logger.error("Backup search response was not HTTP.")
-                throw APIError.networkError("Invalid response from backup server")
-            }
-
-            if httpResponse.statusCode == 404 {
-                logger.debug("Backup search returned 404 for '\(query, privacy: .public)' — no results.")
-                return []
-            }
-
-            if httpResponse.statusCode != 200 {
-                let errorMsg = Self.extractAPIMessage(from: data) ?? "HTTP \(httpResponse.statusCode)"
-                logger.error("Backup search failed (\(httpResponse.statusCode)): \(errorMsg, privacy: .public)")
-                throw APIError.httpError(statusCode: httpResponse.statusCode, message: errorMsg)
-            }
-
-            let json = try JSON(data: data)
-
-            var icons: [IconRes] = []
-
-            if let results = extractIconsFromJSON(json) {
-                icons = results
-            } else {
-                logger.warning("Backup search could not extract icon data.")
-                if let directData = json.array?.first {
-                    if let jsonObj = directData.dictionary {
-                        logger.debug("Backup search response keys: \(jsonObj.keys.joined(separator: ", "), privacy: .public)")
-                    }
-                }
-            }
-            return icons.sorted { $0.downloads > $1.downloads }
-        } catch let error as APIError {
-            throw error
-        } catch {
-            logger.error("Backup search request failed: \(error.localizedDescription, privacy: .public)")
-            let nsError = error as NSError
-            if nsError.code == NSURLErrorTimedOut {
-                throw APIError.requestTimeout
-            }
-            throw APIError.networkError(error.localizedDescription)
-        }
-    }
-    
-    private func extractIconsFromJSON(_ json: JSON) -> [IconRes]? {
-        var results: [IconRes] = []
-
-        if let dataArray = json["data"].array {
-            logger.debug("Backup response contained 'data' array.")
-            for item in dataArray {
-                if let name = item["name"].string,
-                   let icnsUrlString = item["icnsUrl"].string,
-                   let lowResUrlString = item["lowResPngUrl"].string,
-                   let icnsUrl = URL(string: icnsUrlString),
-                   let lowResPngUrl = URL(string: lowResUrlString) {
-                    
-                    let downloads = item["downloads"].int ?? 0
-                    if let icon = IconRes(appName: name, icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: downloads) {
-                        results.append(icon)
-                    }
-                }
-            }
-        }
-        
-        else if let iconsArray = json["icons"].array {
-            logger.debug("Backup response contained 'icons' array.")
-            for item in iconsArray {
-                if let name = item["appName"].string,
-                   let icnsUrlString = item["icnsUrl"].string,
-                   let lowResUrlString = item["lowResPngUrl"].string,
-                   let icnsUrl = URL(string: icnsUrlString),
-                   let lowResPngUrl = URL(string: lowResUrlString) {
-                    
-                    let downloads = item["downloads"].int ?? 0
-                    if let icon = IconRes(appName: name, icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: downloads) {
-                        results.append(icon)
-                    }
-                }
-            }
-        }
-        
-        else if let directArray = json.array {
-            logger.debug("Backup response was a direct array.")
-            for item in directArray {
-                if let name = item["appName"].string,
-                   let icnsUrlString = item["icnsUrl"].string,
-                   let lowResUrlString = item["lowResPngUrl"].string,
-                   let icnsUrl = URL(string: icnsUrlString),
-                   let lowResPngUrl = URL(string: lowResUrlString) {
-                    
-                    let downloads = item["downloads"].int ?? 0
-                    if let icon = IconRes(appName: name, icnsUrl: icnsUrl, lowResPngUrl: lowResPngUrl, downloads: downloads) {
-                        results.append(icon)
-                    }
-                }
-            }
-        }
-        
-        return results.isEmpty ? nil : results
-    }
-
-    /// Extract a clean "message" string from a JSON API error response body.
     private static func extractAPIMessage(from data: Data) -> String? {
-        guard let json = try? JSON(data: data) else { return nil }
-        return json["message"].string ?? json["statusMessage"].string
-    }
-
-    func queryMix(_ query: String) -> String {
-        switch query {
-        case "PyCharm Professional Edition": return "PyCharm"
-        case "Discord PTB": return "Discord"
-        default: return query
-        }
+        guard let response = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
+        return response["message"] as? String ?? response["statusMessage"] as? String
     }
 }

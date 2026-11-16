@@ -49,9 +49,11 @@ struct ChangeView: View {
     @State private var hasLoadedLocalIcons = false
     @State private var hasRequestedIcons = false
     @State private var pendingAutomaticLoadToken: UUID?
+    @State private var remoteAlias: String?
     @AppStorage(IconFetchInteractionPolicy.automaticallyLoadIconsKey)
     private var automaticallyLoadIcons =
         IconFetchInteractionPolicy.defaultAutomaticallyLoadIcons
+    @AppStorage("extendedSearch") private var extendedSearch = false
 
     var body: some View {
         GeometryReader { geometry in
@@ -239,7 +241,7 @@ struct ChangeView: View {
                                 .foregroundColor(.secondary)
                             Button(hasRequestedIcons ? "Set Alias Name" : "Load Icons") {
                                 if hasRequestedIcons {
-                                    setAlias = setPath.url.deletingPathExtension().lastPathComponent
+                        setAlias = AliasName.key(for: setPath.url)
                                 } else {
                                     handleIconFetchEvent(.userRequestedLoad)
                                 }
@@ -343,6 +345,7 @@ struct ChangeView: View {
                     Text("This removes saved history for this app. Its current icon will not change.")
                 }
                 .onAppear {
+                    remoteAlias = AliasName.getName(for: setPath.url)
                     inIcons = iconManager.getIconInPath(setPath.url)
                     hasLoadedLocalIcons = true
                     hasDuplicateName = iconManager.apps.contains { $0.name == setPath.name && $0.id != setPath.id }
@@ -356,8 +359,19 @@ struct ChangeView: View {
                     set: { if !$0 { setAlias = nil } }
                 )) {
                     if let alias = setAlias {
-                        SetAliasNameView(raw: alias, lastText: AliasName.getName(for: alias) ?? "")
+                        SetAliasNameView(raw: alias, lastText: AliasName.getName(for: setPath.url) ?? "")
                     }
+                }
+                .onReceive(NotificationCenter.default.publisher(for: .aliasNamesDidChange)) { _ in
+                    let alias = AliasName.getName(for: setPath.url)
+                    guard alias != remoteAlias else { return }
+                    remoteAlias = alias
+                    resetRemoteIcons()
+                    handleIconFetchEvent(.viewAppeared)
+                }
+                .onChange(of: extendedSearch) { _ in
+                    resetRemoteIcons()
+                    handleIconFetchEvent(.viewAppeared)
                 }
                 .onReceive(NotificationCenter.default.publisher(for: .appearanceIconStoreDidChange)) { _ in
                     appearanceConfiguration = AppearanceIconStore.shared.configuration(for: setPath.id)

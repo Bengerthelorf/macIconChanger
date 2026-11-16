@@ -33,12 +33,13 @@ struct IconList: View {
     @State var selectedApp: AppItem? = nil
 
     @State var searchText: String = ""
-    @State var setAlias: String?
+    @State private var aliasTarget: URL?
     @State private var appToRestore: AppItem?
     @State private var restoreError: String?
     @State private var appFilter: AppFilter = .all
     @State private var dockLayout = DockLayout()
     @State private var customizedPaths: Set<String> = []
+    @State private var searchAliases: [String: String] = [:]
     @State private var dockBarHeight: CGFloat = 0
 
     private var shouldShowDockPreview: Bool {
@@ -52,45 +53,52 @@ struct IconList: View {
         return AppFilter.allCases.map { $0 }
     }
 
-    private var filteredApps: [AppItem] {
-        if appFilter == .folders {
-            return folderManager.folders.filter { folder in
-                searchText.isEmpty || folder.name.localizedStandardContains(searchText)
-            }
+    private var allTargets: [AppItem] {
+        AppDiscoveryPolicy.uniqueByPath(iconManager.apps + folderManager.folders, path: \.id)
+    }
+
+    private func filteredTargets(matching query: AppSidebarQuery) -> [AppItem] {
+        let candidates: [AppItem]
+        switch appFilter {
+        case .all:
+            candidates = allTargets
+        case .dock:
+            candidates = iconManager.apps.filter { dockLayout.allPaths.contains($0.comparisonPath) }
+        case .customized:
+            candidates = allTargets.filter { customizedPaths.contains($0.id) }
+        case .notCustomized:
+            candidates = allTargets.filter { !customizedPaths.contains($0.id) }
+        case .folders:
+            candidates = folderManager.folders
         }
+        guard !query.isEmpty else { return candidates }
 
-        return iconManager.apps.filter { app in
-            let matchesSearch = searchText.isEmpty || app.name.localizedStandardContains(searchText)
-            guard matchesSearch else { return false }
-
-            switch appFilter {
-            case .all:
-                return true
-            case .dock:
-                return dockLayout.allPaths.contains(app.id)
-            case .customized:
-                return customizedPaths.contains(app.id)
-            case .notCustomized:
-                return !customizedPaths.contains(app.id)
-            case .folders:
-                return false // handled above
-            }
+        return candidates.filter { target in
+            let alias = AliasName.getName(for: target.url, aliases: searchAliases)
+            let fields = alias.map { target.searchNames + [$0] } ?? target.searchNames
+            return query.matches(fields: fields, path: target.id)
         }
     }
 
     private func recomputeCustomizedPaths() {
-        var paths = Set<String>()
-        for app in iconManager.apps {
-            let path = app.id
-            if iconManager.hasCustomIcon(app: app)
-                || IconCacheManager.shared.getIconCache(for: path) != nil {
-                paths.insert(path)
-            }
+        customizedPaths = Set(allTargets.filter { iconManager.hasCustomIcon(app: $0) }.map(\.id))
+    }
+
+    private func reloadSearchAliases() {
+        searchAliases = Dictionary(uniqueKeysWithValues: AliasNames.getAll().map { ($0.appName, $0.aliasName) })
+    }
+
+    private func refreshDockLayoutIfVisible() {
+        if shouldShowDockPreview || appFilter == .dock {
+            dockLayout = Self.loadDockLayout()
         }
-        customizedPaths = paths
     }
 
     var body: some View {
+        let query = AppSidebarQuery(searchText)
+        let matches = filteredTargets(matching: query)
+        let folderPaths = Set(folderManager.folders.map(\.id))
+        let applicationPaths = Set(iconManager.apps.map(\.id))
         NavigationSplitView(columnVisibility: .constant(.all)) {
             List(selection: $selectedApp) {
                 if appFilter == .folders {
@@ -103,13 +111,15 @@ struct IconList: View {
                     .padding(.vertical, 4)
                 }
 
-                ForEach(filteredApps, id: \.id) { app in
+                ForEach(matches, id: \.id) { app in
+                    let isFolder = appFilter == .folders
+                        || (folderPaths.contains(app.id) && !applicationPaths.contains(app.id))
                     IconView(app: app, refreshTrigger: iconManager.iconRefreshTrigger,
                              isCustomized: showCustomIconBadge && customizedPaths.contains(app.id),
-                             isFolder: appFilter == .folders)
+                             isFolder: isFolder)
                         .tag(app)
                         .contextMenu {
-                            if appFilter == .folders {
+                            if isFolder {
                                 Button("Copy the Name") {
                                     NSPasteboard.general.clearContents()
                                     NSPasteboard.general.setString(app.name, forType: .string)
@@ -120,7 +130,7 @@ struct IconList: View {
                                 }
 
                                 Button("Set the Alias") {
-                                    setAlias = app.url.lastPathComponent
+                                    aliasTarget = app.url
                                 }
 
                                 Button("Restore Default Icon") {
@@ -158,7 +168,7 @@ struct IconList: View {
                                 }
 
                                 Button("Set the Alias") {
-                                    setAlias = app.url.deletingPathExtension().lastPathComponent
+                                    aliasTarget = app.url
                                 }
 
                                 Button("Restore Default Icon") {
@@ -179,7 +189,7 @@ struct IconList: View {
             }
                     .listStyle(.sidebar)
                     .overlay {
-                        if filteredApps.isEmpty && !searchText.isEmpty {
+                        if matches.isEmpty && !query.isEmpty {
                             VStack(spacing: 10) {
                                 Image(systemName: "magnifyingglass").font(.title2)
                                 Text("No Matches").font(.headline)
@@ -268,11 +278,14 @@ struct IconList: View {
         }
 
                 .sheet(isPresented: Binding(
-                    get: { setAlias != nil },
-                    set: { if !$0 { setAlias = nil } }
+                    get: { aliasTarget != nil },
+                    set: { if !$0 { aliasTarget = nil } }
                 )) {
-                    if let alias = setAlias {
-                        SetAliasNameView(raw: alias, lastText: AliasName.getName(for: alias) ?? "")
+                    if let aliasTarget {
+                        SetAliasNameView(
+                            raw: AliasName.key(for: aliasTarget),
+                            lastText: AliasName.getName(for: aliasTarget) ?? ""
+                        )
                     }
                 }
                 .searchable(text: $searchText, prompt: Text("Search apps and folders"))
@@ -298,12 +311,10 @@ struct IconList: View {
                         .help("Filter apps and folders")
                         .accessibilityLabel("Filter")
                         .accessibilityValue(Text(NSLocalizedString(appFilter.rawValue, comment: "App filter option")))
-                        .onChange(of: appFilter) { newFilter in
-                            if newFilter == .dock || dockPreviewMode == "always" {
-                                dockLayout = Self.loadDockLayout()
-                            }
+                        .onChange(of: appFilter) { _ in
+                            refreshDockLayoutIfVisible()
                             if let selectedApp,
-                               !filteredApps.contains(where: { $0.id == selectedApp.id }) {
+                               !filteredTargets(matching: AppSidebarQuery(searchText)).contains(where: { $0.id == selectedApp.id }) {
                                 self.selectedApp = nil
                             }
                         }
@@ -418,9 +429,16 @@ struct IconList: View {
                 .toolbarBackground(.hidden, for: .windowToolbar)
                 .onAppear {
                     iconManager.refresh()
-                    if shouldShowDockPreview || appFilter == .dock {
-                        dockLayout = Self.loadDockLayout()
-                    }
+                    refreshDockLayoutIfVisible()
+                    recomputeCustomizedPaths()
+                    reloadSearchAliases()
+                }
+                .onReceive(NotificationCenter.default.publisher(for: .aliasNamesDidChange).receive(on: RunLoop.main)) { _ in
+                    reloadSearchAliases()
+                }
+                .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+                    refreshDockLayoutIfVisible()
+                    recomputeCustomizedPaths()
                 }
                 .onChange(of: dockPreviewMode) { newMode in
                     if newMode == "always" {
@@ -432,6 +450,9 @@ struct IconList: View {
                     recomputeCustomizedPaths()
                 }
                 .onChange(of: iconManager.apps) { _ in
+                    recomputeCustomizedPaths()
+                }
+                .onChange(of: folderManager.folders) { _ in
                     recomputeCustomizedPaths()
                 }
                 .confirmationDialog("Restore Default Icon", isPresented: Binding(
@@ -464,6 +485,7 @@ struct IconList: View {
     /// Reads the full Dock layout: pinned apps (ordered) + running apps.
     static func loadDockLayout() -> DockLayout {
         var layout = DockLayout()
+        var pinnedSet = Set<String>()
 
         // 1. Pinned (persistent) apps — ordered as they appear in Dock
         let plistPath = NSHomeDirectory() + "/Library/Preferences/com.apple.dock.plist"
@@ -472,25 +494,24 @@ struct IconList: View {
             for app in persistentApps {
                 if let tileData = app["tile-data"] as? [String: Any],
                    let fileData = tileData["file-data"] as? [String: Any],
-                   let urlString = fileData["_CFURLString"] as? String,
-                   let url = URL(string: urlString) {
-                    let path = url.scheme == "file" ? url.path : urlString
-                    let normalized = path.hasSuffix("/") ? String(path.dropLast()) : path
-                    layout.pinnedPaths.append(normalized)
+                   let urlString = fileData["_CFURLString"] as? String {
+                    let url = urlString.hasPrefix("/") ? URL(fileURLWithPath: urlString) : URL(string: urlString)
+                    guard let url, url.isFileURL else { continue }
+                    let path = AppDiscoveryPolicy.comparisonPath(for: url)
+                    if pinnedSet.insert(path).inserted {
+                        layout.pinnedPaths.append(path)
+                    }
                 }
             }
         }
 
         // 2. Currently running GUI apps (ordered by runningApplications array ≈ launch order)
-        let pinnedSet = Set(layout.pinnedPaths)
         for app in NSWorkspace.shared.runningApplications {
             guard app.activationPolicy == .regular,
                   let bundleURL = app.bundleURL else { continue }
-            let path = bundleURL.path
-            let normalized = path.hasSuffix("/") ? String(path.dropLast()) : path
-            layout.runningPaths.insert(normalized)
-            if !pinnedSet.contains(normalized) {
-                layout.runningOnlyOrdered.append(normalized)
+            let path = AppDiscoveryPolicy.comparisonPath(for: bundleURL)
+            if layout.runningPaths.insert(path).inserted && !pinnedSet.contains(path) {
+                layout.runningOnlyOrdered.append(path)
             }
         }
 
@@ -755,7 +776,7 @@ struct DockPreviewBar: View {
     }
 
     private var resolvedApps: (pinned: [AppItem], runningOnly: [AppItem]) {
-        let lookup = Dictionary(allApps.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        let lookup = Dictionary(allApps.map { ($0.comparisonPath, $0) }, uniquingKeysWith: { first, _ in first })
         return (
             pinned: dockLayout.pinnedPaths.compactMap { lookup[$0] }.filter { shouldShow($0) },
             runningOnly: dockLayout.runningOnlyOrdered.compactMap { lookup[$0] }.filter { shouldShow($0) }
@@ -797,7 +818,7 @@ struct DockPreviewBar: View {
                                 DockPreviewIcon(
                                     app: app,
                                     refreshTrigger: refreshTrigger,
-                                    isRunning: dockLayout.runningPaths.contains(app.id)
+                                    isRunning: dockLayout.runningPaths.contains(app.comparisonPath)
                                 )
                             }
                             .buttonStyle(.plain)

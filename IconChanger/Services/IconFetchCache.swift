@@ -4,7 +4,6 @@
 //
 
 import Foundation
-import AppKit
 import os
 
 // MARK: - Codable IconRes Wrapper
@@ -41,12 +40,17 @@ struct IconFetchCacheEntry: Codable {
     let icons: [CachedIconRes]
     let timestamp: Date
     var lastAccessTime: Date
+
+    fileprivate func isExpired(at now: Date) -> Bool {
+        let maxAge: TimeInterval = icons.isEmpty ? 5 * 60 : 24 * 60 * 60
+        return now.timeIntervalSince(timestamp) >= maxAge
+    }
 }
 
 // MARK: - Icon Fetch Cache Manager
 
 /// Manages icon search result caching with optional disk persistence.
-class IconFetchCacheManager {
+final class IconFetchCacheManager {
     static let shared = IconFetchCacheManager()
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "IconChanger", category: "IconFetchCache")
 
@@ -55,6 +59,7 @@ class IconFetchCacheManager {
     private let maxCacheEntries: Int = 200
     private var cache: [String: IconFetchCacheEntry] = [:]
     private let cacheLock = NSLock()
+    private let diskLock = NSLock()
 
     private(set) var hitCount: Int = 0
     private(set) var missCount: Int = 0
@@ -62,25 +67,32 @@ class IconFetchCacheManager {
 
     // MARK: - Disk Persistence
 
-    private static var persistentCacheFileURL: URL {
-        AppPaths.iconFetchCacheFile
+    private let cacheFileOverride: URL?
+    private let defaults: UserDefaults
+
+    private var persistentCacheFileURL: URL {
+        cacheFileOverride ?? AppPaths.iconFetchCacheFile
     }
 
     private static let cacheAPIResultsKey = "cacheAPIResults"
 
     private var isPersistenceEnabled: Bool {
         // Default to true if never set by the user
-        if UserDefaults.standard.object(forKey: Self.cacheAPIResultsKey) == nil {
+        if defaults.object(forKey: Self.cacheAPIResultsKey) == nil {
             return true
         }
-        return UserDefaults.standard.bool(forKey: Self.cacheAPIResultsKey)
+        return defaults.bool(forKey: Self.cacheAPIResultsKey)
     }
 
     func saveToDisk(force: Bool = false) {
+        // Serialize snapshots and writes so a slow save cannot replace a newer snapshot.
+        diskLock.lock()
+        defer { diskLock.unlock() }
+        let url = persistentCacheFileURL
         let context = DiagnosticsContext(
             operation: .cache,
             iconKind: "search_result_cache",
-            iconPath: Self.persistentCacheFileURL.path
+            iconPath: url.path
         )
         let timer = DiagnosticsTimer()
         guard force || isPersistenceEnabled else {
@@ -97,7 +109,7 @@ class IconFetchCacheManager {
 
         do {
             let data = try JSONEncoder().encode(snapshot)
-            try data.write(to: Self.persistentCacheFileURL, options: .atomic)
+            try data.write(to: url, options: .atomic)
             DiagnosticsLogger.shared.log(
                 .performance,
                 phase: "search_cache.persisted",
@@ -121,11 +133,12 @@ class IconFetchCacheManager {
     }
 
     private func loadFromDisk() {
+        let url = persistentCacheFileURL
         let context = DiagnosticsContext(
             operation: .cache,
             source: .startup,
             iconKind: "search_result_cache",
-            iconPath: Self.persistentCacheFileURL.path
+            iconPath: url.path
         )
         let timer = DiagnosticsTimer()
         guard isPersistenceEnabled else {
@@ -136,7 +149,6 @@ class IconFetchCacheManager {
             )
             return
         }
-        let url = Self.persistentCacheFileURL
         guard FileManager.default.fileExists(atPath: url.path) else {
             DiagnosticsLogger.shared.log(
                 .skipped,
@@ -175,14 +187,17 @@ class IconFetchCacheManager {
     }
 
     func deleteDiskCache() {
+        diskLock.lock()
+        defer { diskLock.unlock() }
+        let url = persistentCacheFileURL
         let context = DiagnosticsContext(
             operation: .cache,
             iconKind: "search_result_cache",
-            iconPath: Self.persistentCacheFileURL.path
+            iconPath: url.path
         )
         do {
-            if FileManager.default.fileExists(atPath: Self.persistentCacheFileURL.path) {
-                try FileManager.default.removeItem(at: Self.persistentCacheFileURL)
+            if FileManager.default.fileExists(atPath: url.path) {
+                try FileManager.default.removeItem(at: url)
             }
             logger.log("Deleted persistent icon fetch cache file")
             DiagnosticsLogger.shared.log(
@@ -202,95 +217,78 @@ class IconFetchCacheManager {
 
     // MARK: - Initialization
 
-    private init() {
+    init(persistentCacheFileURL: URL? = nil, defaults: UserDefaults = .standard) {
+        cacheFileOverride = persistentCacheFileURL
+        self.defaults = defaults
         loadFromDisk()
     }
 
     // MARK: - Cache Key Generation
 
+    private static let cacheKeyPrefix = "query-plan-v2:"
+
     private func generateCacheKey(
-        appName: String,
-        bundleName: String?,
-        aliasName: String?,
-        style: String
-    ) -> String {
-        var components = [appName]
-        if let bundle = bundleName {
-            components.append(bundle)
-        }
-        if let alias = aliasName {
-            components.append(alias)
-        }
-        components.append(style)
-        return components.joined(separator: "|")
+        queries: [String],
+        style: String,
+        extendedSearch: Bool
+    ) -> String? {
+        let components = [style, extendedSearch ? "extended" : "basic"] + queries
+        guard let encoded = try? JSONEncoder().encode(components) else { return nil }
+        return Self.cacheKeyPrefix + String(decoding: encoded, as: UTF8.self)
     }
 
     // MARK: - Cache Operations
 
     func getCachedIcons(
-        appName: String,
-        bundleName: String?,
-        aliasName: String?,
-        style: String
+        queries: [String],
+        style: String,
+        extendedSearch: Bool = false
     ) -> [IconRes]? {
+        guard let key = generateCacheKey(queries: queries, style: style, extendedSearch: extendedSearch) else {
+            return nil
+        }
         cacheLock.lock()
         defer { cacheLock.unlock() }
 
-        let key = generateCacheKey(
-            appName: appName,
-            bundleName: bundleName,
-            aliasName: aliasName,
-            style: style
-        )
+        let now = Date()
+        let context = DiagnosticsContext(operation: .cache, iconKind: "search_result_cache")
 
-        guard var entry = cache[key] else {
+        guard var entry = cache[key], !entry.isExpired(at: now) else {
             missCount += 1
             DiagnosticsLogger.shared.log(
                 .step,
                 phase: "search_cache.miss",
-                context: DiagnosticsContext(
-                    operation: .cache,
-                    appName: appName,
-                    iconKind: "search_result_cache"
-                ),
-                details: ["style": style]
+                context: context,
+                details: ["style": style, "query_count": String(queries.count)]
             )
             return nil
         }
 
-        hitCount += 1
-
-        let now = Date()
-        entry.lastAccessTime = now
-        cache[key] = entry
-
         let validIcons = entry.icons.compactMap { $0.toIconRes() }
 
         if validIcons.isEmpty && !entry.icons.isEmpty {
-            logger.warning("All cached icons failed validation for \(key)")
+            missCount += 1
+            logger.warning("All cached icons failed validation")
             DiagnosticsLogger.shared.log(
                 .failure,
                 phase: "search_cache.validation_failed",
-                context: DiagnosticsContext(
-                    operation: .cache,
-                    appName: appName,
-                    iconKind: "search_result_cache"
-                ),
+                context: context,
                 details: ["stored_result_count": String(entry.icons.count)]
             )
             return nil
         }
 
+        hitCount += 1
+        entry.lastAccessTime = now
+        cache[key] = entry
+
         DiagnosticsLogger.shared.log(
             .step,
             phase: "search_cache.hit",
-            context: DiagnosticsContext(
-                operation: .cache,
-                appName: appName,
-                iconKind: "search_result_cache"
-            ),
+            context: context,
             details: [
                 "style": style,
+                "query_count": String(queries.count),
                 "result_count": String(validIcons.count),
             ]
         )
@@ -299,22 +297,17 @@ class IconFetchCacheManager {
 
     func cacheIcons(
         _ icons: [IconRes],
-        appName: String,
-        bundleName: String?,
-        aliasName: String?,
-        style: String
+        queries: [String],
+        style: String,
+        extendedSearch: Bool = false
     ) {
-        cacheLock.lock()
-
-        let key = generateCacheKey(
-            appName: appName,
-            bundleName: bundleName,
-            aliasName: aliasName,
-            style: style
-        )
+        guard let key = generateCacheKey(queries: queries, style: style, extendedSearch: extendedSearch) else {
+            return
+        }
 
         let cachedIcons = icons.map { CachedIconRes.from($0) }
 
+        cacheLock.lock()
         let now = Date()
         let entry = IconFetchCacheEntry(
             cacheKey: key,
@@ -323,7 +316,7 @@ class IconFetchCacheManager {
             lastAccessTime: now
         )
 
-        if cache.count >= maxCacheEntries {
+        if cache[key] == nil && cache.count >= maxCacheEntries {
             evictOldestEntry()
         }
 
@@ -335,12 +328,12 @@ class IconFetchCacheManager {
             phase: "search_cache.updated",
             context: DiagnosticsContext(
                 operation: .cache,
-                appName: appName,
                 iconKind: "search_result_cache",
-                iconPath: Self.persistentCacheFileURL.path
+                iconPath: persistentCacheFileURL.path
             ),
             details: [
                 "style": style,
+                "query_count": String(queries.count),
                 "result_count": String(icons.count),
                 "entry_count": String(entryCount),
             ]
@@ -370,7 +363,7 @@ class IconFetchCacheManager {
             context: DiagnosticsContext(
                 operation: .cache,
                 iconKind: "search_result_cache",
-                iconPath: Self.persistentCacheFileURL.path
+                iconPath: persistentCacheFileURL.path
             )
         )
         saveToDisk()
@@ -381,9 +374,12 @@ class IconFetchCacheManager {
         cacheLock.lock()
 
         let now = Date()
-        let expiredKeys = cache.filter { entry in
-            now.timeIntervalSince(entry.value.lastAccessTime) > maxAge
-        }.map { $0.key }
+        let expiredKeys = cache.compactMap { key, entry in
+            let expired = !key.hasPrefix(Self.cacheKeyPrefix)
+                || entry.isExpired(at: now)
+                || now.timeIntervalSince(entry.lastAccessTime) > maxAge
+            return expired ? key : nil
+        }
 
         for key in expiredKeys {
             cache.removeValue(forKey: key)
@@ -398,7 +394,7 @@ class IconFetchCacheManager {
                     operation: .cache,
                     source: .scheduled,
                     iconKind: "search_result_cache",
-                    iconPath: Self.persistentCacheFileURL.path
+                    iconPath: persistentCacheFileURL.path
                 ),
                 details: ["removed_count": String(expiredKeys.count)]
             )
