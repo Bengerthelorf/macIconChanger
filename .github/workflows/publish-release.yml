@@ -173,30 +173,14 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh workflow run sparkle-pages.yml --repo "${{ github.repository }}"
 
-      - name: Update Homebrew Cask
+      - name: Publish checked Homebrew update
         if: env.IS_PRERELEASE != 'true'
         env:
           GH_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+        shell: bash
         run: |
-          DMG_URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/IconChanger.dmg"
-          DMG_SHA256=$(shasum -a 256 candidate/IconChanger.dmg | awk '{print $1}')
-          TAP_DIR="$RUNNER_TEMP/homebrew-tap"
-
+          set -euo pipefail
           gh auth setup-git
+          TAP_DIR="$RUNNER_TEMP/homebrew-tap"
           gh repo clone Bengerthelorf/homebrew-tap "$TAP_DIR"
-          mkdir -p "$TAP_DIR/Casks"
-
-          sed \
-            -e "s|@@VERSION@@|$VERSION|g" \
-            -e "s|@@SHA256@@|$DMG_SHA256|g" \
-            -e "s|@@URL@@|$DMG_URL|g" \
-            scripts/iconchanger.rb.template > "$TAP_DIR/Casks/iconchanger.rb"
-
-          cd "$TAP_DIR"
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git add Casks/iconchanger.rb
-          if ! git diff --cached --quiet; then
-            git commit -m "Update iconchanger to $TAG"
-            git push origin main
-          fi
+          bash "$TAP_DIR/scripts/publish-update.sh" iconchanger "$TAG"
