@@ -196,6 +196,22 @@ Custom icons do not support macOS Tahoe's Clear, Tinted, or Dark icon modes. The
 
 ---
 
+### `refresh-dock`
+
+Restart the Dock to refresh all icon displays. Useful when an icon change doesn't show up right away — the Dock and Finder sometimes keep showing a cached icon until they're restarted.
+
+```bash
+iconchanger refresh-dock
+```
+
+This runs `killall Dock` twice (with a short pause in between) to force the Dock to reload every icon. No arguments or options.
+
+:::callout[warning]{kind="warn"}
+The Dock briefly disappears and reappears while it restarts. This does not affect your open apps or Finder windows.
+:::
+
+---
+
 ### `completions`
 
 Generate shell completion scripts for tab completion.
